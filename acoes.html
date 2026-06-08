@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/png" href="favicon.png">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ações B3 — Mais Valor</title>
+<title>Ações — Mais Valor</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,13 +12,12 @@
 
 <div class="page-hero">
   <h1>AÇÕES <em>B3</em></h1>
-  <p>Cotações, indicadores fundamentalistas e histórico de todas as ações listadas. <span id="data-timestamp" style="color:var(--gold);font-size:12px"></span></p>
+  <p>Cotações, indicadores e histórico de todas as ações listadas na bolsa brasileira. <span id="data-timestamp" style="color:var(--gold);font-size:12px"></span></p>
 </div>
 
 <div class="container">
   <div class="main-grid">
     <div>
-      <!-- CHART -->
       <div class="chart-panel">
         <div class="chart-header">
           <div>
@@ -26,68 +25,52 @@
             <div class="chart-price" id="c-price">Carregando...</div>
             <div class="chart-meta" id="c-meta"></div>
           </div>
-          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
-            <div style="display:flex;gap:4px">
-              <button class="range-btn" onclick="setRange('1M',this)">1M</button>
-              <button class="range-btn" onclick="setRange('6M',this)">6M</button>
-              <button class="range-btn active" onclick="setRange('1A',this)">1A</button>
-              <button class="range-btn" onclick="setRange('5A',this)">5A</button>
-              <button class="range-btn" onclick="setRange('10A',this)">10A</button>
-            </div>
+          <div style="display:flex;gap:4px" id="range-btns">
+            <button class="range-btn" onclick="setRange('1M',this)">1M</button>
+            <button class="range-btn" onclick="setRange('6M',this)">6M</button>
+            <button class="range-btn active" onclick="setRange('1A',this)">1A</button>
+            <button class="range-btn" onclick="setRange('5A',this)">5A</button>
+            <button class="range-btn" onclick="setRange('10A',this)">10A</button>
           </div>
         </div>
         <div style="position:relative;width:100%;height:220px">
-          <canvas id="mainChart" role="img" aria-label="Gráfico histórico do ativo"></canvas>
+          <canvas id="mainChart" role="img" aria-label="Histórico do ativo selecionado"></canvas>
         </div>
         <div class="chart-stats">
-          <div class="chart-stat"><div class="chart-stat-label">DY 12m</div><div class="chart-stat-val gold" id="c-dy">—</div></div>
-          <div class="chart-stat"><div class="chart-stat-label">P/L</div><div class="chart-stat-val" id="c-pl">—</div></div>
-          <div class="chart-stat"><div class="chart-stat-label">P/VP</div><div class="chart-stat-val" id="c-pvp">—</div></div>
-          <div class="chart-stat"><div class="chart-stat-label">ROE</div><div class="chart-stat-val" id="c-roe">—</div></div>
+          <div class="chart-stat"><div class="chart-stat-label">DY 12m</div><div class="chart-stat-val up" id="c-dy">—</div></div>
           <div class="chart-stat"><div class="chart-stat-label">Mín. histórico</div><div class="chart-stat-val dn" id="c-min">—</div></div>
           <div class="chart-stat"><div class="chart-stat-label">Máx. histórico</div><div class="chart-stat-val up" id="c-max">—</div></div>
-          <div class="chart-stat"><div class="chart-stat-label">Mrg. Líq.</div><div class="chart-stat-val" id="c-mrg">—</div></div>
-          <div class="chart-stat"><div class="chart-stat-label">Cresc. 5a</div><div class="chart-stat-val" id="c-cresc">—</div></div>
-        </div>
-        <div style="margin-top:.75rem;text-align:right">
-          <a id="c-link" href="#" style="font-size:12px;color:var(--gold);font-weight:700">Ver análise completa →</a>
+          <div class="chart-stat"><div class="chart-stat-label">Volume</div><div class="chart-stat-val" id="c-vol">—</div></div>
         </div>
       </div>
 
-      <!-- FILTROS -->
       <div class="filter-bar">
-        <input class="filter-input" placeholder="🔍 Buscar ticker ou nome..." style="flex:1;max-width:280px" oninput="filter()" id="f-search">
+        <input class="filter-input" placeholder="🔍 Buscar por ticker ou nome..." style="flex:1;max-width:300px" oninput="filter()" id="f-search">
         <select class="filter-select" onchange="filter()" id="f-setor">
           <option value="">Todos os setores</option>
           <option>Bancos</option><option>Petróleo & Gás</option><option>Mineração</option>
           <option>Varejo</option><option>Indústria</option><option>Bebidas</option>
           <option>Telecomunicações</option><option>Siderurgia</option><option>Holdings</option>
-          <option>Papel & Celulose</option><option>Locação de Veículos</option><option>Saúde</option>
-          <option>Energia Elétrica</option><option>Alimentos</option><option>Construção Civil</option>
-          <option>Transporte</option><option>Shoppings</option><option>Seguros</option><option>Outros</option>
+          <option>Papel & Celulose</option><option>Locação</option><option>Saúde</option>
+          <option>Energia</option><option>Alimentos</option><option>Construção</option>
         </select>
         <select class="filter-select" onchange="sortBy(this.value)">
           <option value="t">Ticker A-Z</option>
           <option value="v">Variação dia</option>
-          <option value="dy">Maior DY</option>
-          <option value="pl">Menor P/L</option>
-          <option value="pvp">Menor P/VP</option>
-          <option value="roe">Maior ROE</option>
+          <option value="dy">DY 12m</option>
         </select>
-        <span id="count-label" style="font-size:12px;color:var(--text3);white-space:nowrap;align-self:center"></span>
       </div>
 
       <div class="table-wrap">
         <table class="data-table">
           <thead><tr>
             <th>Ativo</th><th class="r">Preço</th><th class="r">Hoje</th>
-            <th class="r">DY 12m</th><th class="r">P/L</th><th class="r">P/VP</th>
-            <th class="r">ROE</th><th class="r">Volume</th><th class="r">Análise</th>
+            <th class="r">7 dias</th><th class="r">30 dias</th>
+            <th class="r">DY 12m</th><th class="r">Volume</th>
           </tr></thead>
-          <tbody id="tbody"><tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--text3)">Carregando 403 ações...</td></tr></tbody>
+          <tbody id="tbody"><tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text3)">Carregando dados...</td></tr></tbody>
         </table>
       </div>
-      <div id="pagination" style="display:flex;gap:8px;justify-content:center;margin-top:1rem;flex-wrap:wrap"></div>
     </div>
 
     <div class="sidebar">
@@ -96,16 +79,12 @@
         <div id="setor-list"></div>
       </div>
       <div class="card">
-        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Maiores DY</div></div>
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Top DY</div></div>
         <div id="top-dy"></div>
       </div>
       <div class="card">
-        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Maior ROE</div></div>
-        <div id="top-roe"></div>
-      </div>
-      <div class="card">
-        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Menores P/VP</div></div>
-        <div id="top-pvp"></div>
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Mais Negociadas</div></div>
+        <div id="top-vol"></div>
       </div>
     </div>
   </div>
@@ -113,71 +92,71 @@
 
 <div id="footer-placeholder"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="data.js"></script><script src="nav.js"></script>
+<script src="chart_config.js"></script>
+<script src="data.js"></script>
+<script src="nav.js"></script>
 <script>
-let filtered=[], mainChart=null, sel=null, currentRange='1A';
-const PER_PAGE=50; let page=1;
+let data=[], mainChart=null, sel=null, currentRange='1A', histCache={};
 
-function renderTable(arr, p=1){
-  page=p;
-  const start=(p-1)*PER_PAGE, end=start+PER_PAGE;
-  const slice=arr.slice(start,end);
+function renderTable(arr){
   const tb=document.getElementById('tbody'); tb.innerHTML='';
-  document.getElementById('count-label').textContent=arr.length+' ativos';
-  if(!slice.length){tb.innerHTML='<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--text3)">Nenhum ativo encontrado</td></tr>';return;}
-  slice.forEach(d=>{
+  if(!arr.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text3)">Nenhum ativo encontrado</td></tr>';return;}
+  arr.forEach(d=>{
     const tr=document.createElement('tr');
-    const dyPct = d.dy > 0 ? d.dy.toFixed(1)+'%' : '—';
     tr.innerHTML=`<td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
       <td class="r">R$ ${d.p.toFixed(2)}</td>
       <td class="r"><span class="pill ${d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>
-      <td class="r gold">${dyPct}</td>
-      <td class="r">${d.pl?(d.pl>0?d.pl.toFixed(1)+'x':d.pl<0?'<0':'—'):'—'}</td>
-      <td class="r ${d.pvp&&d.pvp<1?'up':d.pvp&&d.pvp>3?'dn':''}">${d.pvp?d.pvp.toFixed(2):'—'}</td>
-      <td class="r ${d.roe&&d.roe>15?'up':''}">${d.roe?d.roe.toFixed(1)+'%':'—'}</td>
-      <td class="r" style="color:var(--text3)">${d.vol}</td>
-      <td class="r"><a href="ativo.html?t=${d.t}" style="color:var(--gold);font-size:11px;font-weight:700" onclick="event.stopPropagation()">ver →</a></td>`;
+      <td class="r ${d.v7>=0?'up':'dn'}">${d.v7>=0?'+':''}${d.v7.toFixed(2)}%</td>
+      <td class="r ${d.v30>=0?'up':'dn'}">${d.v30>=0?'+':''}${d.v30.toFixed(2)}%</td>
+      <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
+      <td class="r" style="color:var(--text3)">${d.vol}</td>`;
     tr.onclick=()=>loadChart(d); tb.appendChild(tr);
   });
-  renderPagination(arr, p);
 }
 
-function renderPagination(arr, p){
-  const total=Math.ceil(arr.length/PER_PAGE);
-  const pg=document.getElementById('pagination'); pg.innerHTML='';
-  if(total<=1) return;
-  for(let i=1;i<=total;i++){
-    const btn=document.createElement('button');
-    btn.textContent=i; btn.className='range-btn'+(i===p?' active':'');
-    btn.onclick=()=>renderTable(arr,i);
-    pg.appendChild(btn);
-  }
+async function loadHistorico(ticker){
+  if(histCache[ticker]) return histCache[ticker];
+  try{
+    const resp = await fetch(`data/historico/${ticker}.json?t=${Date.now()}`);
+    if(!resp.ok) return null;
+    const json = await resp.json();
+    histCache[ticker] = json.history || [];
+    return histCache[ticker];
+  }catch(e){ return null; }
+}
+
+function filterByRange(history, range){
+  if(!history||!history.length) return history;
+  const now = new Date();
+  const meses = range==='1M'?1:range==='6M'?6:range==='1A'?12:range==='5A'?60:120;
+  const cutoff = new Date(now); cutoff.setMonth(cutoff.getMonth()-meses);
+  return history.filter(p=>new Date(p.date)>=cutoff);
 }
 
 async function loadChart(d){
   sel=d;
   document.getElementById('c-ticker').textContent=d.t;
   const isUp=d.v>=0;
-  document.getElementById('c-price').innerHTML=`R$ ${d.p.toFixed(2)} <span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span>${d.fallback?'<span style="font-size:10px;color:var(--text3);margin-left:6px">↩ histórico</span>':''}`;
+  document.getElementById('c-price').innerHTML=`R$ ${d.p.toFixed(2)} <span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span>`;
   document.getElementById('c-meta').textContent=`${d.n} · ${d.setor}`;
   document.getElementById('c-dy').textContent=d.dy>0?d.dy.toFixed(1)+'%':'—';
-  document.getElementById('c-pl').textContent=d.pl?(d.pl>0?d.pl.toFixed(1)+'x':d.pl<0?'negativo':'—'):'—';
-  document.getElementById('c-pvp').textContent=d.pvp?d.pvp.toFixed(2):'—';
-  document.getElementById('c-roe').textContent=d.roe?d.roe.toFixed(1)+'%':'—';
-  document.getElementById('c-mrg').textContent=d.mrg_liq?d.mrg_liq.toFixed(1)+'%':'—';
-  document.getElementById('c-cresc').textContent=d.cresc5a?d.cresc5a.toFixed(1)+'%':'—';
-  document.getElementById('c-link').href=`ativo.html?t=${d.t}`;
+  document.getElementById('c-vol').textContent=d.vol;
 
-  const hist = await loadHistoricoCompleto(d.t);
+  // Tenta carregar histórico real
+  const hist = await loadHistorico(d.t);
   let pts, labels;
-  if(hist && hist.length>0){
-    const filt=filterByRange(hist,currentRange);
-    pts=filt.map(p=>p.close); labels=filt.map(p=>p.date.slice(0,7));
-    const mn=Math.min(...pts), mx=Math.max(...pts);
-    document.getElementById('c-min').textContent='R$ '+mn.toFixed(2);
-    document.getElementById('c-max').textContent='R$ '+mx.toFixed(2);
+
+  if(hist && hist.length > 0){
+    const filtered = filterByRange(hist, currentRange);
+    pts = filtered.map(p=>p.close);
+    labels = filtered.map(p=>p.date.slice(0,7)); // YYYY-MM
+    const min=Math.min(...pts); const max=Math.max(...pts);
+    document.getElementById('c-min').textContent='R$ '+min.toFixed(2);
+    document.getElementById('c-max').textContent='R$ '+max.toFixed(2);
   } else {
-    pts=genHistory(d.p,d.v); labels=genLabels(pts.length);
+    // Fallback simulado
+    pts = genHistory(d.p, d.v);
+    labels = genLabels(pts.length);
     document.getElementById('c-min').textContent='—';
     document.getElementById('c-max').textContent='—';
   }
@@ -186,12 +165,18 @@ async function loadChart(d){
   if(mainChart)mainChart.destroy();
   mainChart=new Chart(document.getElementById('mainChart'),{type:'line',
     data:{labels,datasets:[{data:pts,borderColor:color,borderWidth:2,pointRadius:0,fill:true,backgroundColor:isUp?'rgba(34,200,122,0.06)':'rgba(232,80,58,0.06)',tension:0.35}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$ '+ctx.parsed.y.toFixed(2)}}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},maxTicksLimit:10}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},callback:v=>'R$'+v.toFixed(0)}}}}
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$ '+ctx.parsed.y.toFixed(2)}}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},maxTicksLimit:10}},
+        y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},callback:v=>'R$'+v.toFixed(0)}}
+      }
+    }
   });
 }
 
-async function setRange(r,el){
-  currentRange=r;
+async function setRange(range, el){
+  currentRange=range;
   document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   if(sel) await loadChart(sel);
@@ -200,58 +185,68 @@ async function setRange(r,el){
 function filter(){
   const q=document.getElementById('f-search').value.toLowerCase();
   const s=document.getElementById('f-setor').value;
-  filtered=ACOES.filter(d=>
-    (d.t.toLowerCase().includes(q)||d.n.toLowerCase().includes(q))&&
-    (!s||d.setor===s)
-  );
-  renderTable(filtered,1);
+  const filtered=ACOES.filter(d=>(d.t.toLowerCase().includes(q)||d.n.toLowerCase().includes(q))&&(!s||d.setor===s));
+  data=filtered; renderTable(filtered);
 }
 
 function sortBy(k){
-  if(k==='t') filtered.sort((a,b)=>a.t.localeCompare(b.t));
-  else if(k==='pl') filtered.sort((a,b)=>{
-    if(!a.pl||a.pl<0) return 1; if(!b.pl||b.pl<0) return -1; return a.pl-b.pl;
-  });
-  else if(k==='pvp') filtered.sort((a,b)=>{
-    if(!a.pvp) return 1; if(!b.pvp) return -1; return a.pvp-b.pvp;
-  });
-  else filtered.sort((a,b)=>(b[k]||0)-(a[k]||0));
-  renderTable(filtered,1);
+  if(k==='t')data.sort((a,b)=>a.t.localeCompare(b.t));
+  else data.sort((a,b)=>b[k]-a[k]);
+  renderTable(data);
 }
 
 function renderSidebar(){
   const setores={};
   ACOES.forEach(d=>{setores[d.setor]=(setores[d.setor]||0)+1;});
-  document.getElementById('setor-list').innerHTML=Object.entries(setores)
-    .sort((a,b)=>b[1]-a[1]).slice(0,10)
-    .map(([s,n])=>`<div class="mover-item" style="cursor:pointer" onclick="document.getElementById('f-setor').value='${s}';filter()">
+  document.getElementById('setor-list').innerHTML=Object.entries(setores).sort((a,b)=>b[1]-a[1]).map(([s,n])=>`
+    <div class="mover-item" style="cursor:pointer" onclick="document.getElementById('f-setor').value='${s}';filter()">
       <span style="font-size:12px;font-weight:700">${s}</span><span class="pill gold-pill">${n}</span></div>`).join('');
-
-  const topDy=[...ACOES].filter(d=>d.dy>0).sort((a,b)=>b.dy-a.dy).slice(0,6);
-  document.getElementById('top-dy').innerHTML=topDy.map(d=>`
+  const topDy=[...ACOES].filter(d=>d.dy>0).sort((a,b)=>b.dy-a.dy).slice(0,5);
+  document.getElementById('top-dy').innerHTML=topDy.length?topDy.map(d=>`
     <div class="mover-item"><div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
-    <div style="text-align:right"><span class="pill gold-pill">${d.dy.toFixed(1)}%</span></div></div>`).join('');
-
-  const topRoe=[...ACOES].filter(d=>d.roe&&d.roe>0).sort((a,b)=>b.roe-a.roe).slice(0,5);
-  document.getElementById('top-roe').innerHTML=topRoe.map(d=>`
-    <div class="mover-item"><div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
-    <span class="pill up-pill">${d.roe.toFixed(1)}%</span></div>`).join('');
-
-  const topPvp=[...ACOES].filter(d=>d.pvp&&d.pvp>0&&d.pvp<2).sort((a,b)=>a.pvp-b.pvp).slice(0,5);
-  document.getElementById('top-pvp').innerHTML=topPvp.map(d=>`
-    <div class="mover-item"><div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
-    <span class="pill up-pill">${d.pvp.toFixed(2)}</span></div>`).join('');
+    <span class="pill gold-pill">${d.dy.toFixed(1)}%</span></div>`).join(''):'<div style="color:var(--text3);font-size:12px">DY não disponível no plano free</div>';
+  document.getElementById('top-vol').innerHTML=ACOES.slice(0,5).map(d=>`
+    <div class="mover-item"><div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.n}</div></div>
+    <span style="font-size:12px;font-family:\'DM Mono\',monospace;color:var(--text2)">${d.vol}</span></div>`).join('');
 }
 
 async function init(){
   await loadData();
-  filtered=[...ACOES];
+  data=[...ACOES];
   const params=new URLSearchParams(location.search);
   if(params.get('q')){document.getElementById('f-search').value=params.get('q');filter();}
-  else renderTable(filtered,1);
+  else renderTable(data);
   if(ACOES.length>0) await loadChart(ACOES[0]);
   renderSidebar();
 }
+
 init();
 </script>
 </body></html>
+<!-- patch: carrega histórico diário e combina com mensal -->
+<script>
+// Sobrescreve loadHistorico para combinar mensal + diário
+const _loadHistoricoOriginal = loadHistorico;
+async function loadHistorico(ticker) {
+    // Carrega histórico mensal (10 anos)
+    const mensal = await _loadHistoricoOriginal(ticker) || [];
+    
+    // Carrega histórico diário (últimos 2 anos, mais preciso)
+    let diario = [];
+    try {
+        const resp = await fetch(`data/diario/${ticker}.json?t=${Date.now()}`);
+        if (resp.ok) {
+            const json = await resp.json();
+            diario = json.history || [];
+        }
+    } catch(e) {}
+    
+    if (!diario.length) return mensal;
+    if (!mensal.length) return diario;
+    
+    // Combina: mensal até a data do primeiro diário, depois diário
+    const primeiroD = diario[0]?.date || '9999';
+    const mensalFiltrado = mensal.filter(p => p.date < primeiroD.slice(0,7));
+    return [...mensalFiltrado, ...diario];
+}
+</script>
