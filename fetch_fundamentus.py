@@ -59,6 +59,39 @@ def fetch_fundamentus():
         header = parser.rows[0]
         print(f"  Colunas: {header}")
         
+        def parse_num(v):
+            if not v or v == '-':
+                return None
+            v = str(v).replace('.', '').replace(',', '.').replace('%', '').strip()
+            try:
+                return float(v)
+            except:
+                return None
+
+        # Mapeia colunas pelo nome do header (robusto a mudanças no site)
+        CAMPO_MAP = {
+            "Papel":    "ticker",
+            "Cotação":  "preco",
+            "P/L":      "pl",
+            "P/VP":     "pvp",
+            "PSR":      "psr",
+            "Div.Yield":"dy",
+            "Mrg. Líq.":"mrg_liq",
+            "ROIC":     "roic",
+            "ROE":      "roe",
+            "Liq.2meses":"liq",
+            "Patrim. Líq":"patrim",
+            "Cresc. Rec.5a":"cresc5a",
+        }
+        col_idx = {}
+        for i, h in enumerate(header):
+            h_clean = h.strip()
+            for key, field in CAMPO_MAP.items():
+                if h_clean.startswith(key):
+                    col_idx[field] = i
+                    break
+        print(f"  Colunas mapeadas: {col_idx}")
+
         dados = {}
         for row in parser.rows[1:]:
             if not row or not row[0]:
@@ -66,29 +99,26 @@ def fetch_fundamentus():
             ticker = row[0].strip()
             if not ticker or len(ticker) < 4:
                 continue
-            
-            def parse_num(v):
-                if not v or v == '-':
+
+            def get_col(field):
+                idx = col_idx.get(field)
+                if idx is None or idx >= len(row):
                     return None
-                v = v.replace('.', '').replace(',', '.').replace('%', '').strip()
-                try:
-                    return float(v)
-                except:
-                    return None
-            
+                return parse_num(row[idx])
+
             dados[ticker] = {
-                "ticker": ticker,
-                "preco": parse_num(row[1]) if len(row) > 1 else None,
-                "pl": parse_num(row[2]) if len(row) > 2 else None,
-                "pvp": parse_num(row[3]) if len(row) > 3 else None,
-                "psr": parse_num(row[4]) if len(row) > 4 else None,
-                "dy": parse_num(row[5]) if len(row) > 5 else None,
-                "roic": parse_num(row[16]) if len(row) > 16 else None,
-                "roe": parse_num(row[17]) if len(row) > 17 else None,
-                "liq": parse_num(row[18]) if len(row) > 18 else None,
-                "patrim": parse_num(row[19]) if len(row) > 19 else None,
-                "mrg_liq": parse_num(row[14]) if len(row) > 14 else None,
-                "cresc5a": parse_num(row[21]) if len(row) > 21 else None,
+                "ticker":  ticker,
+                "preco":   get_col("preco"),
+                "pl":      get_col("pl"),
+                "pvp":     get_col("pvp"),
+                "psr":     get_col("psr"),
+                "dy":      get_col("dy"),
+                "roic":    get_col("roic"),
+                "roe":     get_col("roe"),
+                "liq":     get_col("liq"),
+                "patrim":  get_col("patrim"),
+                "mrg_liq": get_col("mrg_liq"),
+                "cresc5a": get_col("cresc5a"),
             }
         
         print(f"  {len(dados)} ações extraídas do Fundamentus")

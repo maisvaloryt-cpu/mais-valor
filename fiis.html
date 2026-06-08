@@ -33,10 +33,10 @@
             <div class="chart-meta" id="c-meta">Maxi Renda · Papel · B3</div>
           </div>
           <div style="display:flex;gap:4px">
-            <button class="range-btn" onclick="setRange(this)">1M</button>
-            <button class="range-btn active" onclick="setRange(this)">3M</button>
-            <button class="range-btn" onclick="setRange(this)">6M</button>
-            <button class="range-btn" onclick="setRange(this)">1A</button>
+            <button class="range-btn" onclick="setRange('1M',this)">1M</button>
+            <button class="range-btn" onclick="setRange('6M',this)">6M</button>
+            <button class="range-btn active" onclick="setRange('1A',this)">1A</button>
+            <button class="range-btn" onclick="setRange('5A',this)">5A</button>
           </div>
         </div>
         <div style="position:relative;width:100%;height:200px">
@@ -46,7 +46,7 @@
           <div class="chart-stat"><div class="chart-stat-label">DY 12m</div><div class="chart-stat-val up" id="c-dy">13.8%</div></div>
           <div class="chart-stat"><div class="chart-stat-label">P/VP</div><div class="chart-stat-val" id="c-pvp">1.02</div></div>
           <div class="chart-stat"><div class="chart-stat-label">Volume</div><div class="chart-stat-val" id="c-vol">R$28M</div></div>
-          <div class="chart-stat"><div class="chart-stat-label">Cotas</div><div class="chart-stat-val" id="c-cotas">3.82M</div></div>
+          <div class="chart-stat"><div class="chart-stat-label">Val. Mercado</div><div class="chart-stat-val" id="c-cotas">—</div></div>
         </div>
       </div>
 
@@ -100,7 +100,7 @@
 <script src="chart_config.js"></script>
 <script src="data.js"></script><script src="nav.js"></script>
 <script>
-let data=[...FIIS], mainChart=null, sel=FIIS[0];
+let data=[...FIIS], mainChart=null, sel=null, currentRange='1A';
 
 function renderTable(arr){
   const tb=document.getElementById('tbody'); tb.innerHTML='';
@@ -119,25 +119,57 @@ function renderTable(arr){
   });
 }
 
-function loadChart(d){
+let histCacheFii = {};
+
+async function loadHistoricoFii(ticker){
+  if(histCacheFii[ticker]) return histCacheFii[ticker];
+  let mensal = [], diario = [];
+  try{
+    const r = await fetch(`data/historico/${ticker}.json?t=${Date.now()}`);
+    if(r.ok){ const j = await r.json(); mensal = j.history || []; }
+  }catch(e){}
+  try{
+    const r = await fetch(`data/diario/${ticker}.json?t=${Date.now()}`);
+    if(r.ok){ const j = await r.json(); diario = j.history || []; }
+  }catch(e){}
+  let resultado;
+  if(!diario.length) resultado = mensal;
+  else if(!mensal.length) resultado = diario;
+  else { const primD = diario[0]?.date || '9999'; resultado = [...mensal.filter(m => m.date < primD.slice(0,7)), ...diario]; }
+  histCacheFii[ticker] = resultado;
+  return resultado;
+}
+
+async function loadChart(d){
   sel=d;
   document.getElementById('c-ticker').textContent=d.t;
   const isUp=d.v>=0;
   document.getElementById('c-price').innerHTML=`R$ ${d.p.toFixed(2)} <span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span>`;
   document.getElementById('c-meta').textContent=`${d.n} · ${d.setor} · B3`;
   document.getElementById('c-dy').textContent=d.dy.toFixed(1)+'%';
-  document.getElementById('c-pvp').textContent=d.pvp.toFixed(2);
+  document.getElementById('c-pvp').textContent=d.pvp?d.pvp.toFixed(2):'—';
   document.getElementById('c-vol').textContent=d.vol;
-  document.getElementById('c-cotas').textContent=(d.cotas/1e6).toFixed(2)+'M';
-  const pts=genHistory(d.p,d.v); const color=isUp?'#22C87A':'#E8503A';
+  document.getElementById('c-cotas').textContent=d.vm||'—';
+
+  const hist = await loadHistoricoFii(d.t);
+  let pts, labels;
+  if(hist && hist.length > 0){
+    const filt = filterByRange(hist, currentRange);
+    pts = filt.map(p=>p.close);
+    labels = filt.map(p=>p.date);
+  } else {
+    pts = genHistory(d.p, d.v);
+    labels = genLabels(pts.length);
+  }
+  const color=isUp?'#22C87A':'#E8503A';
   if(mainChart)mainChart.destroy();
   mainChart=new Chart(document.getElementById('mainChart'),{type:'line',
-    data:{labels:genLabels(pts.length),datasets:[{data:pts,borderColor:color,borderWidth:2,pointRadius:0,fill:true,backgroundColor:isUp?'rgba(34,200,122,0.06)':'rgba(232,80,58,0.06)',tension:0.35}]},
+    data:{labels,datasets:[{data:pts,borderColor:color,borderWidth:2,pointRadius:0,fill:true,backgroundColor:isUp?'rgba(34,200,122,0.06)':'rgba(232,80,58,0.06)',tension:0.35}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$ '+ctx.parsed.y.toFixed(2)}}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},maxTicksLimit:8}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},callback:v=>'R$'+v.toFixed(2)}}}}
   });
 }
 
-function setRange(el){document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');loadChart(sel);}
+function setRange(r,el){currentRange=r;document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');if(sel)loadChart(sel);}
 function filter(){
   const q=document.getElementById('f-search').value.toLowerCase();
   const s=document.getElementById('f-setor').value;
@@ -167,8 +199,15 @@ function renderSidebar(){
     <span class="pill up-pill">P/VP ${d.pvp.toFixed(2)}</span></div>`).join('');
 }
 
-const params=new URLSearchParams(location.search);
-if(params.get('q')){document.getElementById('f-search').value=params.get('q');filter();}
-renderTable(FIIS); loadChart(FIIS[0]); renderSidebar();
+async function init(){
+  await loadData();
+  data=[...FIIS];
+  const params=new URLSearchParams(location.search);
+  if(params.get('q')){document.getElementById('f-search').value=params.get('q');filter();}
+  else renderTable(data);
+  if(FIIS.length>0) await loadChart(FIIS[0]);
+  renderSidebar();
+}
+init();
 </script>
 </body></html>

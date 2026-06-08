@@ -17,10 +17,10 @@
 
 <div class="container">
   <div class="mini-cards">
-    <div class="mini-card"><div class="mini-label">Pagamentos este mês</div><div class="mini-val">48</div><div class="mini-sub">ações + FIIs</div></div>
-    <div class="mini-card"><div class="mini-label">Próximos 7 dias</div><div class="mini-val gold">12</div><div class="mini-sub">ativos pagam</div></div>
-    <div class="mini-card"><div class="mini-label">Maior DY Ações</div><div class="mini-val">18.4%</div><div class="mini-sub">BBSE3 · 12 meses</div></div>
-    <div class="mini-card"><div class="mini-label">Maior DY FIIs</div><div class="mini-val">22.1%</div><div class="mini-sub">MXRF11 · 12 meses</div></div>
+    <div class="mini-card"><div class="mini-label">Total de Ações</div><div class="mini-val" id="mc-total-acoes">—</div><div class="mini-sub">ações + FIIs</div></div>
+    <div class="mini-card"><div class="mini-label">Total de FIIs</div><div class="mini-val gold" id="mc-total-fiis">—</div><div class="mini-sub">monitorados</div></div>
+    <div class="mini-card"><div class="mini-label">Maior DY Ações</div><div class="mini-val" id="mc-dy-acao">—</div><div class="mini-sub" id="mc-dy-acao-sub">12 meses</div></div>
+    <div class="mini-card"><div class="mini-label">Maior DY FIIs</div><div class="mini-val" id="mc-dy-fii">—</div><div class="mini-sub" id="mc-dy-fii-sub">12 meses</div></div>
   </div>
 
   <div class="main-grid">
@@ -109,6 +109,27 @@ function renderSidebar(){
     <div style="text-align:right"><div class="mover-price gold">${d.dy.toFixed(1)}%</div><div style="font-size:11px;color:var(--text3)">R$ ${d.p.toFixed(2)}</div></div></div>`).join('');
 }
 
-renderTable(DIVIDENDOS); renderSidebar();
+function updateMiniCards(){
+  const topAcao=[...ACOES].filter(d=>d.dy>0).sort((a,b)=>b.dy-a.dy)[0];
+  const topFii=[...FIIS].filter(d=>d.dy>0).sort((a,b)=>b.dy-a.dy)[0];
+  document.getElementById('mc-total-acoes').textContent=ACOES.length||'—';
+  document.getElementById('mc-total-fiis').textContent=FIIS.length||'—';
+  if(topAcao){
+    document.getElementById('mc-dy-acao').textContent=topAcao.dy.toFixed(1)+'%';
+    document.getElementById('mc-dy-acao-sub').textContent=topAcao.t+' · 12 meses';
+  }
+  if(topFii){
+    document.getElementById('mc-dy-fii').textContent=topFii.dy.toFixed(1)+'%';
+    document.getElementById('mc-dy-fii-sub').textContent=topFii.t+' · 12 meses';
+  }
+}
+
+async function init(){
+  await loadData();
+  updateMiniCards();
+  renderTable(DIVIDENDOS);
+  renderSidebar();
+}
+init();
 </script>
 </body></html>

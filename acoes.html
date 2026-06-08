@@ -116,13 +116,21 @@ function renderTable(arr){
 
 async function loadHistorico(ticker){
   if(histCache[ticker]) return histCache[ticker];
+  let mensal = [], diario = [];
   try{
     const resp = await fetch(`data/historico/${ticker}.json?t=${Date.now()}`);
-    if(!resp.ok) return null;
-    const json = await resp.json();
-    histCache[ticker] = json.history || [];
-    return histCache[ticker];
-  }catch(e){ return null; }
+    if(resp.ok){ const json = await resp.json(); mensal = json.history || []; }
+  }catch(e){}
+  try{
+    const resp = await fetch(`data/diario/${ticker}.json?t=${Date.now()}`);
+    if(resp.ok){ const json = await resp.json(); diario = json.history || []; }
+  }catch(e){}
+  let resultado;
+  if(!diario.length) resultado = mensal;
+  else if(!mensal.length) resultado = diario;
+  else { const primD = diario[0]?.date || '9999'; resultado = [...mensal.filter(m => m.date < primD.slice(0,7)), ...diario]; }
+  histCache[ticker] = resultado;
+  return resultado;
 }
 
 function filterByRange(history, range){
@@ -223,30 +231,3 @@ async function init(){
 init();
 </script>
 </body></html>
-<!-- patch: carrega histórico diário e combina com mensal -->
-<script>
-// Sobrescreve loadHistorico para combinar mensal + diário
-const _loadHistoricoOriginal = loadHistorico;
-async function loadHistorico(ticker) {
-    // Carrega histórico mensal (10 anos)
-    const mensal = await _loadHistoricoOriginal(ticker) || [];
-    
-    // Carrega histórico diário (últimos 2 anos, mais preciso)
-    let diario = [];
-    try {
-        const resp = await fetch(`data/diario/${ticker}.json?t=${Date.now()}`);
-        if (resp.ok) {
-            const json = await resp.json();
-            diario = json.history || [];
-        }
-    } catch(e) {}
-    
-    if (!diario.length) return mensal;
-    if (!mensal.length) return diario;
-    
-    // Combina: mensal até a data do primeiro diário, depois diário
-    const primeiroD = diario[0]?.date || '9999';
-    const mensalFiltrado = mensal.filter(p => p.date < primeiroD.slice(0,7));
-    return [...mensalFiltrado, ...diario];
-}
-</script>

@@ -196,7 +196,7 @@ async function loadHistoricoCompleto(ticker) {
   let resultado;
   if(!diario.length) resultado=mensal;
   else if(!mensal.length) resultado=diario;
-  else { const p=diario[0]?.date||'9999'; resultado=[...mensal.filter(p=>p.date<p.slice(0,7)),...diario]; }
+  else { const primD=diario[0]?.date||'9999'; resultado=[...mensal.filter(m=>m.date<primD.slice(0,7)),...diario]; }
   cache[ticker]=resultado;
   return resultado;
 }
