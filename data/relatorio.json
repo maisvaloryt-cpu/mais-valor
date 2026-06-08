@@ -1,0 +1,108 @@
+{
+  "gerado_em": "08/06/2026 04:20",
+  "historico_mensal": {
+    "total": 769,
+    "ok": 751,
+    "poucos_dados": 18,
+    "lista_poucos": [
+      {
+        "ticker": "ADSH11",
+        "pontos": 5
+      },
+      {
+        "ticker": "ARTE11",
+        "pontos": 5
+      },
+      {
+        "ticker": "AUAU3",
+        "pontos": 7
+      },
+      {
+        "ticker": "AZUL3",
+        "pontos": 7
+      },
+      {
+        "ticker": "BFCC11",
+        "pontos": 7
+      },
+      {
+        "ticker": "CYRE4",
+        "pontos": 6
+      },
+      {
+        "ticker": "FIXX11",
+        "pontos": 9
+      },
+      {
+        "ticker": "HIRE11",
+        "pontos": 7
+      },
+      {
+        "ticker": "HJCT11",
+        "pontos": 9
+      },
+      {
+        "ticker": "ICNE11",
+        "pontos": 8
+      },
+      {
+        "ticker": "MIDW11",
+        "pontos": 7
+      },
+      {
+        "ticker": "OBTC3",
+        "pontos": 8
+      },
+      {
+        "ticker": "OXRL11",
+        "pontos": 9
+      },
+      {
+        "ticker": "PASS3",
+        "pontos": 3
+      },
+      {
+        "ticker": "PMRL11",
+        "pontos": 8
+      },
+      {
+        "ticker": "RBFY11",
+        "pontos": 9
+      },
+      {
+        "ticker": "REME11",
+        "pontos": 3
+      },
+      {
+        "ticker": "RMBS11",
+        "pontos": 7
+      }
+    ]
+  },
+  "historico_diario": {
+    "total": 769,
+    "atualizados": 769,
+    "desatualizados": 0,
+    "lista_desatualizados": []
+  },
+  "cotacoes": {
+    "atualizado_em": "08/06/2026 04:11",
+    "total_acoes": 398,
+    "total_fiis": 370,
+    "fallbacks": 0,
+    "tickers_fallback": []
+  },
+  "fundamentus": {
+    "atualizado_em": "08/06/2026 06:15",
+    "total_acoes": 403,
+    "total_fiis": 380,
+    "atualizado_fiis": "08/06/2026 06:15"
+  },
+  "resumo": {
+    "acoes_com_historico": 751,
+    "fiis_com_historico": 364,
+    "cotacoes_atuais": 768,
+    "indicadores_fundamentus": 783,
+    "status_geral": "✅ OK"
+  }
+}
