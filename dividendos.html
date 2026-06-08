@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dividendos — Mais Valor</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<div class="page-hero">
+  <h1>AGENDA DE <em>DIVIDENDOS</em></h1>
+  <p>Próximos pagamentos de dividendos, JCP e rendimentos de ações e FIIs.</p>
+</div>
+
+<div class="container">
+  <div class="mini-cards">
+    <div class="mini-card"><div class="mini-label">Pagamentos este mês</div><div class="mini-val">48</div><div class="mini-sub">ações + FIIs</div></div>
+    <div class="mini-card"><div class="mini-label">Próximos 7 dias</div><div class="mini-val gold">12</div><div class="mini-sub">ativos pagam</div></div>
+    <div class="mini-card"><div class="mini-label">Maior DY Ações</div><div class="mini-val">18.4%</div><div class="mini-sub">BBSE3 · 12 meses</div></div>
+    <div class="mini-card"><div class="mini-label">Maior DY FIIs</div><div class="mini-val">22.1%</div><div class="mini-sub">MXRF11 · 12 meses</div></div>
+  </div>
+
+  <div class="main-grid">
+    <div>
+      <div class="filter-bar">
+        <input class="filter-input" placeholder="🔍 Buscar ativo..." style="flex:1;max-width:280px" oninput="filter()" id="f-search">
+        <select class="filter-select" onchange="filter()" id="f-tipo">
+          <option value="">Todos os tipos</option>
+          <option>Dividendo</option><option>JCP</option><option>Rendimento</option>
+        </select>
+        <select class="filter-select" onchange="filter()" id="f-periodo">
+          <option value="7">Próximos 7 dias</option>
+          <option value="15">Próximos 15 dias</option>
+          <option value="30">Próximos 30 dias</option>
+          <option value="999">Todos</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th>Ativo</th><th>Tipo</th>
+            <th class="r">Data Com</th><th class="r">Pagamento</th>
+            <th class="r">Valor / cota</th><th class="r">DY estimado</th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Top DY Ações</div></div>
+        <div id="top-dy-acoes"></div>
+      </div>
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Top DY FIIs</div></div>
+        <div id="top-dy-fiis"></div>
+      </div>
+      <div class="card" style="background:var(--bg3)">
+        <div style="font-size:12px;color:var(--text2);line-height:1.7">
+          <div style="font-weight:700;color:var(--gold);margin-bottom:8px">📌 Glossário</div>
+          <div style="margin-bottom:8px"><strong style="color:var(--text)">Data Com</strong> — último dia para ter direito ao dividendo</div>
+          <div style="margin-bottom:8px"><strong style="color:var(--text)">Pagamento</strong> — data em que o valor cai na conta</div>
+          <div style="margin-bottom:8px"><strong style="color:var(--text)">DY</strong> — dividend yield anualizado sobre preço atual</div>
+          <div><strong style="color:var(--text)">JCP</strong> — juros sobre capital próprio (isenção parcial de IR)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="data.js"></script><script src="nav.js"></script>
+<script>
+function renderTable(arr){
+  const tb=document.getElementById('tbody'); tb.innerHTML='';
+  arr.forEach(d=>{
+    const tipoColor=d.tipo==='Dividendo'?'up-pill':d.tipo==='JCP'?'gold-pill':'';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
+      <td><span class="pill ${tipoColor}">${d.tipo}</span></td>
+      <td class="r" style="font-family:'DM Mono',monospace;font-size:12px">${d.com.slice(0,5)}</td>
+      <td class="r" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--gold)">${d.pag.slice(0,5)}</td>
+      <td class="r" style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--gold)">R$ ${d.val.toFixed(2)}</td>
+      <td class="r up">${d.dy}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function filter(){
+  const q=document.getElementById('f-search').value.toLowerCase();
+  const tipo=document.getElementById('f-tipo').value;
+  const arr=DIVIDENDOS.filter(d=>(d.t.toLowerCase().includes(q)||d.n.toLowerCase().includes(q))&&(!tipo||d.tipo===tipo));
+  renderTable(arr);
+}
+
+function renderSidebar(){
+  const topAcoes=[...ACOES].sort((a,b)=>b.dy-a.dy).slice(0,5);
+  document.getElementById('top-dy-acoes').innerHTML=topAcoes.map(d=>`
+    <div class="mover-item"><div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+    <div style="text-align:right"><div class="mover-price gold">${d.dy.toFixed(1)}%</div><div style="font-size:11px;color:var(--text3)">R$ ${d.p.toFixed(2)}</div></div></div>`).join('');
+  const topFiis=[...FIIS].sort((a,b)=>b.dy-a.dy).slice(0,5);
+  document.getElementById('top-dy-fiis').innerHTML=topFiis.map(d=>`
+    <div class="mover-item"><div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+    <div style="text-align:right"><div class="mover-price gold">${d.dy.toFixed(1)}%</div><div style="font-size:11px;color:var(--text3)">R$ ${d.p.toFixed(2)}</div></div></div>`).join('');
+}
+
+renderTable(DIVIDENDOS); renderSidebar();
+</script>
+</body></html>

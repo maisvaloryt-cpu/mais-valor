@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ações — Mais Valor</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<div class="page-hero">
+  <h1>AÇÕES <em>B3</em></h1>
+  <p>Cotações, indicadores fundamentalistas e histórico de todas as ações listadas na bolsa brasileira.</p>
+</div>
+
+<div class="container">
+  <div class="main-grid">
+    <div>
+      <div class="chart-panel">
+        <div class="chart-header">
+          <div>
+            <div class="chart-ticker" id="c-ticker">PETR4</div>
+            <div class="chart-price" id="c-price">R$ 38,20 <span class="pill up-pill">+1.42%</span></div>
+            <div class="chart-meta" id="c-meta">Petrobras PN · Petróleo & Gás</div>
+          </div>
+          <div style="display:flex;gap:4px">
+            <button class="range-btn" onclick="setRange(this)">1M</button>
+            <button class="range-btn active" onclick="setRange(this)">3M</button>
+            <button class="range-btn" onclick="setRange(this)">6M</button>
+            <button class="range-btn" onclick="setRange(this)">1A</button>
+          </div>
+        </div>
+        <div style="position:relative;width:100%;height:200px">
+          <canvas id="mainChart" role="img" aria-label="Histórico do ativo selecionado"></canvas>
+        </div>
+        <div class="chart-stats">
+          <div class="chart-stat"><div class="chart-stat-label">DY 12m</div><div class="chart-stat-val up" id="c-dy">12.4%</div></div>
+          <div class="chart-stat"><div class="chart-stat-label">P/L</div><div class="chart-stat-val" id="c-pl">4.8x</div></div>
+          <div class="chart-stat"><div class="chart-stat-label">P/VP</div><div class="chart-stat-val" id="c-pvp">0.81</div></div>
+          <div class="chart-stat"><div class="chart-stat-label">Valor de Mercado</div><div class="chart-stat-val" id="c-vm">R$494B</div></div>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <input class="filter-input" placeholder="🔍 Buscar por ticker ou nome..." style="flex:1;max-width:300px" oninput="filter()" id="f-search">
+        <select class="filter-select" onchange="filter()" id="f-setor">
+          <option value="">Todos os setores</option>
+          <option>Bancos</option><option>Petróleo & Gás</option><option>Mineração</option>
+          <option>Varejo</option><option>Indústria</option><option>Bebidas</option>
+          <option>Telecomunicações</option><option>Siderurgia</option><option>Holdings</option>
+          <option>Papel & Celulose</option><option>Locação</option>
+        </select>
+        <select class="filter-select" onchange="sortBy(this.value)" id="f-sort">
+          <option value="t">Ticker A-Z</option>
+          <option value="p">Preço</option>
+          <option value="v">Variação dia</option>
+          <option value="dy">DY 12m</option>
+          <option value="pl">P/L</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th>Ativo</th><th class="r">Preço</th><th class="r">Hoje</th>
+            <th class="r">7 dias</th><th class="r">30 dias</th>
+            <th class="r">DY 12m</th><th class="r">P/L</th><th class="r">P/VP</th><th class="r">Volume</th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Por Setor</div></div>
+        <div id="setor-list"></div>
+      </div>
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Top DY</div></div>
+        <div id="top-dy"></div>
+      </div>
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Mais Negociadas</div></div>
+        <div id="top-vol"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="data.js"></script><script src="nav.js"></script>
+<script>
+let data=[...ACOES], mainChart=null, sel=ACOES[0];
+
+function renderTable(arr){
+  const tb=document.getElementById('tbody'); tb.innerHTML='';
+  arr.forEach(d=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
+      <td class="r">R$ ${d.p.toFixed(2)}</td>
+      <td class="r"><span class="pill ${d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>
+      <td class="r ${d.v7>=0?'up':'dn'}">${d.v7>=0?'+':''}${d.v7.toFixed(2)}%</td>
+      <td class="r ${d.v30>=0?'up':'dn'}">${d.v30>=0?'+':''}${d.v30.toFixed(2)}%</td>
+      <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
+      <td class="r">${d.pl&&d.pl>0?d.pl.toFixed(1)+'x':d.pl<0?'neg.':'—'}</td>
+      <td class="r">${d.pvp?d.pvp.toFixed(2):'—'}</td>
+      <td class="r" style="color:var(--text3)">${d.vol}</td>`;
+    tr.onclick=()=>loadChart(d); tb.appendChild(tr);
+  });
+}
+
+function loadChart(d){
+  sel=d;
+  document.getElementById('c-ticker').textContent=d.t;
+  const isUp=d.v>=0;
+  document.getElementById('c-price').innerHTML=`R$ ${d.p.toFixed(2)} <span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span>`;
+  document.getElementById('c-meta').textContent=`${d.n} · ${d.setor}`;
+  document.getElementById('c-dy').textContent=d.dy>0?d.dy.toFixed(1)+'%':'—';
+  document.getElementById('c-pl').textContent=d.pl?(d.pl>0?d.pl.toFixed(1)+'x':'neg.'):'—';
+  document.getElementById('c-pvp').textContent=d.pvp?d.pvp.toFixed(2):'—';
+  document.getElementById('c-vm').textContent=d.vm||'—';
+  const pts=genHistory(d.p,d.v); const color=isUp?'#22C87A':'#E8503A';
+  if(mainChart)mainChart.destroy();
+  mainChart=new Chart(document.getElementById('mainChart'),{type:'line',
+    data:{labels:genLabels(pts.length),datasets:[{data:pts,borderColor:color,borderWidth:2,pointRadius:0,fill:true,backgroundColor:isUp?'rgba(34,200,122,0.06)':'rgba(232,80,58,0.06)',tension:0.35}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$ '+ctx.parsed.y.toFixed(2)}}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},maxTicksLimit:8}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},callback:v=>'R$'+v.toFixed(0)}}}}
+  });
+}
+
+function setRange(el){document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');loadChart(sel);}
+function filter(){
+  const q=document.getElementById('f-search').value.toLowerCase();
+  const s=document.getElementById('f-setor').value;
+  data=ACOES.filter(d=>(d.t.toLowerCase().includes(q)||d.n.toLowerCase().includes(q))&&(!s||d.setor===s));
+  renderTable(data);
+}
+function sortBy(k){data.sort((a,b)=>k==='t'?a.t.localeCompare(b.t):b[k]-a[k]);renderTable(data);}
+
+function renderSidebar(){
+  const setores={};
+  ACOES.forEach(d=>{setores[d.setor]=(setores[d.setor]||0)+1;});
+  document.getElementById('setor-list').innerHTML=Object.entries(setores).sort((a,b)=>b[1]-a[1]).map(([s,n])=>`
+    <div class="mover-item" style="cursor:pointer" onclick="document.getElementById('f-setor').value='${s}';filter()">
+      <div class="mover-ticker" style="font-size:12px">${s}</div>
+      <span class="pill gold-pill">${n}</span>
+    </div>`).join('');
+  const topDy=[...ACOES].sort((a,b)=>b.dy-a.dy).slice(0,5);
+  document.getElementById('top-dy').innerHTML=topDy.map(d=>`
+    <div class="mover-item"><div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+    <span class="pill gold-pill">${d.dy.toFixed(1)}%</span></div>`).join('');
+  document.getElementById('top-vol').innerHTML=ACOES.slice(0,5).map(d=>`
+    <div class="mover-item"><div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.n}</div></div>
+    <span style="font-size:12px;font-family:'DM Mono',monospace;color:var(--text2)">${d.vol}</span></div>`).join('');
+}
+
+const params=new URLSearchParams(location.search);
+if(params.get('q')){document.getElementById('f-search').value=params.get('q');filter();}
+renderTable(ACOES); loadChart(ACOES[0]); renderSidebar();
+</script>
+</body></html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rankings — Mais Valor</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<div class="page-hero">
+  <h1>RANKINGS <em>B3</em></h1>
+  <p>Os melhores e piores desempenhos por diferentes critérios.</p>
+</div>
+
+<div class="container">
+  <div class="tabs" style="margin-bottom:1.5rem">
+    <button class="tab active" onclick="switchTab('dy-acoes',this)">DY Ações</button>
+    <button class="tab" onclick="switchTab('dy-fiis',this)">DY FIIs</button>
+    <button class="tab" onclick="switchTab('altas',this)">Maiores Altas</button>
+    <button class="tab" onclick="switchTab('baixas',this)">Maiores Baixas</button>
+    <button class="tab" onclick="switchTab('volume',this)">Volume</button>
+    <button class="tab" onclick="switchTab('pvp',this)">Menor P/VP</button>
+  </div>
+
+  <div class="main-grid">
+    <div>
+      <div class="section-header"><div class="section-title" id="rank-title">Maiores Dividend Yield — Ações</div></div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr id="rank-thead"></tr></thead>
+          <tbody id="rank-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Pódio DY Ações</div></div>
+        <div id="podio-acoes"></div>
+      </div>
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Pódio DY FIIs</div></div>
+        <div id="podio-fiis"></div>
+      </div>
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Mais Negociadas</div></div>
+        <div id="mais-neg"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="data.js"></script><script src="nav.js"></script>
+<script>
+const configs = {
+  'dy-acoes': {
+    title:'Maiores Dividend Yield — Ações',
+    data:()=>[...ACOES].sort((a,b)=>b.dy-a.dy),
+    head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">DY 12m</th><th class="r">Setor</th><th class="r">Hoje</th>',
+    row:(d,i)=>`<td style="font-weight:700;color:var(--text3)">#${i+1}</td>
+      <td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
+      <td class="r">R$ ${d.p.toFixed(2)}</td>
+      <td class="r" style="font-size:16px;font-weight:800;color:var(--gold)">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
+      <td class="r" style="color:var(--text3)">${d.setor}</td>
+      <td class="r"><span class="pill ${d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>`
+  },
+  'dy-fiis': {
+    title:'Maiores Dividend Yield — FIIs',
+    data:()=>[...FIIS].sort((a,b)=>b.dy-a.dy),
+    head:'<th>Pos.</th><th>FII</th><th class="r">Cota</th><th class="r">DY 12m</th><th class="r">P/VP</th><th class="r">Segmento</th>',
+    row:(d,i)=>`<td style="font-weight:700;color:var(--text3)">#${i+1}</td>
+      <td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
+      <td class="r">R$ ${d.p.toFixed(2)}</td>
+      <td class="r" style="font-size:16px;font-weight:800;color:var(--gold)">${d.dy.toFixed(1)}%</td>
+      <td class="r ${d.pvp<1?'up':''}">${d.pvp.toFixed(2)}</td>
+      <td class="r" style="color:var(--text3)">${d.setor}</td>`
+  },
+  'altas': {
+    title:'Maiores Altas do Dia',
+    data:()=>[...ACOES,...FIIS].sort((a,b)=>b.v-a.v),
+    head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">Variação Dia</th><th class="r">7 Dias</th><th class="r">Volume</th>',
+    row:(d,i)=>`<td style="font-weight:700;color:var(--text3)">#${i+1}</td>
+      <td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
+      <td class="r">R$ ${d.p.toFixed(2)}</td>
+      <td class="r"><span class="pill up-pill">+${d.v.toFixed(2)}%</span></td>
+      <td class="r ${d.v7>=0?'up':'dn'}">${d.v7>=0?'+':''}${d.v7.toFixed(2)}%</td>
+      <td class="r" style="color:var(--text3)">${d.vol}</td>`
+  },
+  'baixas': {
+    title:'Maiores Baixas do Dia',
+    data:()=>[...ACOES,...FIIS].sort((a,b)=>a.v-b.v),
+    head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">Variação Dia</th><th class="r">7 Dias</th><th class="r">Volume</th>',
+    row:(d,i)=>`<td style="font-weight:700;color:var(--text3)">#${i+1}</td>
+      <td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
+      <td class="r">R$ ${d.p.toFixed(2)}</td>
+      <td class="r"><span class="pill dn-pill">${d.v.toFixed(2)}%</span></td>
+      <td class="r ${d.v7>=0?'up':'dn'}">${d.v7>=0?'+':''}${d.v7.toFixed(2)}%</td>
+      <td class="r" style="color:var(--text3)">${d.vol}</td>`
+  },
+  'volume': {
+    title:'Mais Negociadas — Volume do Dia',
+    data:()=>ACOES.slice().sort(()=>Math.random()-.5),
+    head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">Volume</th><th class="r">Variação</th><th class="r">Setor</th>',
+    row:(d,i)=>`<td style="font-weight:700;color:var(--text3)">#${i+1}</td>
+      <td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
+      <td class="r">R$ ${d.p.toFixed(2)}</td>
+      <td class="r" style="color:var(--gold);font-weight:700">${d.vol}</td>
+      <td class="r"><span class="pill ${d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>
+      <td class="r" style="color:var(--text3)">${d.setor}</td>`
+  },
+  'pvp': {
+    title:'Menor P/VP — FIIs (potencial abaixo do valor patrimonial)',
+    data:()=>[...FIIS].sort((a,b)=>a.pvp-b.pvp),
+    head:'<th>Pos.</th><th>FII</th><th class="r">Cota</th><th class="r">P/VP</th><th class="r">DY 12m</th><th class="r">Segmento</th>',
+    row:(d,i)=>`<td style="font-weight:700;color:var(--text3)">#${i+1}</td>
+      <td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
+      <td class="r">R$ ${d.p.toFixed(2)}</td>
+      <td class="r up" style="font-size:15px;font-weight:800">${d.pvp.toFixed(2)}</td>
+      <td class="r gold">${d.dy.toFixed(1)}%</td>
+      <td class="r" style="color:var(--text3)">${d.setor}</td>`
+  }
+};
+
+let currentCfg = configs['dy-acoes'];
+
+function render(key){
+  const cfg=configs[key]; currentCfg=cfg;
+  document.getElementById('rank-title').textContent=cfg.title;
+  document.getElementById('rank-thead').innerHTML=cfg.head;
+  const data=cfg.data();
+  document.getElementById('rank-tbody').innerHTML=data.map((d,i)=>`<tr>${cfg.row(d,i)}</tr>`).join('');
+}
+
+function switchTab(key,el){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); render(key);
+}
+
+function renderSidebar(){
+  const topA=[...ACOES].sort((a,b)=>b.dy-a.dy).slice(0,3);
+  document.getElementById('podio-acoes').innerHTML=topA.map((d,i)=>`
+    <div class="mover-item"><div style="display:flex;align-items:center;gap:8px">
+      <div style="width:22px;height:22px;border-radius:50%;background:${i===0?'#F5A623':i===1?'#9B9896':'#CD7F32'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#111">${i+1}</div>
+      <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div></div>
+    <div class="mover-price gold">${d.dy.toFixed(1)}%</div></div>`).join('');
+  const topF=[...FIIS].sort((a,b)=>b.dy-a.dy).slice(0,3);
+  document.getElementById('podio-fiis').innerHTML=topF.map((d,i)=>`
+    <div class="mover-item"><div style="display:flex;align-items:center;gap:8px">
+      <div style="width:22px;height:22px;border-radius:50%;background:${i===0?'#F5A623':i===1?'#9B9896':'#CD7F32'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#111">${i+1}</div>
+      <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div></div>
+    <div class="mover-price gold">${d.dy.toFixed(1)}%</div></div>`).join('');
+  document.getElementById('mais-neg').innerHTML=ACOES.slice(0,5).map(d=>`
+    <div class="mover-item"><div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.n}</div></div>
+    <span style="font-size:12px;font-family:'DM Mono',monospace;color:var(--text2)">${d.vol}</span></div>`).join('');
+}
+
+render('dy-acoes'); renderSidebar();
+</script>
+</body></html>
