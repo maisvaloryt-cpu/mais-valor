@@ -1,6 +1,5 @@
 """
-fetch_data.py — Busca cotações da B3 via Brapi.dev (API brasileira gratuita)
-Roda automaticamente pelo GitHub Actions todo dia útil às 18h
+fetch_data.py — Busca cotações da B3 via Brapi.dev (sem token)
 """
 import json, time, datetime, os, requests
 
@@ -17,21 +16,19 @@ FIIS = [
 ]
 
 def fetch_brapi(tickers):
-    """Busca cotações via Brapi.dev — API brasileira gratuita, sem token"""
     results = []
-    # Brapi aceita até 10 tickers por requisição
     batch_size = 10
     for i in range(0, len(tickers), batch_size):
         batch = tickers[i:i+batch_size]
         symbols = ",".join(batch)
-        url = f"https://brapi.dev/api/quote/{symbols}?fundamental=true"
+        # Sem fundamental=true — funciona sem token
+        url = f"https://brapi.dev/api/quote/{symbols}"
         try:
             resp = requests.get(url, timeout=20)
             resp.raise_for_status()
             data = resp.json()
             quotes = data.get("results", [])
             for q in quotes:
-                dy = q.get("dividendYield") or 0
                 results.append({
                     "ticker": q.get("symbol", ""),
                     "name": q.get("longName") or q.get("shortName") or q.get("symbol",""),
@@ -39,13 +36,13 @@ def fetch_brapi(tickers):
                     "change": round(q.get("regularMarketChangePercent") or 0, 2),
                     "volume": q.get("regularMarketVolume") or 0,
                     "marketCap": q.get("marketCap") or 0,
-                    "pe": round(q.get("priceEarnings") or 0, 2) or None,
-                    "pb": round(q.get("priceToBook") or 0, 2) or None,
-                    "dividendYield": round(float(dy), 2) if dy else 0,
+                    "pe": None,
+                    "pb": None,
+                    "dividendYield": round((q.get("dividendYield") or 0), 2),
                 })
-            print(f"  ✅ Lote {i//batch_size+1}: {len(quotes)} ativos")
+            print(f"  Lote {i//batch_size+1}: {len(quotes)} ativos OK")
         except Exception as e:
-            print(f"  ❌ Erro no lote {i//batch_size+1}: {e}")
+            print(f"  Erro lote {i//batch_size+1}: {e}")
         time.sleep(1)
     return results
 
@@ -54,10 +51,10 @@ def main():
     now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-3)))
     now_str = now.strftime("%d/%m/%Y %H:%M")
 
-    print("📊 Buscando ações via Brapi...")
+    print("Buscando acoes...")
     acoes = fetch_brapi(ACOES)
 
-    print("🏢 Buscando FIIs via Brapi...")
+    print("Buscando FIIs...")
     fiis = fetch_brapi(FIIS)
 
     output = {
@@ -69,9 +66,7 @@ def main():
     with open("data/cotacoes.json", "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
 
-    print(f"\n✅ Concluído!")
-    print(f"   {len(acoes)} ações + {len(fiis)} FIIs salvos")
-    print(f"   Horário de Brasília: {now_str}")
+    print(f"Concluido! {len(acoes)} acoes + {len(fiis)} FIIs salvos em {now_str}")
 
 if __name__ == "__main__":
     main()
