@@ -6,29 +6,15 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Ferramentas — Mais Valor</title>
 <link rel="stylesheet" href="style.css">
-<style>
-.tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-.calc-box { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; }
-.calc-label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; display: block; }
-.calc-input { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 16px; font-family: 'DM Mono',monospace; color: var(--text); margin-bottom: 1rem; }
-.calc-input:focus { outline:none; border-color:var(--gold); }
-.calc-result { background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius-lg); padding: 1.25rem; margin-top: 1rem; }
-.result-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px; }
-.result-val { font-size: 24px; font-weight: 800; font-family: 'DM Mono',monospace; color: var(--gold); }
-.calc-btn { width: 100%; background: var(--red); color: #fff; font-size: 14px; font-weight: 700; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Manrope',sans-serif; margin-top: .5rem; }
-.calc-btn:hover { background: #a81515; }
-.carteira-item { display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--border); }
-.carteira-item:last-child { border-bottom:none; }
-</style>
 </head>
 <body>
 <div id="nav-placeholder"></div>
-<div class="page-hero">
+<div class="page-hero fade-in">
   <h1>FERRAMENTAS <em>DO INVESTIDOR</em></h1>
   <p>Calculadoras e simuladores para tomar decisões melhores.</p>
 </div>
 <div class="container">
-  <div class="tabs" style="margin-bottom:1.5rem">
+  <div class="tabs fade-in-1" style="margin-bottom:1.5rem">
     <button class="tab active" onclick="show('juros',this)">Juros Compostos</button>
     <button class="tab" onclick="show('carteira',this)">Calculadora de Carteira</button>
     <button class="tab" onclick="show('aposentadoria',this)">Aposentadoria</button>
@@ -36,7 +22,7 @@
   </div>
 
   <!-- JUROS COMPOSTOS -->
-  <div id="tool-juros">
+  <div id="tool-juros" class="fade-in-2">
     <div class="tool-grid">
       <div class="calc-box">
         <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">💰 Juros Compostos</div>
@@ -50,12 +36,12 @@
         <input class="calc-input" type="number" id="j-anos" value="10" oninput="calcJuros()">
         <div class="calc-result">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
-            <div><div class="result-label">Montante final</div><div class="result-val" id="j-total">—</div></div>
-            <div><div class="result-label">Total investido</div><div style="font-size:18px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text2)" id="j-inv">—</div></div>
+            <div><div class="calc-result-label">Montante final</div><div class="calc-result-val" id="j-total">—</div></div>
+            <div><div class="calc-result-label">Total investido</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--text2)" id="j-inv">—</div></div>
           </div>
           <div style="border-top:1px solid var(--border);padding-top:1rem">
-            <div class="result-label">Juros ganhos</div>
-            <div style="font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:var(--up)" id="j-juros">—</div>
+            <div class="calc-result-label">Juros ganhos</div>
+            <div style="font-size:22px;font-weight:800;font-family:var(--font-mono);color:var(--up)" id="j-juros">—</div>
           </div>
         </div>
       </div>
@@ -70,25 +56,26 @@
     </div>
   </div>
 
-  <!-- CALCULADORA DE CARTEIRA -->
+  <!-- CARTEIRA -->
   <div id="tool-carteira" style="display:none">
     <div class="tool-grid">
       <div class="calc-box">
         <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">📊 Minha Carteira</div>
         <div style="display:flex;gap:8px;margin-bottom:1rem">
           <input class="calc-input" id="cart-ticker" placeholder="Ticker (ex: MXRF11)" style="flex:1;margin:0">
-          <input class="calc-input" id="cart-qtd" type="number" placeholder="Qtd" style="width:100px;margin:0">
-          <button onclick="addAtivo()" style="background:var(--gold);color:#111;border:none;border-radius:8px;padding:0 14px;font-weight:700;cursor:pointer;white-space:nowrap">+ Add</button>
+          <input class="calc-input" id="cart-qtd" type="number" placeholder="Qtd" style="width:90px;margin:0">
+          <button onclick="addAtivo()" style="background:var(--gold);color:#0A0A0A;border:none;border-radius:9px;padding:0 14px;font-weight:800;cursor:pointer;white-space:nowrap;font-family:var(--font-body);transition:all .15s"
+            onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">+ Add</button>
         </div>
         <div id="cart-lista" style="margin-bottom:1rem;min-height:60px"></div>
         <div class="calc-result">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
-            <div><div class="result-label">Renda mensal estimada</div><div class="result-val" id="cart-renda">R$ 0,00</div></div>
-            <div><div class="result-label">Renda anual estimada</div><div style="font-size:18px;font-weight:700;font-family:'DM Mono',monospace;color:var(--up)" id="cart-anual">R$ 0,00</div></div>
+            <div><div class="calc-result-label">Renda mensal estimada</div><div class="calc-result-val" id="cart-renda">R$ 0,00</div></div>
+            <div><div class="calc-result-label">Renda anual estimada</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--up)" id="cart-anual">R$ 0,00</div></div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-            <div><div class="result-label">Total investido</div><div style="font-size:18px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text2)" id="cart-total">R$ 0,00</div></div>
-            <div><div class="result-label">DY médio carteira</div><div style="font-size:18px;font-weight:700;font-family:'DM Mono',monospace;color:var(--gold)" id="cart-dy-med">0.0%</div></div>
+            <div><div class="calc-result-label">Total investido</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--text2)" id="cart-total">R$ 0,00</div></div>
+            <div><div class="calc-result-label">DY médio carteira</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--gold)" id="cart-dy-med">0.0%</div></div>
           </div>
         </div>
       </div>
@@ -113,10 +100,10 @@
         <label class="calc-label">Taxa de retorno anual (%)</label>
         <input class="calc-input" type="number" id="ap-taxa" value="10" step="0.1" oninput="calcAp()">
         <div class="calc-result">
-          <div><div class="result-label">Patrimônio necessário</div><div class="result-val" id="ap-pat">—</div></div>
+          <div><div class="calc-result-label">Patrimônio necessário</div><div class="calc-result-val" id="ap-pat">—</div></div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
-            <div><div class="result-label">Aporte mensal necessário</div><div style="font-size:18px;font-weight:700;font-family:'DM Mono',monospace;color:var(--up)" id="ap-aporte">—</div></div>
-            <div><div class="result-label">Anos até a meta</div><div style="font-size:18px;font-weight:700;font-family:'DM Mono',monospace" id="ap-anos">—</div></div>
+            <div><div class="calc-result-label">Aporte mensal necessário</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--up)" id="ap-aporte">—</div></div>
+            <div><div class="calc-result-label">Anos até a meta</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono)" id="ap-anos">—</div></div>
           </div>
         </div>
       </div>
@@ -127,26 +114,25 @@
     </div>
   </div>
 
-  <!-- CALCULADORA DY -->
+  <!-- DY CALC -->
   <div id="tool-dy-calc" style="display:none">
     <div class="tool-grid">
       <div class="calc-box">
-        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">📈 Calculadora DY</div>
-        <label class="calc-label">Preço de compra (R$)</label>
-        <input class="calc-input" type="number" id="dy-preco" value="10.34" step="0.01" oninput="calcDY()">
-        <label class="calc-label">Dividendo mensal por cota (R$)</label>
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">📈 Calculadora de DY</div>
+        <label class="calc-label">Preço atual (R$)</label>
+        <input class="calc-input" type="number" id="dy-preco" value="10.00" step="0.01" oninput="calcDY()">
+        <label class="calc-label">Dividendo / rendimento mensal (R$)</label>
         <input class="calc-input" type="number" id="dy-div" value="0.10" step="0.01" oninput="calcDY()">
         <label class="calc-label">Quantidade de cotas</label>
-        <input class="calc-input" type="number" id="dy-qtd" value="1000" oninput="calcDY()">
+        <input class="calc-input" type="number" id="dy-qtd" value="100" oninput="calcDY()">
         <div class="calc-result">
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem">
-            <div><div class="result-label">DY mensal</div><div style="font-size:18px;font-weight:800;font-family:'DM Mono',monospace;color:var(--gold)" id="dy-men">—</div></div>
-            <div><div class="result-label">DY anual</div><div style="font-size:18px;font-weight:800;font-family:'DM Mono',monospace;color:var(--gold)" id="dy-anu">—</div></div>
-            <div><div class="result-label">Renda/mês</div><div style="font-size:18px;font-weight:800;font-family:'DM Mono',monospace;color:var(--up)" id="dy-ren">—</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+            <div><div class="calc-result-label">DY mensal</div><div class="calc-result-val" id="dy-men">—</div></div>
+            <div><div class="calc-result-label">DY anual</div><div style="font-size:22px;font-weight:800;font-family:var(--font-mono);color:var(--up)" id="dy-anu">—</div></div>
           </div>
-          <div style="border-top:1px solid var(--border);padding-top:1rem">
-            <div class="result-label">Total investido</div>
-            <div style="font-size:20px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text2)" id="dy-tot">—</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;border-top:1px solid var(--border);padding-top:1rem">
+            <div><div class="calc-result-label">Renda mensal</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--up)" id="dy-ren">—</div></div>
+            <div><div class="calc-result-label">Total investido</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--text2)" id="dy-tot">—</div></div>
           </div>
         </div>
       </div>
@@ -165,9 +151,23 @@
 let jurosChart=null,apChart=null,dyChart=null,carteiraChart=null;
 let carteira=[];
 
+const CHART_OPTS = {
+  responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{labels:{color:'#8A8884',font:{size:11}}}},
+  scales:{
+    x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#4E4D4A',font:{size:10}}},
+    y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#4E4D4A',font:{size:10}}}
+  }
+};
+
 function show(id,el){
-  ['juros','carteira','aposentadoria','dy-calc'].forEach(t=>document.getElementById('tool-'+t).style.display='none');
-  document.getElementById('tool-'+id).style.display='';
+  ['juros','carteira','aposentadoria','dy-calc'].forEach(t=>{
+    const el=document.getElementById('tool-'+t);
+    if(el){ el.style.display='none'; el.classList.remove('fade-in-2'); }
+  });
+  const shown=document.getElementById('tool-'+id);
+  shown.style.display='';
+  shown.classList.add('fade-in-2');
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   if(id==='juros')calcJuros();
@@ -176,14 +176,14 @@ function show(id,el){
   if(id==='carteira')renderCarteira();
 }
 
-function fmt(v){return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fmt(v){ return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 
 function calcJuros(){
   const C=+document.getElementById('j-cap').value||0;
   const A=+document.getElementById('j-aporte').value||0;
   const r=((+document.getElementById('j-taxa').value||0)/100)/12;
   const n=(+document.getElementById('j-anos').value||0)*12;
-  if(!n||!r)return;
+  if(!n||!r) return;
   const M=C*Math.pow(1+r,n)+A*(Math.pow(1+r,n)-1)/r;
   const inv=C+A*n;
   document.getElementById('j-total').textContent=fmt(M);
@@ -192,13 +192,13 @@ function calcJuros(){
   const anos=+document.getElementById('j-anos').value;
   const labels=[],dInv=[],dTot=[];
   for(let y=0;y<=anos;y++){const ny=y*12;labels.push(y+'a');dInv.push(Math.round(C+A*ny));dTot.push(Math.round(C*Math.pow(1+r,ny)+A*(Math.pow(1+r,ny)-1)/r));}
-  if(jurosChart)jurosChart.destroy();
+  if(jurosChart) jurosChart.destroy();
   jurosChart=new Chart(document.getElementById('jurosChart'),{type:'line',
     data:{labels,datasets:[
       {label:'Acumulado',data:dTot,borderColor:'#F5A623',borderWidth:2,pointRadius:0,fill:true,backgroundColor:'rgba(245,166,35,0.08)',tension:0.4},
-      {label:'Investido',data:dInv,borderColor:'#5E5C58',borderWidth:1.5,pointRadius:0,fill:false,tension:0.4,borderDash:[4,4]}
+      {label:'Investido',data:dInv,borderColor:'#4E4D4A',borderWidth:1.5,pointRadius:0,fill:false,tension:0.4,borderDash:[4,4]}
     ]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9B9896',font:{size:11}}}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},callback:v=>'R$'+Math.round(v/1000)+'k'}}}}
+    options:{...CHART_OPTS,plugins:{...CHART_OPTS.plugins},scales:{...CHART_OPTS.scales,y:{...CHART_OPTS.scales.y,ticks:{...CHART_OPTS.scales.y.ticks,callback:v=>'R$'+Math.round(v/1000)+'k'}}}}
   });
 }
 
@@ -215,10 +215,10 @@ function calcAp(){
   document.getElementById('ap-aporte').textContent=fmt(ap);
   const labels=[],data=[];
   for(let y=0;y<=anos;y++){const ny=y*12;labels.push((idade+y)+'a');data.push(Math.round(ap*(Math.pow(1+r,ny)-1)/r));}
-  if(apChart)apChart.destroy();
+  if(apChart) apChart.destroy();
   apChart=new Chart(document.getElementById('apChart'),{type:'line',
-    data:{labels,datasets:[{data,borderColor:'#22C87A',borderWidth:2,pointRadius:0,fill:true,backgroundColor:'rgba(34,200,122,0.07)',tension:0.4}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},callback:v=>'R$'+Math.round(v/1000)+'k'}}}}
+    data:{labels,datasets:[{data,borderColor:'#1FC96E',borderWidth:2,pointRadius:0,fill:true,backgroundColor:'rgba(31,201,110,0.07)',tension:0.4}]},
+    options:{...CHART_OPTS,plugins:{legend:{display:false}},scales:{...CHART_OPTS.scales,y:{...CHART_OPTS.scales.y,ticks:{...CHART_OPTS.scales.y.ticks,callback:v=>'R$'+Math.round(v/1000)+'k'}}}}
   });
 }
 
@@ -226,27 +226,29 @@ function calcDY(){
   const p=+document.getElementById('dy-preco').value||0;
   const d=+document.getElementById('dy-div').value||0;
   const q=+document.getElementById('dy-qtd').value||0;
-  if(!p)return;
+  if(!p) return;
   document.getElementById('dy-men').textContent=(d/p*100).toFixed(2)+'%';
   document.getElementById('dy-anu').textContent=(d*12/p*100).toFixed(2)+'%';
   document.getElementById('dy-ren').textContent=fmt(d*q);
   document.getElementById('dy-tot').textContent=fmt(p*q);
   const labels=[],data=[];
   for(let i=100;i<=5000;i+=100){labels.push(i);data.push(+(d*i).toFixed(2));}
-  if(dyChart)dyChart.destroy();
+  if(dyChart) dyChart.destroy();
   dyChart=new Chart(document.getElementById('dyChart'),{type:'bar',
-    data:{labels,datasets:[{label:'Renda mensal',data,backgroundColor:'rgba(245,166,35,0.7)',borderRadius:3}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#5E5C58',font:{size:9},maxTicksLimit:10,callback:v=>v+'c'}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},callback:v=>'R$'+v}}}}
+    data:{labels,datasets:[{label:'Renda mensal',data,backgroundColor:'rgba(245,166,35,0.75)',borderRadius:4}]},
+    options:{...CHART_OPTS,plugins:{legend:{display:false}},scales:{...CHART_OPTS.scales,
+      x:{...CHART_OPTS.scales.x,ticks:{...CHART_OPTS.scales.x.ticks,maxTicksLimit:10,callback:v=>v+'c'}},
+      y:{...CHART_OPTS.scales.y,ticks:{...CHART_OPTS.scales.y.ticks,callback:v=>'R$'+v}}}}
   });
 }
 
 function addAtivo(){
   const ticker=document.getElementById('cart-ticker').value.toUpperCase().trim();
   const qtd=+document.getElementById('cart-qtd').value||0;
-  if(!ticker||!qtd)return;
+  if(!ticker||!qtd) return;
   const all=[...ACOES,...FIIS];
   const ativo=all.find(d=>d.t===ticker);
-  if(!ativo){alert('Ativo não encontrado: '+ticker);return;}
+  if(!ativo){ alert('Ativo não encontrado: '+ticker); return; }
   carteira=carteira.filter(c=>c.t!==ticker);
   carteira.push({...ativo,qtd});
   document.getElementById('cart-ticker').value='';
@@ -254,39 +256,44 @@ function addAtivo(){
   renderCarteira();
 }
 
-function removeAtivo(t){carteira=carteira.filter(c=>c.t!==t);renderCarteira();}
+function removeAtivo(t){ carteira=carteira.filter(c=>c.t!==t); renderCarteira(); }
 
 function renderCarteira(){
   const lista=document.getElementById('cart-lista');
-  if(!carteira.length){lista.innerHTML='<div style="color:var(--text3);font-size:12px;padding:.5rem 0">Adicione ativos para calcular sua renda.</div>';return;}
-
+  if(!carteira.length){
+    lista.innerHTML='<div style="color:var(--text3);font-size:12px;padding:.5rem 0">Adicione ativos para calcular sua renda.</div>';
+    return;
+  }
   lista.innerHTML=carteira.map(c=>{
     const renda=c.p*(c.dy/100/12)*c.qtd;
     const total=c.p*c.qtd;
     return `<div class="carteira-item">
-      <div style="flex:1"><div style="font-weight:700;font-size:13px">${c.t}</div><div style="font-size:11px;color:var(--text3)">${c.qtd} cotas · R$ ${c.p.toFixed(2)} · DY ${c.dy.toFixed(1)}%</div></div>
-      <div style="text-align:right;margin-right:12px"><div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--up)">+${fmt(renda)}/mês</div><div style="font-size:11px;color:var(--text3)">${fmt(total)} investido</div></div>
-      <button onclick="removeAtivo('${c.t}')" style="background:var(--dn-bg);color:var(--dn);border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px">✕</button>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:13px">${c.t}</div>
+        <div style="font-size:11px;color:var(--text3)">${c.qtd} cotas · R$&nbsp;${c.p.toFixed(2)} · DY ${c.dy.toFixed(1)}%</div>
+      </div>
+      <div style="text-align:right;margin-right:12px">
+        <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--up)">+${fmt(renda)}/mês</div>
+        <div style="font-size:11px;color:var(--text3)">${fmt(total)} investido</div>
+      </div>
+      <button onclick="removeAtivo('${c.t}')" style="background:var(--dn-bg);color:var(--dn);border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px;font-weight:700">✕</button>
     </div>`;
   }).join('');
-
   const totalInv=carteira.reduce((s,c)=>s+c.p*c.qtd,0);
   const rendaMensal=carteira.reduce((s,c)=>s+c.p*(c.dy/100/12)*c.qtd,0);
   const dyMed=totalInv>0?(rendaMensal*12/totalInv*100):0;
-
   document.getElementById('cart-renda').textContent=fmt(rendaMensal);
   document.getElementById('cart-anual').textContent=fmt(rendaMensal*12);
   document.getElementById('cart-total').textContent=fmt(totalInv);
   document.getElementById('cart-dy-med').textContent=dyMed.toFixed(1)+'%';
-
-  if(carteiraChart)carteiraChart.destroy();
+  if(carteiraChart) carteiraChart.destroy();
   carteiraChart=new Chart(document.getElementById('carteiraChart'),{type:'doughnut',
-    data:{labels:carteira.map(c=>c.t),datasets:[{data:carteira.map(c=>+(c.p*(c.dy/100/12)*c.qtd).toFixed(2)),backgroundColor:['#F5A623','#22C87A','#E8503A','#5E8EE0','#A78BFA','#34D399','#F87171','#60A5FA']}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#9B9896',font:{size:11}}}}}
+    data:{labels:carteira.map(c=>c.t),datasets:[{data:carteira.map(c=>+(c.p*(c.dy/100/12)*c.qtd).toFixed(2)),backgroundColor:['#F5A623','#1FC96E','#E8503A','#5E8EE0','#A78BFA','#34D399','#F87171','#60A5FA']}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#8A8884',font:{size:11}}}}}
   });
 }
 
-async function init(){await loadData();calcJuros();}
+async function init(){ await loadData(); calcJuros(); }
 init();
 </script>
 </body></html>

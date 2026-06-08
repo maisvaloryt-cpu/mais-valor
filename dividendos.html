@@ -10,21 +10,37 @@
 <body>
 <div id="nav-placeholder"></div>
 
-<div class="page-hero">
+<div class="page-hero fade-in">
   <h1>AGENDA DE <em>DIVIDENDOS</em></h1>
   <p>Próximos pagamentos de dividendos, JCP e rendimentos de ações e FIIs.</p>
 </div>
 
 <div class="container">
-  <div class="mini-cards">
-    <div class="mini-card"><div class="mini-label">Total de Ações</div><div class="mini-val" id="mc-total-acoes">—</div><div class="mini-sub">ações + FIIs</div></div>
-    <div class="mini-card"><div class="mini-label">Total de FIIs</div><div class="mini-val gold" id="mc-total-fiis">—</div><div class="mini-sub">monitorados</div></div>
-    <div class="mini-card"><div class="mini-label">Maior DY Ações</div><div class="mini-val" id="mc-dy-acao">—</div><div class="mini-sub" id="mc-dy-acao-sub">12 meses</div></div>
-    <div class="mini-card"><div class="mini-label">Maior DY FIIs</div><div class="mini-val" id="mc-dy-fii">—</div><div class="mini-sub" id="mc-dy-fii-sub">12 meses</div></div>
+  <div class="mini-cards fade-in-1">
+    <div class="mini-card">
+      <div class="mini-label">Total de Ações</div>
+      <div class="mini-val" id="mc-total-acoes">—</div>
+      <div class="mini-sub">monitoradas</div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-label">Total de FIIs</div>
+      <div class="mini-val gold" id="mc-total-fiis">—</div>
+      <div class="mini-sub">monitorados</div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-label">Maior DY Ações</div>
+      <div class="mini-val" id="mc-dy-acao">—</div>
+      <div class="mini-sub" id="mc-dy-acao-sub">12 meses</div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-label">Maior DY FIIs</div>
+      <div class="mini-val" id="mc-dy-fii">—</div>
+      <div class="mini-sub" id="mc-dy-fii-sub">12 meses</div>
+    </div>
   </div>
 
   <div class="main-grid">
-    <div>
+    <div class="fade-in-2">
       <div class="filter-bar">
         <input class="filter-input" placeholder="🔍 Buscar ativo..." style="flex:1;max-width:280px" oninput="filter()" id="f-search">
         <select class="filter-select" onchange="filter()" id="f-tipo">
@@ -51,7 +67,7 @@
       </div>
     </div>
 
-    <div class="sidebar">
+    <div class="sidebar fade-in-3">
       <div class="card">
         <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Top DY Ações</div></div>
         <div id="top-dy-acoes"></div>
@@ -61,8 +77,8 @@
         <div id="top-dy-fiis"></div>
       </div>
       <div class="card" style="background:var(--bg3)">
-        <div style="font-size:12px;color:var(--text2);line-height:1.7">
-          <div style="font-weight:700;color:var(--gold);margin-bottom:8px">📌 Glossário</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.8">
+          <div style="font-weight:700;color:var(--gold);margin-bottom:10px;font-size:13px">📌 Glossário</div>
           <div style="margin-bottom:8px"><strong style="color:var(--text)">Data Com</strong> — último dia para ter direito ao dividendo</div>
           <div style="margin-bottom:8px"><strong style="color:var(--text)">Pagamento</strong> — data em que o valor cai na conta</div>
           <div style="margin-bottom:8px"><strong style="color:var(--text)">DY</strong> — dividend yield anualizado sobre preço atual</div>
@@ -76,16 +92,24 @@
 <div id="footer-placeholder"></div>
 <script src="data.js"></script><script src="nav.js"></script>
 <script>
+function logoImg(ticker, size=22) {
+  return `<img src="https://raw.githubusercontent.com/thefintz/icones-b3/main/icones/${ticker}.png"
+    onerror="this.style.display='none'"
+    style="width:${size}px;height:${size}px;border-radius:50%;object-fit:contain;background:#fff;flex-shrink:0">`;
+}
 function renderTable(arr){
   const tb=document.getElementById('tbody'); tb.innerHTML='';
-  arr.forEach(d=>{
+  if(!arr.length){ tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text3)">Nenhum resultado</td></tr>'; return; }
+  arr.forEach((d,i)=>{
     const tipoColor=d.tipo==='Dividendo'?'up-pill':d.tipo==='JCP'?'gold-pill':'';
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
+    tr.style.animationDelay=(i*0.02)+'s'; tr.className='fade-in';
+    tr.innerHTML=`
+      <td><div style="display:flex;align-items:center;gap:8px">${logoImg(d.t)}<div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></div></div></td>
       <td><span class="pill ${tipoColor}">${d.tipo}</span></td>
-      <td class="r" style="font-family:'DM Mono',monospace;font-size:12px">${d.com.slice(0,5)}</td>
-      <td class="r" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--gold)">${d.pag.slice(0,5)}</td>
-      <td class="r" style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--gold)">R$ ${d.val.toFixed(2)}</td>
+      <td class="r" style="font-size:12px">${d.com.slice(0,5)}</td>
+      <td class="r" style="font-size:12px;color:var(--gold)">${d.pag.slice(0,5)}</td>
+      <td class="r" style="font-size:14px;font-weight:700;color:var(--gold)">R$&nbsp;${d.val.toFixed(2)}</td>
       <td class="r up">${d.dy}</td>`;
     tb.appendChild(tr);
   });
@@ -94,19 +118,26 @@ function renderTable(arr){
 function filter(){
   const q=document.getElementById('f-search').value.toLowerCase();
   const tipo=document.getElementById('f-tipo').value;
-  const arr=DIVIDENDOS.filter(d=>(d.t.toLowerCase().includes(q)||d.n.toLowerCase().includes(q))&&(!tipo||d.tipo===tipo));
-  renderTable(arr);
+  renderTable(DIVIDENDOS.filter(d=>(d.t.toLowerCase().includes(q)||d.n.toLowerCase().includes(q))&&(!tipo||d.tipo===tipo)));
 }
 
 function renderSidebar(){
-  const topAcoes=[...ACOES].sort((a,b)=>b.dy-a.dy).slice(0,5);
+  const topAcoes=[...ACOES].filter(d=>d.dy>0).sort((a,b)=>b.dy-a.dy).slice(0,5);
   document.getElementById('top-dy-acoes').innerHTML=topAcoes.map(d=>`
-    <div class="mover-item"><div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
-    <div style="text-align:right"><div class="mover-price gold">${d.dy.toFixed(1)}%</div><div style="font-size:11px;color:var(--text3)">R$ ${d.p.toFixed(2)}</div></div></div>`).join('');
-  const topFiis=[...FIIS].sort((a,b)=>b.dy-a.dy).slice(0,5);
+    <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}'">
+      <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      <div style="text-align:right">
+        <div class="mover-price gold">${d.dy.toFixed(1)}%</div>
+        <div style="font-size:11px;color:var(--text3)">R$&nbsp;${d.p.toFixed(2)}</div>
+      </div></div>`).join('');
+  const topFiis=[...FIIS].filter(d=>d.dy>0).sort((a,b)=>b.dy-a.dy).slice(0,5);
   document.getElementById('top-dy-fiis').innerHTML=topFiis.map(d=>`
-    <div class="mover-item"><div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
-    <div style="text-align:right"><div class="mover-price gold">${d.dy.toFixed(1)}%</div><div style="font-size:11px;color:var(--text3)">R$ ${d.p.toFixed(2)}</div></div></div>`).join('');
+    <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}&tipo=fii'">
+      <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      <div style="text-align:right">
+        <div class="mover-price gold">${d.dy.toFixed(1)}%</div>
+        <div style="font-size:11px;color:var(--text3)">R$&nbsp;${d.p.toFixed(2)}</div>
+      </div></div>`).join('');
 }
 
 function updateMiniCards(){
@@ -114,22 +145,11 @@ function updateMiniCards(){
   const topFii=[...FIIS].filter(d=>d.dy>0).sort((a,b)=>b.dy-a.dy)[0];
   document.getElementById('mc-total-acoes').textContent=ACOES.length||'—';
   document.getElementById('mc-total-fiis').textContent=FIIS.length||'—';
-  if(topAcao){
-    document.getElementById('mc-dy-acao').textContent=topAcao.dy.toFixed(1)+'%';
-    document.getElementById('mc-dy-acao-sub').textContent=topAcao.t+' · 12 meses';
-  }
-  if(topFii){
-    document.getElementById('mc-dy-fii').textContent=topFii.dy.toFixed(1)+'%';
-    document.getElementById('mc-dy-fii-sub').textContent=topFii.t+' · 12 meses';
-  }
+  if(topAcao){ document.getElementById('mc-dy-acao').textContent=topAcao.dy.toFixed(1)+'%'; document.getElementById('mc-dy-acao-sub').textContent=topAcao.t+' · 12m'; }
+  if(topFii){  document.getElementById('mc-dy-fii').textContent=topFii.dy.toFixed(1)+'%';   document.getElementById('mc-dy-fii-sub').textContent=topFii.t+' · 12m'; }
 }
 
-async function init(){
-  await loadData();
-  updateMiniCards();
-  renderTable(DIVIDENDOS);
-  renderSidebar();
-}
+async function init(){ await loadData(); updateMiniCards(); renderTable(DIVIDENDOS); renderSidebar(); }
 init();
 </script>
 </body></html>

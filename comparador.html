@@ -10,17 +10,17 @@
 .cmp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
 .cmp-select { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; }
 .cmp-select label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .6px; display: block; margin-bottom: .5rem; }
-.cmp-input { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 16px; font-weight: 700; font-family: 'DM Mono', monospace; color: var(--text); }
+.cmp-input { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 16px; font-weight: 700; font-family: var(--font-mono); color: var(--text); }
 .cmp-input:focus { outline: none; border-color: var(--gold); }
 .cmp-header { display: flex; align-items: center; gap: 1rem; margin-top: 1rem; }
-.cmp-ticker-big { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 1px; }
-.cmp-price-big { font-family: 'DM Mono', monospace; font-size: 24px; font-weight: 700; }
+.cmp-ticker-big { font-family: var(--font-display); font-size: 36px; letter-spacing: 1px; }
+.cmp-price-big { font-family: var(--font-mono); font-size: 24px; font-weight: 700; }
 .cmp-table { width: 100%; border-collapse: collapse; }
 .cmp-table tr { border-bottom: 1px solid var(--border); }
 .cmp-table tr:last-child { border-bottom: none; }
 .cmp-table td { padding: 10px 14px; font-size: 13px; }
 .cmp-table td:first-child { color: var(--text3); font-weight: 600; width: 35%; }
-.cmp-table td:not(:first-child) { font-family: 'DM Mono', monospace; font-weight: 700; text-align: right; }
+.cmp-table td:not(:first-child) { font-family: var(--font-mono); font-weight: 700; text-align: right; }
 .winner { color: var(--up) !important; }
 .loser { color: var(--dn) !important; }
 .chart-wrap { position: relative; height: 280px; }
@@ -28,7 +28,7 @@
 </head>
 <body>
 <div id="nav-placeholder"></div>
-<div class="page-hero">
+<div class="page-hero fade-in">
   <h1>COMPARADOR <em>DE ATIVOS</em></h1>
   <p>Compare dois ativos lado a lado — indicadores, gráfico histórico e performance.</p>
 </div>
