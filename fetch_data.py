@@ -1,26 +1,45 @@
 """
-fetch_data.py — Cotações diárias via Brapi
-- Salva cotacoes.json com preços atuais
-- Adiciona cada fechamento em data/diario/TICKER.json (histórico diário crescente)
-- Fallback: se Brapi falhar, usa último preço do histórico diário
+fetch_data.py — Cotações diárias via Brapi para TODOS os ativos
+Lê a lista completa do fundamentus.json e fiis_fundamentus.json
+Salva cotação diária em data/diario/TICKER.json (fallback)
 """
 import json, time, datetime, os, requests
 
 BRAPI_TOKEN = os.environ.get("BRAPI_TOKEN", "")
 
-ACOES = [
-    "PETR4","VALE3","ITUB4","BBDC4","WEGE3","ABEV3","BBAS3","MGLU3",
-    "RENT3","SUZB3","ITSA4","BPAC11","PRIO3","GGBR4","VIVT3","EQTL3",
-    "RADL3","LREN3","HAPV3","BRFS3","TOTS3","MULT3","CYRE3","MRVE3","BBSE3",
-]
+def get_tickers_acoes():
+    """Lê lista de ações do fundamentus.json"""
+    try:
+        with open("data/fundamentus.json") as f:
+            d = json.load(f)
+        tickers = list(d.get("acoes", {}).keys())
+        print(f"  {len(tickers)} ações carregadas do fundamentus.json")
+        return tickers
+    except:
+        # Fallback se fundamentus ainda não existir
+        print("  fundamentus.json não encontrado, usando lista padrão")
+        return [
+            "PETR4","VALE3","ITUB4","BBDC4","WEGE3","ABEV3","BBAS3","MGLU3",
+            "RENT3","SUZB3","ITSA4","BPAC11","PRIO3","GGBR4","VIVT3","EQTL3",
+            "RADL3","LREN3","HAPV3","BRFS3","TOTS3","MULT3","CYRE3","MRVE3","BBSE3",
+        ]
 
-FIIS = [
-    "MXRF11","HGLG11","XPML11","KNRI11","CPTS11","VISC11","BTLG11",
-    "BCFF11","RBRF11","KNCR11","HGRE11","LVBI11","BRCO11",
-]
+def get_tickers_fiis():
+    """Lê lista de FIIs do fiis_fundamentus.json"""
+    try:
+        with open("data/fiis_fundamentus.json") as f:
+            d = json.load(f)
+        tickers = list(d.get("fiis", {}).keys())
+        print(f"  {len(tickers)} FIIs carregados do fiis_fundamentus.json")
+        return tickers
+    except:
+        print("  fiis_fundamentus.json não encontrado, usando lista padrão")
+        return [
+            "MXRF11","HGLG11","XPML11","KNRI11","CPTS11","VISC11","BTLG11",
+            "BCFF11","RBRF11","KNCR11","HGRE11","LVBI11","BRCO11",
+        ]
 
 def fetch_one(ticker):
-    """Busca cotação atual na Brapi"""
     url = f"https://brapi.dev/api/quote/{ticker}?token={BRAPI_TOKEN}"
     try:
         resp = requests.get(url, timeout=15)
@@ -45,12 +64,9 @@ def fetch_one(ticker):
     except:
         return None
 
-def salvar_historico_diario(ticker, price, date_str):
-    """Adiciona o fechamento de hoje no histórico diário"""
+def salvar_diario(ticker, price, date_str):
     os.makedirs("data/diario", exist_ok=True)
     path = f"data/diario/{ticker}.json"
-    
-    # Carrega histórico existente
     history = []
     if os.path.exists(path):
         try:
@@ -58,43 +74,31 @@ def salvar_historico_diario(ticker, price, date_str):
                 history = json.load(f).get("history", [])
         except:
             history = []
-    
-    # Evita duplicar o mesmo dia
     if history and history[-1]["date"] == date_str:
-        history[-1]["close"] = price  # atualiza se rodar mais de uma vez no dia
+        history[-1]["close"] = price
     else:
         history.append({"date": date_str, "close": price})
-    
-    # Mantém só os últimos 2 anos de dados diários (evita arquivo gigante)
     if len(history) > 500:
         history = history[-500:]
-    
     with open(path, "w") as f:
         json.dump({"ticker": ticker, "history": history}, f)
 
-def fallback_from_diario(ticker):
-    """Pega último preço do histórico diário (muito mais recente que o mensal)"""
+def fallback_diario(ticker):
     path = f"data/diario/{ticker}.json"
     try:
         if not os.path.exists(path): return None
         with open(path) as f:
             data = json.load(f)
-        history = data.get("history", [])
-        if not history: return None
-        last = history[-1]
-        dias_atras = (datetime.date.today() - datetime.date.fromisoformat(last["date"])).days
+        hist = data.get("history", [])
+        if not hist: return None
+        last = hist[-1]
+        dias = (datetime.date.today() - datetime.date.fromisoformat(last["date"])).days
         return {
-            "ticker": ticker,
-            "name": ticker,
-            "price": last["close"],
-            "change": 0.0,
-            "volume": 0,
-            "marketCap": 0,
-            "pe": None, "pb": None,
-            "dividendYield": 0,
-            "fallback": True,
-            "fallback_date": last["date"],
-            "fallback_days": dias_atras,
+            "ticker": ticker, "name": ticker,
+            "price": last["close"], "change": 0.0,
+            "volume": 0, "marketCap": 0,
+            "pe": None, "pb": None, "dividendYield": 0,
+            "fallback": True, "fallback_date": last["date"], "fallback_days": dias,
         }
     except:
         return None
@@ -102,26 +106,23 @@ def fallback_from_diario(ticker):
 def fetch_all(tickers, label):
     results = []
     today = datetime.date.today().isoformat()
-    
+    ok = fb = sem = 0
     for i, ticker in enumerate(tickers):
         print(f"  {label} {i+1}/{len(tickers)}: {ticker}", end=" ")
         data = fetch_one(ticker)
-        
         if data:
-            # Salva no histórico diário
-            salvar_historico_diario(ticker, data["price"], today)
+            salvar_diario(ticker, data["price"], today)
             print(f"✓ R${data['price']} ({data['change']:+.2f}%)")
-            results.append(data)
+            results.append(data); ok += 1
         else:
-            # Fallback: último preço diário
-            fb = fallback_from_diario(ticker)
-            if fb:
-                print(f"⚠ fallback {fb['fallback_days']}d atrás R${fb['price']}")
-                results.append(fb)
+            fb_data = fallback_diario(ticker)
+            if fb_data:
+                print(f"⚠ fallback {fb_data.get('fallback_days','?')}d R${fb_data['price']}")
+                results.append(fb_data); fb += 1
             else:
-                print("✗ sem dados")
-        
-        time.sleep(0.5)
+                print("✗ sem dados"); sem += 1
+        time.sleep(0.4)
+    print(f"  → {label}: {ok} OK | {fb} fallback | {sem} sem dados")
     return results
 
 def main():
@@ -129,20 +130,25 @@ def main():
     now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-3)))
     now_str = now.strftime("%d/%m/%Y %H:%M")
 
-    print("Buscando ações...")
-    acoes = fetch_all(ACOES, "Ação")
+    # Primeiro roda o Fundamentus para ter a lista atualizada
+    print("Carregando listas de ativos...")
+    acoes_tickers = get_tickers_acoes()
+    fiis_tickers = get_tickers_fiis()
 
-    print("\nBuscando FIIs...")
-    fiis = fetch_all(FIIS, "FII")
+    print(f"\nBuscando {len(acoes_tickers)} ações...")
+    acoes = fetch_all(acoes_tickers, "Ação")
+
+    print(f"\nBuscando {len(fiis_tickers)} FIIs...")
+    fiis = fetch_all(fiis_tickers, "FII")
 
     output = {"updated_at": now_str, "acoes": acoes, "fiis": fiis}
     with open("data/cotacoes.json", "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
 
-    total_fallback = sum(1 for a in acoes+fiis if a.get("fallback"))
-    print(f"\nConcluído! {len(acoes)} ações + {len(fiis)} FIIs")
-    print(f"Brapi OK: {len(acoes)+len(fiis)-total_fallback} | Fallback: {total_fallback}")
-    print(f"Horário: {now_str}")
+    total_fb = sum(1 for a in acoes+fiis if a.get("fallback"))
+    print(f"\n✅ Concluído! {len(acoes)} ações + {len(fiis)} FIIs")
+    print(f"   Brapi OK: {len(acoes)+len(fiis)-total_fb} | Fallback: {total_fb}")
+    print(f"   Horário: {now_str}")
 
 if __name__ == "__main__":
     main()
