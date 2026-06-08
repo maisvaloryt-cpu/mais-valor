@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '0 21 * * 1-5'
   workflow_dispatch:
+    inputs:
+      modo:
+        description: 'Modo: "diario" (padrão) ou "historico" (roda só uma vez)'
+        required: false
+        default: 'diario'
 
 jobs:
   update-data:
@@ -20,15 +25,22 @@ jobs:
       - name: Instalar dependências
         run: pip install requests
 
-      - name: Buscar cotações
+      - name: Buscar cotações diárias
+        if: ${{ github.event.inputs.modo != 'historico' }}
         env:
           BRAPI_TOKEN: ${{ secrets.BRAPI_TOKEN }}
         run: python fetch_data.py
+
+      - name: Buscar histórico completo (rode só uma vez!)
+        if: ${{ github.event.inputs.modo == 'historico' }}
+        env:
+          BRAPI_TOKEN: ${{ secrets.BRAPI_TOKEN }}
+        run: python fetch_historico.py
 
       - name: Commit e push dos dados
         run: |
           git config user.name "Mais Valor Bot"
           git config user.email "bot@maisvalor.com"
           git add data/
-          git diff --staged --quiet || git commit -m "📊 Atualização diária de cotações $(date +'%d/%m/%Y %H:%M')"
+          git diff --staged --quiet || git commit -m "📊 Atualização $(date +'%d/%m/%Y %H:%M')"
           git push
