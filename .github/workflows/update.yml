@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       modo:
-        description: 'diario | g1 | g2 | g3 | g4 | g5 | fii1 | fii2 | fii3 | fii4'
+        description: 'diario | g1-g5 | fii1-fii4 | dividendos | relatorio'
         required: false
         default: 'diario'
 
@@ -15,18 +15,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - name: Checkout do repositório
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Instalar Python
+      - name: Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      - name: Instalar dependências
+      - name: Dependências
         run: pip install requests
 
-      - name: Decidir modo automático
+      - name: Decidir modo
         id: modo
         run: |
           if [ "${{ github.event.inputs.modo }}" != "" ]; then
@@ -34,32 +34,22 @@ jobs:
           else
             ACOES=$(ls data/historico/*.json 2>/dev/null | grep -v "11\.json" | wc -l)
             FIIS=$(ls data/historico/*11.json 2>/dev/null | wc -l)
-            echo "Ações com histórico: $ACOES | FIIs com histórico: $FIIS"
-            if [ "$ACOES" -lt 100 ]; then
-              echo "modo=g1" >> $GITHUB_OUTPUT
-            elif [ "$ACOES" -lt 200 ]; then
-              echo "modo=g2" >> $GITHUB_OUTPUT
-            elif [ "$ACOES" -lt 300 ]; then
-              echo "modo=g3" >> $GITHUB_OUTPUT
-            elif [ "$ACOES" -lt 400 ]; then
-              echo "modo=g4" >> $GITHUB_OUTPUT
-            elif [ "$ACOES" -lt 403 ]; then
-              echo "modo=g5" >> $GITHUB_OUTPUT
-            elif [ "$FIIS" -lt 100 ]; then
-              echo "modo=fii1" >> $GITHUB_OUTPUT
-            elif [ "$FIIS" -lt 200 ]; then
-              echo "modo=fii2" >> $GITHUB_OUTPUT
-            elif [ "$FIIS" -lt 300 ]; then
-              echo "modo=fii3" >> $GITHUB_OUTPUT
-            elif [ "$FIIS" -lt 380 ]; then
-              echo "modo=fii4" >> $GITHUB_OUTPUT
-            else
-              echo "modo=diario" >> $GITHUB_OUTPUT
+            if [ "$ACOES" -lt 100 ]; then echo "modo=g1" >> $GITHUB_OUTPUT
+            elif [ "$ACOES" -lt 200 ]; then echo "modo=g2" >> $GITHUB_OUTPUT
+            elif [ "$ACOES" -lt 300 ]; then echo "modo=g3" >> $GITHUB_OUTPUT
+            elif [ "$ACOES" -lt 400 ]; then echo "modo=g4" >> $GITHUB_OUTPUT
+            elif [ "$ACOES" -lt 403 ]; then echo "modo=g5" >> $GITHUB_OUTPUT
+            elif [ "$FIIS" -lt 100 ]; then echo "modo=fii1" >> $GITHUB_OUTPUT
+            elif [ "$FIIS" -lt 200 ]; then echo "modo=fii2" >> $GITHUB_OUTPUT
+            elif [ "$FIIS" -lt 300 ]; then echo "modo=fii3" >> $GITHUB_OUTPUT
+            elif [ "$FIIS" -lt 380 ]; then echo "modo=fii4" >> $GITHUB_OUTPUT
+            else echo "modo=diario" >> $GITHUB_OUTPUT
             fi
           fi
 
-      - name: Mostrar modo
-        run: echo "Modo => ${{ steps.modo.outputs.modo }}"
+      - name: Índices (Ibovespa, IFIX, Dólar)
+        if: ${{ steps.modo.outputs.modo == 'diario' }}
+        run: python fetch_indices.py
 
       - name: Fundamentus — Ações
         if: ${{ steps.modo.outputs.modo == 'diario' }}
@@ -69,49 +59,61 @@ jobs:
         if: ${{ steps.modo.outputs.modo == 'diario' }}
         run: python fetch_fiis_fundamentus.py
 
-      - name: Cotações diárias (Brapi + fallback histórico)
+      - name: Cotações diárias
         if: ${{ steps.modo.outputs.modo == 'diario' }}
         env:
           BRAPI_TOKEN: ${{ secrets.BRAPI_TOKEN }}
         run: python fetch_data.py
 
-      - name: Histórico Ações — Grupo 1
+      - name: Relatório
+        if: ${{ steps.modo.outputs.modo == 'diario' }}
+        run: python gerar_relatorio.py
+
+      - name: Histórico Ações G1
         if: ${{ steps.modo.outputs.modo == 'g1' }}
         run: python fetch_historico_g1.py
 
-      - name: Histórico Ações — Grupo 2
+      - name: Histórico Ações G2
         if: ${{ steps.modo.outputs.modo == 'g2' }}
         run: python fetch_historico_g2.py
 
-      - name: Histórico Ações — Grupo 3
+      - name: Histórico Ações G3
         if: ${{ steps.modo.outputs.modo == 'g3' }}
         run: python fetch_historico_g3.py
 
-      - name: Histórico Ações — Grupo 4
+      - name: Histórico Ações G4
         if: ${{ steps.modo.outputs.modo == 'g4' }}
         run: python fetch_historico_g4.py
 
-      - name: Histórico Ações — Grupo 5
+      - name: Histórico Ações G5
         if: ${{ steps.modo.outputs.modo == 'g5' }}
         run: python fetch_historico_g5.py
 
-      - name: Histórico FIIs — Grupo 1
+      - name: Histórico FIIs G1
         if: ${{ steps.modo.outputs.modo == 'fii1' }}
         run: python fetch_historico_fii_g1.py
 
-      - name: Histórico FIIs — Grupo 2
+      - name: Histórico FIIs G2
         if: ${{ steps.modo.outputs.modo == 'fii2' }}
         run: python fetch_historico_fii_g2.py
 
-      - name: Histórico FIIs — Grupo 3
+      - name: Histórico FIIs G3
         if: ${{ steps.modo.outputs.modo == 'fii3' }}
         run: python fetch_historico_fii_g3.py
 
-      - name: Histórico FIIs — Grupo 4
+      - name: Histórico FIIs G4
         if: ${{ steps.modo.outputs.modo == 'fii4' }}
         run: python fetch_historico_fii_g4.py
 
-      - name: Commit e push dos dados
+      - name: Histórico Dividendos (rode uma vez)
+        if: ${{ steps.modo.outputs.modo == 'dividendos' }}
+        run: python fetch_dividendos_historico.py
+
+      - name: Relatório manual
+        if: ${{ steps.modo.outputs.modo == 'relatorio' }}
+        run: python gerar_relatorio.py
+
+      - name: Commit e Push
         run: |
           git config user.name "Mais Valor Bot"
           git config user.email "bot@maisvalor.com"

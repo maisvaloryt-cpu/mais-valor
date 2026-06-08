@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Minha Watchlist — Mais Valor</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="nav-placeholder"></div>
+<div class="page-hero">
+  <h1>MINHA <em>WATCHLIST</em></h1>
+  <p>Seus ativos favoritos em um só lugar. Dados salvos localmente no seu navegador.</p>
+</div>
+<div class="container">
+  <div id="empty-msg" style="display:none;text-align:center;padding:4rem 2rem">
+    <div style="font-size:48px;margin-bottom:1rem">☆</div>
+    <div style="font-size:18px;font-weight:700;margin-bottom:.5rem">Nenhum ativo favorito ainda</div>
+    <div style="color:var(--text3);margin-bottom:1.5rem">Acesse a página de qualquer ativo e clique em "Favoritar"</div>
+    <a href="acoes.html" class="banner-btn" style="display:inline-block;text-decoration:none">Ver ações →</a>
+  </div>
+
+  <div id="watchlist-content">
+    <div class="mini-cards" id="wl-summary" style="margin-bottom:1.5rem"></div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr>
+          <th>Ativo</th><th class="r">Preço</th><th class="r">Hoje</th>
+          <th class="r">DY 12m</th><th class="r">P/L</th><th class="r">P/VP</th>
+          <th class="r">Volume</th><th class="r">Ação</th>
+        </tr></thead>
+        <tbody id="wl-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div id="footer-placeholder"></div>
+<script src="data.js"></script><script src="nav.js"></script>
+<script>
+function getWatchlist(){try{return JSON.parse(localStorage.getItem('mv_watchlist')||'[]');}catch{return[];}}
+function removeFromWatchlist(t){
+  const w=getWatchlist().filter(x=>x!==t);
+  localStorage.setItem('mv_watchlist',JSON.stringify(w));
+  renderWatchlist();
+}
+
+function renderWatchlist(){
+  const tickers=getWatchlist();
+  const all=[...ACOES,...FIIS];
+
+  if(!tickers.length){
+    document.getElementById('empty-msg').style.display='';
+    document.getElementById('watchlist-content').style.display='none';
+    return;
+  }
+  document.getElementById('empty-msg').style.display='none';
+  document.getElementById('watchlist-content').style.display='';
+
+  const ativos=tickers.map(t=>all.find(a=>a.t===t)).filter(Boolean);
+
+  // Summary cards
+  const totalInv=0;
+  const avgDY=ativos.filter(a=>a.dy>0).reduce((s,a,_,arr)=>s+a.dy/arr.length,0);
+  const altas=ativos.filter(a=>a.v>0).length;
+  document.getElementById('wl-summary').innerHTML=`
+    <div class="mini-card"><div class="mini-label">Ativos favoritados</div><div class="mini-val">${ativos.length}</div></div>
+    <div class="mini-card"><div class="mini-label">Em alta hoje</div><div class="mini-val up">${altas}</div><div class="mini-sub">${ativos.length-altas} em baixa</div></div>
+    <div class="mini-card"><div class="mini-label">DY médio</div><div class="mini-val gold">${avgDY>0?avgDY.toFixed(1)+'%':'—'}</div></div>
+    <div class="mini-card"><div class="mini-label">Última atualização</div><div class="mini-val" style="font-size:13px">${DATA_UPDATED_AT||'—'}</div></div>`;
+
+  document.getElementById('wl-tbody').innerHTML=ativos.map(d=>`
+    <tr onclick="location.href='ativo.html?t=${d.t}${d.t.endsWith('11')?'&tipo=fii':''}'" style="cursor:pointer">
+      <td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
+      <td class="r">R$ ${d.p.toFixed(2)}</td>
+      <td class="r"><span class="pill ${d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>
+      <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
+      <td class="r">${d.pl?(d.pl>0?d.pl.toFixed(1)+'x':'neg.'):'—'}</td>
+      <td class="r">${d.pvp?d.pvp.toFixed(2):'—'}</td>
+      <td class="r" style="color:var(--text3)">${d.vol}</td>
+      <td class="r"><button onclick="event.stopPropagation();removeFromWatchlist('${d.t}')" style="background:var(--dn-bg);color:var(--dn);border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px">✕ Remover</button></td>
+    </tr>`).join('');
+}
+
+async function init(){await loadData();renderWatchlist();}
+init();
+</script>
+</body></html>
