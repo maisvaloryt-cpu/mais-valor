@@ -1,81 +1,77 @@
 """
-fetch_data.py — Busca cotações da B3 via Yahoo Finance e salva em data/
-Roda automaticamente pelo GitHub Actions todo dia útil às 18h
+fetch_data.py — Busca cotações da B3 via Brapi.dev (1 ticker por vez — plano free)
 """
 import json, time, datetime, os, requests
 
-# Lista de todas as ações e FIIs que queremos monitorar
-# Formato Yahoo Finance: ticker + ".SA" para ativos brasileiros
+BRAPI_TOKEN = os.environ.get("BRAPI_TOKEN", "")
+
 ACOES = [
     "PETR4","VALE3","ITUB4","BBDC4","WEGE3","ABEV3","BBAS3","MGLU3",
-    "RENT3","SUZB3","ITSA4","BPAC11","PRIO3","GGBR4","VIVT3","EQTL3",
-    "RADL3","LREN3","JBSS3","BEEF3","CSAN3","UGPA3","HAPV3","RAIL3",
-    "BRFS3","SOMA3","NTCO3","PCAR3","IRBR3","QUAL3","LWSA3","TOTS3",
-    "MULT3","CASH3","MELI34","AMER3","CYRE3","MRVE3","EVEN3","DIRR3",
+    "RENT3","SUZB3","ITSA4","BPAC11","PRIO3","GGBR4","VIVT3",
+    "RADL3","LREN3","HAPV3","BRFS3","TOTS3","MULT3","CYRE3","MRVE3","BBSE3",
 ]
 
 FIIS = [
     "MXRF11","HGLG11","XPML11","KNRI11","CPTS11","VISC11","BTLG11",
-    "BCFF11","RBRF11","HFOF11","KNCR11","HGRE11","RBRR11","LVBI11",
-    "BRCO11","XPCA11","HGBS11","HSML11","MALL11","PVBI11","IRDM11",
-    "TRXF11","RZTR11","RCRB11","BPFF11","SDIL11","GARE11","TGAR11",
+    "BCFF11","RBRF11","KNCR11","HGRE11","LVBI11","BRCO11",
 ]
 
-def fetch_yahoo(tickers, suffix=".SA"):
-    """Busca dados do Yahoo Finance via query v8"""
-    results = []
-    batch = [t + suffix for t in tickers]
-    symbols = "%2C".join(batch)
-    
-    url = f"https://query1.finance.yahoo.com/v8/finance/spark?symbols={symbols}&range=1d&interval=1d"
-    headers = {"User-Agent": "Mozilla/5.0"}
-    
-    # Tenta buscar preços atuais
-    url2 = f"https://query1.finance.yahoo.com/v7/finance/quote?symbols={symbols}"
+def fetch_one(ticker):
+    url = f"https://brapi.dev/api/quote/{ticker}?token={BRAPI_TOKEN}"
     try:
-        resp = requests.get(url2, headers=headers, timeout=15)
+        resp = requests.get(url, timeout=15)
+        resp.raise_for_status()
         data = resp.json()
-        quotes = data.get("quoteResponse", {}).get("result", [])
-        for q in quotes:
-            ticker = q.get("symbol","").replace(".SA","")
-            results.append({
-                "ticker": ticker,
-                "price": round(q.get("regularMarketPrice", 0), 2),
-                "change": round(q.get("regularMarketChangePercent", 0), 2),
-                "volume": q.get("regularMarketVolume", 0),
-                "marketCap": q.get("marketCap", 0),
-                "name": q.get("shortName", ticker),
-                "pe": round(q.get("trailingPE", 0), 2) if q.get("trailingPE") else None,
-                "pb": round(q.get("priceToBook", 0), 2) if q.get("priceToBook") else None,
-                "dividendYield": round((q.get("trailingAnnualDividendYield") or 0) * 100, 2),
-            })
-        time.sleep(1)  # respeita rate limit
+        results = data.get("results", [])
+        if not results:
+            return None
+        q = results[0]
+        return {
+            "ticker": q.get("symbol", ticker),
+            "name": q.get("longName") or q.get("shortName") or ticker,
+            "price": round(q.get("regularMarketPrice") or 0, 2),
+            "change": round(q.get("regularMarketChangePercent") or 0, 2),
+            "volume": q.get("regularMarketVolume") or 0,
+            "marketCap": q.get("marketCap") or 0,
+            "pe": None,
+            "pb": None,
+            "dividendYield": round(float(q.get("dividendYield") or 0), 2),
+        }
     except Exception as e:
-        print(f"Erro ao buscar {suffix}: {e}")
-    
+        print(f"  Erro {ticker}: {e}")
+        return None
+
+def fetch_all(tickers, label):
+    results = []
+    for i, ticker in enumerate(tickers):
+        print(f"  {label} {i+1}/{len(tickers)}: {ticker}")
+        data = fetch_one(ticker)
+        if data:
+            results.append(data)
+        time.sleep(0.5)
     return results
 
 def main():
     os.makedirs("data", exist_ok=True)
-    now = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
-    
-    print("Buscando ações...")
-    acoes = fetch_yahoo(ACOES, ".SA")
-    
+    now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-3)))
+    now_str = now.strftime("%d/%m/%Y %H:%M")
+
+    print("Buscando acoes...")
+    acoes = fetch_all(ACOES, "Acao")
+
     print("Buscando FIIs...")
-    fiis = fetch_yahoo(FIIS, ".SA")
-    
+    fiis = fetch_all(FIIS, "FII")
+
     output = {
-        "updated_at": now,
+        "updated_at": now_str,
         "acoes": acoes,
         "fiis": fiis,
     }
-    
+
     with open("data/cotacoes.json", "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
-    
-    print(f"✅ Salvo: {len(acoes)} ações + {len(fiis)} FIIs em data/cotacoes.json")
-    print(f"⏱  Atualizado em: {now}")
+
+    print(f"Concluido! {len(acoes)} acoes + {len(fiis)} FIIs salvos em {now_str}")
 
 if __name__ == "__main__":
     main()
