@@ -1,7 +1,9 @@
 """
-fetch_data.py — Busca cotações da B3 via Brapi.dev (sem token)
+fetch_data.py — Busca cotações da B3 via Brapi.dev com token
 """
 import json, time, datetime, os, requests
+
+BRAPI_TOKEN = os.environ.get("BRAPI_TOKEN", "")
 
 ACOES = [
     "PETR4","VALE3","ITUB4","BBDC4","WEGE3","ABEV3","BBAS3","MGLU3",
@@ -21,8 +23,7 @@ def fetch_brapi(tickers):
     for i in range(0, len(tickers), batch_size):
         batch = tickers[i:i+batch_size]
         symbols = ",".join(batch)
-        # Sem fundamental=true — funciona sem token
-        url = f"https://brapi.dev/api/quote/{symbols}"
+        url = f"https://brapi.dev/api/quote/{symbols}?token={BRAPI_TOKEN}"
         try:
             resp = requests.get(url, timeout=20)
             resp.raise_for_status()
@@ -38,7 +39,7 @@ def fetch_brapi(tickers):
                     "marketCap": q.get("marketCap") or 0,
                     "pe": None,
                     "pb": None,
-                    "dividendYield": round((q.get("dividendYield") or 0), 2),
+                    "dividendYield": round(float(q.get("dividendYield") or 0), 2),
                 })
             print(f"  Lote {i//batch_size+1}: {len(quotes)} ativos OK")
         except Exception as e:
