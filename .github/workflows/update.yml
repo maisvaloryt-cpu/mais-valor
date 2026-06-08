@@ -6,13 +6,14 @@ on:
   workflow_dispatch:
     inputs:
       modo:
-        description: 'Modo: "diario" (padrão) ou "historico" (roda só uma vez)'
+        description: 'diario | g1 | g2 | g3 | g4 | g5'
         required: false
         default: 'diario'
 
 jobs:
   update-data:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - name: Checkout do repositório
         uses: actions/checkout@v3
@@ -25,22 +26,68 @@ jobs:
       - name: Instalar dependências
         run: pip install requests
 
-      - name: Buscar cotações diárias
-        if: ${{ github.event.inputs.modo != 'historico' }}
+      - name: Decidir modo automático
+        id: modo
+        run: |
+          if [ "${{ github.event.inputs.modo }}" != "" ]; then
+            echo "modo=${{ github.event.inputs.modo }}" >> $GITHUB_OUTPUT
+          else
+            TOTAL=$(ls data/historico/*.json 2>/dev/null | wc -l)
+            echo "Arquivos de histórico: $TOTAL"
+            if [ "$TOTAL" -lt 100 ]; then
+              echo "modo=g1" >> $GITHUB_OUTPUT
+            elif [ "$TOTAL" -lt 200 ]; then
+              echo "modo=g2" >> $GITHUB_OUTPUT
+            elif [ "$TOTAL" -lt 300 ]; then
+              echo "modo=g3" >> $GITHUB_OUTPUT
+            elif [ "$TOTAL" -lt 400 ]; then
+              echo "modo=g4" >> $GITHUB_OUTPUT
+            elif [ "$TOTAL" -lt 403 ]; then
+              echo "modo=g5" >> $GITHUB_OUTPUT
+            else
+              echo "modo=diario" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: Mostrar modo
+        run: echo "Modo => ${{ steps.modo.outputs.modo }}"
+
+      - name: Fundamentus — Ações (indicadores fundamentalistas)
+        run: python fetch_fundamentus.py
+
+      - name: Fundamentus — FIIs (indicadores)
+        run: python fetch_fiis_fundamentus.py
+
+      - name: Cotações diárias (Brapi)
+        if: ${{ steps.modo.outputs.modo == 'diario' }}
         env:
           BRAPI_TOKEN: ${{ secrets.BRAPI_TOKEN }}
         run: python fetch_data.py
 
-      - name: Buscar histórico completo (rode só uma vez!)
-        if: ${{ github.event.inputs.modo == 'historico' }}
-        env:
-          BRAPI_TOKEN: ${{ secrets.BRAPI_TOKEN }}
-        run: python fetch_historico.py
+      - name: Histórico Grupo 1 (ações 1-100)
+        if: ${{ steps.modo.outputs.modo == 'g1' }}
+        run: python fetch_historico_g1.py
+
+      - name: Histórico Grupo 2 (ações 101-200)
+        if: ${{ steps.modo.outputs.modo == 'g2' }}
+        run: python fetch_historico_g2.py
+
+      - name: Histórico Grupo 3 (ações 201-300)
+        if: ${{ steps.modo.outputs.modo == 'g3' }}
+        run: python fetch_historico_g3.py
+
+      - name: Histórico Grupo 4 (ações 301-400)
+        if: ${{ steps.modo.outputs.modo == 'g4' }}
+        run: python fetch_historico_g4.py
+
+      - name: Histórico Grupo 5 (ações 401-403)
+        if: ${{ steps.modo.outputs.modo == 'g5' }}
+        run: python fetch_historico_g5.py
 
       - name: Commit e push dos dados
         run: |
           git config user.name "Mais Valor Bot"
           git config user.email "bot@maisvalor.com"
           git add data/
-          git diff --staged --quiet || git commit -m "📊 Atualização $(date +'%d/%m/%Y %H:%M')"
+          git diff --staged --quiet || git commit -m "📊 Atualização $(date +'%d/%m/%Y %H:%M') — ${{ steps.modo.outputs.modo }}"
           git push
