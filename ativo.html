@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title id="page-title">Ativo — Mais Valor</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.ativo-hero { padding: 1.5rem 2rem; background: var(--bg2); border-bottom: 1px solid var(--border); }
+.ativo-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+.ativo-logo { width: 56px; height: 56px; border-radius: 12px; background: var(--bg3); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 14px; color: var(--gold); letter-spacing: 1px; flex-shrink: 0; }
+.ativo-info h1 { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 1px; color: var(--text); }
+.ativo-info h1 em { color: var(--gold); font-style: normal; }
+.ativo-info .nome { font-size: 14px; color: var(--text2); margin-top: 2px; }
+.ativo-info .setor { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.ativo-preco { text-align: right; }
+.ativo-preco .preco { font-family: 'DM Mono', monospace; font-size: 32px; font-weight: 700; }
+.ativo-preco .variacao { font-size: 14px; font-family: 'DM Mono', monospace; margin-top: 4px; }
+.ativo-tabs { display: flex; gap: 4px; margin-top: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0; }
+.ativo-tab { padding: 8px 16px; font-size: 13px; font-weight: 600; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; transition: all .15s; }
+.ativo-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+.indicadores-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 1.5rem; }
+@media(max-width:768px){ .indicadores-grid{grid-template-columns:repeat(2,1fr);} }
+.ind-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: .85rem 1rem; }
+.ind-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .6px; font-weight: 700; margin-bottom: 4px; }
+.ind-val { font-size: 20px; font-weight: 800; font-family: 'DM Mono', monospace; }
+.ind-desc { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.section-box { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.5rem; }
+.section-box h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+.section-box h3::before { content:''; width:3px; height:14px; background:var(--gold); border-radius:2px; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+</style>
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<div class="ativo-hero" id="ativo-hero">
+  <div class="ativo-header">
+    <div style="display:flex;align-items:center;gap:1rem">
+      <div class="ativo-logo" id="ativo-logo">—</div>
+      <div class="ativo-info">
+        <h1 id="ativo-titulo">—</h1>
+        <div class="nome" id="ativo-nome">Carregando...</div>
+        <div class="setor" id="ativo-setor"></div>
+      </div>
+    </div>
+    <div class="ativo-preco">
+      <div class="preco" id="ativo-preco">—</div>
+      <div class="variacao" id="ativo-var">—</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px" id="ativo-update"></div>
+    </div>
+  </div>
+  <div class="ativo-tabs">
+    <div class="ativo-tab active" onclick="switchTab('overview',this)">Visão Geral</div>
+    <div class="ativo-tab" onclick="switchTab('indicadores',this)">Indicadores</div>
+    <div class="ativo-tab" onclick="switchTab('historico',this)">Histórico</div>
+    <div class="ativo-tab" onclick="switchTab('dividendos',this)">Dividendos</div>
+  </div>
+</div>
+
+<div class="container" style="max-width:1380px">
+
+  <!-- TAB: OVERVIEW -->
+  <div id="tab-overview" class="tab-content active" style="padding-top:1.5rem">
+    <div class="indicadores-grid" id="ind-grid"></div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem">
+      <div>
+        <div class="section-box">
+          <h3>Histórico de Preço</h3>
+          <div style="display:flex;gap:4px;margin-bottom:1rem">
+            <button class="range-btn" onclick="setRange('1M',this)">1M</button>
+            <button class="range-btn" onclick="setRange('6M',this)">6M</button>
+            <button class="range-btn active" onclick="setRange('1A',this)">1A</button>
+            <button class="range-btn" onclick="setRange('5A',this)">5A</button>
+            <button class="range-btn" onclick="setRange('10A',this)">10A</button>
+          </div>
+          <div style="position:relative;height:280px">
+            <canvas id="mainChart" role="img" aria-label="Gráfico histórico do ativo"></canvas>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:1rem">
+            <div class="ind-card"><div class="ind-label">Mín. período</div><div class="ind-val dn" id="ch-min">—</div></div>
+            <div class="ind-card"><div class="ind-label">Máx. período</div><div class="ind-val up" id="ch-max">—</div></div>
+            <div class="ind-card"><div class="ind-label">Retorno período</div><div class="ind-val" id="ch-ret">—</div></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="section-box">
+          <h3>Sobre o Ativo</h3>
+          <div id="about-content" style="font-size:13px;color:var(--text2);line-height:1.7"></div>
+        </div>
+        <div class="section-box">
+          <h3>Outros Ativos do Setor</h3>
+          <div id="same-sector"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: INDICADORES -->
+  <div id="tab-indicadores" class="tab-content" style="padding-top:1.5rem">
+    <div class="section-box">
+      <h3>Indicadores Fundamentalistas</h3>
+      <div id="ind-completo" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
+    </div>
+  </div>
+
+  <!-- TAB: HISTÓRICO -->
+  <div id="tab-historico" class="tab-content" style="padding-top:1.5rem">
+    <div class="section-box">
+      <h3>Tabela de Preços Históricos</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Data</th><th class="r">Preço (R$)</th><th class="r">Variação</th></tr></thead>
+          <tbody id="hist-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: DIVIDENDOS -->
+  <div id="tab-dividendos" class="tab-content" style="padding-top:1.5rem">
+    <div class="section-box">
+      <h3>Histórico de Dividendos</h3>
+      <p style="font-size:13px;color:var(--text3);margin-bottom:1rem">Dados de dividendos pagos — em breve integração completa.</p>
+      <div id="div-content"></div>
+    </div>
+  </div>
+
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="data.js"></script><script src="nav.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const TICKER = (params.get('t') || 'PETR4').toUpperCase();
+const TIPO = params.get('tipo') || 'acao';
+let ativo = null, mainChart = null, currentRange = '1A', histData = [];
+
+function switchTab(id, el) {
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.ativo-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+function fmt(v, sufx='') { return v!=null ? v.toFixed(2)+sufx : '—'; }
+function fmtPct(v) { return v!=null ? v.toFixed(1)+'%' : '—'; }
+
+function renderHero(d) {
+  document.title = `${d.t} — ${d.n} — Mais Valor`;
+  document.getElementById('page-title').textContent = `${d.t} — Mais Valor`;
+  document.getElementById('ativo-logo').textContent = d.t.slice(0,4);
+  document.getElementById('ativo-titulo').innerHTML = `${d.t} <em>·</em>`;
+  document.getElementById('ativo-nome').textContent = d.n;
+  document.getElementById('ativo-setor').textContent = d.setor || '';
+  const isUp = d.v >= 0;
+  document.getElementById('ativo-preco').textContent = 'R$ ' + d.p.toFixed(2);
+  document.getElementById('ativo-preco').className = 'preco ' + (isUp?'up':'dn');
+  document.getElementById('ativo-var').innerHTML = `<span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span> hoje`;
+  if(d.fallback) document.getElementById('ativo-update').textContent = '↩ preço do histórico';
+}
+
+function renderIndicadores(d) {
+  const isFii = TIPO === 'fii';
+  const inds = isFii ? [
+    {label:'DY 12m', val:fmtPct(d.dy), desc:'Dividend Yield anual', cls:d.dy>10?'gold':''},
+    {label:'P/VP', val:fmt(d.pvp), desc:'Preço / Valor Patrimonial', cls:d.pvp&&d.pvp<1?'up':d.pvp&&d.pvp>1.1?'dn':''},
+    {label:'Vacância', val:fmtPct(d.vacancia), desc:'Taxa de vacância física', cls:d.vacancia!=null&&d.vacancia<5?'up':''},
+    {label:'Cap Rate', val:fmtPct(d.cap_rate), desc:'Retorno sobre valor de mercado'},
+    {label:'Qtd. Imóveis', val:d.qtd_imoveis||'—', desc:'Imóveis na carteira'},
+    {label:'Volume', val:d.vol, desc:'Volume médio diário'},
+    {label:'Variação 7d', val:(d.v7>=0?'+':'')+fmt(d.v7,'%'), desc:'Últimos 7 dias', cls:d.v7>=0?'up':'dn'},
+    {label:'Variação 30d', val:(d.v30>=0?'+':'')+fmt(d.v30,'%'), desc:'Últimos 30 dias', cls:d.v30>=0?'up':'dn'},
+  ] : [
+    {label:'DY 12m', val:fmtPct(d.dy), desc:'Dividend Yield anual', cls:d.dy>8?'gold':''},
+    {label:'P/L', val:d.pl?(d.pl>0?d.pl.toFixed(1)+'x':d.pl<0?'negativo':'—'):'—', desc:'Preço / Lucro'},
+    {label:'P/VP', val:fmt(d.pvp), desc:'Preço / Valor Patrimonial', cls:d.pvp&&d.pvp<1?'up':''},
+    {label:'ROE', val:fmtPct(d.roe), desc:'Retorno sobre Patrimônio', cls:d.roe&&d.roe>15?'up':''},
+    {label:'ROIC', val:fmtPct(d.roic), desc:'Retorno sobre Capital', cls:d.roic&&d.roic>12?'up':''},
+    {label:'Mrg. Líquida', val:fmtPct(d.mrg_liq), desc:'Margem líquida'},
+    {label:'Cresc. 5a', val:fmtPct(d.cresc5a), desc:'Crescimento receita 5 anos', cls:d.cresc5a&&d.cresc5a>0?'up':'dn'},
+    {label:'Volume', val:d.vol, desc:'Volume médio diário'},
+  ];
+
+  document.getElementById('ind-grid').innerHTML = inds.map(i=>`
+    <div class="ind-card">
+      <div class="ind-label">${i.label}</div>
+      <div class="ind-val ${i.cls||''}">${i.val}</div>
+      <div class="ind-desc">${i.desc}</div>
+    </div>`).join('');
+
+  // Aba indicadores completa
+  document.getElementById('ind-completo').innerHTML = inds.map(i=>`
+    <div class="ind-card">
+      <div class="ind-label">${i.label}</div>
+      <div class="ind-val ${i.cls||''}" style="font-size:24px">${i.val}</div>
+      <div class="ind-desc">${i.desc}</div>
+    </div>`).join('');
+}
+
+async function renderChart() {
+  histData = await loadHistoricoCompleto(TICKER);
+  drawChart();
+}
+
+function drawChart() {
+  const filt = filterByRange(histData, currentRange);
+  let pts, labels;
+  if(filt && filt.length > 2) {
+    pts = filt.map(p=>p.close);
+    labels = filt.map(p=>p.date);
+    const mn=Math.min(...pts), mx=Math.max(...pts);
+    document.getElementById('ch-min').textContent = 'R$ '+mn.toFixed(2);
+    document.getElementById('ch-max').textContent = 'R$ '+mx.toFixed(2);
+    const ret = ((pts[pts.length-1]-pts[0])/pts[0]*100);
+    const retEl = document.getElementById('ch-ret');
+    retEl.textContent = (ret>=0?'+':'')+ret.toFixed(1)+'%';
+    retEl.className = 'ind-val '+(ret>=0?'up':'dn');
+  } else {
+    pts = genHistory(ativo?.p||10, ativo?.v||0);
+    labels = genLabels(pts.length);
+    document.getElementById('ch-min').textContent = '—';
+    document.getElementById('ch-max').textContent = '—';
+  }
+
+  const isUp = (ativo?.v||0) >= 0;
+  const color = isUp ? '#22C87A' : '#E8503A';
+  if(mainChart) mainChart.destroy();
+  mainChart = new Chart(document.getElementById('mainChart'), {type:'line',
+    data:{labels,datasets:[{data:pts,borderColor:color,borderWidth:2,pointRadius:0,fill:true,backgroundColor:isUp?'rgba(34,200,122,0.06)':'rgba(232,80,58,0.06)',tension:0.35}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$ '+ctx.parsed.y.toFixed(2)}}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},maxTicksLimit:12}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},callback:v=>'R$'+v.toFixed(0)}}}}
+  });
+}
+
+function setRange(r,el) {
+  currentRange=r;
+  document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  drawChart();
+}
+
+function renderHistTable() {
+  const tb = document.getElementById('hist-tbody');
+  if(!histData?.length){tb.innerHTML='<tr><td colspan="3" style="text-align:center;color:var(--text3);padding:1rem">Sem dados históricos</td></tr>';return;}
+  const reversed = [...histData].reverse().slice(0,60);
+  tb.innerHTML = reversed.map((p,i)=>{
+    const prev = reversed[i+1];
+    const chg = prev ? ((p.close-prev.close)/prev.close*100) : 0;
+    return `<tr><td style="font-family:'DM Mono',monospace;font-size:12px">${p.date}</td>
+      <td class="r" style="font-family:'DM Mono',monospace">R$ ${p.close.toFixed(2)}</td>
+      <td class="r"><span class="pill ${chg>=0?'up-pill':'dn-pill'}">${prev?(chg>=0?'+':'')+chg.toFixed(2)+'%':'—'}</span></td></tr>`;
+  }).join('');
+}
+
+function renderAbout(d) {
+  const isFii = TIPO === 'fii';
+  document.getElementById('about-content').innerHTML = `
+    <div style="margin-bottom:.75rem"><strong style="color:var(--text)">Ticker:</strong> ${d.t}</div>
+    <div style="margin-bottom:.75rem"><strong style="color:var(--text)">Nome:</strong> ${d.n}</div>
+    <div style="margin-bottom:.75rem"><strong style="color:var(--text)">${isFii?'Segmento':'Setor'}:</strong> ${d.setor}</div>
+    ${!isFii?`<div style="margin-bottom:.75rem"><strong style="color:var(--text)">Valor de Mercado:</strong> ${d.vm||'—'}</div>`:''}
+    ${isFii&&d.qtd_imoveis?`<div style="margin-bottom:.75rem"><strong style="color:var(--text)">Qtd. Imóveis:</strong> ${d.qtd_imoveis}</div>`:''}
+    <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);font-size:11px;color:var(--text3)">
+      Dados atualizados diariamente via Fundamentus.com.br e Yahoo Finance.<br>Não constitui recomendação de investimento.
+    </div>`;
+}
+
+function renderSameSetor(d) {
+  const all = TIPO==='fii' ? FIIS : ACOES;
+  const peers = all.filter(a=>a.setor===d.setor&&a.t!==d.t).slice(0,5);
+  document.getElementById('same-sector').innerHTML = peers.map(p=>`
+    <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${p.t}&tipo=${TIPO}'">
+      <div><div class="mover-ticker">${p.t}</div><div class="mover-name">${p.n}</div></div>
+      <div style="text-align:right">
+        <div class="mover-price">R$ ${p.p.toFixed(2)}</div>
+        <div class="mover-chg ${p.v>=0?'up':'dn'}">${p.v>=0?'+':''}${p.v.toFixed(2)}%</div>
+      </div>
+    </div>`).join('') || '<div style="color:var(--text3);font-size:12px">Nenhum outro ativo neste setor</div>';
+}
+
+async function init() {
+  await loadData();
+  const all = TIPO==='fii' ? FIIS : ACOES;
+  ativo = all.find(a=>a.t===TICKER) || all[0];
+  if(!ativo) { document.getElementById('ativo-nome').textContent='Ativo não encontrado'; return; }
+  renderHero(ativo);
+  renderIndicadores(ativo);
+  renderAbout(ativo);
+  renderSameSetor(ativo);
+  await renderChart();
+  renderHistTable();
+}
+init();
+</script>
+</body></html>

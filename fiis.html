@@ -12,15 +12,15 @@
 
 <div class="page-hero">
   <h1>FUNDOS <em>IMOBILIÁRIOS</em></h1>
-  <p>Cotações, DY, P/VP e histórico de todos os FIIs listados na B3.</p>
+  <p>Cotações, DY, P/VP e histórico de todos os FIIs listados na B3. <span id="data-timestamp" style="color:var(--gold);font-size:12px"></span></p>
 </div>
 
 <div class="container">
-  <div class="mini-cards">
-    <div class="mini-card"><div class="mini-label">FIIs listados</div><div class="mini-val">389</div><div class="mini-sub">B3 · Jun 2025</div></div>
+  <div class="mini-cards" style="margin-bottom:1.5rem">
+    <div class="mini-card"><div class="mini-label">FIIs listados</div><div class="mini-val" id="mc-total">380</div><div class="mini-sub">B3 · todos os segmentos</div></div>
     <div class="mini-card"><div class="mini-label">IFIX hoje</div><div class="mini-val">3.421</div><div class="mini-sub dn">-0.14%</div></div>
-    <div class="mini-card"><div class="mini-label">DY médio</div><div class="mini-val gold">11.2%</div><div class="mini-sub">12 meses</div></div>
-    <div class="mini-card"><div class="mini-label">P/VP médio</div><div class="mini-val">0.94</div><div class="mini-sub">abaixo do VP</div></div>
+    <div class="mini-card"><div class="mini-label">DY médio</div><div class="mini-val gold" id="mc-dy-med">—</div><div class="mini-sub">12 meses</div></div>
+    <div class="mini-card"><div class="mini-label">P/VP médio</div><div class="mini-val" id="mc-pvp-med">—</div><div class="mini-sub">patrimônio líquido</div></div>
   </div>
 
   <div class="main-grid">
@@ -28,25 +28,33 @@
       <div class="chart-panel">
         <div class="chart-header">
           <div>
-            <div class="chart-ticker" id="c-ticker">MXRF11</div>
-            <div class="chart-price" id="c-price">R$ 10,34 <span class="pill up-pill">+0.19%</span></div>
-            <div class="chart-meta" id="c-meta">Maxi Renda · Papel · B3</div>
+            <div class="chart-ticker" id="c-ticker">—</div>
+            <div class="chart-price" id="c-price">Carregando...</div>
+            <div class="chart-meta" id="c-meta"></div>
           </div>
           <div style="display:flex;gap:4px">
-            <button class="range-btn" onclick="setRange(this)">1M</button>
-            <button class="range-btn active" onclick="setRange(this)">3M</button>
-            <button class="range-btn" onclick="setRange(this)">6M</button>
-            <button class="range-btn" onclick="setRange(this)">1A</button>
+            <button class="range-btn" onclick="setRange('1M',this)">1M</button>
+            <button class="range-btn" onclick="setRange('6M',this)">6M</button>
+            <button class="range-btn active" onclick="setRange('1A',this)">1A</button>
+            <button class="range-btn" onclick="setRange('5A',this)">5A</button>
+            <button class="range-btn" onclick="setRange('10A',this)">10A</button>
           </div>
         </div>
-        <div style="position:relative;width:100%;height:200px">
-          <canvas id="mainChart" role="img" aria-label="Histórico do FII selecionado"></canvas>
+        <div style="position:relative;width:100%;height:220px">
+          <canvas id="mainChart" role="img" aria-label="Histórico do FII"></canvas>
         </div>
         <div class="chart-stats">
-          <div class="chart-stat"><div class="chart-stat-label">DY 12m</div><div class="chart-stat-val up" id="c-dy">13.8%</div></div>
-          <div class="chart-stat"><div class="chart-stat-label">P/VP</div><div class="chart-stat-val" id="c-pvp">1.02</div></div>
-          <div class="chart-stat"><div class="chart-stat-label">Volume</div><div class="chart-stat-val" id="c-vol">R$28M</div></div>
-          <div class="chart-stat"><div class="chart-stat-label">Cotas</div><div class="chart-stat-val" id="c-cotas">3.82M</div></div>
+          <div class="chart-stat"><div class="chart-stat-label">DY 12m</div><div class="chart-stat-val gold" id="c-dy">—</div></div>
+          <div class="chart-stat"><div class="chart-stat-label">P/VP</div><div class="chart-stat-val" id="c-pvp">—</div></div>
+          <div class="chart-stat"><div class="chart-stat-label">Vacância</div><div class="chart-stat-val" id="c-vac">—</div></div>
+          <div class="chart-stat"><div class="chart-stat-label">Cap Rate</div><div class="chart-stat-val" id="c-cap">—</div></div>
+          <div class="chart-stat"><div class="chart-stat-label">Qtd. Imóveis</div><div class="chart-stat-val" id="c-imoveis">—</div></div>
+          <div class="chart-stat"><div class="chart-stat-label">Mín. histórico</div><div class="chart-stat-val dn" id="c-min">—</div></div>
+          <div class="chart-stat"><div class="chart-stat-label">Máx. histórico</div><div class="chart-stat-val up" id="c-max">—</div></div>
+          <div class="chart-stat"><div class="chart-stat-label">Volume</div><div class="chart-stat-val" id="c-vol">—</div></div>
+        </div>
+        <div style="margin-top:.75rem;text-align:right">
+          <a id="c-link" href="#" style="font-size:12px;color:var(--gold);font-weight:700">Ver análise completa →</a>
         </div>
       </div>
 
@@ -55,27 +63,30 @@
         <select class="filter-select" onchange="filter()" id="f-setor">
           <option value="">Todos os segmentos</option>
           <option>Papel</option><option>Logística</option><option>Shoppings</option>
-          <option>Híbrido</option><option>FOF</option><option>Lajes</option>
+          <option>Lajes Corporativas</option><option>Híbrido</option><option>FOF</option>
+          <option>Residencial</option><option>Agro</option><option>Hospital</option>
         </select>
         <select class="filter-select" onchange="sortBy(this.value)">
           <option value="t">Ticker A-Z</option>
           <option value="dy">Maior DY</option>
           <option value="v">Variação dia</option>
-          <option value="pvp">Menor P/VP</option>
+          <option value="pvp_asc">Menor P/VP</option>
           <option value="vol">Maior Volume</option>
         </select>
+        <span id="count-label" style="font-size:12px;color:var(--text3);white-space:nowrap;align-self:center"></span>
       </div>
 
       <div class="table-wrap">
         <table class="data-table">
           <thead><tr>
             <th>FII</th><th class="r">Cota</th><th class="r">Hoje</th>
-            <th class="r">7 dias</th><th class="r">30 dias</th>
-            <th class="r">DY 12m</th><th class="r">P/VP</th><th class="r">Volume</th>
+            <th class="r">DY 12m</th><th class="r">P/VP</th>
+            <th class="r">Vacância</th><th class="r">Volume</th><th class="r">Análise</th>
           </tr></thead>
-          <tbody id="tbody"></tbody>
+          <tbody id="tbody"><tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text3)">Carregando 380 FIIs...</td></tr></tbody>
         </table>
       </div>
+      <div id="pagination" style="display:flex;gap:8px;justify-content:center;margin-top:1rem;flex-wrap:wrap"></div>
     </div>
 
     <div class="sidebar">
@@ -91,6 +102,10 @@
         <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Abaixo do VP</div></div>
         <div id="below-vp"></div>
       </div>
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Menor Vacância</div></div>
+        <div id="low-vac"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -99,75 +114,137 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="data.js"></script><script src="nav.js"></script>
 <script>
-let data=[...FIIS], mainChart=null, sel=FIIS[0];
+let filtered=[], mainChart=null, sel=null, currentRange='1A';
+const PER_PAGE=50; let page=1;
 
-function renderTable(arr){
+function renderTable(arr,p=1){
+  page=p;
+  const slice=arr.slice((p-1)*PER_PAGE, p*PER_PAGE);
   const tb=document.getElementById('tbody'); tb.innerHTML='';
-  arr.forEach(d=>{
-    const pvpClass=d.pvp<1?'up':d.pvp>1.1?'dn':'';
+  document.getElementById('count-label').textContent=arr.length+' FIIs';
+  if(!slice.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text3)">Nenhum FII encontrado</td></tr>';return;}
+  slice.forEach(d=>{
+    const pvpClass=d.pvp?d.pvp<1?'up':d.pvp>1.1?'dn':'':'';
     const tr=document.createElement('tr');
     tr.innerHTML=`<td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
       <td class="r">R$ ${d.p.toFixed(2)}</td>
       <td class="r"><span class="pill ${d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>
-      <td class="r ${d.v7>=0?'up':'dn'}">${d.v7>=0?'+':''}${d.v7.toFixed(2)}%</td>
-      <td class="r ${d.v30>=0?'up':'dn'}">${d.v30>=0?'+':''}${d.v30.toFixed(2)}%</td>
-      <td class="r gold">${d.dy.toFixed(1)}%</td>
-      <td class="r ${pvpClass}">${d.pvp.toFixed(2)}</td>
-      <td class="r" style="color:var(--text3)">${d.vol}</td>`;
+      <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
+      <td class="r ${pvpClass}">${d.pvp?d.pvp.toFixed(2):'—'}</td>
+      <td class="r">${d.vacancia!=null?d.vacancia.toFixed(1)+'%':'—'}</td>
+      <td class="r" style="color:var(--text3)">${d.vol}</td>
+      <td class="r"><a href="ativo.html?t=${d.t}&tipo=fii" style="color:var(--gold);font-size:11px;font-weight:700" onclick="event.stopPropagation()">ver →</a></td>`;
     tr.onclick=()=>loadChart(d); tb.appendChild(tr);
   });
+  renderPag(arr,p);
 }
 
-function loadChart(d){
+function renderPag(arr,p){
+  const total=Math.ceil(arr.length/PER_PAGE);
+  const pg=document.getElementById('pagination'); pg.innerHTML='';
+  if(total<=1) return;
+  for(let i=1;i<=total;i++){
+    const btn=document.createElement('button');
+    btn.textContent=i; btn.className='range-btn'+(i===p?' active':'');
+    btn.onclick=()=>renderTable(arr,i); pg.appendChild(btn);
+  }
+}
+
+async function loadChart(d){
   sel=d;
   document.getElementById('c-ticker').textContent=d.t;
   const isUp=d.v>=0;
   document.getElementById('c-price').innerHTML=`R$ ${d.p.toFixed(2)} <span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span>`;
   document.getElementById('c-meta').textContent=`${d.n} · ${d.setor} · B3`;
-  document.getElementById('c-dy').textContent=d.dy.toFixed(1)+'%';
-  document.getElementById('c-pvp').textContent=d.pvp.toFixed(2);
+  document.getElementById('c-dy').textContent=d.dy>0?d.dy.toFixed(1)+'%':'—';
+  document.getElementById('c-pvp').textContent=d.pvp?d.pvp.toFixed(2):'—';
+  document.getElementById('c-vac').textContent=d.vacancia!=null?d.vacancia.toFixed(1)+'%':'—';
+  document.getElementById('c-cap').textContent=d.cap_rate?d.cap_rate.toFixed(2)+'%':'—';
+  document.getElementById('c-imoveis').textContent=d.qtd_imoveis||'—';
   document.getElementById('c-vol').textContent=d.vol;
-  document.getElementById('c-cotas').textContent=(d.cotas/1e6).toFixed(2)+'M';
-  const pts=genHistory(d.p,d.v); const color=isUp?'#22C87A':'#E8503A';
+  document.getElementById('c-link').href=`ativo.html?t=${d.t}&tipo=fii`;
+
+  const hist=await loadHistoricoCompleto(d.t);
+  let pts,labels;
+  if(hist&&hist.length>0){
+    const filt=filterByRange(hist,currentRange);
+    pts=filt.map(p=>p.close); labels=filt.map(p=>p.date.slice(0,7));
+    document.getElementById('c-min').textContent='R$ '+Math.min(...pts).toFixed(2);
+    document.getElementById('c-max').textContent='R$ '+Math.max(...pts).toFixed(2);
+  }else{
+    pts=genHistory(d.p,d.v); labels=genLabels(pts.length);
+    document.getElementById('c-min').textContent='—';
+    document.getElementById('c-max').textContent='—';
+  }
+  const color=isUp?'#22C87A':'#E8503A';
   if(mainChart)mainChart.destroy();
   mainChart=new Chart(document.getElementById('mainChart'),{type:'line',
-    data:{labels:genLabels(pts.length),datasets:[{data:pts,borderColor:color,borderWidth:2,pointRadius:0,fill:true,backgroundColor:isUp?'rgba(34,200,122,0.06)':'rgba(232,80,58,0.06)',tension:0.35}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$ '+ctx.parsed.y.toFixed(2)}}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},maxTicksLimit:8}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},callback:v=>'R$'+v.toFixed(2)}}}}
+    data:{labels,datasets:[{data:pts,borderColor:color,borderWidth:2,pointRadius:0,fill:true,backgroundColor:isUp?'rgba(34,200,122,0.06)':'rgba(232,80,58,0.06)',tension:0.35}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$ '+ctx.parsed.y.toFixed(2)}}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},maxTicksLimit:10}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},callback:v=>'R$'+v.toFixed(2)}}}}
   });
 }
 
-function setRange(el){document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');loadChart(sel);}
+async function setRange(r,el){
+  currentRange=r;
+  document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  if(sel) await loadChart(sel);
+}
+
 function filter(){
   const q=document.getElementById('f-search').value.toLowerCase();
   const s=document.getElementById('f-setor').value;
-  data=FIIS.filter(d=>(d.t.toLowerCase().includes(q)||d.n.toLowerCase().includes(q))&&(!s||d.setor===s));
-  renderTable(data);
+  filtered=FIIS.filter(d=>(d.t.toLowerCase().includes(q)||d.n.toLowerCase().includes(q))&&(!s||d.setor.toLowerCase().includes(s.toLowerCase())));
+  renderTable(filtered,1);
 }
+
 function sortBy(k){
-  if(k==='t')data.sort((a,b)=>a.t.localeCompare(b.t));
-  else if(k==='pvp')data.sort((a,b)=>a.pvp-b.pvp);
-  else data.sort((a,b)=>b[k]-a[k]);
-  renderTable(data);
+  if(k==='t') filtered.sort((a,b)=>a.t.localeCompare(b.t));
+  else if(k==='pvp_asc') filtered.sort((a,b)=>{if(!a.pvp)return 1;if(!b.pvp)return-1;return a.pvp-b.pvp;});
+  else if(k==='vol') filtered.sort((a,b)=>b.vol.localeCompare(a.vol));
+  else filtered.sort((a,b)=>(b[k]||0)-(a[k]||0));
+  renderTable(filtered,1);
 }
 
 function renderSidebar(){
   const segs={};
   FIIS.forEach(d=>{segs[d.setor]=(segs[d.setor]||0)+1;});
-  document.getElementById('seg-list').innerHTML=Object.entries(segs).sort((a,b)=>b[1]-a[1]).map(([s,n])=>`
-    <div class="mover-item" style="cursor:pointer" onclick="document.getElementById('f-setor').value='${s}';filter()">
+  document.getElementById('seg-list').innerHTML=Object.entries(segs).sort((a,b)=>b[1]-a[1]).slice(0,8)
+    .map(([s,n])=>`<div class="mover-item" style="cursor:pointer" onclick="document.getElementById('f-setor').value='${s}';filter()">
       <span style="font-size:12px;font-weight:700">${s}</span><span class="pill gold-pill">${n}</span></div>`).join('');
-  const topDy=[...FIIS].sort((a,b)=>b.dy-a.dy).slice(0,5);
+
+  const topDy=[...FIIS].filter(d=>d.dy>0).sort((a,b)=>b.dy-a.dy).slice(0,6);
   document.getElementById('top-dy').innerHTML=topDy.map(d=>`
     <div class="mover-item"><div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
     <span class="pill gold-pill">${d.dy.toFixed(1)}%</span></div>`).join('');
-  const belowVP=[...FIIS].filter(d=>d.pvp<0.95).sort((a,b)=>a.pvp-b.pvp).slice(0,5);
-  document.getElementById('below-vp').innerHTML=belowVP.map(d=>`
+
+  const belowVp=[...FIIS].filter(d=>d.pvp&&d.pvp<0.95).sort((a,b)=>a.pvp-b.pvp).slice(0,5);
+  document.getElementById('below-vp').innerHTML=belowVp.map(d=>`
     <div class="mover-item"><div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
     <span class="pill up-pill">P/VP ${d.pvp.toFixed(2)}</span></div>`).join('');
+
+  const lowVac=[...FIIS].filter(d=>d.vacancia!=null&&d.vacancia>=0).sort((a,b)=>a.vacancia-b.vacancia).slice(0,5);
+  document.getElementById('low-vac').innerHTML=lowVac.map(d=>`
+    <div class="mover-item"><div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+    <span class="pill up-pill">${d.vacancia.toFixed(1)}%</span></div>`).join('');
+
+  // Mini cards
+  const dyVals=FIIS.filter(d=>d.dy>0).map(d=>d.dy);
+  if(dyVals.length) document.getElementById('mc-dy-med').textContent=(dyVals.reduce((a,b)=>a+b)/dyVals.length).toFixed(1)+'%';
+  const pvpVals=FIIS.filter(d=>d.pvp).map(d=>d.pvp);
+  if(pvpVals.length) document.getElementById('mc-pvp-med').textContent=(pvpVals.reduce((a,b)=>a+b)/pvpVals.length).toFixed(2);
+  document.getElementById('mc-total').textContent=FIIS.length;
 }
 
-const params=new URLSearchParams(location.search);
-if(params.get('q')){document.getElementById('f-search').value=params.get('q');filter();}
-renderTable(FIIS); loadChart(FIIS[0]); renderSidebar();
+async function init(){
+  await loadData();
+  filtered=[...FIIS];
+  const params=new URLSearchParams(location.search);
+  if(params.get('q')){document.getElementById('f-search').value=params.get('q');filter();}
+  else renderTable(filtered,1);
+  if(FIIS.length>0) await loadChart(FIIS[0]);
+  renderSidebar();
+}
+init();
 </script>
 </body></html>
