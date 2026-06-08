@@ -156,13 +156,17 @@
 let currentTab='acoes', currentData=[], mainChart=null, sel=null, currentRange='1A';
 const SHOW=20;
 
+function logoImg(ticker, size=24) {
+  return `<img src="https://raw.githubusercontent.com/thefintz/icones-b3/main/icones/${ticker}.png" onerror="this.style.display='none'" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:contain;background:#fff;flex-shrink:0">`;
+}
+
 function renderTable(arr){
   const tb=document.getElementById('main-tbody'); tb.innerHTML='';
   const slice=arr.slice(0,SHOW);
   if(!slice.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text3)">Sem dados</td></tr>';return;}
   slice.forEach(d=>{
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
+    tr.innerHTML=`<td><div style="display:flex;align-items:center;gap:8px">${logoImg(d.t)}<div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></div></div></td>
       <td class="r">R$ ${d.p.toFixed(2)}</td>
       <td class="r"><span class="pill ${d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>
       <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
@@ -229,6 +233,7 @@ function renderSidebar(){
     <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}'">
       <div style="display:flex;align-items:center;gap:8px">
         <div class="mover-dot" style="background:var(--up)"></div>
+        ${logoImg(d.t,20)}
         <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
       </div>
       <div style="text-align:right">
@@ -241,6 +246,7 @@ function renderSidebar(){
     <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}'">
       <div style="display:flex;align-items:center;gap:8px">
         <div class="mover-dot" style="background:var(--dn)"></div>
+        ${logoImg(d.t,20)}
         <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
       </div>
       <div style="text-align:right">
