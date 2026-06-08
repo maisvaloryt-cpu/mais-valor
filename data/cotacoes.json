@@ -1,5 +1,392 @@
 {
-  "updated_at": "07/06/2026 23:15",
-  "acoes": [],
-  "fiis": []
+  "updated_at": "07/06/2026 23:18",
+  "acoes": [
+    {
+      "ticker": "PETR4",
+      "name": "Petroleo Brasileiro SA Pfd",
+      "price": 40.89,
+      "change": -0.87,
+      "volume": 34533700,
+      "marketCap": 561060286488,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "VALE3",
+      "name": "Vale S.A.",
+      "price": 78.7,
+      "change": -3.78,
+      "volume": 22910600,
+      "marketCap": 340976883748,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "ITUB4",
+      "name": "Itau Unibanco Holding SA Pfd",
+      "price": 38.83,
+      "change": 0.28,
+      "volume": 34701800,
+      "marketCap": 432650440829,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "BBDC4",
+      "name": "Banco Bradesco SA Pfd",
+      "price": 17.47,
+      "change": 0.58,
+      "volume": 24153600,
+      "marketCap": 171522838961,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "WEGE3",
+      "name": "WEG SA",
+      "price": 42.46,
+      "change": 1.63,
+      "volume": 10062900,
+      "marketCap": 175309364487,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "ABEV3",
+      "name": "Ambev SA",
+      "price": 16.17,
+      "change": 0.62,
+      "volume": 22955400,
+      "marketCap": 253252994507,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "BBAS3",
+      "name": "Banco do Brasil S.A.",
+      "price": 19.17,
+      "change": -1.84,
+      "volume": 51043500,
+      "marketCap": 111688488341,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "MGLU3",
+      "name": "Magazine Luiza S.A.",
+      "price": 5.44,
+      "change": 1.87,
+      "volume": 27749100,
+      "marketCap": 3763956340,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "RENT3",
+      "name": "Localiza Rent A Car SA",
+      "price": 40.58,
+      "change": 0.35,
+      "volume": 6815700,
+      "marketCap": 43527403947,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "SUZB3",
+      "name": "Suzano S.A.",
+      "price": 41.74,
+      "change": 1.26,
+      "volume": 7276600,
+      "marketCap": 51610561206,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "ITSA4",
+      "name": "Itausa SA Non-Cum Perp Pfd Registered Shs",
+      "price": 12.54,
+      "change": -0.48,
+      "volume": 24938000,
+      "marketCap": 141995882070,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "BPAC11",
+      "name": "Banco BTG Pactual SA Units Cons of 1 Sh + 2 Pfd Shs A",
+      "price": 50.65,
+      "change": -0.12,
+      "volume": 9843900,
+      "marketCap": 0,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "PRIO3",
+      "name": "Prio SA",
+      "price": 61.12,
+      "change": -2.35,
+      "volume": 6604100,
+      "marketCap": 52163611690,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "GGBR4",
+      "name": "Gerdau S.A. Pfd",
+      "price": 23.48,
+      "change": -2.69,
+      "volume": 10638300,
+      "marketCap": 44703132278,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "VIVT3",
+      "name": "Telefonica Brasil S.A.",
+      "price": 32.95,
+      "change": -2.37,
+      "volume": 5621700,
+      "marketCap": 108502113647,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "RADL3",
+      "name": "Raia Drogasil S.A.",
+      "price": 17.46,
+      "change": -0.29,
+      "volume": 11758800,
+      "marketCap": 30600424674,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "LREN3",
+      "name": "Lojas Renner S.A.",
+      "price": 14.89,
+      "change": 1.71,
+      "volume": 15176800,
+      "marketCap": 14693961219,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "HAPV3",
+      "name": "Hapvida Participacoes e Investimentos SA",
+      "price": 10.94,
+      "change": -2.5,
+      "volume": 5670400,
+      "marketCap": 5582063470,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "TOTS3",
+      "name": "TOTVS S.A.",
+      "price": 33.1,
+      "change": -1.55,
+      "volume": 5822900,
+      "marketCap": 19845774151,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "MULT3",
+      "name": "Multiplan Empreendimentos Imobiliarios SA",
+      "price": 28.35,
+      "change": -1.05,
+      "volume": 2978200,
+      "marketCap": 14464796209,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "CYRE3",
+      "name": "Cyrela Brazil Realty SA Empreendimentos e Participacoes",
+      "price": 19.83,
+      "change": -4.94,
+      "volume": 6508200,
+      "marketCap": 9025902599,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "MRVE3",
+      "name": "MRV Engenharia e Participacoes S.A.",
+      "price": 5.6,
+      "change": -2.1,
+      "volume": 9884900,
+      "marketCap": 3219412985,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "BBSE3",
+      "name": "BB Seguridade Participacoes SA",
+      "price": 35.39,
+      "change": 1,
+      "volume": 4726200,
+      "marketCap": 67910554411.00001,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    }
+  ],
+  "fiis": [
+    {
+      "ticker": "MXRF11",
+      "name": "Maxi Renda Fundo de Investimento Imobiliario Cotas",
+      "price": 9.8,
+      "change": 0,
+      "volume": 1324395,
+      "marketCap": 0,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "HGLG11",
+      "name": "Patria Log - Fundo de Investimento Imobiliario - Responsabilidade Limitada Cotas",
+      "price": 154.95,
+      "change": 0.64,
+      "volume": 69849,
+      "marketCap": 0,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "XPML11",
+      "name": "XP Malls Fundo Investimento Imobiliario Investor",
+      "price": 106.4,
+      "change": 0.38,
+      "volume": 173552,
+      "marketCap": 0,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "KNRI11",
+      "name": "Kinea Renda Imobiliaria Fundo de Investimento Imobiliario - FII Cotas",
+      "price": 156.6,
+      "change": 0.99,
+      "volume": 51968,
+      "marketCap": 0,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "CPTS11",
+      "name": "Capitania Securities II Fundo de Investimento Imobiliario Cotas",
+      "price": 7.59,
+      "change": -0.39,
+      "volume": 845671,
+      "marketCap": 0,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "VISC11",
+      "name": "Vinci Shopping Centers Fundo de Investimento Imobiliario - FII Cotas",
+      "price": 105.69,
+      "change": -0.28,
+      "volume": 71268,
+      "marketCap": 0,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "BTLG11",
+      "name": "BTG Pactual Logistica Fundo de Investimento Imobiliario Responsabilidade Limitada",
+      "price": 103.35,
+      "change": 0.37,
+      "volume": 94192,
+      "marketCap": 0,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "RBRF11",
+      "name": "Fundo Investimento Imobiliario Rbr Alpha Fundos De Fundos",
+      "price": 6.65,
+      "change": 1.84,
+      "volume": 0,
+      "marketCap": 0,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "KNCR11",
+      "name": "Kinea Rendimentos Imobiliarios Fundo de Investimento Imobiliario - FII Cotas",
+      "price": 106.61,
+      "change": -0.01,
+      "volume": 215562,
+      "marketCap": 0,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "HGRE11",
+      "name": "Patria Escritorios - Fundo de Investimento Imobi liario - Responsabilidade Limitada",
+      "price": 126.97,
+      "change": 0.5,
+      "volume": 10491,
+      "marketCap": 0,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "LVBI11",
+      "name": "Patria - VBI Asset Management Ltda",
+      "price": 105.45,
+      "change": 0.03,
+      "volume": 29799,
+      "marketCap": 0,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    },
+    {
+      "ticker": "BRCO11",
+      "name": "Bresco - Fundo de Investimento Imobiliario",
+      "price": 115.96,
+      "change": -0.07,
+      "volume": 39363,
+      "marketCap": 0,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0
+    }
+  ]
 }
