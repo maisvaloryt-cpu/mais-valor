@@ -9,25 +9,28 @@
 </head>
 <body>
 <div id="nav-placeholder"></div>
-
 <div class="page-hero">
   <h1>RANKINGS <em>B3</em></h1>
-  <p>Os melhores e piores desempenhos por diferentes critérios.</p>
+  <p>Os melhores e piores desempenhos por diferentes critérios. <span id="data-timestamp" style="color:var(--gold);font-size:12px"></span></p>
 </div>
-
 <div class="container">
-  <div class="tabs" style="margin-bottom:1.5rem">
-    <button class="tab active" onclick="switchTab('dy-acoes',this)">DY Ações</button>
-    <button class="tab" onclick="switchTab('dy-fiis',this)">DY FIIs</button>
-    <button class="tab" onclick="switchTab('altas',this)">Maiores Altas</button>
-    <button class="tab" onclick="switchTab('baixas',this)">Maiores Baixas</button>
-    <button class="tab" onclick="switchTab('volume',this)">Volume</button>
-    <button class="tab" onclick="switchTab('pvp',this)">Menor P/VP</button>
+  <div class="tabs" style="margin-bottom:1.5rem;flex-wrap:wrap">
+    <button class="tab active" onclick="render('dy-acoes',this)">DY Ações</button>
+    <button class="tab" onclick="render('dy-fiis',this)">DY FIIs</button>
+    <button class="tab" onclick="render('altas',this)">Maiores Altas</button>
+    <button class="tab" onclick="render('baixas',this)">Maiores Baixas</button>
+    <button class="tab" onclick="render('pl',this)">Menor P/L</button>
+    <button class="tab" onclick="render('pvp-acoes',this)">Menor P/VP Ações</button>
+    <button class="tab" onclick="render('pvp-fiis',this)">Menor P/VP FIIs</button>
+    <button class="tab" onclick="render('roe',this)">Maior ROE</button>
+    <button class="tab" onclick="render('cresc',this)">Maior Crescimento</button>
   </div>
 
   <div class="main-grid">
     <div>
-      <div class="section-header"><div class="section-title" id="rank-title">Maiores Dividend Yield — Ações</div></div>
+      <div class="section-header"><div class="section-title" id="rank-title">—</div>
+        <input class="filter-input" placeholder="Filtrar..." style="width:160px" oninput="filterRank(this.value)" id="rank-filter">
+      </div>
       <div class="table-wrap">
         <table class="data-table">
           <thead><tr id="rank-thead"></tr></thead>
@@ -35,129 +38,187 @@
         </table>
       </div>
     </div>
-
     <div class="sidebar">
-      <div class="card">
-        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Pódio DY Ações</div></div>
-        <div id="podio-acoes"></div>
-      </div>
-      <div class="card">
-        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Pódio DY FIIs</div></div>
-        <div id="podio-fiis"></div>
-      </div>
-      <div class="card">
-        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Mais Negociadas</div></div>
-        <div id="mais-neg"></div>
-      </div>
+      <div class="card"><div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Pódio DY Ações</div></div><div id="podio-acoes"></div></div>
+      <div class="card"><div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Pódio DY FIIs</div></div><div id="podio-fiis"></div></div>
+      <div class="card"><div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Maiores Altas Hoje</div></div><div id="top-altas"></div></div>
     </div>
   </div>
 </div>
-
 <div id="footer-placeholder"></div>
 <script src="data.js"></script><script src="nav.js"></script>
 <script>
+let currentData=[], currentConfig=null;
+
 const configs = {
   'dy-acoes': {
-    title:'Maiores Dividend Yield — Ações',
-    data:()=>[...ACOES].sort((a,b)=>b.dy-a.dy),
-    head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">DY 12m</th><th class="r">Setor</th><th class="r">Hoje</th>',
-    row:(d,i)=>`<td style="font-weight:700;color:var(--text3)">#${i+1}</td>
+    title: 'Maiores Dividend Yield — Ações',
+    getData: () => [...ACOES].filter(d=>d.dy>0&&d.dy<=50).sort((a,b)=>b.dy-a.dy),
+    head: '<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">DY 12m</th><th class="r">P/L</th><th class="r">Setor</th><th class="r">Hoje</th>',
+    row: (d,i) => `<td style="color:var(--text3);font-weight:700">#${i+1}</td>
       <td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
       <td class="r">R$ ${d.p.toFixed(2)}</td>
-      <td class="r" style="font-size:16px;font-weight:800;color:var(--gold)">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
+      <td class="r" style="font-size:16px;font-weight:800;color:var(--gold)">${d.dy.toFixed(1)}%</td>
+      <td class="r">${d.pl?(d.pl>0?d.pl.toFixed(1)+'x':'neg.'):'—'}</td>
       <td class="r" style="color:var(--text3)">${d.setor}</td>
       <td class="r"><span class="pill ${d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>`
   },
   'dy-fiis': {
-    title:'Maiores Dividend Yield — FIIs',
-    data:()=>[...FIIS].sort((a,b)=>b.dy-a.dy),
-    head:'<th>Pos.</th><th>FII</th><th class="r">Cota</th><th class="r">DY 12m</th><th class="r">P/VP</th><th class="r">Segmento</th>',
-    row:(d,i)=>`<td style="font-weight:700;color:var(--text3)">#${i+1}</td>
+    title: 'Maiores Dividend Yield — FIIs',
+    getData: () => [...FIIS].filter(d=>d.dy>0&&d.dy<=50).sort((a,b)=>b.dy-a.dy),
+    head: '<th>Pos.</th><th>FII</th><th class="r">Cota</th><th class="r">DY 12m</th><th class="r">P/VP</th><th class="r">Segmento</th><th class="r">Hoje</th>',
+    row: (d,i) => `<td style="color:var(--text3);font-weight:700">#${i+1}</td>
       <td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
       <td class="r">R$ ${d.p.toFixed(2)}</td>
       <td class="r" style="font-size:16px;font-weight:800;color:var(--gold)">${d.dy.toFixed(1)}%</td>
-      <td class="r ${d.pvp<1?'up':''}">${d.pvp.toFixed(2)}</td>
-      <td class="r" style="color:var(--text3)">${d.setor}</td>`
+      <td class="r ${d.pvp&&d.pvp<1?'up':''}">${d.pvp?d.pvp.toFixed(2):'—'}</td>
+      <td class="r" style="color:var(--text3)">${d.setor}</td>
+      <td class="r"><span class="pill ${d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>`
   },
   'altas': {
-    title:'Maiores Altas do Dia',
-    data:()=>[...ACOES,...FIIS].sort((a,b)=>b.v-a.v),
-    head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">Variação Dia</th><th class="r">7 Dias</th><th class="r">Volume</th>',
-    row:(d,i)=>`<td style="font-weight:700;color:var(--text3)">#${i+1}</td>
+    title: 'Maiores Altas do Dia',
+    getData: () => [...ACOES,...FIIS].filter(d=>d.v>0).sort((a,b)=>b.v-a.v),
+    head: '<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">Hoje</th><th class="r">DY</th><th class="r">Volume</th>',
+    row: (d,i) => `<td style="color:var(--text3);font-weight:700">#${i+1}</td>
       <td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
       <td class="r">R$ ${d.p.toFixed(2)}</td>
       <td class="r"><span class="pill up-pill">+${d.v.toFixed(2)}%</span></td>
-      <td class="r ${d.v7>=0?'up':'dn'}">${d.v7>=0?'+':''}${d.v7.toFixed(2)}%</td>
+      <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
       <td class="r" style="color:var(--text3)">${d.vol}</td>`
   },
   'baixas': {
-    title:'Maiores Baixas do Dia',
-    data:()=>[...ACOES,...FIIS].sort((a,b)=>a.v-b.v),
-    head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">Variação Dia</th><th class="r">7 Dias</th><th class="r">Volume</th>',
-    row:(d,i)=>`<td style="font-weight:700;color:var(--text3)">#${i+1}</td>
+    title: 'Maiores Baixas do Dia',
+    getData: () => [...ACOES,...FIIS].filter(d=>d.v<0).sort((a,b)=>a.v-b.v),
+    head: '<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">Hoje</th><th class="r">DY</th><th class="r">Volume</th>',
+    row: (d,i) => `<td style="color:var(--text3);font-weight:700">#${i+1}</td>
       <td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
       <td class="r">R$ ${d.p.toFixed(2)}</td>
       <td class="r"><span class="pill dn-pill">${d.v.toFixed(2)}%</span></td>
-      <td class="r ${d.v7>=0?'up':'dn'}">${d.v7>=0?'+':''}${d.v7.toFixed(2)}%</td>
+      <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
       <td class="r" style="color:var(--text3)">${d.vol}</td>`
   },
-  'volume': {
-    title:'Mais Negociadas — Volume do Dia',
-    data:()=>ACOES.slice().sort(()=>Math.random()-.5),
-    head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">Volume</th><th class="r">Variação</th><th class="r">Setor</th>',
-    row:(d,i)=>`<td style="font-weight:700;color:var(--text3)">#${i+1}</td>
+  'pl': {
+    title: 'Menor P/L — Ações mais baratas pelo lucro',
+    getData: () => [...ACOES].filter(d=>d.pl&&d.pl>0&&d.pl<100).sort((a,b)=>a.pl-b.pl),
+    head: '<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">P/L</th><th class="r">DY</th><th class="r">ROE</th><th class="r">Setor</th>',
+    row: (d,i) => `<td style="color:var(--text3);font-weight:700">#${i+1}</td>
       <td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
       <td class="r">R$ ${d.p.toFixed(2)}</td>
-      <td class="r" style="color:var(--gold);font-weight:700">${d.vol}</td>
-      <td class="r"><span class="pill ${d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>
+      <td class="r" style="font-size:16px;font-weight:800;color:var(--up)">${d.pl.toFixed(1)}x</td>
+      <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
+      <td class="r ${d.roe&&d.roe>15?'up':''}">${d.roe?d.roe.toFixed(1)+'%':'—'}</td>
       <td class="r" style="color:var(--text3)">${d.setor}</td>`
   },
-  'pvp': {
-    title:'Menor P/VP — FIIs (potencial abaixo do valor patrimonial)',
-    data:()=>[...FIIS].sort((a,b)=>a.pvp-b.pvp),
-    head:'<th>Pos.</th><th>FII</th><th class="r">Cota</th><th class="r">P/VP</th><th class="r">DY 12m</th><th class="r">Segmento</th>',
-    row:(d,i)=>`<td style="font-weight:700;color:var(--text3)">#${i+1}</td>
+  'pvp-acoes': {
+    title: 'Menor P/VP — Ações abaixo do valor patrimonial',
+    getData: () => [...ACOES].filter(d=>d.pvp&&d.pvp>0&&d.pvp<5).sort((a,b)=>a.pvp-b.pvp),
+    head: '<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">P/VP</th><th class="r">DY</th><th class="r">P/L</th><th class="r">Setor</th>',
+    row: (d,i) => `<td style="color:var(--text3);font-weight:700">#${i+1}</td>
       <td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
       <td class="r">R$ ${d.p.toFixed(2)}</td>
-      <td class="r up" style="font-size:15px;font-weight:800">${d.pvp.toFixed(2)}</td>
-      <td class="r gold">${d.dy.toFixed(1)}%</td>
+      <td class="r" style="font-size:16px;font-weight:800;color:var(--up)">${d.pvp.toFixed(2)}</td>
+      <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
+      <td class="r">${d.pl?(d.pl>0?d.pl.toFixed(1)+'x':'neg.'):'—'}</td>
       <td class="r" style="color:var(--text3)">${d.setor}</td>`
-  }
+  },
+  'pvp-fiis': {
+    title: 'Menor P/VP — FIIs abaixo do valor patrimonial',
+    getData: () => [...FIIS].filter(d=>d.pvp&&d.pvp>0&&d.pvp<2).sort((a,b)=>a.pvp-b.pvp),
+    head: '<th>Pos.</th><th>FII</th><th class="r">Cota</th><th class="r">P/VP</th><th class="r">DY</th><th class="r">Segmento</th><th class="r">Vacância</th>',
+    row: (d,i) => `<td style="color:var(--text3);font-weight:700">#${i+1}</td>
+      <td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
+      <td class="r">R$ ${d.p.toFixed(2)}</td>
+      <td class="r" style="font-size:16px;font-weight:800;color:var(--up)">${d.pvp.toFixed(2)}</td>
+      <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
+      <td class="r" style="color:var(--text3)">${d.setor}</td>
+      <td class="r">${d.vacancia!=null?d.vacancia.toFixed(1)+'%':'—'}</td>`
+  },
+  'roe': {
+    title: 'Maior ROE — Retorno sobre Patrimônio',
+    getData: () => [...ACOES].filter(d=>d.roe&&d.roe>0&&d.roe<200).sort((a,b)=>b.roe-a.roe),
+    head: '<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">ROE</th><th class="r">ROIC</th><th class="r">DY</th><th class="r">Setor</th>',
+    row: (d,i) => `<td style="color:var(--text3);font-weight:700">#${i+1}</td>
+      <td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
+      <td class="r">R$ ${d.p.toFixed(2)}</td>
+      <td class="r" style="font-size:16px;font-weight:800;color:var(--up)">${d.roe.toFixed(1)}%</td>
+      <td class="r ${d.roic&&d.roic>12?'up':''}">${d.roic?d.roic.toFixed(1)+'%':'—'}</td>
+      <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
+      <td class="r" style="color:var(--text3)">${d.setor}</td>`
+  },
+  'cresc': {
+    title: 'Maior Crescimento de Receita — 5 anos',
+    getData: () => [...ACOES].filter(d=>d.cresc5a&&d.cresc5a>0&&d.cresc5a<500).sort((a,b)=>b.cresc5a-a.cresc5a),
+    head: '<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">Cresc. 5a</th><th class="r">ROE</th><th class="r">DY</th><th class="r">Setor</th>',
+    row: (d,i) => `<td style="color:var(--text3);font-weight:700">#${i+1}</td>
+      <td><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></td>
+      <td class="r">R$ ${d.p.toFixed(2)}</td>
+      <td class="r" style="font-size:16px;font-weight:800;color:var(--up)">${d.cresc5a.toFixed(1)}%</td>
+      <td class="r ${d.roe&&d.roe>15?'up':''}">${d.roe?d.roe.toFixed(1)+'%':'—'}</td>
+      <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
+      <td class="r" style="color:var(--text3)">${d.setor}</td>`
+  },
 };
 
-let currentCfg = configs['dy-acoes'];
-
-function render(key){
-  const cfg=configs[key]; currentCfg=cfg;
-  document.getElementById('rank-title').textContent=cfg.title;
-  document.getElementById('rank-thead').innerHTML=cfg.head;
-  const data=cfg.data();
-  document.getElementById('rank-tbody').innerHTML=data.map((d,i)=>`<tr>${cfg.row(d,i)}</tr>`).join('');
+function render(key, el) {
+  if(el){document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+  const cfg = configs[key]; currentConfig = cfg;
+  document.getElementById('rank-title').textContent = cfg.title;
+  document.getElementById('rank-thead').innerHTML = cfg.head;
+  currentData = cfg.getData();
+  document.getElementById('rank-filter').value = '';
+  renderTable(currentData);
 }
 
-function switchTab(key,el){
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active'); render(key);
+function renderTable(arr) {
+  document.getElementById('rank-tbody').innerHTML = arr.slice(0,100).map((d,i) =>
+    `<tr onclick="location.href='ativo.html?t=${d.t}${d.t.endsWith('11')?'&tipo=fii':''}';" style="cursor:pointer">${currentConfig.row(d,i)}</tr>`
+  ).join('');
 }
 
-function renderSidebar(){
-  const topA=[...ACOES].sort((a,b)=>b.dy-a.dy).slice(0,3);
-  document.getElementById('podio-acoes').innerHTML=topA.map((d,i)=>`
-    <div class="mover-item"><div style="display:flex;align-items:center;gap:8px">
-      <div style="width:22px;height:22px;border-radius:50%;background:${i===0?'#F5A623':i===1?'#9B9896':'#CD7F32'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#111">${i+1}</div>
-      <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div></div>
-    <div class="mover-price gold">${d.dy.toFixed(1)}%</div></div>`).join('');
-  const topF=[...FIIS].sort((a,b)=>b.dy-a.dy).slice(0,3);
-  document.getElementById('podio-fiis').innerHTML=topF.map((d,i)=>`
-    <div class="mover-item"><div style="display:flex;align-items:center;gap:8px">
-      <div style="width:22px;height:22px;border-radius:50%;background:${i===0?'#F5A623':i===1?'#9B9896':'#CD7F32'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#111">${i+1}</div>
-      <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div></div>
-    <div class="mover-price gold">${d.dy.toFixed(1)}%</div></div>`).join('');
-  document.getElementById('mais-neg').innerHTML=ACOES.slice(0,5).map(d=>`
-    <div class="mover-item"><div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.n}</div></div>
-    <span style="font-size:12px;font-family:'DM Mono',monospace;color:var(--text2)">${d.vol}</span></div>`).join('');
+function filterRank(q) {
+  if(!currentConfig) return;
+  const filtered = currentConfig.getData().filter(d =>
+    d.t.toLowerCase().includes(q.toLowerCase()) ||
+    d.n.toLowerCase().includes(q.toLowerCase())
+  );
+  renderTable(filtered);
 }
 
-render('dy-acoes'); renderSidebar();
+function renderSidebar() {
+  const medal = (i) => ['🥇','🥈','🥉'][i] || `#${i+1}`;
+  const topA = [...ACOES].filter(d=>d.dy>0&&d.dy<=50).sort((a,b)=>b.dy-a.dy).slice(0,3);
+  document.getElementById('podio-acoes').innerHTML = topA.map((d,i) => `
+    <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}'">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:20px">${medal(i)}</span>
+        <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      </div>
+      <span class="pill gold-pill">${d.dy.toFixed(1)}%</span>
+    </div>`).join('');
+
+  const topF = [...FIIS].filter(d=>d.dy>0&&d.dy<=50).sort((a,b)=>b.dy-a.dy).slice(0,3);
+  document.getElementById('podio-fiis').innerHTML = topF.map((d,i) => `
+    <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}&tipo=fii'">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:20px">${medal(i)}</span>
+        <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      </div>
+      <span class="pill gold-pill">${d.dy.toFixed(1)}%</span>
+    </div>`).join('');
+
+  const altas = [...ACOES,...FIIS].filter(d=>d.v>0).sort((a,b)=>b.v-a.v).slice(0,5);
+  document.getElementById('top-altas').innerHTML = altas.map(d => `
+    <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}'">
+      <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      <span class="pill up-pill">+${d.v.toFixed(2)}%</span>
+    </div>`).join('');
+}
+
+async function init() {
+  await loadData();
+  render('dy-acoes', null);
+  renderSidebar();
+}
+init();
 </script>
 </body></html>

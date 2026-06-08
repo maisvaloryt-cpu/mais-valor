@@ -1,34 +1,14 @@
 const LOGO = 'logo.png';
 
 const NAV_LINKS = [
-  { href: 'index.html',       label: 'Home' },
-  { href: 'acoes.html',       label: 'Ações' },
-  { href: 'fiis.html',        label: 'FIIs' },
-  { href: 'dividendos.html',  label: 'Dividendos' },
-  { href: 'rankings.html',    label: 'Rankings' },
-  { href: 'ferramentas.html', label: 'Ferramentas' },
-  { href: 'status.html',      label: '● Status' },
-];
-
-const TICKER_DATA = [
-  { name:'IBOV', val:'136.420', chg:'+0.82%', up:true },
-  { name:'IFIX', val:'3.421',   chg:'-0.14%', up:false },
-  { name:'USD/BRL', val:'5,18', chg:'-0.23%', up:false },
-  { name:'EUR/BRL', val:'5,62', chg:'+0.11%', up:true },
-  { name:'SELIC', val:'13,75%', chg:null },
-  { name:'CDI',   val:'13,65%', chg:null },
-  { name:'IPCA 12m', val:'4,62%', chg:null },
-  { name:'OURO', val:'R$18.320', chg:'+0.44%', up:true },
-  { name:'PETRÓLEO', val:'US$74,3', chg:'-0.67%', up:false },
-  { name:'BTC', val:'US$67.420', chg:'+2.14%', up:true },
-];
-
-const INDICES = [
-  { name:'Ibovespa', val:'136.420', chg:'+1.124 pts (+0.82%)', up:true },
-  { name:'IFIX',     val:'3.421',   chg:'-4,8 pts (-0.14%)',   up:false },
-  { name:'Small Caps', val:'2.187', chg:'+12,3 pts (+0.57%)',  up:true },
-  { name:'IDIV',     val:'8.932',   chg:'+43 pts (+0.48%)',    up:true },
-  { name:'BDRX',     val:'5.614',   chg:'-28 pts (-0.49%)',    up:false },
+  { href: 'index.html',        label: 'Home' },
+  { href: 'acoes.html',        label: 'Ações' },
+  { href: 'fiis.html',         label: 'FIIs' },
+  { href: 'dividendos.html',   label: 'Dividendos' },
+  { href: 'rankings.html',     label: 'Rankings' },
+  { href: 'comparador.html',   label: 'Comparador' },
+  { href: 'ferramentas.html',  label: 'Ferramentas' },
+  { href: 'status.html',       label: '● Status' },
 ];
 
 function renderNav() {
@@ -48,33 +28,94 @@ function renderNav() {
     </a>
     <div class="nav-links">${links}</div>
     <div class="nav-right">
-      <input class="nav-search" type="text" placeholder="🔍 Buscar ativo..." oninput="navSearch(this.value)">
+      <input class="nav-search" type="text" placeholder="🔍 Buscar ativo..." id="nav-search-input"
+        oninput="navSearchLive(this.value)" onkeydown="if(event.key==='Enter')navSearchGo(this.value)">
+      <div id="nav-search-results" style="position:absolute;top:54px;right:2rem;background:var(--bg2);border:1px solid var(--border);border-radius:10px;width:280px;max-height:320px;overflow-y:auto;display:none;z-index:200;box-shadow:0 8px 32px rgba(0,0,0,0.5)"></div>
       <div class="nav-badge">PRO</div>
     </div>
   </nav>
-  <div class="ticker-bar">
-    ${TICKER_DATA.map((t,i) => `
-      ${i>0?'<span class="ticker-sep">|</span>':''}
-      <div class="ticker-item">
-        <span class="ticker-name">${t.name}</span>
-        <span class="ticker-val">${t.val}</span>
-        ${t.chg?`<span class="pill ${t.up?'up-pill':'dn-pill'}">${t.chg}</span>`:''}
-      </div>`).join('')}
+  <div class="ticker-bar" id="ticker-bar-inner">
+    <div class="ticker-item"><span class="ticker-name">IBOV</span><span class="ticker-val" id="tk-ibov">—</span></div>
+    <span class="ticker-sep">|</span>
+    <div class="ticker-item"><span class="ticker-name">IFIX</span><span class="ticker-val" id="tk-ifix">—</span></div>
+    <span class="ticker-sep">|</span>
+    <div class="ticker-item"><span class="ticker-name">USD/BRL</span><span class="ticker-val" id="tk-dolar">—</span></div>
+    <span class="ticker-sep">|</span>
+    <div class="ticker-item"><span class="ticker-name">SELIC</span><span class="ticker-val">13,75%</span></div>
+    <span class="ticker-sep">|</span>
+    <div class="ticker-item"><span class="ticker-name">CDI</span><span class="ticker-val">13,65%</span></div>
+    <span class="ticker-sep">|</span>
+    <div class="ticker-item"><span class="ticker-name">IPCA 12m</span><span class="ticker-val">4,62%</span></div>
+    <span class="ticker-sep">|</span>
+    <div class="ticker-item"><span class="ticker-name">ATIVOS</span><span class="ticker-val" id="tk-total">—</span></div>
   </div>
   <div class="indices-bar">
-    ${INDICES.map(i=>`
-      <div class="idx-card">
-        <div class="idx-name">${i.name}</div>
-        <div class="idx-val">${i.val}</div>
-        <div class="idx-chg ${i.up?'up':'dn'}">${i.chg}</div>
-      </div>`).join('')}
+    <div class="idx-card"><div class="idx-name">Ibovespa</div><div class="idx-val" id="idx-ibov">—</div><div class="idx-chg" id="idx-ibov-chg">—</div></div>
+    <div class="idx-card"><div class="idx-name">IFIX</div><div class="idx-val" id="idx-ifix">—</div><div class="idx-chg" id="idx-ifix-chg">—</div></div>
+    <div class="idx-card"><div class="idx-name">Small Caps</div><div class="idx-val">2.187</div><div class="idx-chg up">+12,3 pts (+0.57%)</div></div>
+    <div class="idx-card"><div class="idx-name">IDIV</div><div class="idx-val">8.932</div><div class="idx-chg up">+43 pts (+0.48%)</div></div>
+    <div class="idx-card"><div class="idx-name">USD/BRL</div><div class="idx-val" id="idx-dolar">—</div><div class="idx-chg" id="idx-dolar-chg">—</div></div>
   </div>`;
+
+  // Fecha busca ao clicar fora
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.nav-right')) {
+      document.getElementById('nav-search-results').style.display = 'none';
+    }
+  });
 }
 
-function navSearch(q) {
-  if (q.length < 2) return;
-  const isFii = q.toUpperCase().includes('11');
-  window.location.href = isFii ? `fiis.html?q=${q}` : `acoes.html?q=${q}`;
+function navUpdateTickers() {
+  // Atualiza com dados reais quando disponíveis
+  setTimeout(() => {
+    if (typeof ACOES !== 'undefined' && ACOES.length) {
+      document.getElementById('tk-total').textContent = (ACOES.length + (FIIS?.length||0)) + ' ativos';
+    }
+    if (typeof DATA_UPDATED_AT !== 'undefined' && DATA_UPDATED_AT) {
+      const el = document.getElementById('nav-updated');
+      if (el) el.textContent = DATA_UPDATED_AT;
+    }
+  }, 2000);
+}
+
+function navSearchLive(q) {
+  const box = document.getElementById('nav-search-results');
+  if (q.length < 2) { box.style.display = 'none'; return; }
+  
+  const all = [...(typeof ACOES!=='undefined'?ACOES:[]), ...(typeof FIIS!=='undefined'?FIIS:[])];
+  const results = all.filter(d =>
+    d.t.toLowerCase().startsWith(q.toLowerCase()) ||
+    d.n.toLowerCase().includes(q.toLowerCase())
+  ).slice(0, 8);
+
+  if (!results.length) { box.style.display = 'none'; return; }
+
+  const isFii = d => d.t.endsWith('11');
+  box.innerHTML = results.map(d => `
+    <div onclick="location.href='ativo.html?t=${d.t}${isFii(d)?'&tipo=fii':''}'"
+      style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s"
+      onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
+      <div>
+        <div style="font-weight:700;font-size:13px">${d.t}</div>
+        <div style="font-size:11px;color:var(--text3)">${d.n}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'DM Mono',monospace;font-size:13px">R$ ${d.p.toFixed(2)}</div>
+        <div style="font-size:11px;color:${d.v>=0?'var(--up)':'var(--dn)'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</div>
+      </div>
+    </div>`).join('');
+  box.style.display = 'block';
+}
+
+function navSearchGo(q) {
+  if (!q) return;
+  const all = [...(typeof ACOES!=='undefined'?ACOES:[]), ...(typeof FIIS!=='undefined'?FIIS:[])];
+  const found = all.find(d => d.t.toLowerCase() === q.toLowerCase());
+  if (found) {
+    location.href = `ativo.html?t=${found.t}${found.t.endsWith('11')?'&tipo=fii':''}`;
+  } else {
+    location.href = `acoes.html?q=${q}`;
+  }
 }
 
 function renderFooter() {
@@ -87,4 +128,5 @@ function renderFooter() {
 document.addEventListener('DOMContentLoaded', () => {
   renderNav();
   renderFooter();
+  navUpdateTickers();
 });

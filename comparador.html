@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comparador — Mais Valor</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.cmp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+.cmp-select { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; }
+.cmp-select label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .6px; display: block; margin-bottom: .5rem; }
+.cmp-input { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 16px; font-weight: 700; font-family: 'DM Mono', monospace; color: var(--text); }
+.cmp-input:focus { outline: none; border-color: var(--gold); }
+.cmp-header { display: flex; align-items: center; gap: 1rem; margin-top: 1rem; }
+.cmp-ticker-big { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 1px; }
+.cmp-price-big { font-family: 'DM Mono', monospace; font-size: 24px; font-weight: 700; }
+.cmp-table { width: 100%; border-collapse: collapse; }
+.cmp-table tr { border-bottom: 1px solid var(--border); }
+.cmp-table tr:last-child { border-bottom: none; }
+.cmp-table td { padding: 10px 14px; font-size: 13px; }
+.cmp-table td:first-child { color: var(--text3); font-weight: 600; width: 35%; }
+.cmp-table td:not(:first-child) { font-family: 'DM Mono', monospace; font-weight: 700; text-align: right; }
+.winner { color: var(--up) !important; }
+.loser { color: var(--dn) !important; }
+.chart-wrap { position: relative; height: 280px; }
+</style>
+</head>
+<body>
+<div id="nav-placeholder"></div>
+<div class="page-hero">
+  <h1>COMPARADOR <em>DE ATIVOS</em></h1>
+  <p>Compare dois ativos lado a lado — indicadores, gráfico histórico e performance.</p>
+</div>
+<div class="container">
+  <div class="cmp-grid">
+    <div class="cmp-select">
+      <label>Ativo 1</label>
+      <input class="cmp-input" id="inp1" placeholder="Ex: PETR4" oninput="searchAtivo(this.value,1)" onchange="selectAtivo(this.value,1)" list="list1">
+      <datalist id="list1"></datalist>
+      <div id="header1" style="margin-top:1rem"></div>
+    </div>
+    <div class="cmp-select">
+      <label>Ativo 2</label>
+      <input class="cmp-input" id="inp2" placeholder="Ex: VALE3" oninput="searchAtivo(this.value,2)" onchange="selectAtivo(this.value,2)" list="list2">
+      <datalist id="list2"></datalist>
+      <div id="header2" style="margin-top:1rem"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:1.5rem" id="chart-card">
+    <div class="section-header" style="margin-bottom:1rem">
+      <div class="section-title">Histórico Comparativo</div>
+      <div style="display:flex;gap:4px">
+        <button class="range-btn" onclick="setRange('1M',this)">1M</button>
+        <button class="range-btn" onclick="setRange('6M',this)">6M</button>
+        <button class="range-btn active" onclick="setRange('1A',this)">1A</button>
+        <button class="range-btn" onclick="setRange('5A',this)">5A</button>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="cmpChart" role="img" aria-label="Gráfico comparativo dos dois ativos"></canvas>
+    </div>
+    <div style="display:flex;gap:1rem;margin-top:.75rem;font-size:12px;font-family:'DM Mono',monospace">
+      <span><span style="color:#F5A623">●</span> <span id="leg1">Ativo 1</span></span>
+      <span><span style="color:#22C87A">●</span> <span id="leg2">Ativo 2</span></span>
+    </div>
+  </div>
+
+  <div class="card" id="table-card">
+    <div class="section-header" style="margin-bottom:1rem"><div class="section-title">Comparação de Indicadores</div></div>
+    <table class="cmp-table">
+      <thead><tr>
+        <td style="color:var(--text3);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Indicador</td>
+        <td style="text-align:right;font-weight:700" id="th1">—</td>
+        <td style="text-align:right;font-weight:700" id="th2">—</td>
+      </tr></thead>
+      <tbody id="cmp-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="data.js"></script><script src="nav.js"></script>
+<script>
+let ativo1=null, ativo2=null, cmpChart=null, currentRange='1A';
+
+async function init() {
+  await loadData();
+  // Popula datalists
+  const all = [...ACOES, ...FIIS];
+  ['list1','list2'].forEach(id => {
+    document.getElementById(id).innerHTML = all.map(d =>
+      `<option value="${d.t}">${d.t} — ${d.n}</option>`).join('');
+  });
+
+  // Pega parâmetros da URL
+  const p = new URLSearchParams(location.search);
+  if(p.get('t1')) { document.getElementById('inp1').value=p.get('t1'); selectAtivo(p.get('t1'),1); }
+  if(p.get('t2')) { document.getElementById('inp2').value=p.get('t2'); selectAtivo(p.get('t2'),2); }
+
+  // Defaults
+  if(!ativo1 && ACOES.length) selectAtivo(ACOES[0].t, 1);
+  if(!ativo2 && ACOES.length>1) selectAtivo(ACOES[1].t, 2);
+}
+
+function findAtivo(ticker) {
+  const t = ticker.toUpperCase();
+  return [...ACOES,...FIIS].find(d=>d.t===t);
+}
+
+function selectAtivo(ticker, num) {
+  const d = findAtivo(ticker);
+  if(!d) return;
+  if(num===1) ativo1=d; else ativo2=d;
+  renderHeader(d, num);
+  updateAll();
+}
+
+function renderHeader(d, num) {
+  const isUp = d.v>=0;
+  document.getElementById(`header${num}`).innerHTML = `
+    <div class="cmp-ticker-big" style="color:${num===1?'var(--gold)':'var(--up)'}">${d.t}</div>
+    <div style="font-size:13px;color:var(--text2);margin:2px 0">${d.n}</div>
+    <div class="cmp-price-big">R$ ${d.p.toFixed(2)} <span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span></div>
+    <div style="font-size:12px;color:var(--text3);margin-top:4px">${d.setor}</div>`;
+}
+
+async function updateAll() {
+  if(!ativo1||!ativo2) return;
+  document.getElementById('th1').textContent = ativo1.t;
+  document.getElementById('th2').textContent = ativo2.t;
+  document.getElementById('leg1').textContent = ativo1.t;
+  document.getElementById('leg2').textContent = ativo2.t;
+  renderTable();
+  await renderChart();
+}
+
+function fmt(v, sfx='') { return v!=null ? v.toFixed(2)+sfx : '—'; }
+function fmtPct(v) { return v!=null&&v!==0 ? v.toFixed(1)+'%' : '—'; }
+
+function renderTable() {
+  const a=ativo1, b=ativo2;
+  const rows = [
+    { label:'Preço', v1:`R$ ${a.p.toFixed(2)}`, v2:`R$ ${b.p.toFixed(2)}`, cmp: null },
+    { label:'Variação dia', v1:`${a.v>=0?'+':''}${a.v.toFixed(2)}%`, v2:`${b.v>=0?'+':''}${b.v.toFixed(2)}%`, cmp:(x,y)=>x>y },
+    { label:'DY 12m', v1:fmtPct(a.dy), v2:fmtPct(b.dy), cmp:(x,y)=>x>y, va:a.dy, vb:b.dy },
+    { label:'P/L', v1:a.pl?(a.pl>0?fmt(a.pl,'x'):'neg.'):'—', v2:b.pl?(b.pl>0?fmt(b.pl,'x'):'neg.'):'—', cmp:(x,y)=>x<y, va:a.pl>0?a.pl:null, vb:b.pl>0?b.pl:null },
+    { label:'P/VP', v1:fmt(a.pvp), v2:fmt(b.pvp), cmp:(x,y)=>x<y, va:a.pvp, vb:b.pvp },
+    { label:'ROE', v1:fmtPct(a.roe), v2:fmtPct(b.roe), cmp:(x,y)=>x>y, va:a.roe, vb:b.roe },
+    { label:'ROIC', v1:fmtPct(a.roic), v2:fmtPct(b.roic), cmp:(x,y)=>x>y, va:a.roic, vb:b.roic },
+    { label:'Mrg. Líquida', v1:fmtPct(a.mrg_liq), v2:fmtPct(b.mrg_liq), cmp:(x,y)=>x>y, va:a.mrg_liq, vb:b.mrg_liq },
+    { label:'Cresc. 5 anos', v1:fmtPct(a.cresc5a), v2:fmtPct(b.cresc5a), cmp:(x,y)=>x>y, va:a.cresc5a, vb:b.cresc5a },
+    { label:'Volume', v1:a.vol, v2:b.vol, cmp:null },
+    { label:'Valor de Mercado', v1:a.vm||'—', v2:b.vm||'—', cmp:null },
+    { label:'Setor', v1:a.setor, v2:b.setor, cmp:null },
+  ];
+
+  document.getElementById('cmp-tbody').innerHTML = rows.map(r => {
+    let c1='', c2='';
+    if(r.cmp && r.va!=null && r.vb!=null && r.va!==r.vb) {
+      if(r.cmp(r.va,r.vb)) { c1='winner'; c2='loser'; }
+      else { c1='loser'; c2='winner'; }
+    }
+    return `<tr><td>${r.label}</td><td class="${c1}">${r.v1}</td><td class="${c2}">${r.v2}</td></tr>`;
+  }).join('');
+}
+
+async function renderChart() {
+  if(!ativo1||!ativo2) return;
+  const [h1,h2] = await Promise.all([
+    loadHistoricoCompleto(ativo1.t),
+    loadHistoricoCompleto(ativo2.t)
+  ]);
+
+  const f1 = filterByRange(h1,currentRange);
+  const f2 = filterByRange(h2,currentRange);
+
+  // Normaliza para base 100 (retorno relativo)
+  const norm = arr => {
+    if(!arr?.length) return [];
+    const base = arr[0].close;
+    return arr.map(p=>((p.close-base)/base*100));
+  };
+
+  const d1 = norm(f1), d2 = norm(f2);
+  const labels = (f1?.length>=f2?.length?f1:f2)?.map(p=>p.date)||[];
+
+  if(cmpChart) cmpChart.destroy();
+  cmpChart = new Chart(document.getElementById('cmpChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label:ativo1.t, data:d1, borderColor:'#F5A623', borderWidth:2, pointRadius:0, fill:false, tension:0.35 },
+        { label:ativo2.t, data:d2, borderColor:'#22C87A', borderWidth:2, pointRadius:0, fill:false, tension:0.35 }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'rgba(17,17,19,0.95)',borderColor:'rgba(245,166,35,0.3)',borderWidth:1,
+          callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y>=0?'+':''}${ctx.parsed.y.toFixed(2)}%`}
+        }
+      },
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},maxTicksLimit:10}},
+        y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},callback:v=>(v>=0?'+':'')+v.toFixed(1)+'%'}}
+      }
+    }
+  });
+}
+
+async function setRange(r,el) {
+  currentRange=r;
+  document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  await renderChart();
+}
+
+init();
+</script>
+</body></html>
