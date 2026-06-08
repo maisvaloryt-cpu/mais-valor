@@ -1,4 +1,3 @@
-// nav.js — componente compartilhado de navegação
 const LOGO = 'logo.png';
 
 const NAV_LINKS = [
@@ -8,6 +7,7 @@ const NAV_LINKS = [
   { href: 'dividendos.html',  label: 'Dividendos' },
   { href: 'rankings.html',    label: 'Rankings' },
   { href: 'ferramentas.html', label: 'Ferramentas' },
+  { href: 'status.html',      label: '● Status' },
 ];
 
 const TICKER_DATA = [
@@ -33,9 +33,12 @@ const INDICES = [
 
 function renderNav() {
   const page = location.pathname.split('/').pop() || 'index.html';
-  const links = NAV_LINKS.map(l =>
-    `<a href="${l.href}" class="${page===l.href?'active':''}">${l.label}</a>`
-  ).join('');
+  const links = NAV_LINKS.map(l => {
+    const isStatus = l.href === 'status.html';
+    const cls = page === l.href ? 'active' : '';
+    const style = isStatus ? 'color:var(--up);font-size:11px' : '';
+    return `<a href="${l.href}" class="${cls}" style="${style}">${l.label}</a>`;
+  }).join('');
 
   document.getElementById('nav-placeholder').innerHTML = `
   <nav>
@@ -70,11 +73,8 @@ function renderNav() {
 
 function navSearch(q) {
   if (q.length < 2) return;
-  // redireciona para a página mais relevante
-  const fiis = ['11','FII'];
-  const isFii = fiis.some(f => q.toUpperCase().includes(f));
-  if (isFii) window.location.href = `fiis.html?q=${q}`;
-  else window.location.href = `acoes.html?q=${q}`;
+  const isFii = q.toUpperCase().includes('11');
+  window.location.href = isFii ? `fiis.html?q=${q}` : `acoes.html?q=${q}`;
 }
 
 function renderFooter() {
