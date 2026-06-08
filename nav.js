@@ -8,8 +8,9 @@ const NAV_LINKS = [
   { href: 'rankings.html',     label: 'Rankings' },
   { href: 'comparador.html',   label: 'Comparador' },
   { href: 'ferramentas.html',  label: 'Ferramentas' },
-  { href: 'watchlist.html', label: '★ Watchlist' },
-  { href: 'status.html',       label: '● Status' },,
+  { href: 'watchlist.html',              label: '★ Watchlist' },
+  { href: 'Calculadora_maisvalor/index.html', label: 'Simulador' },
+  { href: 'status.html',                 label: '● Status' },
 ];
 
 
