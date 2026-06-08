@@ -2,8 +2,8 @@ name: Atualizar Cotações Diariamente
 
 on:
   schedule:
-    - cron: '0 21 * * 1-5'   # 18h horário de Brasília (UTC-3) = 21h UTC, dias úteis
-  workflow_dispatch:           # permite rodar manualmente
+    - cron: '0 21 * * 1-5'
+  workflow_dispatch:
 
 jobs:
   update-data:
@@ -21,6 +21,8 @@ jobs:
         run: pip install requests
 
       - name: Buscar cotações
+        env:
+          BRAPI_TOKEN: ${{ secrets.BRAPI_TOKEN }}
         run: python fetch_data.py
 
       - name: Commit e push dos dados
