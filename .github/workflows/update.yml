@@ -47,9 +47,13 @@ jobs:
             fi
           fi
 
-      - name: Índices (Ibovespa, IFIX, Dólar)
+      - name: Índices (Ibovespa, IFIX, Dólar, BTC)
         if: ${{ steps.modo.outputs.modo == 'diario' }}
         run: python fetch_indices.py
+
+      - name: BCB (CDI, SELIC, IPCA)
+        if: ${{ steps.modo.outputs.modo == 'diario' }}
+        run: python fetch_bcb.py
 
       - name: Fundamentus — Ações
         if: ${{ steps.modo.outputs.modo == 'diario' }}

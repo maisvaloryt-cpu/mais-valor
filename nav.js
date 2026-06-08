@@ -12,6 +12,28 @@ const NAV_LINKS = [
   { href: 'status.html',       label: '● Status' },,
 ];
 
+
+async function loadBCBNav() {
+  try {
+    const r = await fetch('data/bcb.json?t=' + Date.now());
+    if (!r.ok) return;
+    const j = await r.json();
+    
+    // Atualiza CDI e SELIC no ticker bar
+    const cdiEl = document.getElementById('tk-cdi');
+    if(cdiEl && j.cdi?.anual) cdiEl.textContent = j.cdi.anual.toFixed(2) + '% a.a.';
+    
+    const selicEl = document.getElementById('tk-selic');
+    if(selicEl && j.selic?.anual) selicEl.textContent = j.selic.anual.toFixed(2) + '% a.a.';
+
+    const ipcaEl = document.getElementById('tk-ipca');
+    if(ipcaEl && j.ipca?.acumulado_12m) ipcaEl.textContent = j.ipca.acumulado_12m.toFixed(2) + '%';
+
+    // Disponibiliza globalmente para o gráfico
+    window.BCB_DATA = j;
+  } catch(e) {}
+}
+
 async function loadIndicesNav() {
   try {
     const r = await fetch('data/indices.json?t=' + Date.now());
@@ -105,6 +127,7 @@ function renderNav() {
   });
 
   setTimeout(loadIndicesNav, 500);
+  setTimeout(loadBCBNav, 800);
 }
 
 function navUpdateTotal() {

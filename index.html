@@ -44,6 +44,16 @@
       <div class="mini-val gold" id="mc-dy-fii">—</div>
       <div class="mini-sub" id="mc-dy-fii-ticker">12 meses</div>
     </div>
+    <div class="mini-card">
+      <div class="mini-label">CDI atual</div>
+      <div class="mini-val" id="mc-cdi">13,75%</div>
+      <div class="mini-sub">a.a. · Banco Central</div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-label">IPCA 12m</div>
+      <div class="mini-val" id="mc-ipca">4,62%</div>
+      <div class="mini-sub">inflação acumulada</div>
+    </div>
   </div>
 
   <div class="main-grid">
@@ -282,6 +292,16 @@ function updateMiniCards(){
 
 async function init(){
   await loadData();
+  // Carrega dados BCB
+  try {
+    const r = await fetch('data/bcb.json?t=' + Date.now());
+    if(r.ok) {
+      const j = await r.json();
+      window.BCB_DATA = j;
+      if(j.cdi?.anual) document.getElementById('mc-cdi').textContent = j.cdi.anual.toFixed(2)+'% a.a.';
+      if(j.ipca?.acumulado_12m) document.getElementById('mc-ipca').textContent = j.ipca.acumulado_12m.toFixed(2)+'%';
+    }
+  } catch(e) {}
   currentData=[...ACOES];
   renderTable(currentData);
   if(ACOES.length>0) await loadChart(ACOES[0]);

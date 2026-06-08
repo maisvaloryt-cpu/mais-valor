@@ -247,6 +247,12 @@ function renderIndicadores(d){
   if(d.pvp&&d.pvp<1) ops.push({label:`P/VP ${d.pvp.toFixed(2)} (abaixo do VP)`,color:'var(--up)',bg:'var(--up-bg)',icon:'📊'});
   if(d.pl&&d.pl>0&&d.pl<8) ops.push({label:`P/L ${d.pl.toFixed(1)}x (barato)`,color:'var(--up)',bg:'var(--up-bg)',icon:'📈'});
   if(d.roe&&d.roe>20) ops.push({label:`ROE ${d.roe.toFixed(1)}% (excelente)`,color:'#5E8EE0',bg:'rgba(94,142,224,0.1)',icon:'⭐'});
+  // Verifica se bate o CDI
+  if(window.BCB_DATA?.cdi?.anual && d.dy > 0) {
+    if(d.dy > window.BCB_DATA.cdi.anual) {
+      ops.push({label:`Bate o CDI (${window.BCB_DATA.cdi.anual.toFixed(1)}% a.a.)`,color:'var(--up)',bg:'var(--up-bg)',icon:'✓'});
+    }
+  }
   if(ops.length) document.getElementById('oportunidades').innerHTML=`
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.5rem">
       ${ops.map(o=>`<span class="oportunidade-badge" style="background:${o.bg};color:${o.color}">${o.icon} ${o.label}</span>`).join('')}
@@ -291,7 +297,107 @@ function renderIndVsSetor(){
 
 async function renderChart(){
   histData=await loadHistoricoCompleto(TICKER);
-  drawChart();
+  await drawChartWithCDI();
+}
+
+
+async function loadBCBData() {
+  try {
+    const r = await fetch('data/bcb.json?t=' + Date.now());
+    if (!r.ok) return null;
+    return await r.json();
+  } catch { return null; }
+}
+
+async function drawChartWithCDI() {
+  const filt = filterByRange(histData, currentRange);
+  let pts, labels;
+  if (filt && filt.length > 2) {
+    pts = filt.map(p => p.close);
+    labels = filt.map(p => p.date);
+    const mn = Math.min(...pts), mx = Math.max(...pts);
+    document.getElementById('ch-min').textContent = 'R$ ' + mn.toFixed(2);
+    document.getElementById('ch-max').textContent = 'R$ ' + mx.toFixed(2);
+    const ret = ((pts[pts.length-1] - pts[0]) / pts[0] * 100);
+    const el = document.getElementById('ch-ret');
+    el.textContent = (ret >= 0 ? '+' : '') + ret.toFixed(1) + '%';
+    el.className = 'ind-val ' + (ret >= 0 ? 'up' : 'dn');
+  } else {
+    pts = genHistory(ativo?.p || 10, ativo?.v || 0);
+    labels = genLabels(pts.length);
+    ['ch-min','ch-max','ch-ret'].forEach(id => document.getElementById(id).textContent = '—');
+  }
+
+  const isUp = (ativo?.v || 0) >= 0;
+  const color = isUp ? '#22C87A' : '#E8503A';
+
+  // Tenta carregar CDI para comparação
+  const bcb = window.BCB_DATA || await loadBCBData();
+  if (bcb) window.BCB_DATA = bcb;
+
+  // Monta datasets
+  const datasets = [{
+    label: TICKER,
+    data: pts,
+    borderColor: color,
+    borderWidth: 2,
+    pointRadius: 0,
+    fill: true,
+    backgroundColor: isUp ? 'rgba(34,200,122,0.06)' : 'rgba(232,80,58,0.06)',
+    tension: 0.35,
+    yAxisID: 'y'
+  }];
+
+  // Adiciona CDI normalizado se houver histórico e período for <= 1A
+  if (bcb?.cdi?.acumulado && ['1M','6M','1A'].includes(currentRange) && pts.length > 0) {
+    const cdiAcum = filterByRange(
+      bcb.cdi.acumulado.map(d => ({date: d.date.split('/').reverse().join('-'), close: d.value})),
+      currentRange
+    );
+    if (cdiAcum?.length > 2) {
+      // Normaliza CDI para começar no mesmo preço do ativo
+      const cdiBase = cdiAcum[0].close;
+      const ativoBase = pts[0];
+      const cdiNorm = cdiAcum.map(d => +(d.close / cdiBase * ativoBase).toFixed(2));
+      datasets.push({
+        label: 'CDI (normalizado)',
+        data: cdiNorm,
+        borderColor: 'rgba(245,166,35,0.6)',
+        borderWidth: 1.5,
+        borderDash: [5, 5],
+        pointRadius: 0,
+        fill: false,
+        tension: 0.35,
+        yAxisID: 'y'
+      });
+    }
+  }
+
+  if (mainChart) mainChart.destroy();
+  mainChart = new Chart(document.getElementById('mainChart'), {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          display: datasets.length > 1,
+          labels: { color: '#9B9896', font: { size: 11 }, boxWidth: 20 }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(17,17,19,0.95)',
+          borderColor: 'rgba(245,166,35,0.3)',
+          borderWidth: 1,
+          callbacks: { label: ctx => `  ${ctx.dataset.label}: R$ ${ctx.parsed.y.toFixed(2)}` }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#5E5C58', font: { size: 10 }, maxTicksLimit: 10 } },
+        y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#5E5C58', font: { size: 10 }, callback: v => 'R$' + v.toFixed(0) } }
+      }
+    }
+  });
 }
 
 function drawChart(){
@@ -321,7 +427,7 @@ function setRange(r,el){
   currentRange=r;
   document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
-  drawChart();
+  drawChartWithCDI();
 }
 
 async function renderDividendos(){
