@@ -20,7 +20,6 @@ async function loadBCBNav() {
     if (!r.ok) return;
     const j = await r.json();
     
-    // Atualiza CDI e SELIC no ticker bar
     const cdiEl = document.getElementById('tk-cdi');
     if(cdiEl && j.cdi?.anual) cdiEl.textContent = j.cdi.anual.toFixed(2) + '% a.a.';
     
@@ -30,62 +29,120 @@ async function loadBCBNav() {
     const ipcaEl = document.getElementById('tk-ipca');
     if(ipcaEl && j.ipca?.acumulado_12m) ipcaEl.textContent = j.ipca.acumulado_12m.toFixed(2) + '%';
 
-    // Disponibiliza globalmente para o gráfico
     window.BCB_DATA = j;
   } catch(e) {}
 }
 
-async function loadIndicesNav() {
+// Fallback: busca câmbio e índices diretamente no browser via APIs públicas
+async function fetchIndicesFallback() {
+  const result = {};
   try {
-    const r = await fetch('data/indices.json?t=' + Date.now());
-    if (!r.ok) return;
-    const j = await r.json();
-
-    const fmt = (v, dec=0) => v?.val != null ? v.val.toLocaleString('pt-BR', {minimumFractionDigits:dec, maximumFractionDigits:dec}) : '—';
-    const chgClass = v => v?.chg >= 0 ? 'up-pill' : 'dn-pill';
-    const chgStr = v => v?.chg != null ? `${v.chg >= 0 ? '+' : ''}${v.chg.toFixed(2)}%` : '';
-
-    // Ticker bar
-    const tb = document.getElementById('ticker-bar-inner');
-    if (tb && j.ibov) {
-      tb.innerHTML = `
-        <div class="ticker-item"><span class="ticker-name">IBOV</span><span class="ticker-val">${fmt(j.ibov)}</span><span class="pill ${chgClass(j.ibov)}">${chgStr(j.ibov)}</span></div>
-        <span class="ticker-sep">|</span>
-        <div class="ticker-item"><span class="ticker-name">IFIX</span><span class="ticker-val">${fmt(j.ifix)}</span><span class="pill ${chgClass(j.ifix)}">${chgStr(j.ifix)}</span></div>
-        <span class="ticker-sep">|</span>
-        <div class="ticker-item"><span class="ticker-name">USD/BRL</span><span class="ticker-val">R$${fmt(j.dolar,2)}</span><span class="pill ${chgClass(j.dolar)}">${chgStr(j.dolar)}</span></div>
-        <span class="ticker-sep">|</span>
-        <div class="ticker-item"><span class="ticker-name">EUR/BRL</span><span class="ticker-val">R$${fmt(j.euro,2)}</span><span class="pill ${chgClass(j.euro)}">${chgStr(j.euro)}</span></div>
-        <span class="ticker-sep">|</span>
-        <div class="ticker-item"><span class="ticker-name">OURO</span><span class="ticker-val">US$${fmt(j.ouro,0)}</span><span class="pill ${chgClass(j.ouro)}">${chgStr(j.ouro)}</span></div>
-        <span class="ticker-sep">|</span>
-        <div class="ticker-item"><span class="ticker-name">BTC</span><span class="ticker-val">US$${fmt(j.btc,0)}</span><span class="pill ${chgClass(j.btc)}">${chgStr(j.btc)}</span></div>
-        <span class="ticker-sep">|</span>
-        <div class="ticker-item"><span class="ticker-name">SELIC</span><span class="ticker-val">13,75%</span></div>
-        <span class="ticker-sep">|</span>
-        <div class="ticker-item"><span class="ticker-name">ATIVOS</span><span class="ticker-val" id="tk-total">—</span></div>`;
-    }
-
-    // Barra de índices
-    if (j.ibov) {
-      const el = document.getElementById('idx-ibov');
-      if(el) el.textContent = fmt(j.ibov);
-      const ec = document.getElementById('idx-ibov-chg');
-      if(ec) { ec.textContent = `${j.ibov.chg_pts >= 0 ? '+' : ''}${j.ibov.chg_pts?.toFixed(0)} pts (${chgStr(j.ibov)})`; ec.className = `idx-chg ${j.ibov.chg >= 0 ? 'up' : 'dn'}`; }
-    }
-    if (j.ifix) {
-      const el = document.getElementById('idx-ifix');
-      if(el) el.textContent = fmt(j.ifix);
-      const ec = document.getElementById('idx-ifix-chg');
-      if(ec) { ec.textContent = `${chgStr(j.ifix)}`; ec.className = `idx-chg ${j.ifix.chg >= 0 ? 'up' : 'dn'}`; }
-    }
-    if (j.dolar) {
-      const el = document.getElementById('idx-dolar');
-      if(el) el.textContent = 'R$ ' + fmt(j.dolar, 2);
-      const ec = document.getElementById('idx-dolar-chg');
-      if(ec) { ec.textContent = chgStr(j.dolar); ec.className = `idx-chg ${j.dolar.chg >= 0 ? 'up' : 'dn'}`; }
+    // AwesomeAPI: USD, EUR, câmbio em tempo real
+    const rc = await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL', { cache: 'no-store' });
+    if (rc.ok) {
+      const dc = await rc.json();
+      if (dc.USDBRL) {
+        result.dolar = { val: parseFloat(dc.USDBRL.bid), chg: parseFloat(dc.USDBRL.pctChange), chg_pts: 0 };
+      }
+      if (dc.EURBRL) {
+        result.euro = { val: parseFloat(dc.EURBRL.bid), chg: parseFloat(dc.EURBRL.pctChange), chg_pts: 0 };
+      }
     }
   } catch(e) {}
+  try {
+    // Brapi: IBOV e IFIX
+    const rb = await fetch('https://brapi.dev/api/quote/%5EBVSP,IFIX11?fundamental=false', { cache: 'no-store' });
+    if (rb.ok) {
+      const db = await rb.json();
+      for (const q of (db.results || [])) {
+        const key = q.symbol === '^BVSP' ? 'ibov' : q.symbol === 'IFIX11' ? 'ifix' : null;
+        if (key && q.regularMarketPrice) {
+          result[key] = {
+            val: q.regularMarketPrice,
+            chg: q.regularMarketChangePercent || 0,
+            chg_pts: q.regularMarketChange || 0,
+          };
+        }
+      }
+    }
+  } catch(e) {}
+  return result;
+}
+
+async function loadIndicesNav() {
+  const fmt = (v, dec=0) => v?.val != null ? v.val.toLocaleString('pt-BR', {minimumFractionDigits:dec, maximumFractionDigits:dec}) : '—';
+  const chgClass = v => v?.chg >= 0 ? 'up-pill' : 'dn-pill';
+  const chgStr = v => v?.chg != null ? `${v.chg >= 0 ? '+' : ''}${v.chg.toFixed(2)}%` : '';
+
+  let j = {};
+
+  // Tenta carregar o indices.json gerado pelo GitHub Actions
+  try {
+    const r = await fetch('data/indices.json?t=' + Date.now());
+    if (r.ok) {
+      const raw = await r.json();
+      // Valida se realmente tem dados (não apenas updated_at)
+      if (raw.ibov?.val || raw.dolar?.val) {
+        j = raw;
+      }
+    }
+  } catch(e) {}
+
+  // Se indices.json falhou ou está vazio, busca direto no browser
+  if (!j.ibov?.val || !j.dolar?.val) {
+    const fallback = await fetchIndicesFallback();
+    // Mescla: mantém o que veio do JSON, preenche o que faltou com fallback
+    j = { ...fallback, ...j };
+    // Se ainda faltou ibov no JSON, usa do fallback
+    if (!j.ibov?.val && fallback.ibov) j.ibov = fallback.ibov;
+    if (!j.dolar?.val && fallback.dolar) j.dolar = fallback.dolar;
+    if (!j.ifix?.val && fallback.ifix) j.ifix = fallback.ifix;
+    if (!j.euro?.val && fallback.euro) j.euro = fallback.euro;
+  }
+
+  // Ticker bar
+  const tb = document.getElementById('ticker-bar-inner');
+  if (tb) {
+    tb.innerHTML = `
+      <div class="ticker-item"><span class="ticker-name">IBOV</span><span class="ticker-val">${fmt(j.ibov)}</span>${j.ibov ? `<span class="pill ${chgClass(j.ibov)}">${chgStr(j.ibov)}</span>` : ''}</div>
+      <span class="ticker-sep">|</span>
+      <div class="ticker-item"><span class="ticker-name">IFIX</span><span class="ticker-val">${fmt(j.ifix)}</span>${j.ifix ? `<span class="pill ${chgClass(j.ifix)}">${chgStr(j.ifix)}</span>` : ''}</div>
+      <span class="ticker-sep">|</span>
+      <div class="ticker-item"><span class="ticker-name">USD/BRL</span><span class="ticker-val">R$${fmt(j.dolar,4)}</span>${j.dolar ? `<span class="pill ${chgClass(j.dolar)}">${chgStr(j.dolar)}</span>` : ''}</div>
+      <span class="ticker-sep">|</span>
+      <div class="ticker-item"><span class="ticker-name">EUR/BRL</span><span class="ticker-val">R$${fmt(j.euro,4)}</span>${j.euro ? `<span class="pill ${chgClass(j.euro)}">${chgStr(j.euro)}</span>` : ''}</div>
+      <span class="ticker-sep">|</span>
+      <div class="ticker-item"><span class="ticker-name">OURO</span><span class="ticker-val">US$${fmt(j.ouro,0)}</span>${j.ouro ? `<span class="pill ${chgClass(j.ouro)}">${chgStr(j.ouro)}</span>` : ''}</div>
+      <span class="ticker-sep">|</span>
+      <div class="ticker-item"><span class="ticker-name">BTC</span><span class="ticker-val">US$${fmt(j.btc,0)}</span>${j.btc ? `<span class="pill ${chgClass(j.btc)}">${chgStr(j.btc)}</span>` : ''}</div>
+      <span class="ticker-sep">|</span>
+      <div class="ticker-item"><span class="ticker-name">SELIC</span><span class="ticker-val" id="tk-selic">13,75%</span></div>
+      <span class="ticker-sep">|</span>
+      <div class="ticker-item"><span class="ticker-name">ATIVOS</span><span class="ticker-val" id="tk-total">—</span></div>`;
+  }
+
+  // Barra de índices
+  if (j.ibov) {
+    const el = document.getElementById('idx-ibov');
+    if(el) el.textContent = fmt(j.ibov);
+    const ec = document.getElementById('idx-ibov-chg');
+    if(ec) { ec.textContent = `${j.ibov.chg_pts >= 0 ? '+' : ''}${(j.ibov.chg_pts||0).toFixed(0)} pts (${chgStr(j.ibov)})`; ec.className = `idx-chg ${j.ibov.chg >= 0 ? 'up' : 'dn'}`; }
+  }
+  if (j.ifix) {
+    const el = document.getElementById('idx-ifix');
+    if(el) el.textContent = fmt(j.ifix);
+    const ec = document.getElementById('idx-ifix-chg');
+    if(ec) { ec.textContent = chgStr(j.ifix); ec.className = `idx-chg ${j.ifix.chg >= 0 ? 'up' : 'dn'}`; }
+  }
+  if (j.dolar) {
+    const el = document.getElementById('idx-dolar');
+    if(el) el.textContent = 'R$ ' + fmt(j.dolar, 4);
+    const ec = document.getElementById('idx-dolar-chg');
+    if(ec) { ec.textContent = chgStr(j.dolar); ec.className = `idx-chg ${j.dolar.chg >= 0 ? 'up' : 'dn'}`; }
+  }
+
+  // BCB após índices
+  setTimeout(loadBCBNav, 300);
 }
 
 function renderNav() {
@@ -127,8 +184,8 @@ function renderNav() {
     }
   });
 
-  setTimeout(loadIndicesNav, 500);
-  setTimeout(loadBCBNav, 800);
+  // Carrega índices imediatamente (com fallback embutido)
+  loadIndicesNav();
 }
 
 function navUpdateTotal() {
