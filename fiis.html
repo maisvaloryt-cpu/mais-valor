@@ -25,22 +25,34 @@
         <input class="filter-input" placeholder="🔍 Buscar por ticker ou nome..." style="flex:1;max-width:300px" oninput="filterTable()" id="f-search">
         <select class="filter-select" onchange="filterTable()" id="f-setor">
           <option value="">Todos os tipos e segmentos</option>
-          <option>Agências</option>
-          <option>Agrícola</option>
-          <option>CRI / Papel</option>
-          <option>Educacional</option>
-          <option>FII</option>
-          <option>FOF</option>
-          <option>Hospital</option>
-          <option>Hotel</option>
-          <option>Híbrido</option>
-          <option>Industrial</option>
-          <option>Lajes Corporativas</option>
-          <option>Logística</option>
-          <option>Multiestratégia</option>
-          <option>Residencial</option>
-          <option>Shoppings</option>
-          <option>Varejo</option>
+          <optgroup label="🧱 Tijolo">
+            <option value="__tijolo__">— Todos os Tijolo —</option>
+            <option>Escritórios</option>
+            <option>Lajes Corporativas</option>
+            <option>Logística</option>
+            <option>Shoppings</option>
+            <option>Hospital</option>
+            <option>Hotel</option>
+            <option>Residencial</option>
+            <option>Varejo</option>
+            <option>Agências</option>
+            <option>Industrial</option>
+            <option>Educacional</option>
+          </optgroup>
+          <optgroup label="📄 Papel">
+            <option value="__papel__">— Todos os Papel —</option>
+            <option value="Títulos e Val. Mob.">Títulos e Val. Mob.</option>
+            <option value="CRI / Papel">CRI / Papel</option>
+          </optgroup>
+          <optgroup label="📦 Outros">
+            <option value="__outros__">— Todos os Outros —</option>
+            <option>Multicategoria</option>
+            <option>FOF</option>
+            <option>Híbrido</option>
+            <option>Multiestratégia</option>
+            <option>Outros</option>
+            <option>Agrícola</option>
+          </optgroup>
         </select>
       </div>
 
@@ -64,7 +76,7 @@
             <th class="r sortable" data-sort="dy" onclick="setRank(this)" title="Ordenar por Dividend Yield">DY 12m <span class="sort-arrow"></span></th>
             <th class="r sortable" data-sort="vac" onclick="setRank(this)" title="Menor vacância = melhor">Vacância <span class="sort-arrow"></span></th>
             <th class="r sortable" data-sort="liq" onclick="setRank(this)" title="Ordenar por Liquidez Diária">Liquidez Diária <span class="sort-arrow"></span></th>
-            <th class="r sortable" data-sort="v12" onclick="setRank(this)" title="Ordenar por Variação Anual">Variação Anual <span class="sort-arrow"></span></th>
+            <th class="r" style="color:var(--text3)">Segmento</th>
           </tr></thead>
           <tbody id="tbody">
             <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text3)">
@@ -160,11 +172,6 @@ function renderTable(arr) {
     // Liquidez diária
     const liqTxt = d.volNum > 0 ? fmtBi(d.volNum) : '—';
 
-    // Variação anual
-    const v12 = d.v12 !== undefined ? d.v12 : null;
-    const v12Class = v12 !== null ? (v12 >= 0 ? 'up' : 'dn') : '';
-    const v12Txt = v12 !== null ? (v12 >= 0 ? '+' : '') + v12.toFixed(2) + '%' : '—';
-
     // Patrimônio líquido
     const vpVal = d.pl_val || d.mcap || d.vmNum || null;
 
@@ -183,20 +190,30 @@ function renderTable(arr) {
       <td class="r gold">${d.dy > 0 ? d.dy.toFixed(1) + '%' : '—'}</td>
       <td class="r ${vacClass}">${vacTxt}</td>
       <td class="r" style="color:var(--text2);font-size:12px">${liqTxt}</td>
-      <td class="r ${v12Class}">${v12Txt}</td>`;
+      <td class="r" style="color:var(--text3);font-size:11px">${d.setor || '—'}</td>`;
     tr.onclick = () => location.href = `ativo.html?t=${d.t}&tipo=fii`;
     tb.appendChild(tr);
   });
 }
 
 // ── Filtro e ordenação ─────────────────────────────────────────────
+// Mapeamento de categorias hierárquicas
+const SETOR_TIJOLO = ['Escritórios','Lajes Corporativas','Logística','Shoppings','Hospital','Hotel','Residencial','Varejo','Agências','Industrial','Educacional'];
+const SETOR_PAPEL  = ['Títulos e Val. Mob.','CRI / Papel'];
+const SETOR_OUTROS = ['Multicategoria','FOF','Híbrido','Multiestratégia','Outros','Agrícola'];
+
 function filterTable() {
   const q = document.getElementById('f-search').value.toLowerCase();
   const s = document.getElementById('f-setor').value;
-  data = FIIS.filter(d =>
-    (d.t.toLowerCase().includes(q) || (d.n||'').toLowerCase().includes(q)) &&
-    (!s || d.setor === s)
-  );
+  data = FIIS.filter(d => {
+    const matchQ = d.t.toLowerCase().includes(q) || (d.n||'').toLowerCase().includes(q);
+    let matchS = true;
+    if (s === '__tijolo__') matchS = SETOR_TIJOLO.includes(d.setor);
+    else if (s === '__papel__')  matchS = SETOR_PAPEL.includes(d.setor);
+    else if (s === '__outros__') matchS = SETOR_OUTROS.includes(d.setor);
+    else if (s) matchS = d.setor === s;
+    return matchQ && matchS;
+  });
   applySort(currentSort);
 }
 

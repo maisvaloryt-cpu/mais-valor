@@ -5,6 +5,15 @@ const NAV_LINKS = [
   { href: 'acoes.html',        label: 'Ações' },
   { href: 'fiis.html',         label: 'FIIs' },
   { href: 'criptos.html',      label: 'Criptos' },
+  {
+    label: 'Exterior',
+    dropdown: [
+      { href: 'stocks.html',   label: '🇺🇸 Stocks' },
+      { href: 'reits.html',    label: '🏢 REITs' },
+      { href: 'bdrs.html',     label: '🇧🇷 BDRs' },
+      { href: 'etfs.html',     label: '📊 ETFs' },
+    ]
+  },
   { href: 'dividendos.html',   label: 'Dividendos' },
   { href: 'rankings.html',     label: 'Rankings' },
   { href: 'comparador.html',   label: 'Comparador' },
@@ -424,6 +433,16 @@ async function loadIndicesNav() {
 function renderNav() {
   const page = location.pathname.split('/').pop() || 'index.html';
   const links = NAV_LINKS.map(l => {
+    if (l.dropdown) {
+      const isActiveParent = l.dropdown.some(s => s.href === page);
+      const items = l.dropdown.map(s =>
+        `<a href="${s.href}" class="nav-dropdown-item${page === s.href ? ' active' : ''}">${s.label}</a>`
+      ).join('');
+      return `<div class="nav-dropdown-wrap${isActiveParent ? ' active' : ''}">
+        <button class="nav-dropdown-btn${isActiveParent ? ' active' : ''}" onclick="this.parentElement.classList.toggle('open')">${l.label} &#9662;</button>
+        <div class="nav-dropdown">${items}</div>
+      </div>`;
+    }
     const isStatus = l.href === 'status.html';
     const cls = page === l.href ? 'active' : '';
     const style = isStatus ? 'color:var(--up);font-size:11px' : '';
@@ -431,6 +450,15 @@ function renderNav() {
   }).join('');
 
   document.getElementById('nav-placeholder').innerHTML = `
+  <style>
+  .nav-dropdown-wrap{position:relative;display:inline-flex;align-items:center}
+  .nav-dropdown-btn{background:transparent;border:none;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;padding:4px 6px;border-radius:6px;transition:color .15s;white-space:nowrap;font-family:inherit}
+  .nav-dropdown-btn:hover,.nav-dropdown-btn.active{color:var(--gold)}
+  .nav-dropdown{display:none;position:absolute;top:calc(100% + 8px);left:0;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:6px;min-width:160px;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+  .nav-dropdown-wrap.open .nav-dropdown{display:flex;flex-direction:column;gap:2px}
+  .nav-dropdown-item{display:block;padding:8px 12px;border-radius:7px;font-size:13px;color:var(--text2);text-decoration:none;transition:background .12s,color .12s;white-space:nowrap}
+  .nav-dropdown-item:hover,.nav-dropdown-item.active{background:var(--bg3);color:var(--gold)}
+  </style>
   <nav>
     <a class="nav-logo" href="index.html">
       <img src="${LOGO}" alt="Mais Valor">
@@ -489,11 +517,14 @@ function renderNav() {
   // Aplica tema salvo
   applyTheme(getTheme());
 
-  // Fecha busca ao clicar fora
+  // Fecha busca e dropdowns ao clicar fora
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.nav-search-wrap')) {
       const r = document.getElementById('nav-search-results');
       if (r) r.style.display = 'none';
+    }
+    if (!e.target.closest('.nav-dropdown-wrap')) {
+      document.querySelectorAll('.nav-dropdown-wrap.open').forEach(el => el.classList.remove('open'));
     }
   });
 
