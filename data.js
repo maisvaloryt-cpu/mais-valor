@@ -206,35 +206,37 @@ async function loadData() {
       const live = intraday[tipo]?.[ticker];
 
       if (live && live._fresh && live.price) {
-        // Dado intraday fresco → usa, sem stale
+        // Dado intraday fresco → atualiza só preço/variação/volume, preserva tudo mais do base
         return {
+          ...base,
           ticker,
-          name:          live.name          || base.name          || ticker,
+          name:          live.name       || base.name    || ticker,
           price:         live.price,
-          change:        live.changePct      ?? base.change        ?? 0,
-          volume:        live.volume         ?? base.volume        ?? 0,
-          marketCap:     live.marketCap      ?? base.marketCap     ?? 0,
-          dividendYield: live.dividendYield  ?? base.dividendYield ?? 0,
+          change:        live.changePct  ?? base.change  ?? 0,
+          volume:        live.volume     || base.volume  || 0,
+          marketCap:     live.marketCap  || base.marketCap || 0,
+          dividendYield: live.dividendYield ?? base.dividendYield ?? 0,
           fallback:      false,
           stale:         false,
           _source:       'intraday',
         };
       } else if (live && live.price) {
-        // Intraday existe mas não é fresco (fora do pregão) → usa como dado do dia, não stale
+        // Intraday existe mas não é fresco → mesmo esquema, sem stale
         return {
+          ...base,
           ticker,
-          name:          live.name          || base.name          || ticker,
+          name:          live.name       || base.name    || ticker,
           price:         live.price,
-          change:        live.changePct      ?? base.change        ?? 0,
-          volume:        live.volume         ?? base.volume        ?? 0,
-          marketCap:     live.marketCap      ?? base.marketCap     ?? 0,
-          dividendYield: live.dividendYield  ?? base.dividendYield ?? 0,
+          change:        live.changePct  ?? base.change  ?? 0,
+          volume:        live.volume     || base.volume  || 0,
+          marketCap:     live.marketCap  || base.marketCap || 0,
+          dividendYield: live.dividendYield ?? base.dividendYield ?? 0,
           fallback:      false,
           stale:         false,
           _source:       'intraday_stale',
         };
       } else if (base.price || base.fallback) {
-        // Só fechamento diário → usa, marca stale se era fallback
+        // Só fechamento diário → usa tudo do base, marca stale se era fallback
         return { ...base, stale: base.fallback || false, _source: 'diario' };
       }
       return null;
