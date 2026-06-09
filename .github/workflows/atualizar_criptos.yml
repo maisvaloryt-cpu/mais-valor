@@ -1,0 +1,42 @@
+name: Atualizar Criptos
+
+on:
+  schedule:
+    # Roda às 6h e 18h UTC (3h e 15h horário de Brasília)
+    - cron: '0 6,18 * * *'
+  workflow_dispatch:  # permite rodar manualmente pelo GitHub
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60   # histórico de 250 moedas pode demorar ~30min
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependências
+        run: pip install requests
+
+      - name: Rodar script de atualização
+        run: |
+          python atualizar_criptos.py \
+            --top 250 \
+            --data-dir data \
+            --details-top 50
+        # Se quiser top 500 (demora mais ~60min):
+        # python atualizar_criptos.py --top 500 --data-dir data --details-top 50
+
+      - name: Commitar JSONs atualizados
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name  "GitHub Actions"
+          git add data/cripto_market.json data/cripto_historico/
+          # Só commita se houver mudanças
+          git diff --staged --quiet || git commit -m "🤖 Criptos: atualização automática $(date -u '+%d/%m/%Y %H:%M UTC')"
+          git push

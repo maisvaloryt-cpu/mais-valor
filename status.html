@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="style.css">
 <style>
 .status-hero { padding: 1.5rem 2rem; background: var(--bg2); border-bottom: 1px solid var(--border); }
-.status-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; margin-bottom: 1.5rem; }
+.status-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 1rem; margin-bottom: 1.5rem; }
 .status-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; }
 .status-card.ok { border-color: rgba(34,200,122,0.3); background: rgba(34,200,122,0.05); }
 .status-card.warn { border-color: rgba(245,166,35,0.3); background: rgba(245,166,35,0.05); }
@@ -69,6 +69,10 @@
       <div class="card">
         <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Fundamentus</div></div>
         <div id="fund-detail"></div>
+      </div>
+      <div class="card" style="margin-top:1.5rem">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">🪙 Criptomoedas</div></div>
+        <div id="cripto-detail"></div>
       </div>
     </div>
   </div>
@@ -130,6 +134,7 @@ async function loadStatus() {
     const diario = r.historico_diario || {};
     const cot = r.cotacoes || {};
     const fund = r.fundamentus || {};
+    const cripto = r.criptos || {};
 
     const totalHist = hist.total || 0;
     const metaHist = 783; // 403 ações + 380 FIIs
@@ -163,7 +168,12 @@ async function loadStatus() {
         <div class="status-val">${(fund.total_acoes||0)+(fund.total_fiis||0)}</div>
         <div class="status-sub">${fund.total_acoes||0} ações · ${fund.total_fiis||0} FIIs</div>
       </div>
-    `;
+      <div class="status-card ${(cripto.total_moedas||0)>0?'ok':'warn'}">
+        <div class="status-icon">🪙</div>
+        <div class="status-label">Criptomoedas</div>
+        <div class="status-val">${cripto.total_moedas||0}</div>
+        <div class="status-sub">${cripto.com_dados||0} com cotação · ${cripto.sem_dados||0} sem dados</div>
+      </div>
 
     // HISTÓRICO MENSAL
     document.getElementById('hist-detail').innerHTML = `
@@ -202,8 +212,25 @@ async function loadStatus() {
       <div class="detail-row"><span>FIIs atualizado em</span><span style="font-size:11px;color:var(--text3)">${fund.atualizado_fiis||'—'}</span></div>
       <div style="margin-top:.75rem;padding:.75rem;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--text2)">
         💡 Atualiza automaticamente todo dia útil às 18h via Fundamentus.com.br
-      </div>
     `;
+
+    // CRIPTOS
+    if (cripto.erro) {
+      document.getElementById('cripto-detail').innerHTML = `<div class="detail-row"><span style="color:var(--dn)">❌ ${cripto.erro}</span></div>`;
+    } else {
+      document.getElementById('cripto-detail').innerHTML = `
+        <div class="detail-row"><span>Última atualização</span><span style="font-size:12px;color:var(--gold);font-family:'DM Mono',monospace">${cripto.atualizado_em||'—'}</span></div>
+        <div class="detail-row"><span>Total de moedas</span><span class="badge badge-ok">${cripto.total_moedas||0}</span></div>
+        <div class="detail-row"><span>Com cotação</span><span class="badge badge-ok">${cripto.com_dados||0}</span></div>
+        <div class="detail-row"><span>Sem cotação</span><span class="badge ${(cripto.sem_dados||0)>0?'badge-warn':'badge-ok'}">${cripto.sem_dados||0}</span></div>
+        <div class="detail-row"><span>Histórico OK (≥10 pts)</span><span class="badge badge-ok">${cripto.historico_ok||0}</span></div>
+        <div class="detail-row"><span>Histórico com falha</span><span class="badge ${(cripto.historico_falhou||0)>0?'badge-warn':'badge-ok'}">${cripto.historico_falhou||0}</span></div>
+        ${(cripto.tickers_sem_dados||[]).length>0?`<div style="margin-top:8px;font-size:11px;color:var(--text3)">Sem cotação:</div>
+        <div class="ticker-list">${cripto.tickers_sem_dados.map(t=>`<span class="ticker-badge">${t}</span>`).join('')}</div>`:''}
+        ${(cripto.historico_falhou_lista||[]).length>0?`<div style="margin-top:8px;font-size:11px;color:var(--text3)">Histórico falhou:</div>
+        <div class="ticker-list">${cripto.historico_falhou_lista.map(t=>`<span class="ticker-badge">${t.symbol}</span>`).join('')}</div>`:''}
+      `;
+    }
 
     // PROBLEMAS
     const problemas = [];
@@ -211,6 +238,8 @@ async function loadStatus() {
     if((cot.fallbacks||0) > 5) problemas.push(`${cot.fallbacks} ativos usando preço do histórico (Brapi falhou)`);
     if((fund.total_acoes||0) === 0) problemas.push('Dados do Fundamentus não encontrados — rode o modo diario');
     if((diario.desatualizados||0) > 10) problemas.push(`${diario.desatualizados} ativos sem cotação recente`);
+    if((cripto.sem_dados||0) > 0) problemas.push(`${cripto.sem_dados} criptomoeda(s) sem cotação`);
+    if((cripto.historico_falhou||0) > 0) problemas.push(`${cripto.historico_falhou} cripto(s) com histórico incompleto`);
 
     if(problemas.length > 0) {
       document.getElementById('problems-card').style.display = '';

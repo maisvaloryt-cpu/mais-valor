@@ -231,6 +231,30 @@ function updateMiniCards(){
   }
 }
 
+// ─── Fallback: carrega do JSON local (gerado pelo atualizar_criptos.py) ───────
+async function loadFromCache() {
+  const r = await fetch('data/cripto_market.json?t=' + Date.now());
+  if (!r.ok) throw new Error('Cache não encontrado');
+  const json = await r.json();
+  // Normaliza para o mesmo formato da API ao vivo
+  return (json.coins || []).map(c => ({
+    id:                              c.id,
+    symbol:                          c.symbol,
+    name:                            c.name,
+    image:                           c.image,
+    market_cap_rank:                 c.rank,
+    current_price:                   c.price,
+    market_cap:                      c.market_cap,
+    total_volume:                    c.volume_24h,
+    high_24h:                        c.high_24h,
+    low_24h:                         c.low_24h,
+    price_change_percentage_24h:     c.chg_24h,
+    price_change_percentage_7d_in_currency: c.chg_7d,
+    _from_cache: true,
+    _cache_date: json.updated_at,
+  }));
+}
+
 // Busca múltiplas páginas respeitando rate limit da CoinGecko (free tier)
 async function fetchPage(page, perPage=100){
   const url = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${perPage}&page=${page}&sparkline=false&price_change_percentage=24h,7d&locale=pt`;
@@ -251,61 +275,88 @@ async function loadCryptos(){
   btn.style.opacity = '0.5';
   allCryptos = [];
 
-  // Calcula quantas páginas precisamos (max 100 por página na tier gratuita)
   const perPage = 100;
   const totalPages = Math.ceil(displayLimit / perPage);
   progressWrap.style.display = 'block';
 
   try {
+    // ── Tenta API ao vivo ──────────────────────────────────────────────────
     for(let page = 1; page <= totalPages; page++){
       progressText.textContent = `Carregando página ${page} de ${totalPages}...`;
       progressBar.style.width = ((page-1)/totalPages*100) + '%';
 
       const data = await fetchPage(page, perPage);
-      // Deduplica por id (evita repetir moedas entre páginas)
       const existingIds = new Set(allCryptos.map(c=>c.id));
       const newItems = data.filter(c => !existingIds.has(c.id));
       allCryptos = [...allCryptos, ...newItems];
 
-      // Renderiza progressivamente após primeira página
       if(page === 1){
         renderTable(allCryptos);
         updateMiniCards();
         renderSidebar();
       }
 
-      // Aguarda entre páginas para respeitar rate limit (1.5s entre requests)
       if(page < totalPages) await new Promise(r => setTimeout(r, 1500));
     }
 
-    // Corta no limite exato pedido
     allCryptos = allCryptos.slice(0, displayLimit);
     progressBar.style.width = '100%';
-
     renderTable(allCryptos);
     updateMiniCards();
     renderSidebar();
 
     const now = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-    document.getElementById('update-time').textContent = `${allCryptos.length} criptos carregadas · Atualizado às ${now} via CoinGecko`;
+    document.getElementById('update-time').textContent =
+      `${allCryptos.length} criptos carregadas · Atualizado às ${now} via CoinGecko`;
 
     setTimeout(() => { progressWrap.style.display = 'none'; }, 1500);
 
   } catch(e) {
     progressWrap.style.display = 'none';
-    const partial = allCryptos.length;
-    if(partial > 0){
-      // Mostra o que já foi carregado com aviso
+
+    // ── Fallback: dados parciais da API ────────────────────────────────────
+    if(allCryptos.length > 0){
       renderTable(allCryptos);
       updateMiniCards();
       renderSidebar();
-      document.getElementById('update-time').textContent = `⚠️ ${partial} criptos carregadas (erro ao buscar mais — CoinGecko rate limit)`;
-    } else {
-      tb.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--dn)">
-        ⚠️ Não foi possível carregar os dados. CoinGecko pode estar com limite de requisições.
-        <br><br><button onclick="loadCryptos()" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 14px;color:var(--text);cursor:pointer;font-family:var(--font-body);margin-top:.5rem">Tentar novamente</button>
-      </td></tr>`;
+      document.getElementById('update-time').textContent =
+        `⚠️ ${allCryptos.length} criptos (API limitada) — tentando cache local...`;
     }
+
+    // ── Fallback: JSON local salvo pelo atualizar_criptos.py ───────────────
+    try {
+      const cached = await loadFromCache();
+      if(cached.length > 0){
+        const merged = [...allCryptos];
+        const liveIds = new Set(merged.map(c=>c.id));
+        cached.forEach(c => { if(!liveIds.has(c.id)) merged.push(c); });
+        allCryptos = merged.slice(0, displayLimit);
+
+        renderTable(allCryptos);
+        updateMiniCards();
+        renderSidebar();
+
+        const cacheDate = cached[0]?._cache_date || 'data desconhecida';
+        document.getElementById('update-time').innerHTML =
+          `<span style="color:var(--gold)">📦 Dados do cache local</span> · Salvo em: ${cacheDate}` +
+          (allCryptos.some(c=>!c._from_cache)
+            ? ` · <span style="color:var(--up)">${allCryptos.filter(c=>!c._from_cache).length} ao vivo</span>`
+            : '');
+      }
+    } catch(cacheErr) {
+      // Sem API e sem cache: mostra erro completo
+      if(allCryptos.length === 0){
+        tb.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--dn)">
+          ⚠️ Não foi possível carregar os dados.<br>
+          <small style="color:var(--text3)">CoinGecko offline e cache local não encontrado.</small>
+          <br><br>
+          <button onclick="loadCryptos()" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 14px;color:var(--text);cursor:pointer;font-family:var(--font-body);margin-top:.5rem">
+            Tentar novamente
+          </button>
+        </td></tr>`;
+      }
+    }
+
   } finally {
     btn.disabled = false;
     btn.style.opacity = '1';

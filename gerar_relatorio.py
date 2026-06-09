@@ -14,6 +14,7 @@ def main():
         "historico_diario": {},
         "cotacoes": {},
         "fundamentus": {},
+        "criptos": {},
         "resumo": {}
     }
 
@@ -109,12 +110,50 @@ def main():
     except:
         relatorio['fundamentus']['total_fiis'] = 0
 
-    # 5. Resumo executivo
+    # 5. Criptomoedas
+    try:
+        with open('data/cripto_market.json') as f:
+            cripto = json.load(f)
+        moedas = cripto.get('moedas', [])
+        relatorio['criptos'] = {
+            'atualizado_em': cripto.get('updated_at'),
+            'total_moedas': len(moedas),
+            'com_dados': len([m for m in moedas if m.get('price_usd')]),
+            'sem_dados': len([m for m in moedas if not m.get('price_usd')]),
+            'tickers_sem_dados': [m['symbol'] for m in moedas if not m.get('price_usd')]
+        }
+    except:
+        relatorio['criptos'] = {'erro': 'cripto_market.json não encontrado'}
+
+    # Histórico de criptos
+    arq_cripto_hist = glob.glob("data/cripto_historico/*.json")
+    cripto_hist_ok = []
+    cripto_hist_falhou = []
+    for arq in sorted(arq_cripto_hist):
+        symbol = os.path.basename(arq).replace('.json', '')
+        try:
+            with open(arq) as f:
+                d = json.load(f)
+            pts = len(d.get('history', []))
+            if pts >= 10:
+                cripto_hist_ok.append({'symbol': symbol, 'pontos': pts})
+            else:
+                cripto_hist_falhou.append({'symbol': symbol, 'pontos': pts})
+        except:
+            cripto_hist_falhou.append({'symbol': symbol, 'pontos': 0})
+
+    if 'erro' not in relatorio['criptos']:
+        relatorio['criptos']['historico_ok'] = len(cripto_hist_ok)
+        relatorio['criptos']['historico_falhou'] = len(cripto_hist_falhou)
+        relatorio['criptos']['historico_falhou_lista'] = cripto_hist_falhou
+
+    # 6. Resumo executivo
     relatorio['resumo'] = {
         'acoes_com_historico': len(mensal_ok),
         'fiis_com_historico': len([t for t in mensal_ok if t['ticker'].endswith('11')]),
         'cotacoes_atuais': relatorio['cotacoes'].get('total_acoes',0) + relatorio['cotacoes'].get('total_fiis',0),
         'indicadores_fundamentus': relatorio['fundamentus'].get('total_acoes',0) + relatorio['fundamentus'].get('total_fiis',0),
+        'criptos_atuais': relatorio['criptos'].get('total_moedas', 0),
         'status_geral': '✅ OK' if total_mensal >= 700 else '⚠️ Histórico incompleto' if total_mensal >= 400 else '❌ Histórico muito incompleto'
     }
 
@@ -157,6 +196,19 @@ def main():
         print(f"  Atualizado: {f_info.get('atualizado_em')}")
     else:
         print(f"  ❌ {f_info['erro']}")
+
+    print(f"\n🪙 CRIPTOMOEDAS")
+    c_info = relatorio['criptos']
+    if 'erro' not in c_info:
+        print(f"  Atualizado em: {c_info.get('atualizado_em')}")
+        print(f"  Total de moedas: {c_info.get('total_moedas')} | Com dados: {c_info.get('com_dados')} | Sem dados: {c_info.get('sem_dados')}")
+        print(f"  Histórico OK: {c_info.get('historico_ok')} | Falhou: {c_info.get('historico_falhou')}")
+        if c_info.get('tickers_sem_dados'):
+            print(f"  Sem cotação: {c_info['tickers_sem_dados'][:5]}")
+        if c_info.get('historico_falhou_lista'):
+            print(f"  Histórico falhou: {[t['symbol'] for t in c_info['historico_falhou_lista'][:5]]}")
+    else:
+        print(f"  ❌ {c_info['erro']}")
 
     print(f"\n🎯 RESUMO GERAL")
     r = relatorio['resumo']

@@ -418,6 +418,65 @@ function stripHtml(html){
   const d=document.createElement('div'); d.innerHTML=html; return d.textContent||d.innerText||'';
 }
 
+// ─── Fallback: lê do cripto_market.json local ────────────
+async function loadCoinFromCache(id) {
+  const r = await fetch('data/cripto_market.json?t=' + Date.now());
+  if (!r.ok) throw new Error('Cache não encontrado');
+  const json = await r.json();
+  const c = (json.coins || []).find(x => x.id === id);
+  if (!c) throw new Error('Moeda não encontrada no cache');
+
+  // Normaliza para o mesmo formato do endpoint /coins/{id}
+  return {
+    id:           c.id,
+    symbol:       c.symbol,
+    name:         c.name,
+    image:        { large: c.image, small: c.image },
+    description:  { en: c.description || '' },
+    categories:   c.categories || [],
+    links: {
+      homepage:            [c.links?.homepage || ''],
+      whitepaper:          c.links?.whitepaper || '',
+      twitter_screen_name: c.links?.twitter || '',
+      repos_url:           { github: [c.links?.github || ''] },
+    },
+    market_cap_rank:         c.rank,
+    coingecko_score:         c.score,
+    sentiment_votes_up_percentage: c.sentiment_up,
+    market_data: {
+      current_price:    { usd: c.price },
+      market_cap:       { usd: c.market_cap },
+      total_volume:     { usd: c.volume_24h },
+      high_24h:         { usd: c.high_24h },
+      low_24h:          { usd: c.low_24h },
+      ath:              { usd: c.ath },
+      ath_date:         { usd: c.ath_date },
+      atl:              { usd: c.atl },
+      atl_date:         { usd: c.atl_date },
+      circulating_supply: c.supply,
+      total_supply:       c.total_supply,
+      price_change_percentage_24h:  c.chg_24h,
+      price_change_percentage_7d:   c.chg_7d,
+      price_change_percentage_30d:  c.chg_30d,
+      price_change_percentage_1y:   c.chg_1y,
+    },
+    _from_cache: true,
+    _cache_date: json.updated_at,
+  };
+}
+
+// ─── Fallback: lê histórico do JSON local ────────────────
+async function loadHistoryFromCache(id) {
+  const r = await fetch(`data/cripto_historico/${id}.json?t=` + Date.now());
+  if (!r.ok) throw new Error('Histórico local não encontrado');
+  const json = await r.json();
+  // Converte para o formato [[timestamp_ms, price]] da API ao vivo
+  return (json.history || []).map(h => [
+    new Date(h.date + 'T12:00:00Z').getTime(),
+    h.close
+  ]);
+}
+
 // ─── Inicialização ────────────────────────────────────────
 function init(){
   const params = new URLSearchParams(window.location.search);
@@ -430,13 +489,33 @@ function init(){
 // ─── Dados da moeda ───────────────────────────────────────
 async function loadCoinDetail(){
   try {
+    // Tenta API ao vivo
     const url = `https://api.coingecko.com/api/v3/coins/${coinId}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false`;
     const r = await fetch(url);
-    if(!r.ok) throw new Error('Moeda não encontrada');
+    if(!r.ok) throw new Error('API indisponível');
     coinData = await r.json();
     renderDetail(coinData);
   } catch(e) {
-    document.getElementById('d-name').innerHTML = `<span style="color:var(--dn)">Erro ao carregar dados</span>`;
+    // Fallback: cache local
+    try {
+      coinData = await loadCoinFromCache(coinId);
+      renderDetail(coinData);
+      const cacheDate = coinData._cache_date || '';
+      document.getElementById('update-time') &&
+        (document.getElementById('update-time').innerHTML =
+          `<span style="color:var(--gold)">📦 Cache local</span> · ${cacheDate}`);
+      // Mostra banner de aviso no hero
+      const hero = document.getElementById('detail-hero');
+      if(hero){
+        const banner = document.createElement('div');
+        banner.style.cssText = 'margin-top:.75rem;padding:8px 12px;background:rgba(210,163,76,.1);border:1px solid rgba(210,163,76,.3);border-radius:8px;font-size:12px;color:var(--gold)';
+        banner.textContent = `📦 Dados do cache local (${cacheDate}) — API CoinGecko indisponível no momento`;
+        hero.appendChild(banner);
+      }
+    } catch(cacheErr) {
+      document.getElementById('d-name').innerHTML =
+        `<span style="color:var(--dn)">Erro ao carregar dados (API e cache indisponíveis)</span>`;
+    }
   }
 }
 
@@ -521,14 +600,32 @@ async function loadChart(days){
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
   try {
-    // Usa OHLC para >1 dia, minutos para 1 dia
-    const interval = days===1 ? '' : days<=90 ? '&interval=daily' : '&interval=daily';
-    const url = `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}${interval}`;
-    const r = await fetch(url);
-    if(!r.ok) throw new Error('Erro histórico');
-    const data = await r.json();
+    // ── Tenta API ao vivo ───────────────────────────────────────────────────
+    let historyData;
+    let fromCache = false;
 
-    rawHistory = data.prices; // [[timestamp, price], ...]
+    try {
+      const interval = days===1 ? '' : '&interval=daily';
+      const url = `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}${interval}`;
+      const r = await fetch(url);
+      if(!r.ok) throw new Error('API histórico indisponível');
+      const data = await r.json();
+      historyData = data.prices;
+    } catch(apiErr) {
+      // ── Fallback: JSON local (só disponível para o range completo salvo) ──
+      try {
+        historyData = await loadHistoryFromCache(coinId);
+        fromCache = true;
+        // Filtra pelo range pedido
+        const cutoff = Date.now() - days * 86400000;
+        historyData = historyData.filter(([ts]) => ts >= cutoff);
+        if(!historyData.length) throw new Error('Cache sem dados para este período');
+      } catch(cacheErr) {
+        throw new Error('API e cache indisponíveis para o histórico');
+      }
+    }
+
+    rawHistory = historyData;
 
     const labels = rawHistory.map(([ts]) => {
       const d = new Date(ts);
@@ -610,6 +707,11 @@ async function loadChart(days){
         }
       }
     });
+
+    if(fromCache){
+      document.getElementById('chart-stats').innerHTML +=
+        ` <span style="color:var(--gold);margin-left:auto">📦 cache local</span>`;
+    }
 
     renderHistTable();
 
