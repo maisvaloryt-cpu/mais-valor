@@ -1,5 +1,5 @@
 {
-  "gerado_em": "08/06/2026 04:20",
+  "gerado_em": "08/06/2026 21:45",
   "historico_mensal": {
     "total": 769,
     "ok": 751,
@@ -86,11 +86,13 @@
     "lista_desatualizados": []
   },
   "cotacoes": {
-    "atualizado_em": "08/06/2026 04:11",
+    "atualizado_em": "08/06/2026 21:37",
     "total_acoes": 398,
     "total_fiis": 370,
-    "fallbacks": 0,
-    "tickers_fallback": []
+    "fallbacks": 1,
+    "tickers_fallback": [
+      "HGPO11"
+    ]
   },
   "fundamentus": {
     "atualizado_em": "08/06/2026 06:15",
