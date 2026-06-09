@@ -1,0 +1,1327 @@
+{
+  "updated_at": "09/06/2026 15:49",
+  "cripto": [
+    {
+      "ticker": "BTC",
+      "stale": true,
+      "name": "Bitcoin",
+      "categoria": "Layer 1",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "ETH",
+      "stale": true,
+      "name": "Ethereum",
+      "categoria": "Layer 1",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "BNB",
+      "stale": true,
+      "name": "BNB (Binance)",
+      "categoria": "Exchange",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "SOL",
+      "stale": true,
+      "name": "Solana",
+      "categoria": "Layer 1",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "XRP",
+      "stale": true,
+      "name": "XRP (Ripple)",
+      "categoria": "Pagamentos",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "USDC",
+      "stale": true,
+      "name": "USD Coin",
+      "categoria": "Stablecoin",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "USDT",
+      "stale": true,
+      "name": "Tether",
+      "categoria": "Stablecoin",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "ADA",
+      "stale": true,
+      "name": "Cardano",
+      "categoria": "Layer 1",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "AVAX",
+      "stale": true,
+      "name": "Avalanche",
+      "categoria": "Layer 1",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "DOGE",
+      "stale": true,
+      "name": "Dogecoin",
+      "categoria": "Meme",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "DOT",
+      "stale": true,
+      "name": "Polkadot",
+      "categoria": "Interoperabilidade",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "MATIC",
+      "stale": true,
+      "name": "Polygon",
+      "categoria": "Layer 2",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "SHIB",
+      "stale": true,
+      "name": "Shiba Inu",
+      "categoria": "Meme",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "LTC",
+      "stale": true,
+      "name": "Litecoin",
+      "categoria": "Pagamentos",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "LINK",
+      "stale": true,
+      "name": "Chainlink",
+      "categoria": "Oracle",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "TRX",
+      "stale": true,
+      "name": "TRON",
+      "categoria": "Layer 1",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "ATOM",
+      "stale": true,
+      "name": "Cosmos",
+      "categoria": "Interoperabilidade",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "UNI",
+      "stale": true,
+      "name": "Uniswap",
+      "categoria": "DEX",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "XMR",
+      "stale": true,
+      "name": "Monero",
+      "categoria": "Privacidade",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "ETC",
+      "stale": true,
+      "name": "Ethereum Classic",
+      "categoria": "Layer 1",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "XLM",
+      "stale": true,
+      "name": "Stellar",
+      "categoria": "Pagamentos",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "BCH",
+      "stale": true,
+      "name": "Bitcoin Cash",
+      "categoria": "Pagamentos",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "ALGO",
+      "stale": true,
+      "name": "Algorand",
+      "categoria": "Layer 1",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "NEAR",
+      "stale": true,
+      "name": "NEAR Protocol",
+      "categoria": "Layer 1",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "ICP",
+      "stale": true,
+      "name": "Internet Computer",
+      "categoria": "Layer 1",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "FIL",
+      "stale": true,
+      "name": "Filecoin",
+      "categoria": "Storage",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "VET",
+      "stale": true,
+      "name": "VeChain",
+      "categoria": "Supply Chain",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "HBAR",
+      "stale": true,
+      "name": "Hedera",
+      "categoria": "Layer 1",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "APT",
+      "stale": true,
+      "name": "Aptos",
+      "categoria": "Layer 1",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "ARB",
+      "stale": true,
+      "name": "Arbitrum",
+      "categoria": "Layer 2",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "OP",
+      "stale": true,
+      "name": "Optimism",
+      "categoria": "Layer 2",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "MKR",
+      "stale": true,
+      "name": "Maker",
+      "categoria": "DeFi",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "AAVE",
+      "stale": true,
+      "name": "Aave",
+      "categoria": "DeFi",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "CRV",
+      "stale": true,
+      "name": "Curve",
+      "categoria": "DeFi",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "COMP",
+      "stale": true,
+      "name": "Compound",
+      "categoria": "DeFi",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "SNX",
+      "stale": true,
+      "name": "Synthetix",
+      "categoria": "DeFi",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "SUSHI",
+      "stale": true,
+      "name": "SushiSwap",
+      "categoria": "DEX",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "1INCH",
+      "stale": true,
+      "name": "1inch",
+      "categoria": "DEX Aggregator",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "GRT",
+      "stale": true,
+      "name": "The Graph",
+      "categoria": "Indexação",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "LDO",
+      "stale": true,
+      "name": "Lido DAO",
+      "categoria": "Liquid Staking",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "RUNE",
+      "stale": true,
+      "name": "THORChain",
+      "categoria": "DEX",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "INJ",
+      "stale": true,
+      "name": "Injective",
+      "categoria": "Layer 1",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "SUI",
+      "stale": true,
+      "name": "Sui",
+      "categoria": "Layer 1",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "SEI",
+      "stale": true,
+      "name": "Sei",
+      "categoria": "Layer 1",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "MANTA",
+      "stale": true,
+      "name": "Manta Network",
+      "categoria": "Layer 2",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "JUP",
+      "stale": true,
+      "name": "Jupiter",
+      "categoria": "DEX",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "PYTH",
+      "stale": true,
+      "name": "Pyth Network",
+      "categoria": "Oracle",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "W",
+      "stale": true,
+      "name": "Wormhole",
+      "categoria": "Interoperabilidade",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "STRK",
+      "stale": true,
+      "name": "Starknet",
+      "categoria": "Layer 2",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "ZK",
+      "stale": true,
+      "name": "ZKsync",
+      "categoria": "Layer 2",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "FTM",
+      "stale": true,
+      "name": "Fantom",
+      "categoria": "Layer 1",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "EGLD",
+      "stale": true,
+      "name": "MultiversX",
+      "categoria": "Layer 1",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "THETA",
+      "stale": true,
+      "name": "Theta Network",
+      "categoria": "Streaming",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "AXS",
+      "stale": true,
+      "name": "Axie Infinity",
+      "categoria": "GameFi",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "SAND",
+      "stale": true,
+      "name": "The Sandbox",
+      "categoria": "Metaverso",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "MANA",
+      "stale": true,
+      "name": "Decentraland",
+      "categoria": "Metaverso",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "ENJ",
+      "stale": true,
+      "name": "Enjin Coin",
+      "categoria": "GameFi",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "GALA",
+      "stale": true,
+      "name": "Gala Games",
+      "categoria": "GameFi",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "IMX",
+      "stale": true,
+      "name": "Immutable X",
+      "categoria": "Gaming/NFT",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "GMT",
+      "stale": true,
+      "name": "STEPN",
+      "categoria": "Move to Earn",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "CHZ",
+      "stale": true,
+      "name": "Chiliz",
+      "categoria": "Fan Tokens",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "FLOW",
+      "stale": true,
+      "name": "Flow",
+      "categoria": "NFT",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "XTZ",
+      "stale": true,
+      "name": "Tezos",
+      "categoria": "Layer 1",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "ZEC",
+      "stale": true,
+      "name": "Zcash",
+      "categoria": "Privacidade",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "DASH",
+      "stale": true,
+      "name": "Dash",
+      "categoria": "Pagamentos",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "KSM",
+      "stale": true,
+      "name": "Kusama",
+      "categoria": "Interoperabilidade",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "OCEAN",
+      "stale": true,
+      "name": "Ocean Protocol",
+      "categoria": "Dados",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "FET",
+      "stale": true,
+      "name": "Fetch.ai",
+      "categoria": "IA/Web3",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "AGIX",
+      "stale": true,
+      "name": "SingularityNET",
+      "categoria": "IA/Web3",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "NMR",
+      "stale": true,
+      "name": "Numerai",
+      "categoria": "IA",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "REN",
+      "stale": true,
+      "name": "Ren Protocol",
+      "categoria": "DeFi",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "YFI",
+      "stale": true,
+      "name": "Yearn Finance",
+      "categoria": "DeFi",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "BAL",
+      "stale": true,
+      "name": "Balancer",
+      "categoria": "DEX",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "DYDX",
+      "stale": true,
+      "name": "dYdX",
+      "categoria": "DEX Derivativos",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "PERP",
+      "stale": true,
+      "name": "Perpetual Protocol",
+      "categoria": "DEX Derivativos",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "GMX",
+      "stale": true,
+      "name": "GMX",
+      "categoria": "DEX Derivativos",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "GNS",
+      "stale": true,
+      "name": "Gains Network",
+      "categoria": "DEX Derivativos",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "PENDLE",
+      "stale": true,
+      "name": "Pendle",
+      "categoria": "DeFi",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "ENA",
+      "stale": true,
+      "name": "Ethena",
+      "categoria": "DeFi/Stablecoin",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "EIGEN",
+      "stale": true,
+      "name": "EigenLayer",
+      "categoria": "Restaking",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "ETHFI",
+      "stale": true,
+      "name": "Ether.fi",
+      "categoria": "Liquid Restaking",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "PUFFER",
+      "stale": true,
+      "name": "Puffer Finance",
+      "categoria": "Liquid Restaking",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "SWELL",
+      "stale": true,
+      "name": "Swell Network",
+      "categoria": "Liquid Staking",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "RSETH",
+      "stale": true,
+      "name": "Kelp DAO",
+      "categoria": "Restaking",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "RPL",
+      "stale": true,
+      "name": "Rocket Pool",
+      "categoria": "Liquid Staking",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "SSV",
+      "stale": true,
+      "name": "SSV Network",
+      "categoria": "Staking",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "ANKR",
+      "stale": true,
+      "name": "Ankr",
+      "categoria": "Infra Web3",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "API3",
+      "stale": true,
+      "name": "API3",
+      "categoria": "Oracle",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "BAND",
+      "stale": true,
+      "name": "Band Protocol",
+      "categoria": "Oracle",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "DIA",
+      "stale": true,
+      "name": "DIA",
+      "categoria": "Oracle",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "TIA",
+      "stale": true,
+      "name": "Celestia",
+      "categoria": "Modular Blockchain",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "DYMENSION",
+      "stale": true,
+      "name": "Dymension",
+      "categoria": "Rollup",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "ALT",
+      "stale": true,
+      "name": "AltLayer",
+      "categoria": "Restaking",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "SAGA",
+      "stale": true,
+      "name": "Saga",
+      "categoria": "Layer 1 Modular",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "PORTAL",
+      "stale": true,
+      "name": "Portal",
+      "categoria": "Gaming",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "PIXEL",
+      "stale": true,
+      "name": "Pixels",
+      "categoria": "GameFi",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "BIGTIME",
+      "stale": true,
+      "name": "Big Time",
+      "categoria": "GameFi",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "BEAM",
+      "stale": true,
+      "name": "Beam",
+      "categoria": "Gaming",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "PRIME",
+      "stale": true,
+      "name": "Echelon Prime",
+      "categoria": "Gaming",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    },
+    {
+      "ticker": "RON",
+      "stale": true,
+      "name": "Ronin",
+      "categoria": "Gaming",
+      "price": null,
+      "changePct": 0,
+      "volume": 0,
+      "marketCap": 0
+    }
+  ],
+  "macro": [
+    {
+      "ticker": "CURRENCY:USDBRL",
+      "stale": true,
+      "descricao": "Dólar/Real",
+      "tipo": "Câmbio",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    },
+    {
+      "ticker": "CURRENCY:EURBRL",
+      "stale": true,
+      "descricao": "Euro/Real",
+      "tipo": "Câmbio",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    },
+    {
+      "ticker": "CURRENCY:GBPBRL",
+      "stale": true,
+      "descricao": "Libra/Real",
+      "tipo": "Câmbio",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    },
+    {
+      "ticker": "CURRENCY:JPYBRL",
+      "stale": true,
+      "descricao": "Iene/Real",
+      "tipo": "Câmbio",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    },
+    {
+      "ticker": "CURRENCY:CHFBRL",
+      "stale": true,
+      "descricao": "Franco Suíço/Real",
+      "tipo": "Câmbio",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    },
+    {
+      "ticker": "CURRENCY:CADBRL",
+      "stale": true,
+      "descricao": "Dólar Canadense/Real",
+      "tipo": "Câmbio",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    },
+    {
+      "ticker": "CURRENCY:AUDBRL",
+      "stale": true,
+      "descricao": "Dólar Australiano/Real",
+      "tipo": "Câmbio",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    },
+    {
+      "ticker": "CURRENCY:CNYBRL",
+      "stale": true,
+      "descricao": "Yuan/Real",
+      "tipo": "Câmbio",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    },
+    {
+      "ticker": "CURRENCY:ARSBRL",
+      "stale": true,
+      "descricao": "Peso Argentino/Real",
+      "tipo": "Câmbio",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    },
+    {
+      "ticker": "CURRENCY:MXNBRL",
+      "stale": true,
+      "descricao": "Peso Mexicano/Real",
+      "tipo": "Câmbio",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    },
+    {
+      "ticker": "CURRENCY:USDEUR",
+      "stale": true,
+      "descricao": "Dólar/Euro",
+      "tipo": "Câmbio",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    },
+    {
+      "ticker": "CURRENCY:USDJPY",
+      "stale": true,
+      "descricao": "Dólar/Iene",
+      "tipo": "Câmbio",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    },
+    {
+      "ticker": "INDEXBVMF:IBOV",
+      "stale": false,
+      "descricao": "Ibovespa",
+      "tipo": "Índice BR",
+      "price": 169612.06,
+      "changePct": 0.005600000000000001,
+      "high": 170600.9,
+      "low": 168406.17
+    },
+    {
+      "ticker": "INDEXBVMF:IFIX",
+      "stale": false,
+      "descricao": "IFIX (FIIs)",
+      "tipo": "Índice BR",
+      "price": 3814.66,
+      "changePct": -0.0009,
+      "high": 3824.23,
+      "low": 3814.42
+    },
+    {
+      "ticker": "INDEXBVMF:SMLL",
+      "stale": true,
+      "descricao": "Small Caps BR",
+      "tipo": "Índice BR",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    },
+    {
+      "ticker": "INDEXBVMF:IDIV",
+      "stale": false,
+      "descricao": "Índice Dividendos",
+      "tipo": "Índice BR",
+      "price": 11919.89,
+      "changePct": 0.0103,
+      "high": 11962.47,
+      "low": 11798.21
+    },
+    {
+      "ticker": "INDEXBVMF:IMAB",
+      "stale": true,
+      "descricao": "IMA-B (IPCA+)",
+      "tipo": "Índice BR",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    },
+    {
+      "ticker": "INDEXBVMF:IRFM",
+      "stale": true,
+      "descricao": "IRF-M (Pré-fixado)",
+      "tipo": "Índice BR",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    },
+    {
+      "ticker": "INDEXSP:.INX",
+      "stale": false,
+      "descricao": "S&P 500",
+      "tipo": "Índice EUA",
+      "price": 7365.14,
+      "changePct": -0.0055000000000000005,
+      "high": 7483.15,
+      "low": 7237.85
+    },
+    {
+      "ticker": "INDEXNASDAQ:.IXIC",
+      "stale": false,
+      "descricao": "Nasdaq Composite",
+      "tipo": "Índice EUA",
+      "price": 25587.72,
+      "changePct": -0.0132,
+      "high": 26259.92,
+      "low": 24980.38
+    },
+    {
+      "ticker": "INDEXDJX:.DJI",
+      "stale": false,
+      "descricao": "Dow Jones Industrial",
+      "tipo": "Índice EUA",
+      "price": 50818.07,
+      "changePct": 0.0006,
+      "high": 51260.92,
+      "low": 50211.12
+    },
+    {
+      "ticker": "INDEXRUSSELL:RUT",
+      "stale": false,
+      "descricao": "Russell 2000",
+      "tipo": "Índice EUA",
+      "price": 2861.81,
+      "changePct": 0.0022,
+      "high": 2921.33,
+      "low": 2795.48
+    },
+    {
+      "ticker": "CBOE:VIX",
+      "stale": true,
+      "descricao": "VIX (Volatilidade)",
+      "tipo": "Índice EUA",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    },
+    {
+      "ticker": "INDEXFTSE:UKX",
+      "stale": false,
+      "descricao": "FTSE 100 (Reino Unido)",
+      "tipo": "Índice Global",
+      "price": 10227.33,
+      "changePct": -0.0141,
+      "high": 10372.77,
+      "low": 10227.33
+    },
+    {
+      "ticker": "INDEXDB:DAX",
+      "stale": false,
+      "descricao": "DAX (Alemanha)",
+      "tipo": "Índice Global",
+      "price": 24433.06,
+      "changePct": -0.0074,
+      "high": 24820.95,
+      "low": 24398.87
+    },
+    {
+      "ticker": "INDEXEURO:SX5E",
+      "stale": true,
+      "descricao": "Euro Stoxx 50",
+      "tipo": "Índice Global",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    },
+    {
+      "ticker": "INDEXNIKKEI:NI225",
+      "stale": false,
+      "descricao": "Nikkei 225 (Japão)",
+      "tipo": "Índice Global",
+      "price": 65416.63,
+      "changePct": 0.0217,
+      "high": 65485.16,
+      "low": 63918.96
+    },
+    {
+      "ticker": "INDEXHANGSENG:HSI",
+      "stale": false,
+      "descricao": "Hang Seng (HK)",
+      "tipo": "Índice Global",
+      "price": 24565.9,
+      "changePct": -0.0037,
+      "high": 24740.65,
+      "low": 24486.39
+    },
+    {
+      "ticker": "SHA:000001",
+      "stale": true,
+      "descricao": "Shanghai Composite",
+      "tipo": "Índice China",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    },
+    {
+      "ticker": "CURRENCY:XAUUSD",
+      "stale": true,
+      "descricao": "Ouro (XAU/USD)",
+      "tipo": "Commodity",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    },
+    {
+      "ticker": "CURRENCY:XAGUSD",
+      "stale": true,
+      "descricao": "Prata (XAG/USD)",
+      "tipo": "Commodity",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    },
+    {
+      "ticker": "NASDAQ:USO",
+      "stale": true,
+      "descricao": "WTI Oil ETF (proxy)",
+      "tipo": "Commodity",
+      "price": null,
+      "changePct": 0,
+      "high": null,
+      "low": null
+    }
+  ]
+}
