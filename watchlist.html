@@ -144,7 +144,7 @@ function renderWatchlist(){
     <div class="mini-card"><div class="mini-label">Última atualização</div><div class="mini-val" style="font-size:13px">${DATA_UPDATED_AT||'—'}</div></div>`;
 
   document.getElementById('wl-tbody').innerHTML=ativos.map((d,i)=>`
-    <tr onclick="location.href='ativo.html?t=${d.t}${d.t.endsWith('11')?'&tipo=fii':''}'" class="fade-in" style="cursor:pointer;animation-delay:${i*0.03}s">
+    <tr onclick="location.href='ativo.html?t=${d.t}${d.t.endsWith('11')?'&tipo=fii':''}'" class="fade-in" style="cursor:pointer;animation-delay:${i*0.03}s"${d.stale?' data-stale="true" title="Último valor disponível (dado desatualizado)"':''}>
       <td>
         <div style="display:flex;align-items:center;gap:10px">
           ${logoHtml(d.t,32)}
@@ -152,7 +152,7 @@ function renderWatchlist(){
         </div>
       </td>
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
-      <td class="r"><span class="pill ${d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>
+      <td class="r"><span class="pill ${d.stale?'stale-pill':d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>
       <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
       <td class="r">${d.pl?(d.pl>0?d.pl.toFixed(1)+'x':'neg.'):'—'}</td>
       <td class="r">${d.pvp?d.pvp.toFixed(2):'—'}</td>

@@ -124,6 +124,7 @@ function renderTable(arr) {
     tr.style.animationDelay = (i * 0.015) + 's';
     tr.className = 'fade-in';
     tr.style.cursor = 'pointer';
+    if (d.stale) tr.setAttribute('data-stale', 'true');
     tr.innerHTML = `
       <td>
         <div style="display:flex;align-items:center;gap:10px">

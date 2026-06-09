@@ -324,8 +324,8 @@ async function init() {
     const r = await fetch('data/bcb.json?t=' + Date.now());
     if (r.ok) {
       const j = await r.json();
-      if (j.cdi?.anual)         document.getElementById('mc-cdi').textContent  = j.cdi.anual.toFixed(2) + '%';
-      if (j.ipca?.acumulado_12m) document.getElementById('mc-ipca').textContent = j.ipca.acumulado_12m.toFixed(2) + '%';
+      if (j.cdi?.anual)         { document.getElementById('mc-cdi').textContent  = j.cdi.anual.toFixed(2) + '%'; applyStaleEl('mc-cdi', j.cdi.stale); }
+      if (j.ipca?.acumulado_12m) { document.getElementById('mc-ipca').textContent = j.ipca.acumulado_12m.toFixed(2) + '%'; applyStaleEl('mc-ipca', j.ipca.stale); }
     }
   } catch(e) {}
   currentData = [...ACOES];

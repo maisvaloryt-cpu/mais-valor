@@ -136,8 +136,7 @@ function renderTable(arr) {
     tr.style.animationDelay = (i * 0.015) + 's';
     tr.className = 'fade-in';
     tr.style.cursor = 'pointer';
-
-    // P/VP coloring: abaixo de 1 = verde, acima de 1.1 = vermelho
+    if (d.stale) tr.setAttribute('data-stale', 'true');: abaixo de 1 = verde, acima de 1.1 = vermelho
     const pvpClass = d.pvp < 1 ? 'up' : d.pvp > 1.1 ? 'dn' : '';
 
     // Variação 12m — usa d.v12 se existir, senão d.v (dia)

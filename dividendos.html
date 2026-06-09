@@ -121,6 +121,7 @@ function renderTable(arr){
     const isFii = d.t && /\d{2}$/.test(d.t);
     tr.onclick=()=>location.href=`ativo.html?t=${d.t}${isFii?'&tipo=fii':''}`;
     tr.style.cursor='pointer';
+    if (d.stale) tr.setAttribute('data-stale','true');
     tr.innerHTML=`
       <td>
         <div style="display:flex;align-items:center;gap:10px">

@@ -135,6 +135,7 @@ function renderHeader(d, num) {
   const isUp = d.v>=0;
   const score = calcScore(d);
   const scoreHtml = score!==null ? `<div style="margin-top:6px">${scoreBadge(d)}</div>` : '';
+  const staleNote = d.stale ? `<div style="margin-top:4px;font-size:11px;color:var(--stale)" title="Último valor disponível (dado desatualizado)">⚠ dado desatualizado</div>` : '';
   document.getElementById(`header${num}`).innerHTML = `
     <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
       ${logoHtml(d.t,40)}
@@ -143,8 +144,9 @@ function renderHeader(d, num) {
         <div style="font-size:12px;color:var(--text2)">${d.n}</div>
       </div>
     </div>
-    <div class="cmp-price-big" style="margin-top:8px">R$ ${d.p.toFixed(2)} <span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span></div>
+    <div class="cmp-price-big" style="margin-top:8px${d.stale?';color:var(--stale)':''}">R$ ${d.p.toFixed(2)} <span class="pill ${d.stale?'stale-pill':isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span></div>
     <div style="font-size:12px;color:var(--text3);margin-top:4px">${d.setor}</div>
+    ${staleNote}
     ${scoreHtml}`;
 }
 

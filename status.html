@@ -199,9 +199,9 @@ async function loadStatus() {
       <div class="detail-row"><span>Última atualização</span><span style="font-size:12px;color:var(--gold);font-family:'DM Mono',monospace">${cot.updated_at||'—'}</span></div>
       <div class="detail-row"><span>Ações com cotação</span><span class="badge badge-ok">${cot.total_acoes||0}</span></div>
       <div class="detail-row"><span>FIIs com cotação</span><span class="badge badge-ok">${cot.total_fiis||0}</span></div>
-      <div class="detail-row"><span>Usando preço histórico</span><span class="badge ${(cot.fallbacks||0)>0?'badge-warn':'badge-ok'}">${cot.fallbacks||0}</span></div>
-      ${(cot.tickers_fallback||[]).length>0?`<div style="margin-top:8px;font-size:11px;color:var(--text3)">Fallbacks:</div>
-      <div class="ticker-list">${cot.tickers_fallback.map(t=>`<span class="ticker-badge">${t}</span>`).join('')}</div>`:''}
+      <div class="detail-row"><span>Usando preço histórico (stale)</span><span class="badge ${(cot.fallbacks||0)>0?'badge-warn':'badge-ok'}">${cot.fallbacks||0}</span></div>
+      ${(cot.tickers_fallback||[]).length>0?`<div style="margin-top:8px;font-size:11px;color:var(--stale)">⚠ Ativos com dado desatualizado (exibidos em amarelo no site):</div>
+      <div class="ticker-list">${cot.tickers_fallback.map(t=>`<span class="ticker-badge" style="color:var(--stale);border-color:var(--stale-bg)">${t}</span>`).join('')}</div>`:''}
     `;
 
     // FUNDAMENTUS

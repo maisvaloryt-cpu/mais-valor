@@ -79,10 +79,16 @@ async function loadBCBNav() {
     const j = await r.json();
     window.BCB_DATA = j;
     if (j.cdi?.anual) {
-      document.querySelectorAll('.tk-selic').forEach(el => { el.textContent = j.cdi.anual.toFixed(2) + '%'; });
+      document.querySelectorAll('.tk-selic').forEach(el => {
+        el.textContent = j.cdi.anual.toFixed(2) + '%';
+        if (j.cdi.stale) { el.classList.add('stale'); el.setAttribute('data-stale','true'); el.title='Último valor disponível (dado desatualizado)'; }
+      });
     }
     if (j.ipca?.acumulado_12m) {
-      document.querySelectorAll('.tk-ipca').forEach(el => { el.textContent = j.ipca.acumulado_12m.toFixed(2) + '%'; });
+      document.querySelectorAll('.tk-ipca').forEach(el => {
+        el.textContent = j.ipca.acumulado_12m.toFixed(2) + '%';
+        if (j.ipca.stale) { el.classList.add('stale'); el.setAttribute('data-stale','true'); el.title='Último valor disponível (dado desatualizado)'; }
+      });
     }
   } catch(e) {}
 }
@@ -170,22 +176,24 @@ async function loadIndicesNav() {
   // Ativos prioritários: grandes índices, câmbio, BTC, top ações líquidas
   const buildTickerItems = () => {
     const items = [];
+    const sc = (item) => item?.stale ? ' class="stale"' : '';
+    const sa = (item) => item?.stale ? ' data-stale="true" title="Último valor disponível (dado desatualizado)"' : '';
 
     // Índices se disponíveis
-    if (j.ibov)  items.push(`<div class="ticker-item"><span class="ticker-name">IBOV</span><span class="ticker-val">${fmtNum(j.ibov)}</span>${pillHtml(j.ibov)}</div>`);
-    if (j.ifix)  items.push(`<div class="ticker-item"><span class="ticker-name">IFIX</span><span class="ticker-val">${fmtNum(j.ifix)}</span>${pillHtml(j.ifix)}</div>`);
+    if (j.ibov)  items.push(`<div class="ticker-item"><span class="ticker-name">IBOV</span><span class="ticker-val"${sc(j.ibov)}${sa(j.ibov)}>${fmtNum(j.ibov)}</span>${pillHtml(j.ibov)}</div>`);
+    if (j.ifix)  items.push(`<div class="ticker-item"><span class="ticker-name">IFIX</span><span class="ticker-val"${sc(j.ifix)}${sa(j.ifix)}>${fmtNum(j.ifix)}</span>${pillHtml(j.ifix)}</div>`);
     if (j.small) items.push(`<div class="ticker-item"><span class="ticker-name">SMALL</span><span class="ticker-val">${fmtNum(j.small)}</span>${pillHtml(j.small)}</div>`);
     if (j.idiv)  items.push(`<div class="ticker-item"><span class="ticker-name">IDIV</span><span class="ticker-val">${fmtNum(j.idiv)}</span>${pillHtml(j.idiv)}</div>`);
 
     // Câmbio
-    if (j.dolar) items.push(`<div class="ticker-item"><span class="ticker-name">USD/BRL</span><span class="ticker-val">R$${fmtNum(j.dolar,4)}</span>${pillHtml(j.dolar)}</div>`);
-    if (j.euro)  items.push(`<div class="ticker-item"><span class="ticker-name">EUR/BRL</span><span class="ticker-val">R$${fmtNum(j.euro,4)}</span>${pillHtml(j.euro)}</div>`);
+    if (j.dolar) items.push(`<div class="ticker-item"><span class="ticker-name">USD/BRL</span><span class="ticker-val"${sc(j.dolar)}${sa(j.dolar)}>R$${fmtNum(j.dolar,4)}</span>${pillHtml(j.dolar)}</div>`);
+    if (j.euro)  items.push(`<div class="ticker-item"><span class="ticker-name">EUR/BRL</span><span class="ticker-val"${sc(j.euro)}${sa(j.euro)}>R$${fmtNum(j.euro,4)}</span>${pillHtml(j.euro)}</div>`);
 
     // Commodities
-    if (j.ouro)  items.push(`<div class="ticker-item"><span class="ticker-name">OURO</span><span class="ticker-val">US$${fmtNum(j.ouro,0)}</span>${pillHtml(j.ouro)}</div>`);
+    if (j.ouro)  items.push(`<div class="ticker-item"><span class="ticker-name">OURO</span><span class="ticker-val"${sc(j.ouro)}${sa(j.ouro)}>US$${fmtNum(j.ouro,0)}</span>${pillHtml(j.ouro)}</div>`);
 
     // Cripto
-    if (j.btc)   items.push(`<div class="ticker-item"><span class="ticker-name">BTC</span><span class="ticker-val">US$${fmtNum(j.btc,0)}</span>${pillHtml(j.btc)}</div>`);
+    if (j.btc)   items.push(`<div class="ticker-item"><span class="ticker-name">BTC</span><span class="ticker-val"${sc(j.btc)}${sa(j.btc)}>US$${fmtNum(j.btc,0)}</span>${pillHtml(j.btc)}</div>`);
 
     // IPCA sempre (relevante)
     items.push(`<div class="ticker-item"><span class="ticker-name">IPCA 12m</span><span class="ticker-val tk-ipca">—</span></div>`);

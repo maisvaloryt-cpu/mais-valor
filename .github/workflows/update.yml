@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       modo:
-        description: 'diario | g1-g5 | fii1-fii4 | dividendos | indices | relatorio'
+        description: 'diario | g1-g5 | fii1-fii4 | dividendos | indices | relatorio | setup'
         required: false
         default: 'diario'
 
@@ -47,6 +47,21 @@ jobs:
             fi
           fi
 
+      # ── SETUP: cria estrutura de pastas + JSONs placeholder ──────────────────
+      - name: Setup — criar estrutura de pastas e placeholders
+        if: ${{ steps.modo.outputs.modo == 'setup' }}
+        run: |
+          mkdir -p data/intraday data/historico data/diario data/fundamentalistas
+          # Placeholder para cada JSON intraday (evita 404 no site antes do Apps Script rodar)
+          for tipo in acoes-br fiis internacional cripto-macro; do
+            if [ ! -f "data/intraday/${tipo}.json" ]; then
+              echo '{"updated_at":null,"_placeholder":true}' > "data/intraday/${tipo}.json"
+              echo "  Criado placeholder: data/intraday/${tipo}.json"
+            fi
+          done
+          echo "✅ Estrutura criada"
+
+      # ── DIÁRIO ────────────────────────────────────────────────────────────────
       - name: Índices (Ibovespa, IFIX, Dólar, BTC)
         if: ${{ steps.modo.outputs.modo == 'diario' }}
         run: python fetch_indices.py
@@ -55,7 +70,7 @@ jobs:
         if: ${{ steps.modo.outputs.modo == 'diario' }}
         run: python fetch_bcb.py
 
-      - name: Histórico Índices para Simulador (CDI, IPCA, IMA-B, IBOV, IFIX)
+      - name: Histórico Índices para Simulador
         if: ${{ steps.modo.outputs.modo == 'diario' || steps.modo.outputs.modo == 'indices' }}
         run: python fetch_historico_indices.py
 
@@ -77,6 +92,7 @@ jobs:
         if: ${{ steps.modo.outputs.modo == 'diario' }}
         run: python gerar_relatorio.py
 
+      # ── HISTÓRICO ─────────────────────────────────────────────────────────────
       - name: Histórico Ações G1
         if: ${{ steps.modo.outputs.modo == 'g1' }}
         run: python fetch_historico_g1.py
@@ -121,6 +137,7 @@ jobs:
         if: ${{ steps.modo.outputs.modo == 'relatorio' }}
         run: python gerar_relatorio.py
 
+      # ── COMMIT ────────────────────────────────────────────────────────────────
       - name: Commit e Push
         run: |
           git config user.name "Mais Valor Bot"

@@ -185,9 +185,10 @@ function render(key, el) {
 }
 
 function renderTable(arr){
-  document.getElementById('rank-tbody').innerHTML=arr.slice(0,100).map((d,i)=>
-    `<tr onclick="location.href='ativo.html?t=${d.t}${d.t.endsWith('11')?'&tipo=fii':''}'" class="fade-in" style="cursor:pointer;animation-delay:${i*0.012}s">${currentConfig.row(d,i)}</tr>`
-  ).join('');
+  document.getElementById('rank-tbody').innerHTML=arr.slice(0,100).map((d,i)=>{
+    const staleAttr = d.stale ? ' data-stale="true" title="Último valor disponível"' : '';
+    return `<tr onclick="location.href='ativo.html?t=${d.t}${d.t.endsWith('11')?'&tipo=fii':''}'" class="fade-in" style="cursor:pointer;animation-delay:${i*0.012}s"${staleAttr}>${currentConfig.row(d,i)}</tr>`;
+  }).join('');
 }
 
 function filterRank(q) {

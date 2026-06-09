@@ -9,6 +9,7 @@
   --text: #ECEAE4; --text2: #8A8884; --text3: #4E4D4A;
   --up: #1FC96E; --up-bg: rgba(31,201,110,0.10); --up-glow: rgba(31,201,110,0.2);
   --dn: #E8503A; --dn-bg: rgba(232,80,58,0.10); --dn-glow: rgba(232,80,58,0.2);
+  --stale: #C8B882; --stale-bg: rgba(200,184,130,0.12);
   --radius: 10px; --radius-lg: 14px; --radius-xl: 20px;
   --shadow: 0 4px 24px rgba(0,0,0,0.5);
   --shadow-lg: 0 8px 40px rgba(0,0,0,0.7);
@@ -25,6 +26,7 @@
   --border: rgba(0,0,0,0.08); --border2: rgba(245,166,35,0.35); --border3: rgba(0,0,0,0.15);
   --text: #1A1A18; --text2: #5A5A56; --text3: #9A9A96;
   --up-bg: rgba(31,201,110,0.12); --dn-bg: rgba(232,80,58,0.10);
+  --stale: #A08840; --stale-bg: rgba(160,136,64,0.12);
   --shadow: 0 4px 24px rgba(0,0,0,0.10);
   --shadow-lg: 0 8px 40px rgba(0,0,0,0.15);
   --gold-dim: rgba(245,166,35,0.15);
@@ -383,6 +385,16 @@ nav {
 .data-table tbody tr:hover td { background: var(--bg3); }
 .data-table tbody tr:hover .asset-ticker { color: var(--gold); }
 
+/* Linha com dado antigo — amarelo suave em todo o conteúdo */
+.data-table tbody tr[data-stale="true"] td { color: var(--stale) !important; }
+.data-table tbody tr[data-stale="true"] .asset-ticker { color: var(--stale) !important; }
+.data-table tbody tr[data-stale="true"] .asset-name   { color: var(--stale) !important; opacity: 0.7; }
+.data-table tbody tr[data-stale="true"] .up-pill,
+.data-table tbody tr[data-stale="true"] .dn-pill,
+.data-table tbody tr[data-stale="true"] .gold-pill    { background: var(--stale-bg) !important; color: var(--stale) !important; }
+/* Mini-cards stale */
+.mini-val.stale { color: var(--stale) !important; }
+
 .asset-ticker { font-weight: 700; font-size: 14px; transition: var(--transition); }
 .asset-name { font-size: 11.5px; color: var(--text3); margin-top: 2px; }
 
@@ -431,6 +443,20 @@ nav {
 .up { color: var(--up); }
 .dn { color: var(--dn); }
 .gold { color: var(--gold); }
+
+/* ─── DADO ANTIGO / FALLBACK ──────────────────────────────────── */
+/* Aplicado quando o dado vem do último valor válido (API falhou)  */
+.stale        { color: var(--stale) !important; }
+.stale-cell   { color: var(--stale) !important; }
+.stale-block  { color: var(--stale) !important; }
+.stale-pill   { background: var(--stale-bg) !important; color: var(--stale) !important; }
+.stale-val    { color: var(--stale) !important; font-style: italic; }
+
+/* Cursor de dica para qualquer elemento marcado como stale */
+[data-stale="true"] {
+  cursor: help;
+  position: relative;
+}
 
 /* ─── CARD ────────────────────────────────────────────────────── */
 .card {

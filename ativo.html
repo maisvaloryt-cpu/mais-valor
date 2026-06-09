@@ -498,7 +498,12 @@ function renderHero(d) {
   const isUp = d.v >= 0;
   document.getElementById('kpi-preco').textContent = 'R$ ' + d.p.toFixed(2);
   document.getElementById('kpi-preco').className = 'kpi-val ' + (isUp ? 'up' : 'dn');
-  document.getElementById('kpi-var').innerHTML = `<span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span> hoje`;
+  if (d.stale) {
+    document.getElementById('kpi-preco').classList.add('stale');
+    document.getElementById('kpi-preco').setAttribute('data-stale','true');
+    document.getElementById('kpi-preco').title = 'Último valor disponível (dado desatualizado)';
+  }
+  document.getElementById('kpi-var').innerHTML = `<span class="pill ${d.stale?'stale-pill':isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span> hoje`;
 
   const v12 = d.v12 !== undefined ? d.v12 : d.v;
   const v12Up = v12 >= 0;

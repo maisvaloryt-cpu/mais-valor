@@ -136,11 +136,13 @@ function renderTable(arr){
   arr.forEach((c, i) => {
     const chg24  = c.price_change_percentage_24h || 0;
     const chg7   = c.price_change_percentage_7d_in_currency || 0;
+    const isStale = c._from_cache || false;
     const tr = document.createElement('tr');
     tr.style.animationDelay = (Math.min(i,30) * 0.015) + 's';
     tr.className = 'fade-in';
     tr.style.cursor = 'pointer';
-    tr.title = `Ver análise de ${c.name}`;
+    tr.title = isStale ? `${c.name} — último valor disponível (dado do cache local)` : `Ver análise de ${c.name}`;
+    if (isStale) tr.setAttribute('data-stale','true');
     tr.onclick = () => { window.location.href = `cripto-detalhe.html?id=${c.id}`; };
     tr.innerHTML = `
       <td style="color:var(--text3);font-size:12px;font-family:var(--font-mono)">${i + 1}</td>
@@ -150,16 +152,16 @@ function renderTable(arr){
             style="width:32px;height:32px;border-radius:50%;object-fit:contain;flex-shrink:0"
             onerror="this.style.display='none'">
           <div>
-            <div class="asset-ticker">${c.symbol.toUpperCase()}</div>
+            <div class="asset-ticker${isStale?' stale':''}">${c.symbol.toUpperCase()}</div>
             <div class="asset-name">${c.name}</div>
           </div>
         </div>
       </td>
-      <td class="r" style="font-family:var(--font-mono);font-size:13px;font-weight:600">${fmtUSD(c.current_price)}</td>
-      <td class="r"><span class="pill ${chg24>=0?'up-pill':'dn-pill'}">${chg24>=0?'+':''}${chg24.toFixed(2)}%</span></td>
-      <td class="r ${chg7>=0?'up':'dn'}">${chg7>=0?'+':''}${chg7.toFixed(2)}%</td>
-      <td class="r" style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">${fmtUSD(c.market_cap)}</td>
-      <td class="r" style="font-family:var(--font-mono);font-size:12px;color:var(--text3)">${fmtUSD(c.total_volume)}</td>`;
+      <td class="r" style="font-family:var(--font-mono);font-size:13px;font-weight:600${isStale?';color:var(--stale)':''}">${fmtUSD(c.current_price)}</td>
+      <td class="r"><span class="pill ${isStale?'stale-pill':chg24>=0?'up-pill':'dn-pill'}">${chg24>=0?'+':''}${chg24.toFixed(2)}%</span></td>
+      <td class="r ${isStale?'stale':chg7>=0?'up':'dn'}">${chg7>=0?'+':''}${chg7.toFixed(2)}%</td>
+      <td class="r" style="font-family:var(--font-mono);font-size:12px;color:${isStale?'var(--stale)':'var(--text2)'}">${fmtUSD(c.market_cap)}</td>
+      <td class="r" style="font-family:var(--font-mono);font-size:12px;color:${isStale?'var(--stale)':'var(--text3)'}">${fmtUSD(c.total_volume)}</td>`;
     tb.appendChild(tr);
   });
 }
