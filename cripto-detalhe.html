@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cripto — Mais Valor</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  .detail-hero {
+    padding: 2rem 0 1.5rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
+  }
+  .detail-hero-inner {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .detail-coin-logo {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    object-fit: contain;
+    background: var(--bg3);
+    padding: 4px;
+  }
+  .detail-coin-info { flex: 1; }
+  .detail-coin-name {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.1;
+  }
+  .detail-coin-symbol {
+    font-size: 0.95rem;
+    color: var(--text3);
+    font-family: var(--font-mono);
+    margin-top: 2px;
+  }
+  .detail-price-block { text-align: right; }
+  .detail-price {
+    font-size: 2.2rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--text);
+    line-height: 1;
+  }
+  .detail-change {
+    font-size: 1rem;
+    font-family: var(--font-mono);
+    margin-top: 4px;
+  }
+
+  .detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 1.5rem;
+    align-items: start;
+  }
+  @media(max-width:900px){
+    .detail-layout { grid-template-columns: 1fr; }
+    .detail-price-block { text-align: left; }
+  }
+
+  .chart-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: .5rem;
+  }
+  .chart-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+  .range-btns { display: flex; gap: 4px; }
+  .range-btn {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    color: var(--text2);
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: var(--transition);
+  }
+  .range-btn:hover, .range-btn.active {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  .chart-wrap { position: relative; height: 280px; }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .75rem;
+    margin-bottom: 1.5rem;
+  }
+  .metric-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+  }
+  .metric-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+  .metric-val   { font-size: 1.1rem; font-weight: 600; font-family: var(--font-mono); color: var(--text); }
+  .metric-sub   { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  .info-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .info-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: 1rem;
+    padding-bottom: .5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-row-label { color: var(--text3); }
+  .info-row-val   { color: var(--text); font-family: var(--font-mono); font-weight: 600; }
+
+  .desc-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .desc-text {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.8;
+    max-height: 120px;
+    overflow: hidden;
+    position: relative;
+    transition: max-height 0.4s ease;
+  }
+  .desc-text.expanded { max-height: 1000px; }
+  .desc-fade {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 50px;
+    background: linear-gradient(transparent, var(--bg2));
+    pointer-events: none;
+  }
+  .desc-toggle {
+    background: none; border: none; color: var(--gold);
+    font-size: 12px; cursor: pointer; padding: 6px 0 0;
+    font-family: var(--font-body);
+  }
+
+  .links-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: .75rem; }
+  .ext-link {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 5px 10px; font-size: 12px;
+    color: var(--text2); text-decoration: none;
+    transition: var(--transition);
+  }
+  .ext-link:hover { border-color: var(--gold); color: var(--gold); }
+
+  .breadcrumb {
+    font-size: 12px;
+    color: var(--text3);
+    margin-bottom: 1rem;
+  }
+  .breadcrumb a { color: var(--text3); text-decoration: none; }
+  .breadcrumb a:hover { color: var(--gold); }
+
+  .skeleton {
+    background: linear-gradient(90deg, var(--bg3) 25%, var(--bg2) 50%, var(--bg3) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-pulse 1.5s infinite;
+    border-radius: 6px;
+  }
+  @keyframes skeleton-pulse { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+  .mini-sparkline { display: inline-block; vertical-align: middle; }
+
+  /* Tabela de histórico */
+  .hist-table-wrap { max-height: 320px; overflow-y: auto; margin-top: .75rem; }
+  .hist-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .hist-table th { position: sticky; top: 0; background: var(--bg2); padding: 6px 10px; color: var(--text3); text-align: left; font-weight: 600; border-bottom: 1px solid var(--border); }
+  .hist-table td { padding: 6px 10px; border-bottom: 1px solid var(--border); color: var(--text2); font-family: var(--font-mono); }
+  .hist-table tr:last-child td { border-bottom: none; }
+  .hist-table tbody tr:hover { background: var(--bg3); }
+</style>
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<div class="container" style="max-width:1100px">
+  <div class="breadcrumb">
+    <a href="criptos.html">← Criptos</a>
+    <span style="margin:0 6px">›</span>
+    <span id="bc-name">Carregando...</span>
+  </div>
+
+  <!-- Hero da moeda -->
+  <div class="detail-hero fade-in" id="detail-hero">
+    <div class="detail-hero-inner">
+      <img id="d-logo" class="detail-coin-logo" src="" alt="" onerror="this.style.display='none'">
+      <div class="detail-coin-info">
+        <div class="detail-coin-name" id="d-name"><div class="skeleton" style="width:180px;height:28px"></div></div>
+        <div class="detail-coin-symbol" id="d-symbol"></div>
+        <div style="margin-top:6px" id="d-rank"></div>
+      </div>
+      <div class="detail-price-block">
+        <div class="detail-price" id="d-price">—</div>
+        <div class="detail-change" id="d-change24"></div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px" id="d-change7"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-layout">
+    <!-- Coluna principal -->
+    <div>
+      <!-- Gráfico histórico -->
+      <div class="chart-card fade-in-1">
+        <div class="chart-header">
+          <div class="chart-title">Histórico de Preço</div>
+          <div class="range-btns">
+            <button class="range-btn" onclick="changeRange(1,'1d')">1D</button>
+            <button class="range-btn active" onclick="changeRange(7,'7d')">7D</button>
+            <button class="range-btn" onclick="changeRange(30,'30d')">1M</button>
+            <button class="range-btn" onclick="changeRange(90,'90d')">3M</button>
+            <button class="range-btn" onclick="changeRange(180,'180d')">6M</button>
+            <button class="range-btn" onclick="changeRange(365,'1a')">1A</button>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="price-chart"></canvas>
+        </div>
+        <div id="chart-stats" style="display:flex;gap:1.5rem;margin-top:.75rem;font-size:12px;color:var(--text3)"></div>
+      </div>
+
+      <!-- Métricas de mercado -->
+      <div class="metrics-grid fade-in-2">
+        <div class="metric-card">
+          <div class="metric-label">Market Cap</div>
+          <div class="metric-val" id="m-cap">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Volume 24h</div>
+          <div class="metric-val" id="m-vol">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Máxima 24h</div>
+          <div class="metric-val up" id="m-high">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Mínima 24h</div>
+          <div class="metric-val dn" id="m-low">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">ATH (Máxima histórica)</div>
+          <div class="metric-val" id="m-ath">—</div>
+          <div class="metric-sub" id="m-ath-date"></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">ATL (Mínima histórica)</div>
+          <div class="metric-val" id="m-atl">—</div>
+          <div class="metric-sub" id="m-atl-date"></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Oferta Circulante</div>
+          <div class="metric-val" id="m-supply">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Oferta Total</div>
+          <div class="metric-val" id="m-total-supply">—</div>
+        </div>
+      </div>
+
+      <!-- Tabela de histórico de preços -->
+      <div class="chart-card fade-in-3">
+        <div class="chart-header">
+          <div class="chart-title">Histórico de Preços (tabela)</div>
+          <select id="hist-range" class="filter-select" style="font-size:12px;padding:4px 8px" onchange="renderHistTable()">
+            <option value="7">7 dias</option>
+            <option value="30" selected>30 dias</option>
+            <option value="90">90 dias</option>
+            <option value="365">1 ano</option>
+          </select>
+        </div>
+        <div class="hist-table-wrap">
+          <table class="hist-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Abertura (aprox.)</th>
+                <th>Mínima</th>
+                <th>Máxima</th>
+                <th>Fechamento</th>
+                <th>Variação</th>
+              </tr>
+            </thead>
+            <tbody id="hist-tbody">
+              <tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--text3)">Carregando histórico...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div>
+      <!-- Sobre a moeda -->
+      <div class="desc-card fade-in-1" id="desc-card" style="display:none">
+        <div class="info-card-title">Sobre</div>
+        <div class="desc-text" id="d-desc"></div>
+        <button class="desc-toggle" id="desc-toggle" onclick="toggleDesc()">Ver mais ▼</button>
+        <div class="links-row" id="d-links"></div>
+      </div>
+
+      <!-- Info detalhada -->
+      <div class="info-card fade-in-2">
+        <div class="info-card-title">Informações</div>
+        <div class="info-row"><span class="info-row-label">Ranking</span><span class="info-row-val" id="i-rank">—</span></div>
+        <div class="info-row"><span class="info-row-label">Categoria</span><span class="info-row-val" id="i-cat">—</span></div>
+        <div class="info-row"><span class="info-row-label">Variação 24h</span><span class="info-row-val" id="i-chg24">—</span></div>
+        <div class="info-row"><span class="info-row-label">Variação 7d</span><span class="info-row-val" id="i-chg7">—</span></div>
+        <div class="info-row"><span class="info-row-label">Variação 30d</span><span class="info-row-val" id="i-chg30">—</span></div>
+        <div class="info-row"><span class="info-row-label">Variação 1 ano</span><span class="info-row-val" id="i-chg1y">—</span></div>
+        <div class="info-row"><span class="info-row-label">Score CoinGecko</span><span class="info-row-val" id="i-score">—</span></div>
+      </div>
+
+      <!-- Sentimento -->
+      <div class="info-card fade-in-3" id="sentiment-card" style="display:none">
+        <div class="info-card-title">Sentimento de mercado</div>
+        <div style="margin-bottom:.75rem;font-size:12px;color:var(--text3)">Votos dos usuários CoinGecko</div>
+        <div id="sentiment-bar" style="position:relative;height:8px;border-radius:4px;background:var(--dn);overflow:hidden;margin-bottom:6px">
+          <div id="sentiment-fill" style="height:100%;border-radius:4px;background:var(--up);transition:width 0.6s ease"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span class="up" id="sent-up">—% 🐂 Alta</span>
+          <span class="dn" id="sent-dn">—% 🐻 Baixa</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="nav.js"></script>
+<script>
+// ─── Estado global ───────────────────────────────────────
+let coinId   = '';
+let coinData = null;
+let chartInstance = null;
+let rawHistory = [];   // dados brutos do histórico completo
+let currentRange = 7;
+
+// ─── Helpers ─────────────────────────────────────────────
+function fmtUSD(v){
+  if(!v && v!==0) return '—';
+  if(v>=1e12) return '$' + (v/1e12).toFixed(3) + 'T';
+  if(v>=1e9)  return '$' + (v/1e9).toFixed(2)  + 'B';
+  if(v>=1e6)  return '$' + (v/1e6).toFixed(2)  + 'M';
+  if(v>=1000) return '$' + v.toLocaleString('en-US',{maximumFractionDigits:2});
+  if(v>=1)    return '$' + v.toFixed(2);
+  if(v>=0.01) return '$' + v.toFixed(4);
+  return '$' + v.toFixed(8);
+}
+
+function fmtNum(v){
+  if(!v && v!==0) return '—';
+  if(v>=1e12) return (v/1e12).toFixed(2)+'T';
+  if(v>=1e9)  return (v/1e9).toFixed(2)+'B';
+  if(v>=1e6)  return (v/1e6).toFixed(2)+'M';
+  if(v>=1e3)  return (v/1e3).toFixed(2)+'K';
+  return v.toFixed(0);
+}
+
+function fmtDate(str){
+  if(!str) return '—';
+  return new Date(str).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+}
+
+function chgClass(v){ return v>=0 ? 'up':'dn'; }
+function chgStr(v){
+  if(v===null||v===undefined) return '—';
+  return (v>=0?'+':'')+v.toFixed(2)+'%';
+}
+
+function stripHtml(html){
+  const d=document.createElement('div'); d.innerHTML=html; return d.textContent||d.innerText||'';
+}
+
+// ─── Inicialização ────────────────────────────────────────
+function init(){
+  const params = new URLSearchParams(window.location.search);
+  coinId = params.get('id') || 'bitcoin';
+  document.getElementById('bc-name').textContent = coinId;
+  loadCoinDetail();
+  loadChart(currentRange);
+}
+
+// ─── Dados da moeda ───────────────────────────────────────
+async function loadCoinDetail(){
+  try {
+    const url = `https://api.coingecko.com/api/v3/coins/${coinId}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false`;
+    const r = await fetch(url);
+    if(!r.ok) throw new Error('Moeda não encontrada');
+    coinData = await r.json();
+    renderDetail(coinData);
+  } catch(e) {
+    document.getElementById('d-name').innerHTML = `<span style="color:var(--dn)">Erro ao carregar dados</span>`;
+  }
+}
+
+function renderDetail(d){
+  const md = d.market_data;
+  const price = md.current_price.usd;
+  const chg24 = md.price_change_percentage_24h;
+  const chg7  = md.price_change_percentage_7d;
+  const chg30 = md.price_change_percentage_30d;
+  const chg1y = md.price_change_percentage_1y;
+
+  // Breadcrumb & título
+  document.title = `${d.name} (${d.symbol.toUpperCase()}) — Mais Valor`;
+  document.getElementById('bc-name').textContent = d.name;
+
+  // Hero
+  document.getElementById('d-logo').src = d.image?.large || '';
+  document.getElementById('d-logo').alt = d.name;
+  document.getElementById('d-name').textContent = d.name;
+  document.getElementById('d-symbol').textContent = d.symbol.toUpperCase() + ' · CoinGecko ID: ' + d.id;
+  if(d.market_cap_rank){
+    document.getElementById('d-rank').innerHTML = `<span class="pill" style="background:var(--bg3);color:var(--gold);border:1px solid var(--gold33,rgba(210,163,76,.25));font-size:11px">#${d.market_cap_rank} por market cap</span>`;
+  }
+  document.getElementById('d-price').textContent = fmtUSD(price);
+  document.getElementById('d-change24').innerHTML = `<span class="${chgClass(chg24)}">${chgStr(chg24)} (24h)</span>`;
+  document.getElementById('d-change7').innerHTML  = `<span class="${chgClass(chg7)}">${chgStr(chg7)} (7d)</span>`;
+
+  // Métricas
+  document.getElementById('m-cap').textContent         = fmtUSD(md.market_cap.usd);
+  document.getElementById('m-vol').textContent         = fmtUSD(md.total_volume.usd);
+  document.getElementById('m-high').textContent        = fmtUSD(md.high_24h.usd);
+  document.getElementById('m-low').textContent         = fmtUSD(md.low_24h.usd);
+  document.getElementById('m-ath').textContent         = fmtUSD(md.ath.usd);
+  document.getElementById('m-ath-date').textContent    = 'Em ' + fmtDate(md.ath_date?.usd);
+  document.getElementById('m-atl').textContent         = fmtUSD(md.atl.usd);
+  document.getElementById('m-atl-date').textContent    = 'Em ' + fmtDate(md.atl_date?.usd);
+  document.getElementById('m-supply').textContent      = fmtNum(md.circulating_supply);
+  document.getElementById('m-total-supply').textContent= fmtNum(md.total_supply) || '∞';
+
+  // Sidebar info
+  document.getElementById('i-rank').textContent  = d.market_cap_rank ? '#' + d.market_cap_rank : '—';
+  document.getElementById('i-cat').textContent   = (d.categories||[]).slice(0,2).join(', ') || '—';
+  document.getElementById('i-chg24').innerHTML   = `<span class="${chgClass(chg24)}">${chgStr(chg24)}</span>`;
+  document.getElementById('i-chg7').innerHTML    = `<span class="${chgClass(chg7)}">${chgStr(chg7)}</span>`;
+  document.getElementById('i-chg30').innerHTML   = `<span class="${chgClass(chg30)}">${chgStr(chg30)}</span>`;
+  document.getElementById('i-chg1y').innerHTML   = `<span class="${chgClass(chg1y)}">${chgStr(chg1y)}</span>`;
+  document.getElementById('i-score').textContent = d.coingecko_score ? d.coingecko_score.toFixed(1) + '/100' : '—';
+
+  // Descrição
+  const desc = stripHtml(d.description?.en || '');
+  if(desc){
+    document.getElementById('desc-card').style.display = 'block';
+    document.getElementById('d-desc').textContent = desc;
+  }
+
+  // Links
+  const links = [];
+  if(d.links?.homepage?.[0]) links.push(`<a class="ext-link" href="${d.links.homepage[0]}" target="_blank">🌐 Site oficial</a>`);
+  if(d.links?.whitepaper)    links.push(`<a class="ext-link" href="${d.links.whitepaper}" target="_blank">📄 Whitepaper</a>`);
+  if(d.links?.repos_url?.github?.[0]) links.push(`<a class="ext-link" href="${d.links.repos_url.github[0]}" target="_blank">💻 GitHub</a>`);
+  if(d.links?.twitter_screen_name)    links.push(`<a class="ext-link" href="https://twitter.com/${d.links.twitter_screen_name}" target="_blank">🐦 Twitter</a>`);
+  document.getElementById('d-links').innerHTML = links.join('');
+
+  // Sentimento
+  const sentUp = d.sentiment_votes_up_percentage;
+  const sentDn = d.sentiment_votes_down_percentage;
+  if(sentUp !== null && sentUp !== undefined){
+    document.getElementById('sentiment-card').style.display='block';
+    document.getElementById('sentiment-fill').style.width = sentUp + '%';
+    document.getElementById('sent-up').textContent = sentUp.toFixed(1) + '% 🐂 Alta';
+    document.getElementById('sent-dn').textContent = (sentDn||0).toFixed(1) + '% 🐻 Baixa';
+  }
+}
+
+// ─── Gráfico ──────────────────────────────────────────────
+async function loadChart(days){
+  const canvas = document.getElementById('price-chart');
+  const ctx = canvas.getContext('2d');
+
+  // Mostra loading
+  if(chartInstance){ chartInstance.destroy(); chartInstance=null; }
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  try {
+    // Usa OHLC para >1 dia, minutos para 1 dia
+    const interval = days===1 ? '' : days<=90 ? '&interval=daily' : '&interval=daily';
+    const url = `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}${interval}`;
+    const r = await fetch(url);
+    if(!r.ok) throw new Error('Erro histórico');
+    const data = await r.json();
+
+    rawHistory = data.prices; // [[timestamp, price], ...]
+
+    const labels = rawHistory.map(([ts]) => {
+      const d = new Date(ts);
+      if(days===1) return d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+      if(days<=30) return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
+      return d.toLocaleDateString('pt-BR',{month:'short',year:'2-digit'});
+    });
+    const prices = rawHistory.map(([,p])=>p);
+
+    const firstPrice = prices[0];
+    const lastPrice  = prices[prices.length-1];
+    const isUp = lastPrice >= firstPrice;
+    const color = isUp ? '#22c55e' : '#ef4444';
+    const colorA = isUp ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.12)';
+
+    // Estatísticas do período
+    const minP = Math.min(...prices);
+    const maxP = Math.max(...prices);
+    const pctChange = ((lastPrice-firstPrice)/firstPrice*100);
+    document.getElementById('chart-stats').innerHTML = `
+      <span>Abertura: <strong>${fmtUSD(firstPrice)}</strong></span>
+      <span>Mínima: <strong class="dn">${fmtUSD(minP)}</strong></span>
+      <span>Máxima: <strong class="up">${fmtUSD(maxP)}</strong></span>
+      <span>Variação: <strong class="${chgClass(pctChange)}">${chgStr(pctChange)}</strong></span>
+    `;
+
+    chartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets:[{
+          data: prices,
+          borderColor: color,
+          borderWidth: 2,
+          backgroundColor: colorA,
+          fill: true,
+          tension: 0.3,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: color,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 400 },
+        interaction: { mode:'index', intersect:false },
+        plugins: {
+          legend: { display:false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ' ' + fmtUSD(ctx.parsed.y),
+            },
+            backgroundColor: 'rgba(15,15,25,0.9)',
+            borderColor: color,
+            borderWidth: 1,
+            titleColor: '#aaa',
+            bodyColor: '#fff',
+            padding: 10,
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: 'rgba(150,150,170,0.7)',
+              maxTicksLimit: 8,
+              font: { size: 11 }
+            },
+            grid: { color: 'rgba(255,255,255,0.04)' },
+          },
+          y: {
+            ticks: {
+              color: 'rgba(150,150,170,0.7)',
+              font: { size: 11 },
+              callback: v => fmtUSD(v),
+            },
+            grid: { color: 'rgba(255,255,255,0.04)' },
+          }
+        }
+      }
+    });
+
+    renderHistTable();
+
+  } catch(e) {
+    ctx.fillStyle = 'rgba(150,150,170,0.5)';
+    ctx.textAlign = 'center';
+    ctx.font = '14px sans-serif';
+    ctx.fillText('Erro ao carregar histórico', canvas.width/2, canvas.height/2);
+  }
+}
+
+function changeRange(days, label){
+  currentRange = days;
+  document.querySelectorAll('.range-btn').forEach(b=>{
+    b.classList.toggle('active', b.textContent === label.toUpperCase() || b.onclick.toString().includes(`'${label}'`));
+  });
+  // Atualiza botão ativo manualmente pelo texto
+  document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  loadChart(days);
+}
+
+// ─── Tabela de histórico ──────────────────────────────────
+function renderHistTable(){
+  const tbody = document.getElementById('hist-tbody');
+  const days  = parseInt(document.getElementById('hist-range').value);
+
+  if(!rawHistory.length){
+    tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--text3)">Aguardando carregamento do gráfico...</td></tr>';
+    return;
+  }
+
+  // Filtra pelos dias desejados
+  const cutoff = Date.now() - days * 86400000;
+  const filtered = rawHistory.filter(([ts])=> ts >= cutoff);
+
+  // Agrupa por dia (para histórico >1d, usa pontos diários)
+  const byDay = {};
+  filtered.forEach(([ts, price]) => {
+    const key = new Date(ts).toISOString().slice(0,10);
+    if(!byDay[key]) byDay[key] = [];
+    byDay[key].push(price);
+  });
+
+  const rows = Object.entries(byDay).sort((a,b)=>b[0].localeCompare(a[0])).slice(0, Math.min(days, 365));
+
+  if(!rows.length){
+    tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--text3)">Sem dados neste período</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = rows.map(([date, prices], i) => {
+    const open  = prices[0];
+    const close = prices[prices.length-1];
+    const high  = Math.max(...prices);
+    const low   = Math.min(...prices);
+    const chg   = ((close-open)/open*100);
+    return `<tr>
+      <td>${new Date(date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'})}</td>
+      <td>${fmtUSD(open)}</td>
+      <td class="dn">${fmtUSD(low)}</td>
+      <td class="up">${fmtUSD(high)}</td>
+      <td style="font-weight:600;color:var(--text)">${fmtUSD(close)}</td>
+      <td><span class="${chgClass(chg)}">${chgStr(chg)}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

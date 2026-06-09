@@ -51,8 +51,21 @@
           <option value="current_price">Preço</option>
           <option value="total_volume">Volume 24h</option>
         </select>
-        <button onclick="loadCryptos()" style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:7px 12px;font-size:13px;color:var(--text);cursor:pointer;font-family:var(--font-body);transition:var(--transition)"
+        <select class="filter-select" id="f-limit" onchange="changeLimit(this.value)">
+          <option value="100">Top 100</option>
+          <option value="250" selected>Top 250</option>
+          <option value="500">Top 500</option>
+        </select>
+        <button id="btn-refresh" onclick="loadCryptos()" style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:7px 12px;font-size:13px;color:var(--text);cursor:pointer;font-family:var(--font-body);transition:var(--transition)"
           onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">↻ Atualizar</button>
+      </div>
+
+      <!-- Barra de progresso de carregamento -->
+      <div id="load-progress" style="display:none;margin-bottom:1rem">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:6px" id="load-progress-text">Carregando página 1...</div>
+        <div style="background:var(--bg3);border-radius:4px;height:4px;overflow:hidden">
+          <div id="load-progress-bar" style="height:100%;background:var(--gold);border-radius:4px;transition:width 0.3s ease;width:0%"></div>
+        </div>
       </div>
 
       <div class="table-wrap">
@@ -94,7 +107,7 @@
           <div style="margin-bottom:8px">Dados via <strong style="color:var(--gold)">CoinGecko</strong> (gratuito, sem API key)</div>
           <div style="margin-bottom:8px">Atualizado a cada carregamento da página</div>
           <div style="margin-bottom:8px">Preços em USD · Market cap em bilhões</div>
-          <div>Top 100 criptos por market cap</div>
+          <div id="sidebar-count">Top 250 criptos por market cap</div>
         </div>
       </div>
     </div>
@@ -105,7 +118,7 @@
 <script src="nav.js"></script>
 <script>
 let allCryptos = [];
-let globalData  = null;
+let displayLimit = 250;
 
 function fmtUSD(v){
   if(!v && v!==0) return '—';
@@ -124,8 +137,11 @@ function renderTable(arr){
     const chg24  = c.price_change_percentage_24h || 0;
     const chg7   = c.price_change_percentage_7d_in_currency || 0;
     const tr = document.createElement('tr');
-    tr.style.animationDelay = (i * 0.015) + 's';
+    tr.style.animationDelay = (Math.min(i,30) * 0.015) + 's';
     tr.className = 'fade-in';
+    tr.style.cursor = 'pointer';
+    tr.title = `Ver análise de ${c.name}`;
+    tr.onclick = () => { window.location.href = `cripto-detalhe.html?id=${c.id}`; };
     tr.innerHTML = `
       <td style="color:var(--text3);font-size:12px;font-family:var(--font-mono)">${c.market_cap_rank || '—'}</td>
       <td>
@@ -159,10 +175,16 @@ function filterCrypto(){
 function sortCrypto(key){
   const sorted = [...allCryptos].sort((a,b)=>{
     const va = a[key]||0, vb = b[key]||0;
-    return key==='price_change_24h' ? vb-va : vb-va;
+    return vb - va;
   });
   allCryptos = sorted;
   filterCrypto();
+}
+
+function changeLimit(val) {
+  displayLimit = parseInt(val);
+  document.getElementById('sidebar-count').textContent = `Top ${val} criptos por market cap`;
+  loadCryptos();
 }
 
 function renderSidebar(){
@@ -170,7 +192,7 @@ function renderSidebar(){
   const losers  = [...allCryptos].sort((a,b)=>(a.price_change_percentage_24h||0)-(b.price_change_percentage_24h||0)).slice(0,5);
 
   document.getElementById('top-gainers').innerHTML = gainers.map(c=>`
-    <div class="mover-item">
+    <div class="mover-item" style="cursor:pointer" onclick="window.location.href='cripto-detalhe.html?id=${c.id}'">
       <div style="display:flex;align-items:center;gap:8px">
         <img src="${c.image}" style="width:26px;height:26px;border-radius:50%;object-fit:contain" onerror="this.style.display='none'">
         <div><div class="mover-ticker">${c.symbol.toUpperCase()}</div><div class="mover-name">${fmtUSD(c.current_price)}</div></div>
@@ -179,7 +201,7 @@ function renderSidebar(){
     </div>`).join('');
 
   document.getElementById('top-losers').innerHTML = losers.map(c=>`
-    <div class="mover-item">
+    <div class="mover-item" style="cursor:pointer" onclick="window.location.href='cripto-detalhe.html?id=${c.id}'">
       <div style="display:flex;align-items:center;gap:8px">
         <img src="${c.image}" style="width:26px;height:26px;border-radius:50%;object-fit:contain" onerror="this.style.display='none'">
         <div><div class="mover-ticker">${c.symbol.toUpperCase()}</div><div class="mover-name">${fmtUSD(c.current_price)}</div></div>
@@ -201,7 +223,6 @@ function updateMiniCards(){
     const chg=eth.price_change_percentage_24h||0;
     document.getElementById('mc-eth-chg').innerHTML=`<span class="${chg>=0?'up':'dn'}">${chg>=0?'+':''}${chg.toFixed(2)}% 24h</span>`;
   }
-  // Market cap total e dominância BTC
   const totalCap = allCryptos.reduce((s,c)=>s+(c.market_cap||0),0);
   const btcCap   = btc?.market_cap||0;
   if(totalCap>0){
@@ -210,27 +231,81 @@ function updateMiniCards(){
   }
 }
 
+// Busca múltiplas páginas respeitando rate limit da CoinGecko (free tier)
+async function fetchPage(page, perPage=100){
+  const url = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${perPage}&page=${page}&sparkline=false&price_change_percentage=24h,7d&locale=pt`;
+  const r = await fetch(url);
+  if(!r.ok) throw new Error(`Erro página ${page}: ${r.status}`);
+  return r.json();
+}
+
 async function loadCryptos(){
   const tb = document.getElementById('crypto-tbody');
+  const progressWrap = document.getElementById('load-progress');
+  const progressText = document.getElementById('load-progress-text');
+  const progressBar  = document.getElementById('load-progress-bar');
+  const btn = document.getElementById('btn-refresh');
+
   tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text3)"><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>&nbsp; Buscando dados...</td></tr>';
+  btn.disabled = true;
+  btn.style.opacity = '0.5';
+  allCryptos = [];
+
+  // Calcula quantas páginas precisamos (max 100 por página na tier gratuita)
+  const perPage = 100;
+  const totalPages = Math.ceil(displayLimit / perPage);
+  progressWrap.style.display = 'block';
 
   try {
-    const url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h,7d&locale=pt';
-    const r = await fetch(url);
-    if (!r.ok) throw new Error('Erro na API');
-    allCryptos = await r.json();
+    for(let page = 1; page <= totalPages; page++){
+      progressText.textContent = `Carregando página ${page} de ${totalPages}...`;
+      progressBar.style.width = ((page-1)/totalPages*100) + '%';
+
+      const data = await fetchPage(page, perPage);
+      allCryptos = [...allCryptos, ...data];
+
+      // Renderiza progressivamente após primeira página
+      if(page === 1){
+        renderTable(allCryptos);
+        updateMiniCards();
+        renderSidebar();
+      }
+
+      // Aguarda entre páginas para respeitar rate limit (1.5s entre requests)
+      if(page < totalPages) await new Promise(r => setTimeout(r, 1500));
+    }
+
+    // Corta no limite exato pedido
+    allCryptos = allCryptos.slice(0, displayLimit);
+    progressBar.style.width = '100%';
 
     renderTable(allCryptos);
-    renderSidebar();
     updateMiniCards();
+    renderSidebar();
 
     const now = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-    document.getElementById('update-time').textContent = `Atualizado às ${now} via CoinGecko`;
+    document.getElementById('update-time').textContent = `${allCryptos.length} criptos carregadas · Atualizado às ${now} via CoinGecko`;
+
+    setTimeout(() => { progressWrap.style.display = 'none'; }, 1500);
+
   } catch(e) {
-    tb.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--dn)">
-      ⚠️ Não foi possível carregar os dados. CoinGecko pode estar com limite de requisições.
-      <br><br><button onclick="loadCryptos()" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 14px;color:var(--text);cursor:pointer;font-family:var(--font-body);margin-top:.5rem">Tentar novamente</button>
-    </td></tr>`;
+    progressWrap.style.display = 'none';
+    const partial = allCryptos.length;
+    if(partial > 0){
+      // Mostra o que já foi carregado com aviso
+      renderTable(allCryptos);
+      updateMiniCards();
+      renderSidebar();
+      document.getElementById('update-time').textContent = `⚠️ ${partial} criptos carregadas (erro ao buscar mais — CoinGecko rate limit)`;
+    } else {
+      tb.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--dn)">
+        ⚠️ Não foi possível carregar os dados. CoinGecko pode estar com limite de requisições.
+        <br><br><button onclick="loadCryptos()" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 14px;color:var(--text);cursor:pointer;font-family:var(--font-body);margin-top:.5rem">Tentar novamente</button>
+      </td></tr>`;
+    }
+  } finally {
+    btn.disabled = false;
+    btn.style.opacity = '1';
   }
 }
 
