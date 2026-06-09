@@ -95,7 +95,7 @@ const configs = {
       ${assetCell(d)}
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
       <td class="r" style="font-size:16px;font-weight:800;color:var(--gold)">${d.dy.toFixed(1)}%</td>
-      <td class="r ${d.pvp&&d.pvp<1?'up':''}">${d.pvp?d.pvp.toFixed(2):'—'}</td>
+      <td class="r ${d.pvp&&d.pvp<1?'up':d.pvp&&d.pvp>3?'dn':''}">${d.pvp?d.pvp.toFixed(2):'—'}</td>
       <td class="r" style="color:var(--text3);font-size:11px">${d.setor}</td>
       <td class="r"><span class="pill ${d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>`},
 

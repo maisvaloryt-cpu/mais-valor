@@ -30,23 +30,96 @@ function applyStaleEl(id, isStale) {
 
 // ─── Setores conhecidos ───────────────────────────────────────────────────────
 const SETORES = {
-  PETR4:'Petróleo & Gás',PETR3:'Petróleo & Gás',VALE3:'Mineração',
-  ITUB4:'Bancos',ITUB3:'Bancos',BBDC4:'Bancos',BBDC3:'Bancos',
-  WEGE3:'Indústria',ABEV3:'Bebidas',BBAS3:'Bancos',MGLU3:'Varejo',
-  RENT3:'Locação de Veículos',SUZB3:'Papel & Celulose',ITSA4:'Holdings',
-  BPAC11:'Bancos',PRIO3:'Petróleo & Gás',GGBR4:'Siderurgia',
-  VIVT3:'Telecomunicações',EQTL3:'Energia Elétrica',RADL3:'Saúde',
-  LREN3:'Varejo',HAPV3:'Saúde',BRFS3:'Alimentos',TOTS3:'Tecnologia',
-  MULT3:'Shoppings',CYRE3:'Construção Civil',MRVE3:'Construção Civil',
-  BBSE3:'Seguros',AMER3:'Varejo',RAIL3:'Transporte',JBSS3:'Alimentos',
-  BEEF3:'Alimentos',RDOR3:'Saúde',FLRY3:'Saúde',AZUL4:'Transporte Aéreo',
-  GOLL4:'Transporte Aéreo',EMBR3:'Aeronáutica',TAEE11:'Energia Elétrica',
-  CMIG4:'Energia Elétrica',ELET3:'Energia Elétrica',ELET6:'Energia Elétrica',
-  CPFE3:'Energia Elétrica',SBSP3:'Saneamento',TIMS3:'Telecomunicações',
-  SANB11:'Bancos',BRSR6:'Bancos',BBPO11:'Bancos',CSMG3:'Saneamento',
-  AESB3:'Energia Elétrica',ENEV3:'Energia Elétrica',ALUP11:'Energia Elétrica',
-  TRPL4:'Energia Elétrica',EGIE3:'Energia Elétrica',CESP6:'Energia Elétrica',
-  COGN3:'Educação',YDUQ3:'Educação',ANIM3:'Educação',SEER3:'Educação',
+  // Petróleo & Gás
+  PETR3:'Petróleo & Gás',PETR4:'Petróleo & Gás',PRIO3:'Petróleo & Gás',
+  RECV3:'Petróleo & Gás',RRRP3:'Petróleo & Gás',UGPA3:'Petróleo & Gás',
+  VBBR3:'Petróleo & Gás',CSAN3:'Combustíveis',
+  // Mineração & Siderurgia
+  VALE3:'Mineração',BRAP3:'Mineração',BRAP4:'Mineração',CBAV3:'Mineração',
+  CSNA3:'Siderurgia',GGBR3:'Siderurgia',GGBR4:'Siderurgia',
+  GOAU3:'Siderurgia',GOAU4:'Siderurgia',USIM3:'Siderurgia',USIM5:'Siderurgia',USIM6:'Siderurgia',
+  // Bancos
+  ITUB3:'Bancos',ITUB4:'Bancos',BBDC3:'Bancos',BBDC4:'Bancos',BBAS3:'Bancos',
+  SANB3:'Bancos',SANB4:'Bancos',SANB11:'Bancos',BPAC3:'Bancos',BPAC5:'Bancos',BPAC11:'Bancos',
+  BRSR3:'Bancos',BRSR5:'Bancos',BRSR6:'Bancos',BMEB3:'Bancos',BMEB4:'Bancos',
+  BMIN3:'Bancos',BMIN4:'Bancos',BGIP3:'Bancos',BGIP4:'Bancos',
+  PINE3:'Bancos',PINE4:'Bancos',ABCB4:'Bancos',
+  // Energia Elétrica
+  ELET3:'Energia Elétrica',ELET6:'Energia Elétrica',CMIG3:'Energia Elétrica',CMIG4:'Energia Elétrica',
+  EQTL3:'Energia Elétrica',CPFE3:'Energia Elétrica',ENGI3:'Energia Elétrica',
+  ENGI4:'Energia Elétrica',ENGI11:'Energia Elétrica',TAEE3:'Energia Elétrica',
+  TAEE4:'Energia Elétrica',TAEE11:'Energia Elétrica',TRPL3:'Energia Elétrica',TRPL4:'Energia Elétrica',
+  CESP3:'Energia Elétrica',CESP6:'Energia Elétrica',AESB3:'Energia Elétrica',ENEV3:'Energia Elétrica',
+  ALUP3:'Energia Elétrica',ALUP4:'Energia Elétrica',ALUP11:'Energia Elétrica',EGIE3:'Energia Elétrica',
+  EQPA3:'Energia Elétrica',EQPA5:'Energia Elétrica',EMAE3:'Energia Elétrica',EMAE4:'Energia Elétrica',
+  GEPA3:'Energia Elétrica',GEPA4:'Energia Elétrica',EKTR3:'Energia Elétrica',EKTR4:'Energia Elétrica',
+  COCE3:'Energia Elétrica',COCE5:'Energia Elétrica',CEBR3:'Energia Elétrica',CEBR5:'Energia Elétrica',
+  CEBR6:'Energia Elétrica',CEEB3:'Energia Elétrica',CEEB5:'Energia Elétrica',
+  RNEW3:'Energia Elétrica',RNEW4:'Energia Elétrica',AURE3:'Energia Elétrica',
+  ISAE3:'Energia Elétrica',ISAE4:'Energia Elétrica',EALT3:'Energia Elétrica',EALT4:'Energia Elétrica',
+  ENMT3:'Energia Elétrica',ENMT4:'Energia Elétrica',
+  // Saneamento
+  SBSP3:'Saneamento',CSMG3:'Saneamento',SAPR3:'Saneamento',SAPR4:'Saneamento',SAPR11:'Saneamento',
+  // Telecomunicações
+  VIVT3:'Telecomunicações',TIMS3:'Telecomunicações',OIBR3:'Telecomunicações',OIBR4:'Telecomunicações',
+  TELB3:'Telecomunicações',TELB4:'Telecomunicações',
+  // Varejo
+  MGLU3:'Varejo',LREN3:'Varejo',AMER3:'Varejo',PCAR3:'Varejo',GMAT3:'Varejo',
+  SOMA3:'Varejo',AMAR3:'Varejo',CEAB3:'Varejo',GRND3:'Varejo',VVAR3:'Varejo',
+  // Saúde
+  RDOR3:'Saúde',HAPV3:'Saúde',RADL3:'Saúde',FLRY3:'Saúde',DASA3:'Saúde',
+  HYPE3:'Saúde',ONCO3:'Saúde',BLAU3:'Saúde',AALR3:'Saúde',PNVL3:'Saúde',
+  ADHM3:'Saúde',
+  // Alimentos & Bebidas
+  ABEV3:'Bebidas',JBSS3:'Alimentos',BEEF3:'Alimentos',BRFS3:'Alimentos',
+  MRFG3:'Alimentos',MDIA3:'Alimentos',SMTO3:'Alimentos',CAML3:'Alimentos',
+  TTEN3:'Alimentos',CVAL3:'Alimentos',TASA3:'Alimentos',TASA4:'Alimentos',
+  // Agronegócio
+  SOJA3:'Agronegócio',SLCE3:'Agronegócio',AGRO3:'Agronegócio',
+  // Tecnologia
+  TOTS3:'Tecnologia',LWSA3:'Tecnologia',POSI3:'Tecnologia',SQIA3:'Tecnologia',
+  STNE3:'Tecnologia',CASH3:'Tecnologia',IFCM3:'Tecnologia',INTB3:'Tecnologia',
+  // Construção Civil
+  CYRE3:'Construção Civil',CYRE4:'Construção Civil',MRVE3:'Construção Civil',
+  EVEN3:'Construção Civil',DIRR3:'Construção Civil',TEND3:'Construção Civil',
+  LAVV3:'Construção Civil',MTRE3:'Construção Civil',TRIS3:'Construção Civil',
+  // Shoppings
+  MULT3:'Shoppings',IGTI3:'Shoppings',IGTI11:'Shoppings',BRML3:'Shoppings',ALSC3:'Shoppings',
+  // Holdings & Financeiro
+  ITSA3:'Holdings',ITSA4:'Holdings',WIZC3:'Financeiro',IRBR3:'Seguros',
+  BBSE3:'Seguros',PSSA3:'Seguros',
+  // Papel & Celulose
+  SUZB3:'Papel & Celulose',KLBN3:'Papel & Celulose',KLBN4:'Papel & Celulose',KLBN11:'Papel & Celulose',
+  // Transporte & Logística
+  RAIL3:'Transporte',EMBR3:'Aeronáutica',AZUL4:'Transporte Aéreo',GOLL4:'Transporte Aéreo',
+  JSLG3:'Transporte',VAMO3:'Locação de Veículos',RENT3:'Locação de Veículos',
+  // Indústria
+  WEGE3:'Indústria',ROMI3:'Indústria',FRAS3:'Indústria',TUPY3:'Indústria',
+  KEPL3:'Indústria',MYPK3:'Indústria',MAPT3:'Indústria',MAPT4:'Indústria',
+  UNIP3:'Indústria',UNIP5:'Indústria',UNIP6:'Indústria',RAPT3:'Indústria',RAPT4:'Indústria',
+  WHRL3:'Eletrodomésticos',WHRL4:'Eletrodomésticos',WLMM3:'Indústria',WLMM4:'Indústria',
+  CRPG3:'Indústria',CRPG5:'Indústria',CRPG6:'Indústria',TXRX3:'Indústria',TXRX4:'Indústria',
+  CLSC3:'Distribuição',CLSC4:'Distribuição',CGAS3:'Gás',CGAS5:'Gás',
+  CGRA3:'Varejo',CGRA4:'Varejo',DEXP3:'Transporte',DEXP4:'Transporte',
+  INEP3:'Indústria',INEP4:'Indústria',EUCA3:'Papel & Celulose',EUCA4:'Papel & Celulose',
+  FESA3:'Mineração',FESA4:'Mineração',BLUT3:'Financeiro',BLUT4:'Financeiro',
+  BEES3:'Bancos',BEES4:'Bancos',BDLL3:'Alimentos',BDLL4:'Alimentos',
+  BALM3:'Saúde',BALM4:'Saúde',AZEV3:'Papel & Celulose',AZEV4:'Papel & Celulose',
+  ALPA3:'Calçados',ALPA4:'Calçados',CTSA3:'Têxtil',CTSA4:'Têxtil',
+  CTKA3:'Têxtil',CTKA4:'Têxtil',HAGA3:'Indústria',HAGA4:'Indústria',
+  BSLI3:'Financeiro',BSLI4:'Financeiro',PEAB3:'Bancos',PEAB4:'Bancos',
+  SIMH3:'Transporte',WEST3:'Varejo',NATU3:'Cosméticos',CVCB3:'Turismo',
+  AXIA3:'Energia Elétrica',AXIA6:'Energia Elétrica',SEQL3:'Saúde',
+  MRSA3B:'Mineração',MRSA5B:'Mineração',MRSA6B:'Mineração',
+  PATI3:'Financeiro',PATI4:'Financeiro',PTNT3:'Farmacêutica',PTNT4:'Farmacêutica',
+  RCSL3:'Indústria',RCSL4:'Indústria',RPAD3:'Holdings',RPAD5:'Holdings',RPAD6:'Holdings',
+  SOND5:'Construção Civil',SOND6:'Construção Civil',JOPA3:'Varejo',JOPA4:'Varejo',
+  HBSA3:'Saúde',DTCY3:'Tecnologia',NGRD3:'Gás',ATED3:'Energia Elétrica',
+  FIEI3:'Financeiro',MNDL3:'Alimentos',BIED3:'Financeiro',OBTC3:'Financeiro',
+  CEDO3:'Têxtil',CEDO4:'Têxtil',AZTE3:'Telecomunicações',MSPA3:'Saúde',
+  UCAS3:'Educação',
+  // Educação
+  COGN3:'Educação',YDUQ3:'Educação',ANIM3:'Educação',SEER3:'Educação',ENJU3:'Educação',
 };
 
 function formatVol(v) {
@@ -270,7 +343,7 @@ async function loadData() {
           stale:    cot.stale    || false,
           _source:  cot._source,
         };
-      }).filter(Boolean);
+      }).filter(a => a && !isDuplicado(a.t));
     } else {
       ACOES = (json.acoes||[]).map(d => {
         const cot = mergeCot(d.ticker, 'acoes') || d;
@@ -289,7 +362,7 @@ async function loadData() {
           stale:    cot.stale||false,
           _source:  cot._source,
         };
-      }).filter(a => a.p > 0);
+      }).filter(a => a.p > 0 && !isDuplicado(a.t));
     }
 
     // ── Montar FIIS ───────────────────────────────────────────────────────────

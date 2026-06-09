@@ -155,7 +155,7 @@ function renderWatchlist(){
       <td class="r"><span class="pill ${d.stale?'stale-pill':d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>
       <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
       <td class="r">${d.pl?(d.pl>0?d.pl.toFixed(1)+'x':'neg.'):'—'}</td>
-      <td class="r">${d.pvp?d.pvp.toFixed(2):'—'}</td>
+      <td class="r" style="color:${d.pvp > 0 && d.pvp < 1 ? 'var(--up)' : d.pvp > 3 ? 'var(--dn)' : ''}">${d.pvp?d.pvp.toFixed(2):'—'}</td>
       <td class="r">${scoreBadge(d)}</td>
       <td class="r" style="color:var(--text3)">${d.vol}</td>
       <td class="r">

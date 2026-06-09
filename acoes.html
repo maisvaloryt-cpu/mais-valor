@@ -137,7 +137,7 @@ function renderTable(arr) {
       </td>
       <td class="r" style="color:var(--text2)">${d.mcap ? fmtBi(d.mcap) : d.vol}</td>
       <td class="r" style="color:var(--text2)">${d.pl > 0 ? d.pl.toFixed(2) : '—'}</td>
-      <td class="r" style="color:var(--text2)">${d.pvp > 0 ? d.pvp.toFixed(2) : '—'}</td>
+      <td class="r" style="color:${d.pvp > 0 && d.pvp < 1 ? 'var(--up)' : d.pvp > 3 ? 'var(--dn)' : 'var(--text2)'}">${d.pvp > 0 ? d.pvp.toFixed(2) : '—'}</td>
       <td class="r gold">${d.dy > 0 ? d.dy.toFixed(1) + '%' : '—'}</td>
       <td class="r" style="color:var(--text2)">${d.ml > 0 ? d.ml.toFixed(2) + '%' : '—'}</td>
       <td class="r" style="color:var(--text3);font-size:11px">${d.setor || '—'}</td>`;
