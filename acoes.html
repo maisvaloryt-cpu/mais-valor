@@ -172,7 +172,7 @@ function renderTable(arr) {
       <td class="r gold">${d.dy > 0 ? d.dy.toFixed(1) + '%' : '—'}</td>
       <td class="r" style="color:var(--text2)">${
         currentSort === 'bazin'
-          ? (() => { const t = (d.p*(d.dy/100))/0.06; const up = ((t-d.p)/d.p*100); return `<span style="color:var(--up)">Teto R$${t.toFixed(2)}</span> <span style="font-size:10px;color:var(--up)">(+${up.toFixed(1)}%)</span>`; })()
+          ? (() => { const t = d.div12m / 0.06; const up = ((t-d.p)/d.p*100); return `<span style="color:var(--up)">Teto R$${t.toFixed(2)}</span> <span style="font-size:10px;color:var(--up)">(+${up.toFixed(1)}%)</span>`; })()
           : d.ml > 0 ? d.ml.toFixed(2) + '%' : '—'
       }</td>
       <td class="r" style="color:var(--text3);font-size:11px">${d.setor || '—'}</td>`;
@@ -205,17 +205,15 @@ function applySort(k) {
     data.sort((a, b) => grahamScore(a) - grahamScore(b));
   }
   else if (k === 'bazin') {
-    // Bazin: mostra só ações abaixo do preço teto (div_anual / 0.06)
-    // div_anual estimado via DY × preço
+    // Bazin: preço teto = div12m / 0.06
+    // div12m = dividendos absolutos em R$/ação (calculados em data.js via f.dy × preço)
     data = data.filter(d => {
-      if (d.dy <= 0 || d.p <= 0) return false;
-      const divAnual = d.p * (d.dy / 100);
-      const teto = divAnual / 0.06;
-      return d.p < teto; // apenas abaixo do teto
+      if (!d.div12m || d.div12m <= 0 || d.p <= 0) return false;
+      const teto = d.div12m / 0.06;
+      return d.p < teto;
     });
-    // Ordena pelo maior upside em relação ao teto
     data.sort((a, b) => {
-      const upside = d => { const divA = d.p*(d.dy/100); return (divA/0.06 - d.p)/d.p; };
+      const upside = d => (d.div12m / 0.06 - d.p) / d.p;
       return upside(b) - upside(a);
     });
   }

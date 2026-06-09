@@ -351,12 +351,18 @@ async function loadData() {
         const cot = mergeCot(f.ticker, 'acoes');
         if (!cot || !cot.price) return null;
         const rawDY = f.dy ? f.dy * 100 : (cot.dividendYield || 0);
+        // div12m: dividendos absolutos em R$/ação nos últimos 12 meses
+        // Fundamentus retorna f.dy como decimal (ex: 0.12) sobre o preço base
+        // Usamos cot.price (preço atual) × f.dy para obter o valor absoluto
+        // Este campo é a base correta para o cálculo do preço teto de Bazin
+        const div12m = f.dy > 0 ? f.dy * cot.price : 0;
         return {
           t: f.ticker, n: cot.name || f.ticker,
           p: cot.price, v: cot.change || 0,
           v7:  (cot.change || 0) * (0.8 + Math.random() * 0.8),
           v30: (cot.change || 0) * (1.5 + Math.random() * 2),
           dy:   sanitizeDY(rawDY),
+          div12m,
           pl:   f.pl, pvp: f.pvp,
           roe:  f.roe  ? f.roe  * 100 : null,
           roic: f.roic ? f.roic * 100 : null,
