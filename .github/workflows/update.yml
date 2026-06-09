@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       modo:
-        description: 'diario | g1-g5 | fii1-fii4 | dividendos | relatorio'
+        description: 'diario | g1-g5 | fii1-fii4 | dividendos | indices | relatorio'
         required: false
         default: 'diario'
 
@@ -54,6 +54,10 @@ jobs:
       - name: BCB (CDI, SELIC, IPCA)
         if: ${{ steps.modo.outputs.modo == 'diario' }}
         run: python fetch_bcb.py
+
+      - name: Histórico Índices para Simulador (CDI, IPCA, IMA-B, IBOV, IFIX)
+        if: ${{ steps.modo.outputs.modo == 'diario' || steps.modo.outputs.modo == 'indices' }}
+        run: python fetch_historico_indices.py
 
       - name: Fundamentus — Ações
         if: ${{ steps.modo.outputs.modo == 'diario' }}
