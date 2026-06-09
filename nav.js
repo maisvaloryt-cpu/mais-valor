@@ -11,7 +11,8 @@ const NAV_LINKS = [
   { href: 'ferramentas.html',  label: 'Ferramentas' },
   { href: 'analise.html',      label: '✦ Análise' },
   { href: 'watchlist.html',    label: '★ Watchlist' },
-  { href: 'Calculadora_maisvalor/index.html', label: 'Simulador' },
+  { href: 'Calculadora_maisvalor/index.html', label: 'Calculadora' },
+  { href: 'simulador.html',                 label: 'Simulador' },
   { href: 'status.html',       label: '● Status' },
 ];
 

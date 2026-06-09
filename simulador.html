@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador de Carteiras — Mais Valor</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+/* ── VARIÁVEIS LOCAIS: mapeiam tema do site para o simulador ── */
+:root {
+  --sim-accent:   var(--up);
+  --sim-accent-d: var(--up-bg);
+  --sim-accent-g: var(--up-glow);
+  --sim-danger:   var(--dn);
+  --sim-warn:     var(--gold);
+  --sim-surf:     var(--bg2);
+  --sim-surf2:    var(--bg3);
+  --sim-surf3:    var(--bg4);
+  --sim-border:   var(--border);
+  --sim-border2:  var(--border3);
+  --sim-text:     var(--text);
+  --sim-text2:    var(--text2);
+  --sim-text3:    var(--text3);
+  --sim-mono:     var(--font-mono);
+  --sim-font:     var(--font-body);
+  --sim-r:        var(--radius);
+  --sim-rl:       var(--radius-lg);
+  --sim-sidebar:  320px;
+}
+
+/* ── LAYOUT RAIZ ── */
+.sim-root {
+  display: flex;
+  height: calc(100vh - 58px);
+  overflow: hidden;
+}
+
+/* ── SIDEBAR ── */
+.sim-sidebar {
+  width: var(--sim-sidebar);
+  flex-shrink: 0;
+  background: var(--sim-surf);
+  border-right: 1px solid var(--sim-border);
+  overflow-y: auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.sim-sidebar::-webkit-scrollbar { width: 4px; }
+.sim-sidebar::-webkit-scrollbar-thumb { background: var(--sim-border2); border-radius: 2px; }
+
+.sim-sidebar-header {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--sim-border);
+  flex-shrink: 0;
+}
+.sim-sidebar-title {
+  font-size: 10px; font-weight: 700; color: var(--sim-text3);
+  letter-spacing: 0.14em; text-transform: uppercase;
+}
+
+/* Botões nova carteira / editar — ficam no topo quando há sims */
+.sim-ctrl-row {
+  display: flex; gap: 6px; margin-top: 10px;
+}
+.sim-ctrl-btn {
+  flex: 1; padding: 6px 0;
+  font-size: 10px; font-weight: 600; font-family: var(--sim-font);
+  border-radius: 6px; border: 1px solid var(--sim-border2);
+  cursor: pointer; transition: all .15s;
+  background: transparent; color: var(--sim-text2);
+}
+.sim-ctrl-btn:hover { border-color: var(--sim-accent); color: var(--sim-accent); }
+.sim-ctrl-btn.primary { background: var(--sim-accent); color: #000; border-color: var(--sim-accent); font-weight: 700; }
+.sim-ctrl-btn.primary:hover { filter: brightness(1.1); }
+.sim-ctrl-btn.danger { color: var(--sim-danger); border-color: var(--sim-border2); }
+.sim-ctrl-btn.danger:hover { border-color: var(--sim-danger); background: rgba(232,80,58,.08); }
+
+.sim-sidebar-body { padding: 12px 16px; flex: 1; }
+
+/* Estado locked (visualizando sim salva) */
+.sim-sidebar-body.locked input,
+.sim-sidebar-body.locked select,
+.sim-sidebar-body.locked textarea {
+  pointer-events: none; opacity: .55;
+}
+.sim-sidebar-body.locked .cls-chip { pointer-events: none; opacity: .6; }
+.sim-sidebar-body.locked .mode-toggle-btn { pointer-events: none; }
+.sim-sidebar-body.locked .btn-add-mini { pointer-events: none; }
+.sim-sidebar-body.locked .btn-rm { pointer-events: none; }
+.sim-sidebar-body.locked .divmode-btn { pointer-events: none; opacity: .6; }
+.sim-sidebar-body.locked input[type="range"] { pointer-events: none; }
+.sim-sidebar-body.locked .inp-pct { pointer-events: none; }
+
+.sim-sidebar-footer {
+  padding: 12px 16px;
+  border-top: 1px solid var(--sim-border);
+  flex-shrink: 0;
+}
+.btn-simular {
+  width: 100%;
+  background: var(--sim-accent);
+  color: #000; font-weight: 700; font-size: 13px;
+  font-family: var(--sim-font);
+  padding: 11px; border-radius: var(--sim-r);
+  border: none; cursor: pointer; transition: all .2s;
+  letter-spacing: 0.02em;
+}
+.btn-simular:hover { filter: brightness(1.1); box-shadow: 0 4px 16px var(--sim-accent-g); }
+.btn-simular:active { transform: translateY(1px); }
+.btn-simular:disabled { opacity: .35; cursor: not-allowed; filter: none; box-shadow: none; }
+.err-inline { font-size: 10px; color: var(--sim-danger); margin-bottom: 6px; display: none; }
+.err-inline.show { display: block; }
+
+/* ── PARAM GROUP ── */
+.param-group { margin-bottom: 18px; }
+.param-group-label {
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 0.14em; color: var(--sim-text3);
+  text-transform: uppercase; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.param-group-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--sim-border);
+}
+.param-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+.param-field { display: flex; flex-direction: column; gap: 4px; }
+.param-field label { font-size: 9px; color: var(--sim-text3); font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
+input[type="month"].param-inp,
+input[type="number"].param-inp,
+select.param-inp {
+  width: 100%; background: var(--sim-surf2);
+  border: 1px solid var(--sim-border2); border-radius: 6px;
+  color: var(--sim-text); font-family: var(--sim-mono);
+  font-size: 11px; padding: 6px 8px; outline: none; transition: border-color .15s;
+}
+input[type="month"].param-inp:focus,
+input[type="number"].param-inp:focus,
+select.param-inp:focus { border-color: var(--sim-accent); }
+select.param-inp option { background: var(--sim-surf2); }
+
+/* ── CLASSES CHIP ── */
+.classes-mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+.cls-chip {
+  background: var(--sim-surf2); border: 1px solid var(--sim-border);
+  border-radius: 6px; padding: 7px 10px; cursor: pointer; transition: all .18s;
+  display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--sim-text2);
+}
+.cls-chip:hover { border-color: var(--sim-border2); color: var(--sim-text); }
+.cls-chip.selected { border-color: var(--sim-accent); background: var(--sim-accent-d); color: var(--sim-accent); }
+.cls-chip-icon { font-size: 13px; }
+.cls-chip-name { font-size: 11px; font-weight: 500; }
+.cls-chip-pct { margin-left: auto; font-family: var(--sim-mono); font-size: 10px; color: var(--sim-accent); }
+
+/* ── ALLOC BAR ── */
+.alloc-bar-mini {
+  display: flex; height: 6px; border-radius: 3px; overflow: hidden;
+  margin-bottom: 4px; background: var(--sim-surf3);
+}
+.alloc-seg { height: 100%; transition: width .3s; }
+.alloc-total-mini { font-family: var(--sim-mono); font-size: 10px; margin-bottom: 10px; }
+.alloc-total-mini.ok  { color: var(--sim-accent); }
+.alloc-total-mini.over { color: var(--sim-danger); }
+.alloc-total-mini.under { color: var(--sim-warn); }
+
+/* ── SLIDERS + INPUT ── */
+.slider-row { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.slider-icon { font-size: 12px; width: 18px; text-align: center; flex-shrink: 0; }
+.slider-name { font-size: 10px; color: var(--sim-text2); width: 52px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+input[type="range"].pct-slider {
+  -webkit-appearance: none; flex: 1; height: 3px;
+  background: var(--sim-surf3); border-radius: 2px; outline: none; cursor: pointer;
+}
+input[type="range"].pct-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--sim-accent); cursor: pointer; box-shadow: 0 0 6px var(--sim-accent-g);
+}
+.inp-pct {
+  width: 42px; background: var(--sim-surf2); border: 1px solid var(--sim-border2);
+  border-radius: 4px; color: var(--sim-accent); font-family: var(--sim-mono);
+  font-size: 10px; padding: 3px 5px; outline: none; text-align: right; transition: border-color .15s;
+}
+.inp-pct:focus { border-color: var(--sim-accent); }
+
+/* ── ACCORDION ── */
+.class-acc { border: 1px solid var(--sim-border); border-radius: 6px; margin-bottom: 6px; overflow: hidden; }
+.class-acc-head {
+  background: var(--sim-surf2); padding: 8px 10px;
+  display: flex; align-items: center; gap: 7px; cursor: pointer;
+  font-size: 11px; transition: background .15s;
+}
+.class-acc-head:hover { background: var(--sim-surf3); }
+.class-acc-pct { margin-left: auto; font-family: var(--sim-mono); font-size: 10px; color: var(--sim-accent); }
+.class-acc-chev { font-size: 8px; color: var(--sim-text3); margin-left: 4px; transition: transform .2s; }
+.class-acc.open .class-acc-chev { transform: rotate(180deg); }
+.class-acc-body { display: none; padding: 10px; background: var(--sim-surf); border-top: 1px solid var(--sim-border); }
+.class-acc.open .class-acc-body { display: block; }
+
+/* ── MODE TOGGLE ── */
+.mode-toggle { display: flex; gap: 4px; margin-bottom: 8px; }
+.mode-toggle-btn {
+  flex: 1; padding: 5px; background: var(--sim-surf2);
+  border: 1px solid var(--sim-border2); border-radius: 5px; color: var(--sim-text3);
+  font-size: 10px; font-family: var(--sim-font); cursor: pointer; transition: all .15s; text-align: center;
+}
+.mode-toggle-btn.active { border-color: var(--sim-accent); color: var(--sim-accent); background: var(--sim-accent-d); font-weight: 600; }
+
+/* ── INDICADORES GRID ── */
+.ind-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 6px; }
+.ind-chip {
+  background: var(--sim-surf2); border: 1px solid var(--sim-border); border-radius: 4px;
+  padding: 5px 4px; text-align: center; cursor: pointer; transition: all .15s;
+}
+.ind-chip:hover { border-color: var(--sim-border2); }
+.ind-chip.selected { border-color: var(--sim-accent); background: var(--sim-accent-d); }
+.ind-chip-ticker { font-family: var(--sim-mono); font-size: 9px; font-weight: 600; color: var(--sim-text); }
+.ind-chip-desc { font-size: 8px; color: var(--sim-text3); margin-top: 1px; }
+.ind-chip.has-data .ind-chip-ticker::after { content: ' ●'; color: var(--sim-accent); font-size: 7px; }
+
+/* ── ATIVOS CUSTOM ── */
+.ativos-mini { margin-bottom: 6px; }
+.ativo-mini-row { display: grid; grid-template-columns: 1fr 52px 22px; gap: 4px; margin-bottom: 4px; align-items: center; }
+input[type="text"].mini, input[type="number"].mini {
+  width: 100%; background: var(--sim-surf2); border: 1px solid var(--sim-border2);
+  border-radius: 4px; color: var(--sim-text); font-family: var(--sim-mono);
+  font-size: 10px; padding: 4px 6px; outline: none; transition: border-color .15s;
+}
+input[type="text"].mini:focus, input[type="number"].mini:focus { border-color: var(--sim-accent); }
+input[type="number"].mini { text-align: right; }
+.btn-rm {
+  width: 20px; height: 20px; background: transparent; border: 1px solid var(--sim-border);
+  border-radius: 4px; color: var(--sim-text3); cursor: pointer; font-size: 10px;
+  display: flex; align-items: center; justify-content: center; transition: all .15s;
+}
+.btn-rm:hover { border-color: var(--sim-danger); color: var(--sim-danger); }
+.btn-add-mini {
+  width: 100%; background: transparent; border: 1px dashed var(--sim-border2);
+  border-radius: 4px; color: var(--sim-text3); font-size: 10px; padding: 4px; cursor: pointer;
+  font-family: var(--sim-font); transition: all .15s; margin-bottom: 4px;
+}
+.btn-add-mini:hover { border-color: var(--sim-accent); color: var(--sim-accent); }
+.interno-mini { font-family: var(--sim-mono); font-size: 9px; margin-top: 2px; }
+.interno-mini.ok  { color: var(--sim-accent); }
+.interno-mini.over { color: var(--sim-danger); }
+
+/* ── DIV MODE ── */
+.divmode-row { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.divmode-btn {
+  background: var(--sim-surf2); border: 1px solid var(--sim-border); border-radius: 6px;
+  padding: 6px 8px; cursor: pointer; transition: all .15s; font-size: 10px; color: var(--sim-text2);
+}
+.divmode-btn:hover { border-color: var(--sim-border2); }
+.divmode-btn.active { border-color: var(--sim-accent); background: var(--sim-accent-d); color: var(--sim-accent); }
+.divmode-btn-title { font-weight: 700; font-size: 10px; }
+.divmode-btn-sub { font-size: 9px; color: var(--sim-text3); margin-top: 2px; }
+.divmode-btn.active .divmode-btn-sub { color: var(--sim-accent); opacity: .7; }
+
+/* ── MAIN AREA ── */
+.sim-main { flex: 1; overflow-y: auto; height: 100%; background: var(--bg); }
+.sim-main::-webkit-scrollbar { width: 6px; }
+.sim-main::-webkit-scrollbar-thumb { background: var(--sim-border2); border-radius: 3px; }
+.sim-main-inner { padding: 20px; min-height: 100%; }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: calc(100vh - 160px); text-align: center; gap: 12px;
+}
+.empty-icon { font-size: 42px; opacity: .25; }
+.empty-title { font-size: 18px; font-weight: 700; color: var(--sim-text); }
+.empty-sub { font-size: 13px; color: var(--sim-text3); max-width: 340px; line-height: 1.7; }
+
+/* ── ABAS EXCEL STYLE ── */
+.excel-tab-bar {
+  display: flex; align-items: flex-end; gap: 2px;
+  border-bottom: 2px solid var(--sim-border2); margin-bottom: 0;
+  flex-wrap: wrap;
+}
+.excel-tab {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px 6px; font-size: 12px; cursor: pointer;
+  border: 1px solid var(--sim-border); border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  background: var(--sim-surf); color: var(--sim-text2);
+  transition: all .15s; position: relative; margin-bottom: -2px;
+}
+.excel-tab:hover { background: var(--sim-surf2); color: var(--sim-text); }
+.excel-tab.active {
+  background: var(--bg); border-color: var(--sim-border2);
+  border-bottom: 2px solid var(--bg); color: var(--sim-text); font-weight: 600;
+  z-index: 1;
+}
+.excel-tab-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.excel-tab-name { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.excel-tab-rm {
+  width: 14px; height: 14px; background: transparent; border: none;
+  color: var(--sim-text3); cursor: pointer; font-size: 10px; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 3px; transition: all .15s;
+}
+.excel-tab-rm:hover { color: var(--sim-danger); background: rgba(232,80,58,.1); }
+
+/* ── CONTENT AREA ABAIXO DAS ABAS ── */
+.tab-content-area {
+  border: 1px solid var(--sim-border2); border-top: none;
+  border-radius: 0 0 var(--sim-rl) var(--sim-rl);
+  background: var(--sim-surf); padding: 16px; margin-bottom: 16px;
+}
+
+/* ── ACTIONS BAR ── */
+.actions-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; flex-wrap: wrap; gap: 8px;
+}
+.actions-bar-title { font-size: 14px; font-weight: 700; color: var(--sim-text); }
+.actions-bar-btns { display: flex; gap: 6px; }
+.btn-sm {
+  padding: 6px 14px; border-radius: 6px; font-size: 11px;
+  font-family: var(--sim-font); font-weight: 600; cursor: pointer; border: none; transition: all .2s;
+}
+.btn-sm-ghost { background: var(--sim-surf2); border: 1px solid var(--sim-border2); color: var(--sim-text2); }
+.btn-sm-ghost:hover { border-color: var(--sim-accent); color: var(--sim-accent); }
+.btn-sm-danger { background: transparent; border: 1px solid var(--sim-border2); color: var(--sim-danger); }
+.btn-sm-danger:hover { border-color: var(--sim-danger); background: rgba(232,80,58,.08); }
+
+/* ── RESUMO CARTEIRA ── */
+.carteira-resumo {
+  background: var(--sim-surf2); border: 1px solid var(--sim-border);
+  border-radius: var(--sim-r); padding: 10px 14px; margin-bottom: 14px;
+  font-size: 11px; color: var(--sim-text2); line-height: 1.9;
+}
+.carteira-resumo strong { color: var(--sim-text); }
+
+/* ── CHART PANEL ── */
+.chart-panel {
+  background: var(--sim-surf); border: 1px solid var(--sim-border);
+  border-radius: var(--sim-rl); padding: 16px; margin-bottom: 16px;
+}
+.chart-tabs { display: flex; gap: 3px; margin-bottom: 12px; }
+.chart-tab {
+  padding: 5px 12px; font-size: 11px; color: var(--sim-text2); cursor: pointer;
+  border: none; background: none; font-family: var(--sim-font); border-radius: 5px; transition: all .15s;
+}
+.chart-tab:hover { color: var(--sim-text); background: var(--sim-surf2); }
+.chart-tab.active { color: var(--sim-accent); background: var(--sim-accent-d); font-weight: 600; }
+.chart-wrap { position: relative; height: 280px; }
+
+/* ── MÉTRICAS ── */
+.metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
+.metrics-row2 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 16px; }
+.metric-card {
+  background: var(--sim-surf2); border: 1px solid var(--sim-border);
+  border-radius: var(--sim-r); padding: 12px 14px;
+}
+.metric-label { font-size: 9px; color: var(--sim-text3); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 5px; }
+.metric-value { font-family: var(--sim-mono); font-size: 17px; font-weight: 600; color: var(--sim-text); line-height: 1.2; }
+.metric-value.green { color: var(--sim-accent); }
+.metric-value.red   { color: var(--sim-danger); }
+.metric-value.gold  { color: var(--sim-warn); }
+.metric-sub { font-size: 10px; color: var(--sim-text2); margin-top: 3px; }
+
+/* Badge dados reais / mock */
+.data-badge {
+  display: inline-block; padding: 1px 5px; border-radius: 3px;
+  font-size: 8px; font-weight: 700; letter-spacing: .04em; font-family: var(--sim-mono);
+  margin-left: 4px; vertical-align: middle;
+}
+.data-badge.real { background: var(--up-bg); color: var(--up); }
+.data-badge.mock { background: var(--bg4); color: var(--sim-text3); }
+
+/* ── BREAKDOWN ── */
+.breakdown-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.breakdown-card {
+  background: var(--sim-surf2); border: 1px solid var(--sim-border);
+  border-radius: var(--sim-r); padding: 12px 14px;
+}
+.bd-ticker { font-family: var(--sim-mono); font-size: 12px; font-weight: 600; }
+.bd-class { font-size: 9px; color: var(--sim-text3); margin-bottom: 8px; }
+.bd-val { font-family: var(--sim-mono); font-size: 16px; color: var(--sim-accent); font-weight: 600; }
+.bd-divs { font-size: 10px; color: var(--sim-text2); margin-top: 2px; }
+.bd-bar-wrap { margin-top: 8px; background: var(--sim-surf3); border-radius: 2px; height: 3px; }
+.bd-bar { height: 3px; border-radius: 2px; background: var(--sim-accent); }
+
+/* ── COMPARE VIEW ── */
+.compare-metrics { display: grid; gap: 16px; margin-bottom: 20px; }
+.compare-metrics.cols-1 { grid-template-columns: 1fr; }
+.compare-metrics.cols-2 { grid-template-columns: repeat(2,1fr); }
+.compare-metrics.cols-3 { grid-template-columns: repeat(3,1fr); }
+.compare-metrics.cols-4 { grid-template-columns: repeat(4,1fr); }
+.compare-metrics.cols-5 { grid-template-columns: repeat(5,1fr); }
+.sim-card { background: var(--sim-surf); border: 1px solid var(--sim-border); border-radius: var(--sim-rl); overflow: hidden; }
+.sim-card-head { padding: 12px 14px; border-bottom: 1px solid var(--sim-border); display: flex; align-items: center; gap: 8px; }
+.sim-card-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.sim-card-name { font-size: 12px; font-weight: 700; flex: 1; }
+.sim-card-period { font-size: 10px; color: var(--sim-text3); font-family: var(--sim-mono); }
+.sim-card-body { padding: 12px 14px; }
+.metric-item { margin-bottom: 10px; }
+.metric-item:last-child { margin-bottom: 0; }
+.metric-item-label { font-size: 9px; color: var(--sim-text3); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 2px; }
+.metric-item-val { font-family: var(--sim-mono); font-size: 16px; font-weight: 500; line-height: 1.2; }
+.metric-item-val.green { color: var(--sim-accent); }
+.metric-item-val.red   { color: var(--sim-danger); }
+.metric-item-sub { font-size: 10px; color: var(--sim-text2); margin-top: 1px; }
+.best-tag {
+  display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 8px;
+  font-family: var(--sim-mono); font-weight: 700; letter-spacing: .05em;
+  background: var(--sim-accent); color: #000; margin-left: 4px; vertical-align: middle;
+}
+.sim-divider { height: 1px; background: var(--sim-border); margin: 10px 0; }
+
+/* ── LOADER ── */
+.loader-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(8,8,9,.75); z-index: 500;
+  align-items: center; justify-content: center; flex-direction: column; gap: 12px;
+}
+.loader-overlay.show { display: flex; }
+.loader-ring {
+  width: 36px; height: 36px; border: 2px solid var(--sim-border2);
+  border-top-color: var(--sim-accent); border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loader-text { font-size: 12px; color: var(--sim-text2); }
+
+/* ── CHART COMPARE ── */
+.chart-panel-title {
+  font-size: 11px; font-weight: 700; color: var(--sim-text3);
+  text-transform: uppercase; letter-spacing: .1em; margin-bottom: 12px;
+}
+
+@media (max-width: 900px) {
+  :root { --sim-sidebar: 260px; }
+  .metrics-row { grid-template-columns: 1fr 1fr; }
+  .metrics-row2 { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<div class="sim-root">
+
+  <!-- ══════════ SIDEBAR ══════════ -->
+  <aside class="sim-sidebar">
+    <div class="sim-sidebar-header">
+      <div class="sim-sidebar-title">Parâmetros</div>
+      <div id="ctrlRow" class="sim-ctrl-row" style="display:none">
+        <button class="sim-ctrl-btn" onclick="editarSim()">✏️ Editar</button>
+        <button class="sim-ctrl-btn danger" onclick="deleteSim()">🗑 Remover</button>
+      </div>
+    </div>
+
+    <div class="sim-sidebar-body" id="sidebarBody">
+
+      <!-- 1. Período -->
+      <div class="param-group">
+        <div class="param-group-label">Período</div>
+        <div class="param-row">
+          <div class="param-field">
+            <label>Início</label>
+            <input type="month" class="param-inp" id="startDate" value="2019-01" min="2010-01" max="2025-01">
+          </div>
+          <div class="param-field">
+            <label>Fim</label>
+            <input type="month" class="param-inp" id="endDate" value="2024-12" min="2010-02" max="2025-06">
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Aportes -->
+      <div class="param-group">
+        <div class="param-group-label">Aportes</div>
+        <div class="param-row">
+          <div class="param-field">
+            <label>Inicial (R$)</label>
+            <input type="number" class="param-inp" id="initialAmount" value="10000" min="0" step="1000">
+          </div>
+          <div class="param-field">
+            <label>Mensal (R$)</label>
+            <input type="number" class="param-inp" id="monthlyAmount" value="500" min="0" step="100">
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Classes -->
+      <div class="param-group">
+        <div class="param-group-label">Classes de ativos</div>
+        <div class="classes-mini-grid" id="classesMiniGrid"></div>
+        <div id="allocBarWrap" style="display:none">
+          <div class="alloc-bar-mini" id="allocBarMini"></div>
+          <div class="alloc-total-mini" id="allocTotalMini"></div>
+          <div id="slidersWrap"></div>
+        </div>
+      </div>
+
+      <!-- 4. Composição -->
+      <div class="param-group" id="composicaoGroup" style="display:none">
+        <div class="param-group-label">Composição</div>
+        <div id="classesAccContainer"></div>
+      </div>
+
+      <!-- 5. Rebalancear -->
+      <div class="param-group">
+        <div class="param-group-label">Rebalancear</div>
+        <select class="param-inp" id="rebalance" style="width:100%">
+          <option value="none">Não rebalancear</option>
+          <option value="annual">Anualmente</option>
+          <option value="semiannual">Semestralmente</option>
+          <option value="quarterly">Trimestralmente</option>
+          <option value="monthly">Mensalmente</option>
+        </select>
+      </div>
+
+      <!-- 6. Dividendos -->
+      <div class="param-group">
+        <div class="param-group-label">Dividendos</div>
+        <div class="divmode-row">
+          <div class="divmode-btn active" onclick="selectDivMode('none',this)">
+            <div class="divmode-btn-title">💰 Caixa</div>
+            <div class="divmode-btn-sub">Não reinvestir</div>
+          </div>
+          <div class="divmode-btn" onclick="selectDivMode('reinvest_same',this)">
+            <div class="divmode-btn-title">🔄 Mesmo ativo</div>
+            <div class="divmode-btn-sub">Reinveste no ativo</div>
+          </div>
+          <div class="divmode-btn" onclick="selectDivMode('reinvest_class',this)">
+            <div class="divmode-btn-title">📊 Na classe</div>
+            <div class="divmode-btn-sub">Distribui na classe</div>
+          </div>
+          <div class="divmode-btn" onclick="selectDivMode('reinvest_rebalance',this)">
+            <div class="divmode-btn-title">⚖️ Rebalancear</div>
+            <div class="divmode-btn-sub">Reduz drift</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. Nome -->
+      <div class="param-group">
+        <div class="param-group-label">Nome da simulação</div>
+        <input type="text" class="param-inp" id="simName"
+          placeholder="ex: Carteira Conservadora"
+          style="width:100%;background:var(--sim-surf2);border:1px solid var(--sim-border2);border-radius:6px;color:var(--sim-text);font-family:var(--sim-font);font-size:12px;padding:7px 10px;outline:none;">
+      </div>
+
+    </div><!-- /sidebarBody -->
+
+    <div class="sim-sidebar-footer">
+      <div class="err-inline" id="sidebarError"></div>
+      <button class="btn-simular" id="btnSimular" onclick="simular()">▶ Simular carteira</button>
+    </div>
+  </aside>
+
+  <!-- ══════════ MAIN ══════════ -->
+  <main class="sim-main">
+    <div class="sim-main-inner">
+
+      <!-- Empty state -->
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">📊</div>
+        <div class="empty-title">Simule sua carteira</div>
+        <div class="empty-sub">Configure os parâmetros na sidebar e clique em <strong>Simular</strong>. Compare até 5 carteiras lado a lado.</div>
+      </div>
+
+      <!-- Results -->
+      <div id="resultsArea" style="display:none">
+
+        <!-- Actions bar -->
+        <div class="actions-bar">
+          <div class="actions-bar-title" id="resultsTitle">Simulações</div>
+          <div class="actions-bar-btns">
+            <button class="btn-sm btn-sm-ghost" onclick="novaSim()">+ Nova carteira</button>
+            <button class="btn-sm btn-sm-ghost" onclick="toggleView()" id="btnView">🔀 Comparar</button>
+            <button class="btn-sm btn-sm-danger" onclick="clearAll()">🗑 Limpar tudo</button>
+          </div>
+        </div>
+
+        <!-- Abas Excel -->
+        <div class="excel-tab-bar" id="excelTabBar"></div>
+
+        <!-- Single view -->
+        <div id="singleView" style="display:none">
+          <div class="tab-content-area">
+            <div class="carteira-resumo" id="carteiraResumo"></div>
+
+            <!-- GRÁFICO PRIMEIRO -->
+            <div class="chart-panel" style="margin-bottom:16px">
+              <div class="chart-tabs">
+                <button class="chart-tab active" onclick="showChart('evolution',this)">Evolução</button>
+                <button class="chart-tab" onclick="showChart('monthly',this)">Mensal</button>
+                <button class="chart-tab" onclick="showChart('dividends',this)">Dividendos</button>
+                <button class="chart-tab" onclick="showChart('allocation',this)">Alocação</button>
+              </div>
+              <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
+            </div>
+
+            <!-- MÉTRICAS APÓS GRÁFICO -->
+            <div class="metrics-row" id="metricsRow1"></div>
+            <div class="metrics-row2" id="metricsRow2"></div>
+
+            <!-- BREAKDOWN -->
+            <div class="param-group-label" style="margin-bottom:10px">Detalhamento por ativo</div>
+            <div class="breakdown-grid" id="breakdownGrid"></div>
+          </div>
+        </div>
+
+        <!-- Compare view -->
+        <div id="compareView" style="display:none">
+          <div class="tab-content-area">
+            <div class="compare-metrics" id="compareMetrics"></div>
+            <div class="chart-panel">
+              <div class="chart-panel-title">Evolução comparada</div>
+              <div class="chart-wrap"><canvas id="compareChart"></canvas></div>
+            </div>
+            <div class="chart-panel">
+              <div class="chart-panel-title">Métricas lado a lado</div>
+              <div class="chart-wrap"><canvas id="compareBarChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /resultsArea -->
+    </div>
+  </main>
+</div>
+
+<!-- Loader -->
+<div class="loader-overlay" id="loaderOverlay">
+  <div class="loader-ring"></div>
+  <div class="loader-text">Calculando simulação...</div>
+</div>
+
+<script src="nav.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════
+// BASE DE ATIVOS
+// ══════════════════════════════════════════════════════════════
+const CLASSES_DEF = [
+  {
+    id: 'acao', icon: '📈', name: 'Ações', sub: 'B3', color: '#5b8def',
+    indicadores: [
+      { ticker: 'IBOV',  desc: 'Ibovespa' },
+      { ticker: 'IBRA',  desc: 'Brasil A.' },
+      { ticker: 'SMLL',  desc: 'Small Cap' },
+      { ticker: 'IDIV',  desc: 'Dividendos' },
+      { ticker: 'IPCA',  desc: 'Inflação' },
+      { ticker: 'CDI',   desc: 'CDI' },
+    ],
+    defaultTickers: ['PETR4','VALE3','ITUB4','BBDC4','WEGE3'],
+    exampleTickers: ['PETR4','VALE3','ITUB4','BBDC4','WEGE3','BBAS3','RENT3','EGIE3','RADL3','ABEV3'],
+  },
+  {
+    id: 'fii', icon: '🏢', name: 'FIIs', sub: 'Fundos Imob.', color: '#1FC96E',
+    indicadores: [
+      { ticker: 'IFIX',  desc: 'Índice FII' },
+      { ticker: 'IMOB',  desc: 'Imobiliário' },
+      { ticker: 'IPCA',  desc: 'Inflação' },
+      { ticker: 'CDI',   desc: 'CDI' },
+    ],
+    defaultTickers: ['MXRF11','HGLG11','KNRI11','XPML11','VISC11'],
+    exampleTickers: ['MXRF11','HGLG11','KNRI11','XPML11','VISC11','BCFF11','RBRF11','BTLG11','HGRU11','IRDM11'],
+  },
+  {
+    id: 'rf', icon: '💵', name: 'Renda Fixa', sub: 'CDI, Tesouro', color: '#F5A623',
+    indicadores: [
+      { ticker: 'CDI',   desc: 'CDI' },
+      { ticker: 'IPCA',  desc: 'IPCA' },
+      { ticker: 'IMAB',  desc: 'IMA-B' },
+      { ticker: 'IMAB5', desc: 'IMA-B5' },
+      { ticker: 'IMA',   desc: 'IMA Geral' },
+    ],
+    defaultTickers: ['CDI'],
+    exampleTickers: ['CDI','IPCA','IMAB','IMAB5','IMA'],
+  },
+  {
+    id: 'ext', icon: '🌍', name: 'Exterior', sub: 'BDRs, REITs, USD', color: '#9b72ef',
+    // Exposição cambial — proteção contra desvalorização do Real.
+    // Inclui ETFs em USD, BDRs, REITs via BDR. SEM ativos puramente brasileiros.
+    indicadores: [
+      { ticker: 'IVVB11', desc: 'S&P 500' },
+      { ticker: 'SPXI11', desc: 'S&P ETF' },
+      { ticker: 'IPCA',   desc: 'IPCA' },
+      { ticker: 'CDI',    desc: 'CDI' },
+    ],
+    defaultTickers: ['IVVB11','SPXI11'],
+    exampleTickers: ['IVVB11','SPXI11','SPY:BRL','QQQ:BRL','AAPL:BRL','MSFT:BRL','AMZO34','MSFT34'],
+  },
+  {
+    id: 'cripto', icon: '₿', name: 'Cripto', sub: 'HASH11, QBTC', color: '#f7931a',
+    indicadores: [
+      { ticker: 'HASH11', desc: 'Cripto B3' },
+      { ticker: 'QBTC11', desc: 'Bitcoin B3' },
+      { ticker: 'IBOV',   desc: 'Ibovespa' },
+      { ticker: 'CDI',    desc: 'CDI' },
+    ],
+    defaultTickers: ['HASH11','QBTC11'],
+    exampleTickers: ['HASH11','QBTC11'],
+  },
+  {
+    id: 'etf', icon: '📦', name: 'ETFs', sub: 'ETFs B3', color: '#e05c5c',
+    indicadores: [
+      { ticker: 'BOVA11', desc: 'ETF Ibov' },
+      { ticker: 'SMAL11', desc: 'Small Cap' },
+      { ticker: 'IVVB11', desc: 'S&P 500' },
+      { ticker: 'IBOV',   desc: 'Ibovespa' },
+      { ticker: 'CDI',    desc: 'CDI' },
+    ],
+    defaultTickers: ['BOVA11','SMAL11','DIVO11'],
+    exampleTickers: ['BOVA11','SMAL11','DIVO11','IVVB11','SPXI11','FIND11'],
+  },
+  {
+    id: 'commodity', icon: '🥇', name: 'Commodities', sub: 'Ouro, Prata, Agro', color: '#56c8d8',
+    // Ativos reais com proteção contra inflação e descorrelação com renda variável BR.
+    indicadores: [
+      { ticker: 'GOLD11', desc: 'Ouro B3' },
+      { ticker: 'IPCA',   desc: 'IPCA' },
+      { ticker: 'CDI',    desc: 'CDI' },
+      { ticker: 'IBOV',   desc: 'Ibovespa' },
+    ],
+    defaultTickers: ['GOLD11'],
+    exampleTickers: ['GOLD11','OGLD11','SLVR11','AGRI11','VALE3','PETR4'],
+  },
+];
+
+const SIM_COLORS = ['#1FC96E','#5b8def','#F5A623','#e05c5c','#9b72ef'];
+
+// ══════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════
+let state = { classesSel: [], classesConfig: {}, dividendMode: 'none' };
+let simulations = [];
+let activeSimIdx = 0;
+let viewMode = 'single';
+let editingSimIdx = null;
+let chartInst = null, compareChartInst = null, compareBarChartInst = null;
+let _realDataCache = {};   // ticker → true/false (tem dado real?)
+let _priceCache   = {};    // ticker → {YYYY-MM: price}
+let _divCache     = {};    // ticker → {YYYY-MM: divPerCota}
+
+// ══════════════════════════════════════════════════════════════
+// DADOS REAIS — carrega data/historico/TICKER.json
+// ══════════════════════════════════════════════════════════════
+async function loadRealPrices(ticker, startDate, endDate) {
+  if (_priceCache[ticker]) return _priceCache[ticker];
+  try {
+    const r = await fetch(`data/historico/${ticker}.json?t=${Date.now()}`);
+    if (!r.ok) throw new Error('not found');
+    const j = await r.json();
+    const hist = j.history || [];
+    // Converte [{date:'YYYY-MM-DD', close:X}] → {'YYYY-MM': X}
+    const map = {};
+    hist.forEach(pt => {
+      if (pt.date && pt.close) map[pt.date.slice(0,7)] = pt.close;
+    });
+    _realDataCache[ticker] = true;
+    _priceCache[ticker] = map;
+    return map;
+  } catch {
+    _realDataCache[ticker] = false;
+    return null;
+  }
+}
+
+async function loadRealDividends(ticker) {
+  if (_divCache[ticker]) return _divCache[ticker];
+  try {
+    const r = await fetch(`data/dividendos/${ticker}.json?t=${Date.now()}`);
+    if (!r.ok) throw new Error('not found');
+    const j = await r.json();
+    const divs = j.dividendos || [];
+    // Agrega por mês: soma pagamentos do mesmo mês
+    // Não é por-cota ainda (dado bruto do Yahoo); usamos como referência de valor absoluto/cota
+    const map = {};
+    divs.forEach(d => {
+      if (d.date && d.value) {
+        const m = d.date.slice(0,7);
+        map[m] = (map[m] || 0) + d.value;
+      }
+    });
+    _divCache[ticker] = map;
+    return map;
+  } catch {
+    _divCache[ticker] = {};
+    return {};
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// MOCK DATA — fallback quando não há dado real
+// ══════════════════════════════════════════════════════════════
+function generateMockPrices(ticker, startDate, endDate) {
+  const months = generateMonthRange(startDate, endDate);
+  const RF_INDICES   = { CDI:1.0, IPCA:1.0, IMAB:1.0, IMAB5:1.0, IMA:1.0 };
+  const ACAO_INDICES = { IBOV:80000, IBRA:3000, SMLL:900, IDIV:5000 };
+  const FII_INDICES  = { IFIX:2800, IMOB:1500 };
+  const ETF_BR = { BOVA11:80, SMAL11:8, DIVO11:10, IVVB11:200, SPXI11:80, FIND11:12 };
+  const CRIPTO_BR = { HASH11:40, QBTC11:30 };
+  const ACOES_BR = ['PETR4','VALE3','ITUB4','BBDC4','WEGE3','BBAS3','RENT3','EGIE3','RADL3','ABEV3'];
+  const FIIS_BR  = ['MXRF11','HGLG11','KNRI11','XPML11','VISC11','BCFF11','RBRF11','BTLG11','HGRU11','IRDM11'];
+  const seed = ticker.replace(':BRL','').split('').reduce((s,c)=>s+c.charCodeAt(0),0);
+  let rngState = seed;
+  const rng = () => { rngState = (rngState*1664525+1013904223)&0xffffffff; return (rngState>>>0)/0xffffffff; };
+  const t = ticker.replace(':BRL','').toUpperCase();
+  let startPrice, minRet, maxRet;
+  if (RF_INDICES[t]!==undefined)   { startPrice=RF_INDICES[t]; minRet=0.005; maxRet=0.013; }
+  else if (ACAO_INDICES[t]!==undefined) { startPrice=ACAO_INDICES[t]; minRet=-0.09; maxRet=0.11; }
+  else if (FII_INDICES[t]!==undefined)  { startPrice=FII_INDICES[t]; minRet=-0.05; maxRet=0.08; }
+  else if (ETF_BR[t]!==undefined)       { startPrice=ETF_BR[t]; minRet=-0.08; maxRet=0.10; }
+  else if (CRIPTO_BR[t]!==undefined)    { startPrice=CRIPTO_BR[t]; minRet=-0.15; maxRet=0.35; }
+  else if (ACOES_BR.includes(t))  { startPrice=15+rng()*30; minRet=-0.10; maxRet=0.12; }
+  else if (FIIS_BR.includes(t))   { startPrice=8+rng()*6; minRet=-0.03; maxRet=0.07; }
+  else if (['GOLD11','OGLD11','SLVR11'].includes(t)) { startPrice=15+rng()*10; minRet=-0.05; maxRet=0.08; }
+  else if (['AGRI11'].includes(t)) { startPrice=10+rng()*5; minRet=-0.06; maxRet=0.09; }
+  else if (ticker.endsWith(':BRL')) { startPrice=20+rng()*100; minRet=-0.09; maxRet=0.13; }
+  else { startPrice=20+rng()*80; minRet=-0.08; maxRet=0.10; }
+  const series = {};
+  let price = startPrice;
+  months.forEach(m => { const r=rng(); price=Math.max(0.01,price*(1+minRet+r*(maxRet-minRet))); series[m]=parseFloat(price.toFixed(4)); });
+  return series;
+}
+
+function generateMockDividends(ticker, startDate, endDate) {
+  const months = generateMonthRange(startDate, endDate);
+  const fiis = ['MXRF11','HGLG11','KNRI11','XPML11','VISC11','BCFF11','RBRF11','BTLG11','HGRU11','IRDM11'];
+  const acoes = ['PETR4','VALE3','ITUB4','BBDC4','WEGE3','BBAS3','RENT3','EGIE3','RADL3','ABEV3'];
+  const isFII = fiis.includes(ticker), isAcao = acoes.includes(ticker);
+  if (!isFII && !isAcao) return {};
+  const seed = ticker.split('').reduce((s,c)=>s+c.charCodeAt(0),0)+1;
+  let rngState = seed;
+  const rng = () => { rngState=(rngState*1664525+1013904223)&0xffffffff; return (rngState>>>0)/0xffffffff; };
+  const series = {};
+  months.forEach(m => {
+    if (isFII) series[m] = parseFloat((0.05+rng()*0.08).toFixed(4));
+    else if (isAcao) { const mo=parseInt(m.split('-')[1]); if(mo%3===0) series[m]=parseFloat((0.20+rng()*1.5).toFixed(4)); }
+  });
+  return series;
+}
+
+function generateMonthRange(start, end) {
+  const months = [];
+  let [y,m] = start.split('-').map(Number);
+  const [ey,em] = end.split('-').map(Number);
+  while (y<ey||(y===ey&&m<=em)) { months.push(`${y}-${String(m).padStart(2,'0')}`); m++; if(m>12){m=1;y++;} }
+  return months;
+}
+
+// ══════════════════════════════════════════════════════════════
+// BACKTEST ENGINE (com correções de bugs)
+// ══════════════════════════════════════════════════════════════
+function runBacktest(config, allPrices, allDividends, dataSourceMap) {
+  const months = generateMonthRange(config.startDate, config.endDate);
+  const assets = config.assets;
+  const mode = config.dividendMode || 'none';
+  const rebalFreq = config.rebalance || 'none';
+  const totalW = assets.reduce((s,a)=>s+a.weight, 0);
+  const normAssets = assets.map(a=>({...a, weight:a.weight/totalW}));
+  const holdings = {};
+  normAssets.forEach(a=>holdings[a.ticker]=0);
+  let totalInvested=0, dividendsCash=0, totalDividendsEver=0;
+  const dividendsByTicker = {};
+  normAssets.forEach(a=>dividendsByTicker[a.ticker]=0);
+  const series = [];
+  let prevVal = null;
+  const getPrice = (ticker, month) => allPrices[ticker]?.[month] ?? null;
+  const portValue = (month) => normAssets.reduce((s,a)=>{ const p=getPrice(a.ticker,month); return p!=null?s+holdings[a.ticker]*p:s; },0);
+
+  // Frequência de rebalanceamento
+  const shouldRebalance = (month, i) => {
+    if (rebalFreq === 'none') return false;
+    if (rebalFreq === 'monthly') return true;
+    const mo = parseInt(month.split('-')[1]);
+    if (rebalFreq === 'quarterly') return mo%3===0;
+    if (rebalFreq === 'semiannual') return mo%6===0;
+    if (rebalFreq === 'annual') return mo===12;
+    return false;
+  };
+
+  for (let i=0; i<months.length; i++) {
+    const month = months[i];
+    // BUG 2 FIX: mês 0 aplica só o initial; mensal a partir do mês 1
+    const aporte = i===0 ? config.initialAmount : config.monthlyAmount;
+    if (aporte>0) {
+      normAssets.forEach(a=>{ const verba=aporte*a.weight; const p=getPrice(a.ticker,month); if(p&&p>0) holdings[a.ticker]+=verba/p; });
+      totalInvested+=aporte;
+    }
+
+    // BUG 1 FIX: snapshot das quantidades ANTES de processar dividendos
+    const qtySnapshot = {};
+    normAssets.forEach(a=>qtySnapshot[a.ticker]=holdings[a.ticker]);
+
+    let totalDivMes=0;
+    const divByTicker = {};
+    normAssets.forEach(a=>{
+      const dpCota = allDividends[a.ticker]?.[month] ?? 0;
+      // Usa snapshot para calcular dividendo recebido (qty antes do reinvestimento)
+      divByTicker[a.ticker] = dpCota * qtySnapshot[a.ticker];
+      totalDivMes += divByTicker[a.ticker];
+      dividendsByTicker[a.ticker] += divByTicker[a.ticker];
+    });
+    totalDividendsEver += totalDivMes;
+
+    if (totalDivMes>0) {
+      if (mode==='none') { dividendsCash+=totalDivMes; }
+      else if (mode==='reinvest_same') {
+        normAssets.forEach(a=>{ const verba=divByTicker[a.ticker]; const p=getPrice(a.ticker,month); if(p&&p>0) holdings[a.ticker]+=verba/p; });
+      } else if (mode==='reinvest_class') {
+        normAssets.forEach(payer=>{
+          const verba=divByTicker[payer.ticker]; if(verba<=0) return;
+          const sc=normAssets.filter(a=>a.assetClass===payer.assetClass);
+          const tw=sc.reduce((s,a)=>s+a.weight,0);
+          sc.forEach(target=>{ const part=verba*(target.weight/tw); const p=getPrice(target.ticker,month); if(p&&p>0) holdings[target.ticker]+=part/p; });
+        });
+      } else if (mode==='reinvest_rebalance') {
+        const pv=portValue(month);
+        const drifts=normAssets.map(a=>{ const p=getPrice(a.ticker,month); const cur=p?holdings[a.ticker]*p:0; return {a,drift:(pv>0?cur/pv:0)-a.weight}; });
+        drifts.sort((x,y)=>x.drift-y.drift);
+        const sub=drifts.filter(d=>d.drift<0);
+        const targets=sub.length>0?sub:drifts;
+        const totalDef=targets.reduce((s,d)=>s+Math.abs(d.drift),0);
+        targets.forEach(d=>{ const verba=totalDivMes*(totalDef>0?Math.abs(d.drift)/totalDef:1/targets.length); const p=getPrice(d.a.ticker,month); if(p&&p>0) holdings[d.a.ticker]+=verba/p; });
+      }
+    }
+
+    // Rebalanceamento por frequência (BUG 4 FIX: frequência configurável)
+    if (shouldRebalance(month, i)) {
+      const pv=portValue(month);
+      const drift=normAssets.some(a=>{ const p=getPrice(a.ticker,month); const cw=p?(holdings[a.ticker]*p)/pv:0; return Math.abs(cw-a.weight)>0.03; });
+      if (drift&&pv>0) normAssets.forEach(a=>{ const p=getPrice(a.ticker,month); if(p&&p>0) holdings[a.ticker]=(pv*a.weight)/p; });
+    }
+
+    const pv=portValue(month);
+    const monthRet=prevVal!=null&&prevVal>0?(pv-prevVal)/prevVal:0;
+    const weights={};
+    normAssets.forEach(a=>{ const p=getPrice(a.ticker,month); weights[a.ticker]=p&&pv>0?(holdings[a.ticker]*p)/pv:0; });
+    series.push({date:month, portfolioValue:pv, totalInvested, monthReturn:monthRet, dividendsCash, dividendsMonth:totalDivMes, weights});
+    prevVal=pv;
+  }
+
+  const finalValue=series[series.length-1]?.portfolioValue||0;
+  const monthlyReturns=series.map(s=>s.monthReturn).filter((_,i)=>i>0);
+  const n=monthlyReturns.length;
+  const avg=n>0?monthlyReturns.reduce((s,r)=>s+r,0)/n:0;
+  // BUG 3 FIX: variância amostral (n-1)
+  const variance=n>1?monthlyReturns.reduce((s,r)=>s+(r-avg)**2,0)/(n-1):0;
+  const vol=Math.sqrt(variance*12);
+  const years=months.length/12;
+  const cagr=years>0?(finalValue/totalInvested)**(1/years)-1:0;
+  // BUG 2 FIX: Sharpe correto — média mensal vs risk-free mensal, depois escala
+  const rfMonthly=0.005; // ~6% aa
+  const sharpe=vol>0?((avg-rfMonthly)/Math.sqrt(variance))*Math.sqrt(12):0;
+  let peak=0, maxDD=0;
+  series.forEach(s=>{ if(s.portfolioValue>peak) peak=s.portfolioValue; const dd=peak>0?(s.portfolioValue-peak)/peak:0; if(dd<maxDD) maxDD=dd; });
+
+  const breakdown=normAssets.map(a=>{
+    const p=getPrice(a.ticker,months[months.length-1]);
+    const fv=p?holdings[a.ticker]*p:0;
+    return {
+      ticker:a.ticker, assetClass:a.assetClass, targetWeight:a.weight,
+      finalValue:fv, contribution:finalValue>0?fv/finalValue:0,
+      totalDividends:dividendsByTicker[a.ticker]||0,
+      hasRealData: dataSourceMap?.[a.ticker] || false,
+    };
+  });
+
+  return {
+    series, metrics:{finalValue, totalInvested, profit:finalValue-totalInvested,
+      totalReturn:totalInvested>0?(finalValue-totalInvested)/totalInvested:0,
+      cagr, volatility:vol, sharpeRatio:sharpe, maxDrawdown:maxDD,
+      totalDividends:totalDividendsEver, dividendsCash, months:months.length
+    },
+    breakdown, dividendMode:mode
+  };
+}
+
+// ══════════════════════════════════════════════════════════════
+// BUILD ASSET LIST
+// ══════════════════════════════════════════════════════════════
+function buildAssetList() {
+  const assets = [];
+  for (const sel of state.classesSel) {
+    const cfg = state.classesConfig[sel.id];
+    const cls = CLASSES_DEF.find(c=>c.id===sel.id);
+    const classW = sel.pct/100;
+    if (!cfg||cfg.mode==='indicador') {
+      const ticker=(cfg?.indicadorTicker||cls.defaultTickers[0]||'IBOV').trim().toUpperCase();
+      assets.push({ticker, weight:classW, assetClass:cls.name, assetClassId:sel.id, isIndicador:true});
+    } else {
+      const validos=cfg.ativos.filter(a=>a.ticker.trim()&&parseFloat(a.pct)>0);
+      const soma=validos.reduce((s,a)=>s+parseFloat(a.pct),0);
+      validos.forEach(a=>assets.push({
+        ticker:a.ticker.trim().toUpperCase(),
+        weight:classW*(parseFloat(a.pct)/soma),
+        assetClass:cls.name, assetClassId:sel.id,
+        pctInterna:parseFloat(a.pct), isIndicador:false
+      }));
+    }
+  }
+  return assets;
+}
+
+// ══════════════════════════════════════════════════════════════
+// SIDEBAR RENDER
+// ══════════════════════════════════════════════════════════════
+function renderSidebar() {
+  renderClassesGrid();
+  renderAllocBar();
+  renderSliders();
+  renderComposicao();
+}
+
+function renderClassesGrid() {
+  const grid = document.getElementById('classesMiniGrid');
+  grid.innerHTML = '';
+  CLASSES_DEF.forEach(cls=>{
+    const sel=state.classesSel.find(c=>c.id===cls.id);
+    const div=document.createElement('div');
+    div.className='cls-chip'+(sel?' selected':'');
+    div.innerHTML=`<span class="cls-chip-icon">${cls.icon}</span><span class="cls-chip-name">${cls.name}</span>${sel?`<span class="cls-chip-pct">${sel.pct}%</span>`:''}`;
+    div.onclick=()=>toggleClasse(cls.id);
+    grid.appendChild(div);
+  });
+}
+
+function toggleClasse(id) {
+  const idx=state.classesSel.findIndex(c=>c.id===id);
+  if(idx>=0){state.classesSel.splice(idx,1);delete state.classesConfig[id];}
+  else state.classesSel.push({id,pct:0});
+  const n=state.classesSel.length;
+  if(n>0){const base=Math.floor(100/n),rem=100-base*n; state.classesSel.forEach((c,i)=>{c.pct=base+(i===0?rem:0);});}
+  renderSidebar();
+}
+
+function renderAllocBar() {
+  const hasAny=state.classesSel.length>0;
+  document.getElementById('allocBarWrap').style.display=hasAny?'block':'none';
+  if(!hasAny) return;
+  const total=state.classesSel.reduce((s,c)=>s+c.pct,0);
+  document.getElementById('allocBarMini').innerHTML=state.classesSel.map(sel=>{
+    const cls=CLASSES_DEF.find(c=>c.id===sel.id);
+    return `<div class="alloc-seg" style="width:${sel.pct}%;background:${cls.color}"></div>`;
+  }).join('');
+  const el=document.getElementById('allocTotalMini');
+  el.textContent=`${total}% de 100%`;
+  el.className='alloc-total-mini '+(total===100?'ok':total>100?'over':'under');
+}
+
+function renderSliders() {
+  const wrap=document.getElementById('slidersWrap');
+  wrap.innerHTML='';
+  state.classesSel.forEach(sel=>{
+    const cls=CLASSES_DEF.find(c=>c.id===sel.id);
+    const div=document.createElement('div');
+    div.className='slider-row';
+    div.innerHTML=`
+      <span class="slider-icon">${cls.icon}</span>
+      <span class="slider-name" title="${cls.name}">${cls.name}</span>
+      <input type="range" class="pct-slider" min="0" max="100" step="1" value="${sel.pct}" id="sl_${sel.id}"
+        oninput="onSlider('${sel.id}',+this.value)">
+      <input type="number" class="inp-pct" min="0" max="100" step="1" value="${sel.pct}" id="slv_${sel.id}"
+        oninput="onSlider('${sel.id}',+this.value)">
+    `;
+    wrap.appendChild(div);
+  });
+}
+
+function onSlider(id, requested) {
+  const others=state.classesSel.filter(c=>c.id!==id);
+  const othersTotal=others.reduce((s,c)=>s+c.pct,0);
+  const capped=Math.min(Math.max(0,Math.round(requested)),Math.max(0,100-othersTotal));
+  const sel=state.classesSel.find(c=>c.id===id);
+  if(sel) sel.pct=capped;
+  const slEl=document.getElementById('sl_'+id); if(slEl) slEl.value=capped;
+  const inpEl=document.getElementById('slv_'+id); if(inpEl) inpEl.value=capped;
+  renderAllocBar();
+  renderClassesGrid();
+}
+
+function renderComposicao() {
+  const grp=document.getElementById('composicaoGroup');
+  const cont=document.getElementById('classesAccContainer');
+  grp.style.display=state.classesSel.length>0?'block':'none';
+  cont.innerHTML='';
+  state.classesSel.forEach((sel,idx)=>{
+    const cls=CLASSES_DEF.find(c=>c.id===sel.id);
+    if(!state.classesConfig[sel.id]) {
+      state.classesConfig[sel.id]={
+        mode:'indicador',
+        indicadorTicker:cls.indicadores[0]?.ticker||cls.defaultTickers[0]||'IBOV',
+        ativos:cls.defaultTickers.slice(0,3).map((t,i,arr)=>({ticker:t, pct:Math.floor(100/arr.length)+(i===0?100%arr.length:0)})),
+      };
+    }
+    const cfg=state.classesConfig[sel.id];
+    const acc=document.createElement('div');
+    acc.className='class-acc'+(idx===0?' open':'');
+    acc.id='acc_'+sel.id;
+    acc.innerHTML=`
+      <div class="class-acc-head" onclick="toggleAcc('${sel.id}')">
+        <span>${cls.icon}</span>
+        <span style="font-size:11px;font-weight:700">${cls.name}</span>
+        <span class="class-acc-pct">${sel.pct}%</span>
+        <span class="class-acc-chev">▼</span>
+      </div>
+      <div class="class-acc-body">
+        <div class="mode-toggle" id="modeToggle_${sel.id}">
+          <button class="mode-toggle-btn ${cfg.mode==='indicador'?'active':''}" onclick="setCfgMode('${sel.id}','indicador')">📊 Indicador</button>
+          <button class="mode-toggle-btn ${cfg.mode==='custom'?'active':''}" onclick="setCfgMode('${sel.id}','custom')">🔧 Personalizado</button>
+        </div>
+        <div id="indSection_${sel.id}" style="display:${cfg.mode==='indicador'?'block':'none'}">
+          <div class="ind-grid" id="indGrid_${sel.id}"></div>
+          <input type="text" class="mini" style="width:100%;margin-top:2px;" placeholder="Ou ticker..."
+            value="${cfg.indicadorTicker}" oninput="setCfgIndicador('${sel.id}',this.value.toUpperCase())">
+          <div style="font-size:9px;color:var(--sim-text3);margin-top:4px;line-height:1.6;">
+            Ex: ${cls.exampleTickers.slice(0,5).join(', ')}
+          </div>
+        </div>
+        <div id="customSection_${sel.id}" style="display:${cfg.mode==='custom'?'block':'none'}">
+          <div class="ativos-mini" id="ativosRows_${sel.id}"></div>
+          <div style="font-size:9px;color:var(--sim-text3);margin-bottom:4px;line-height:1.6;">
+            Ex: ${cls.exampleTickers.slice(0,4).join(', ')}
+          </div>
+          <button class="btn-add-mini" onclick="addAtivo('${sel.id}')">+ Ativo</button>
+          <div class="interno-mini" id="internoMini_${sel.id}"></div>
+        </div>
+      </div>
+    `;
+    cont.appendChild(acc);
+    renderIndGrid(sel.id);
+    renderAtivosRows(sel.id);
+  });
+}
+
+function toggleAcc(id) { document.getElementById('acc_'+id).classList.toggle('open'); }
+
+function setCfgMode(id, mode) {
+  state.classesConfig[id].mode=mode;
+  document.getElementById('indSection_'+id).style.display=mode==='indicador'?'block':'none';
+  document.getElementById('customSection_'+id).style.display=mode==='custom'?'block':'none';
+  document.querySelectorAll(`#modeToggle_${id} .mode-toggle-btn`).forEach((b,i)=>b.classList.toggle('active',(i===0&&mode==='indicador')||(i===1&&mode==='custom')));
+}
+
+function renderIndGrid(id) {
+  const grid=document.getElementById('indGrid_'+id); if(!grid) return;
+  const cfg=state.classesConfig[id];
+  const cls=CLASSES_DEF.find(c=>c.id===id);
+  grid.innerHTML=cls.indicadores.map(ind=>`
+    <div class="ind-chip ${cfg.indicadorTicker===ind.ticker?'selected':''} ${_realDataCache[ind.ticker]===true?'has-data':''}"
+      onclick="setCfgIndicador('${id}','${ind.ticker}')">
+      <div class="ind-chip-ticker">${ind.ticker}</div>
+      <div class="ind-chip-desc">${ind.desc}</div>
+    </div>
+  `).join('');
+}
+
+function setCfgIndicador(id, ticker) {
+  state.classesConfig[id].indicadorTicker=ticker.toUpperCase();
+  renderIndGrid(id);
+}
+
+function renderAtivosRows(id) {
+  const cont=document.getElementById('ativosRows_'+id); if(!cont) return;
+  const cfg=state.classesConfig[id];
+  cont.innerHTML=cfg.ativos.map((a,i)=>`
+    <div class="ativo-mini-row">
+      <input type="text" class="mini" placeholder="TICKER" value="${a.ticker}"
+        oninput="updateAtivo('${id}',${i},'ticker',this.value.toUpperCase())" style="text-transform:uppercase">
+      <input type="number" class="mini" min="0" max="100" value="${a.pct}" placeholder="%"
+        oninput="updateAtivo('${id}',${i},'pct',+this.value)">
+      <button class="btn-rm" onclick="removeAtivo('${id}',${i})">✕</button>
+    </div>
+  `).join('');
+  renderInternoMini(id);
+}
+
+function updateAtivo(id,idx,field,val){state.classesConfig[id].ativos[idx][field]=val;renderInternoMini(id);}
+function addAtivo(id){state.classesConfig[id].ativos.push({ticker:'',pct:0});renderAtivosRows(id);}
+function removeAtivo(id,idx){state.classesConfig[id].ativos.splice(idx,1);renderAtivosRows(id);}
+function renderInternoMini(id){
+  const cfg=state.classesConfig[id];
+  const total=cfg.ativos.reduce((s,a)=>s+(parseFloat(a.pct)||0),0);
+  const el=document.getElementById('internoMini_'+id); if(!el) return;
+  el.textContent=`Soma: ${total.toFixed(0)}%`;
+  el.className='interno-mini '+(Math.abs(total-100)<0.5?'ok':'over');
+}
+
+function selectDivMode(mode, el) {
+  state.dividendMode=mode;
+  document.querySelectorAll('.divmode-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════════════
+// VALIDATE
+// ══════════════════════════════════════════════════════════════
+function showErr(msg){const el=document.getElementById('sidebarError');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),4500);}
+
+function validate() {
+  if(state.classesSel.length===0){showErr('Selecione ao menos uma classe.');return false;}
+  const total=state.classesSel.reduce((s,c)=>s+c.pct,0);
+  if(total!==100){showErr(`Soma: ${total}%. Deve ser 100%.`);return false;}
+  const sd=document.getElementById('startDate').value, ed=document.getElementById('endDate').value;
+  if(!sd||!ed){showErr('Informe o período.');return false;}
+  if(sd>=ed){showErr('Início deve ser anterior ao fim.');return false;}
+  for(const sel of state.classesSel){
+    const cfg=state.classesConfig[sel.id];
+    if(cfg?.mode==='custom'){
+      const ativos=cfg.ativos.filter(a=>a.ticker.trim());
+      if(ativos.length===0){showErr(`Adicione ativos em "${CLASSES_DEF.find(c=>c.id===sel.id)?.name}".`);return false;}
+      const soma=ativos.reduce((s,a)=>s+(parseFloat(a.pct)||0),0);
+      if(Math.abs(soma-100)>1){showErr(`Pesos de "${CLASSES_DEF.find(c=>c.id===sel.id)?.name}" somam ${soma.toFixed(0)}%.`);return false;}
+    }
+  }
+  return true;
+}
+
+// ══════════════════════════════════════════════════════════════
+// SIMULAR
+// ══════════════════════════════════════════════════════════════
+async function simular() {
+  if(editingSimIdx===null&&simulations.length>=5){showErr('Máximo de 5 simulações atingido.');return;}
+  if(!validate()) return;
+  document.getElementById('loaderOverlay').classList.add('show');
+  await new Promise(r=>setTimeout(r,50));
+  try {
+    const startDate=document.getElementById('startDate').value;
+    const endDate=document.getElementById('endDate').value;
+    const initialAmount=parseFloat(document.getElementById('initialAmount').value)||0;
+    const monthlyAmount=parseFloat(document.getElementById('monthlyAmount').value)||0;
+    const rebalance=document.getElementById('rebalance').value;
+    const assets=buildAssetList();
+
+    // Tenta dados reais, cai no mock se não encontrar
+    const allPrices={}, allDividends={}, dataSourceMap={};
+    await Promise.all(assets.map(async a=>{
+      const real=await loadRealPrices(a.ticker, startDate, endDate);
+      if(real&&Object.keys(real).length>0){
+        allPrices[a.ticker]=real;
+        dataSourceMap[a.ticker]=true;
+        const divReal=await loadRealDividends(a.ticker);
+        allDividends[a.ticker]=divReal;
+      } else {
+        allPrices[a.ticker]=generateMockPrices(a.ticker, startDate, endDate);
+        allDividends[a.ticker]=generateMockDividends(a.ticker, startDate, endDate);
+        dataSourceMap[a.ticker]=false;
+      }
+    }));
+
+    const config={assets, startDate, endDate, initialAmount, monthlyAmount, rebalance, dividendMode:state.dividendMode};
+    const result=runBacktest(config, allPrices, allDividends, dataSourceMap);
+    const simName=document.getElementById('simName').value.trim()||`Simulação ${simulations.length+1}`;
+    const simObj={
+      id:Date.now(), name:simName,
+      color:SIM_COLORS[simulations.length%SIM_COLORS.length],
+      config, result,
+      classesSel:JSON.parse(JSON.stringify(state.classesSel)),
+      classesConfig:JSON.parse(JSON.stringify(state.classesConfig)),
+      dataSourceMap,
+    };
+    if(editingSimIdx!==null&&simulations[editingSimIdx]){
+      simObj.id=simulations[editingSimIdx].id;
+      simObj.color=simulations[editingSimIdx].color;
+      simulations[editingSimIdx]=simObj;
+      activeSimIdx=editingSimIdx;
+    } else {
+      simObj.color=SIM_COLORS[simulations.length%SIM_COLORS.length];
+      simulations.push(simObj);
+      activeSimIdx=simulations.length-1;
+      editingSimIdx=activeSimIdx;
+    }
+    document.getElementById('emptyState').style.display='none';
+    document.getElementById('resultsArea').style.display='block';
+    setSidebarLocked(true);
+    renderExcelTabs();
+    if(viewMode==='compare'&&simulations.length>1) renderCompareView();
+    else { viewMode='single'; renderSingleView(activeSimIdx); }
+  } catch(e) {
+    showErr('Erro: '+e.message);
+  } finally {
+    document.getElementById('loaderOverlay').classList.remove('show');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// SIDEBAR STATE CONTROL
+// ══════════════════════════════════════════════════════════════
+function setSidebarLocked(locked) {
+  const body=document.getElementById('sidebarBody');
+  const ctrlRow=document.getElementById('ctrlRow');
+  const btnSim=document.getElementById('btnSimular');
+  if(locked){
+    body.classList.add('locked');
+    ctrlRow.style.display='flex';
+    btnSim.style.display='none';
+  } else {
+    body.classList.remove('locked');
+    ctrlRow.style.display='none';
+    btnSim.style.display='block';
+  }
+}
+
+function editarSim() {
+  setSidebarLocked(false);
+  document.getElementById('btnSimular').textContent='💾 Atualizar simulação';
+}
+
+function novaSim() {
+  editingSimIdx=null;
+  state.classesSel=[];
+  state.classesConfig={};
+  state.dividendMode='none';
+  document.getElementById('startDate').value='2019-01';
+  document.getElementById('endDate').value='2024-12';
+  document.getElementById('initialAmount').value='10000';
+  document.getElementById('monthlyAmount').value='500';
+  document.getElementById('rebalance').value='none';
+  document.getElementById('simName').value='';
+  document.querySelectorAll('.divmode-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+  document.getElementById('btnSimular').textContent='▶ Simular carteira';
+  setSidebarLocked(false);
+  renderSidebar();
+}
+
+function deleteSim() {
+  if(editingSimIdx===null||!simulations[editingSimIdx]) return;
+  removeSim({stopPropagation:()=>{}}, editingSimIdx);
+}
+
+function loadSimIntoSidebar(idx) {
+  const sim=simulations[idx]; if(!sim) return;
+  editingSimIdx=idx;
+  state.classesSel=JSON.parse(JSON.stringify(sim.classesSel));
+  state.classesConfig=JSON.parse(JSON.stringify(sim.classesConfig));
+  state.dividendMode=sim.result.dividendMode;
+  document.getElementById('startDate').value=sim.config.startDate;
+  document.getElementById('endDate').value=sim.config.endDate;
+  document.getElementById('initialAmount').value=sim.config.initialAmount;
+  document.getElementById('monthlyAmount').value=sim.config.monthlyAmount;
+  document.getElementById('rebalance').value=sim.config.rebalance||'none';
+  document.getElementById('simName').value=sim.name;
+  document.querySelectorAll('.divmode-btn').forEach(b=>b.classList.remove('active'));
+  const modes=['none','reinvest_same','reinvest_class','reinvest_rebalance'];
+  const dIdx=modes.indexOf(sim.result.dividendMode);
+  const dBtns=document.querySelectorAll('.divmode-btn');
+  if(dBtns[dIdx]) dBtns[dIdx].classList.add('active');
+  document.getElementById('btnSimular').textContent='💾 Atualizar simulação';
+  setSidebarLocked(true);
+  renderSidebar();
+  activeSimIdx=idx;
+  viewMode='single';
+  renderExcelTabs();
+  renderSingleView(idx);
+  updateViewBtn();
+}
+
+// ══════════════════════════════════════════════════════════════
+// ABAS EXCEL
+// ══════════════════════════════════════════════════════════════
+function renderExcelTabs() {
+  const bar=document.getElementById('excelTabBar');
+  bar.innerHTML='';
+  simulations.forEach((sim,idx)=>{
+    const tab=document.createElement('div');
+    tab.className='excel-tab'+(idx===activeSimIdx&&viewMode==='single'?' active':'');
+    tab.innerHTML=`
+      <div class="excel-tab-dot" style="background:${sim.color}"></div>
+      <span class="excel-tab-name">${sim.name}</span>
+      <button class="excel-tab-rm" onclick="removeSim(event,${idx})" title="Remover">✕</button>
+    `;
+    tab.onclick=(e)=>{ if(!e.target.closest('.excel-tab-rm')){ loadSimIntoSidebar(idx); } };
+    bar.appendChild(tab);
+  });
+  document.getElementById('resultsTitle').textContent=simulations.length===1?'Resultado':`${simulations.length} Simulações`;
+}
+
+function removeSim(e, idx) {
+  e.stopPropagation();
+  simulations.splice(idx,1);
+  if(simulations.length===0){
+    document.getElementById('emptyState').style.display='flex';
+    document.getElementById('resultsArea').style.display='none';
+    document.getElementById('singleView').style.display='none';
+    document.getElementById('compareView').style.display='none';
+    editingSimIdx=null;
+    novaSim();
+    return;
+  }
+  activeSimIdx=Math.min(activeSimIdx,simulations.length-1);
+  editingSimIdx=Math.min(editingSimIdx??0,simulations.length-1);
+  renderExcelTabs();
+  if(viewMode==='compare') renderCompareView();
+  else renderSingleView(activeSimIdx);
+}
+
+function clearAll() {
+  simulations=[];activeSimIdx=0;viewMode='single';editingSimIdx=null;
+  document.getElementById('emptyState').style.display='flex';
+  document.getElementById('resultsArea').style.display='none';
+  document.getElementById('singleView').style.display='none';
+  document.getElementById('compareView').style.display='none';
+  if(chartInst){chartInst.destroy();chartInst=null;}
+  if(compareChartInst){compareChartInst.destroy();compareChartInst=null;}
+  if(compareBarChartInst){compareBarChartInst.destroy();compareBarChartInst=null;}
+  novaSim();
+}
+
+function toggleView() {
+  if(simulations.length<2){showErr('Adicione ao menos 2 simulações para comparar.');return;}
+  viewMode=viewMode==='single'?'compare':'single';
+  updateViewBtn();
+  if(viewMode==='compare'){
+    document.getElementById('singleView').style.display='none';
+    document.getElementById('compareView').style.display='block';
+    renderExcelTabs();
+    renderCompareView();
+  } else {
+    document.getElementById('singleView').style.display='block';
+    document.getElementById('compareView').style.display='none';
+    renderExcelTabs();
+    renderSingleView(activeSimIdx);
+  }
+}
+
+function updateViewBtn(){document.getElementById('btnView').textContent=viewMode==='compare'?'📋 Individual':'🔀 Comparar';}
+
+// ══════════════════════════════════════════════════════════════
+// SINGLE VIEW
+// ══════════════════════════════════════════════════════════════
+const brl=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const pct=v=>(v*100).toFixed(2)+'%';
+const monthLabel=yyyymm=>{const[y,m]=yyyymm.split('-');return ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][+m-1]+'/'+y.slice(2);};
+const divModeLabel={none:'Caixa',reinvest_same:'Mesmo ativo',reinvest_class:'Na classe',reinvest_rebalance:'Rebalancear'};
+
+function renderSingleView(idx) {
+  document.getElementById('singleView').style.display='block';
+  document.getElementById('compareView').style.display='none';
+  const sim=simulations[idx]; if(!sim) return;
+  const {result,config,classesSel,classesConfig,dataSourceMap}=sim;
+  const {metrics,breakdown,series,dividendMode}=result;
+
+  // Resumo da carteira
+  const resumo=classesSel.map(sel=>{
+    const cls=CLASSES_DEF.find(c=>c.id===sel.id);
+    const cfg=classesConfig[sel.id];
+    const detail=cfg?.mode==='indicador'?cfg?.indicadorTicker:(cfg?.ativos||[]).filter(a=>a.ticker).map(a=>`${a.ticker} ${a.pct}%`).join(', ');
+    return `<strong>${cls.icon} ${cls.name} ${sel.pct}%</strong> — ${detail}`;
+  });
+  document.getElementById('carteiraResumo').innerHTML=resumo.join('&ensp;·&ensp; ');
+
+  // Métricas row 1
+  const pos=metrics.totalReturn>=0;
+  document.getElementById('metricsRow1').innerHTML=`
+    <div class="metric-card"><div class="metric-label">Valor Final</div><div class="metric-value ${pos?'green':'red'}">${brl(metrics.finalValue)}</div><div class="metric-sub">Aportado: ${brl(metrics.totalInvested)}</div></div>
+    <div class="metric-card"><div class="metric-label">Retorno Total</div><div class="metric-value ${pos?'green':'red'}">${pct(metrics.totalReturn)}</div><div class="metric-sub">Lucro: ${brl(metrics.profit)}</div></div>
+    <div class="metric-card"><div class="metric-label">CAGR (a.a.)</div><div class="metric-value ${metrics.cagr>=0?'green':'red'}">${pct(metrics.cagr)}</div><div class="metric-sub">Retorno anualizado</div></div>
+    <div class="metric-card"><div class="metric-label">Dividendos</div><div class="metric-value gold">${brl(metrics.totalDividends)}</div><div class="metric-sub">${dividendMode==='none'?'Em caixa: '+brl(metrics.dividendsCash):'Reinvestidos'}</div></div>
+  `;
+
+  // Métricas row 2
+  document.getElementById('metricsRow2').innerHTML=`
+    <div class="metric-card"><div class="metric-label">Volatilidade a.a.</div><div class="metric-value">${pct(metrics.volatility)}</div></div>
+    <div class="metric-card"><div class="metric-label">Sharpe Ratio</div><div class="metric-value ${metrics.sharpeRatio>=1?'green':''}">${metrics.sharpeRatio.toFixed(2)}</div></div>
+    <div class="metric-card"><div class="metric-label">Máx. Drawdown</div><div class="metric-value red">${pct(metrics.maxDrawdown)}</div></div>
+    <div class="metric-card"><div class="metric-label">Meses</div><div class="metric-value">${metrics.months}</div></div>
+    <div class="metric-card"><div class="metric-label">Dividendos</div><div class="metric-value" style="font-size:11px;color:var(--sim-text2);font-family:var(--sim-font)">${divModeLabel[dividendMode]}</div></div>
+  `;
+
+  // Breakdown
+  const maxFV=Math.max(...breakdown.map(b=>b.finalValue));
+  document.getElementById('breakdownGrid').innerHTML=breakdown.map(b=>`
+    <div class="breakdown-card">
+      <div class="bd-ticker">
+        ${b.ticker}
+        <span class="data-badge ${b.hasRealData?'real':'mock'}">${b.hasRealData?'REAL':'MOCK'}</span>
+      </div>
+      <div class="bd-class">${b.assetClass} · ${pct(b.targetWeight)}</div>
+      <div class="bd-val">${brl(b.finalValue)}</div>
+      <div class="bd-divs">Dividendos: ${brl(b.totalDividends)}</div>
+      <div class="bd-bar-wrap"><div class="bd-bar" style="width:${maxFV>0?(b.finalValue/maxFV*100).toFixed(1):0}%"></div></div>
+    </div>
+  `).join('');
+
+  showChart('evolution', document.querySelector('.chart-tab'));
+}
+
+// ══════════════════════════════════════════════════════════════
+// CHARTS
+// ══════════════════════════════════════════════════════════════
+const CHART_GRID_COLOR='rgba(255,255,255,0.05)';
+const CHART_TICK_COLOR='#4E4D4A';
+const CHART_TOOLTIP_BG='#0E0E11';
+
+function chartOpts(unit) {
+  return {
+    responsive:true, maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{
+      legend:{labels:{color:'#8A8884',font:{size:11},boxWidth:12}},
+      tooltip:{backgroundColor:CHART_TOOLTIP_BG,borderColor:'var(--border)',borderWidth:1,
+        titleColor:CHART_TICK_COLOR,bodyColor:'#8A8884',
+        callbacks:{label:ctx=>{const v=ctx.parsed.y;return unit==='R$'?` ${ctx.dataset.label}: ${brl(v)}`:` ${ctx.dataset.label}: ${v.toFixed(2)}%`;}}}
+    },
+    scales:{
+      x:{ticks:{color:CHART_TICK_COLOR,font:{size:10},maxTicksLimit:16},grid:{color:CHART_GRID_COLOR}},
+      y:{ticks:{color:CHART_TICK_COLOR,font:{size:10},callback:v=>unit==='R$'?brl(v):v+'%'},grid:{color:CHART_GRID_COLOR}}
+    }
+  };
+}
+
+function showChart(type, el) {
+  document.querySelectorAll('.chart-tab').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const sim=simulations[activeSimIdx]; if(!sim) return;
+  const series=sim.result.series;
+  if(chartInst){chartInst.destroy();chartInst=null;}
+  const ctx=document.getElementById('mainChart').getContext('2d');
+  const labels=series.map(s=>monthLabel(s.date));
+  const color=sim.color;
+
+  if(type==='evolution') {
+    const datasets=[];
+    simulations.forEach((s,i)=>{
+      const isActive=i===activeSimIdx;
+      datasets.push({label:s.name,data:s.result.series.map(pt=>pt.portfolioValue),borderColor:s.color,backgroundColor:isActive?s.color+'14':'transparent',borderWidth:isActive?2.5:1.5,fill:isActive,tension:.3,pointRadius:0,order:isActive?0:1});
+    });
+    datasets.push({label:'Aportado',data:series.map(s=>s.totalInvested),borderColor:'#4E4D4A',borderWidth:1.5,borderDash:[4,4],fill:false,tension:.1,pointRadius:0,order:2});
+    chartInst=new Chart(ctx,{type:'line',data:{labels,datasets},options:chartOpts('R$')});
+  } else if(type==='monthly') {
+    chartInst=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Retorno %',data:series.map(s=>+(s.monthReturn*100).toFixed(2)),backgroundColor:series.map(s=>s.monthReturn>=0?color+'b3':'#E8503Ab3'),borderRadius:2}]},options:chartOpts('%')});
+  } else if(type==='dividends') {
+    chartInst=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Dividendos R$',data:series.map(s=>s.dividendsMonth),backgroundColor:'rgba(245,166,35,0.7)',borderRadius:2}]},options:chartOpts('R$')});
+  } else if(type==='allocation') {
+    const assets=sim.result.breakdown;
+    const COLORS=['#1FC96E','#5b8def','#9b72ef','#F5A623','#e05c5c','#56c8d8','#f7931a','#a8e6cf'];
+    chartInst=new Chart(ctx,{type:'doughnut',data:{labels:assets.map(a=>a.ticker),datasets:[{data:assets.map(a=>+(a.contribution*100).toFixed(2)),backgroundColor:COLORS.slice(0,assets.length),borderColor:'#0E0E11',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#8A8884',font:{size:11},padding:14}},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.raw}%`}}}}});
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// COMPARE VIEW
+// ══════════════════════════════════════════════════════════════
+function renderCompareView() {
+  const n=simulations.length;
+  const cont=document.getElementById('compareMetrics');
+  cont.className=`compare-metrics cols-${n}`;
+  const best={
+    finalValue:Math.max(...simulations.map(s=>s.result.metrics.finalValue)),
+    totalReturn:Math.max(...simulations.map(s=>s.result.metrics.totalReturn)),
+    cagr:Math.max(...simulations.map(s=>s.result.metrics.cagr)),
+    sharpeRatio:Math.max(...simulations.map(s=>s.result.metrics.sharpeRatio)),
+    volatility:Math.min(...simulations.map(s=>s.result.metrics.volatility)),
+    maxDrawdown:Math.max(...simulations.map(s=>s.result.metrics.maxDrawdown)),
+    totalDividends:Math.max(...simulations.map(s=>s.result.metrics.totalDividends)),
+  };
+  const isBest=(key,val)=>n>=2&&Math.abs(val-best[key])<0.0001;
+  cont.innerHTML=simulations.map((sim)=>{
+    const m=sim.result.metrics;
+    const pos=m.totalReturn>=0;
+    const b=(key,val)=>isBest(key,val)?'<span class="best-tag">MELHOR</span>':'';
+    return `
+      <div class="sim-card">
+        <div class="sim-card-head">
+          <div class="sim-card-dot" style="background:${sim.color}"></div>
+          <div class="sim-card-name">${sim.name}</div>
+          <div class="sim-card-period">${monthLabel(sim.config.startDate)}→${monthLabel(sim.config.endDate)}</div>
+        </div>
+        <div class="sim-card-body">
+          <div class="metric-item"><div class="metric-item-label">Valor Final ${b('finalValue',m.finalValue)}</div><div class="metric-item-val ${pos?'green':'red'}">${brl(m.finalValue)}</div><div class="metric-item-sub">Aportado: ${brl(m.totalInvested)}</div></div>
+          <div class="metric-item"><div class="metric-item-label">Retorno Total ${b('totalReturn',m.totalReturn)}</div><div class="metric-item-val ${pos?'green':'red'}">${pct(m.totalReturn)}</div><div class="metric-item-sub">Lucro: ${brl(m.profit)}</div></div>
+          <div class="metric-item"><div class="metric-item-label">CAGR (a.a.) ${b('cagr',m.cagr)}</div><div class="metric-item-val ${m.cagr>=0?'green':'red'}">${pct(m.cagr)}</div></div>
+          <div class="metric-item"><div class="metric-item-label">Sharpe ${b('sharpeRatio',m.sharpeRatio)}</div><div class="metric-item-val ${m.sharpeRatio>=1?'green':''}">${m.sharpeRatio.toFixed(2)}</div></div>
+          <div class="metric-item"><div class="metric-item-label">Volatilidade a.a. ${b('volatility',m.volatility)}</div><div class="metric-item-val">${pct(m.volatility)}</div></div>
+          <div class="metric-item"><div class="metric-item-label">Máx. Drawdown ${b('maxDrawdown',m.maxDrawdown)}</div><div class="metric-item-val red">${pct(m.maxDrawdown)}</div></div>
+          <div class="metric-item"><div class="metric-item-label">Dividendos ${b('totalDividends',m.totalDividends)}</div><div class="metric-item-val" style="color:var(--gold)">${brl(m.totalDividends)}</div><div class="metric-item-sub">${divModeLabel[sim.result.dividendMode]}</div></div>
+          <div class="sim-divider"></div>
+          <div class="metric-item"><div class="metric-item-label">Carteira</div><div style="font-size:10px;color:var(--sim-text3);line-height:1.7">
+            ${sim.classesSel.map(sel=>{ const cls=CLASSES_DEF.find(c=>c.id===sel.id); return `${cls.icon} ${cls.name} <span style="color:var(--up);font-family:var(--sim-mono)">${sel.pct}%</span>`; }).join(' · ')}
+          </div></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  renderCompareChart();
+  renderCompareBarChart();
+}
+
+function renderCompareChart() {
+  if(compareChartInst){compareChartInst.destroy();compareChartInst=null;}
+  if(!simulations.length) return;
+  const longest=simulations.reduce((a,b)=>a.result.series.length>b.result.series.length?a:b);
+  const labels=longest.result.series.map(s=>monthLabel(s.date));
+  const datasets=simulations.map(sim=>({label:sim.name,data:sim.result.series.map(s=>s.portfolioValue),borderColor:sim.color,backgroundColor:'transparent',borderWidth:2,tension:.3,pointRadius:0}));
+  compareChartInst=new Chart(document.getElementById('compareChart').getContext('2d'),{type:'line',data:{labels,datasets},options:chartOpts('R$')});
+}
+
+function renderCompareBarChart() {
+  if(compareBarChartInst){compareBarChartInst.destroy();compareBarChartInst=null;}
+  if(!simulations.length) return;
+  const labels=simulations.map(s=>s.name);
+  const colors=simulations.map(s=>s.color);
+  compareBarChartInst=new Chart(document.getElementById('compareBarChart').getContext('2d'),{
+    type:'bar',
+    data:{labels,datasets:[
+      {label:'CAGR %',data:simulations.map(s=>+(s.result.metrics.cagr*100).toFixed(2)),backgroundColor:colors.map(c=>c+'cc'),borderRadius:4},
+      {label:'Volatilidade %',data:simulations.map(s=>+(s.result.metrics.volatility*100).toFixed(2)),backgroundColor:simulations.map(()=>'#4E4D4A80'),borderRadius:4},
+      {label:'Sharpe',data:simulations.map(s=>+s.result.metrics.sharpeRatio.toFixed(2)),backgroundColor:simulations.map(()=>'#9b72ef80'),borderRadius:4},
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#8A8884',font:{size:11},boxWidth:12}},tooltip:{backgroundColor:CHART_TOOLTIP_BG,borderColor:'var(--border)',borderWidth:1,titleColor:'#8A8884',bodyColor:'#8A8884'}},
+      scales:{x:{ticks:{color:CHART_TICK_COLOR,font:{size:10}},grid:{color:CHART_GRID_COLOR}},y:{ticks:{color:CHART_TICK_COLOR,font:{size:10}},grid:{color:CHART_GRID_COLOR}}}
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+renderSidebar();
+</script>
+</body>
+</html>
