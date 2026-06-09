@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comparador — Mais Valor</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.cmp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+.cmp-select { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; }
+.cmp-select label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .6px; display: block; margin-bottom: .5rem; }
+.cmp-input { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 16px; font-weight: 700; font-family: var(--font-mono); color: var(--text); }
+.cmp-input:focus { outline: none; border-color: var(--gold); }
+.cmp-header { display: flex; align-items: center; gap: 1rem; margin-top: 1rem; }
+.cmp-ticker-big { font-family: var(--font-display); font-size: 34px; font-weight: 400; }
+.cmp-price-big { font-family: var(--font-mono); font-size: 22px; font-weight: 700; }
+.cmp-table { width: 100%; border-collapse: collapse; }
+.cmp-table tr { border-bottom: 1px solid var(--border); }
+.cmp-table tr:last-child { border-bottom: none; }
+.cmp-table td { padding: 11px 14px; font-size: 13px; }
+.cmp-table td:first-child { color: var(--text3); font-weight: 600; width: 32%; }
+.cmp-table td:not(:first-child) { font-family: var(--font-mono); font-weight: 700; text-align: right; }
+.winner { color: var(--up) !important; }
+.loser  { color: var(--dn) !important; }
+.chart-wrap { position: relative; height: 280px; }
+
+/* Score total */
+.score-total-row td { border-top: 2px solid var(--border3) !important; background: var(--bg3); }
+.score-bar-wrap { margin-top: 4px; height: 6px; background: var(--bg4); border-radius: 3px; overflow: hidden; }
+.score-bar-fill { height: 100%; border-radius: 3px; transition: width .8s ease; }
+.cmp-criterion { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+/* Winner badge */
+.winner-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(31,201,110,0.12); color: var(--up);
+  border: 1px solid rgba(31,201,110,0.25);
+  border-radius: 8px; padding: 4px 10px;
+  font-size: 11px; font-weight: 700; margin-top: 8px;
+}
+</style>
+</head>
+<body>
+<div id="nav-placeholder"></div>
+<div class="page-hero fade-in">
+  <h1>COMPARADOR <em>DE ATIVOS</em></h1>
+  <p>Compare dois ativos lado a lado — indicadores, pontuação fundamentalista e histórico.</p>
+</div>
+<div class="container">
+  <div class="cmp-grid">
+    <div class="cmp-select">
+      <label>Ativo 1</label>
+      <input class="cmp-input" id="inp1" placeholder="Ex: PETR4" oninput="searchAtivo(this.value,1)" onchange="selectAtivo(this.value,1)" list="list1">
+      <datalist id="list1"></datalist>
+      <div id="header1" style="margin-top:1rem"></div>
+    </div>
+    <div class="cmp-select">
+      <label>Ativo 2</label>
+      <input class="cmp-input" id="inp2" placeholder="Ex: VALE3" oninput="searchAtivo(this.value,2)" onchange="selectAtivo(this.value,2)" list="list2">
+      <datalist id="list2"></datalist>
+      <div id="header2" style="margin-top:1rem"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:1.5rem" id="chart-card">
+    <div class="section-header" style="margin-bottom:1rem">
+      <div class="section-title">Histórico Comparativo (Base 100)</div>
+      <div style="display:flex;gap:4px">
+        <button class="range-btn" onclick="setRange('1M',this)">1M</button>
+        <button class="range-btn" onclick="setRange('6M',this)">6M</button>
+        <button class="range-btn active" onclick="setRange('1A',this)">1A</button>
+        <button class="range-btn" onclick="setRange('5A',this)">5A</button>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="cmpChart" role="img" aria-label="Gráfico comparativo dos dois ativos"></canvas>
+    </div>
+    <div style="display:flex;gap:1rem;margin-top:.75rem;font-size:12px;font-family:var(--font-mono)">
+      <span><span style="color:#F5A623">●</span> <span id="leg1">Ativo 1</span></span>
+      <span><span style="color:#22C87A">●</span> <span id="leg2">Ativo 2</span></span>
+    </div>
+  </div>
+
+  <div class="card" id="table-card">
+    <div class="section-header" style="margin-bottom:1rem">
+      <div class="section-title">Comparação de Indicadores</div>
+      <div id="winner-banner" style="display:none"></div>
+    </div>
+    <table class="cmp-table">
+      <thead><tr>
+        <td style="color:var(--text3);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Indicador</td>
+        <td style="text-align:right;font-weight:700" id="th1">—</td>
+        <td style="text-align:right;font-weight:700" id="th2">—</td>
+      </tr></thead>
+      <tbody id="cmp-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="data.js"></script><script src="nav.js"></script>
+<script>
+let ativo1=null, ativo2=null, cmpChart=null, currentRange='1A';
+
+async function init() {
+  await loadData();
+  const all = [...ACOES, ...FIIS];
+  ['list1','list2'].forEach(id => {
+    document.getElementById(id).innerHTML = all.map(d =>
+      `<option value="${d.t}">${d.t} — ${d.n}</option>`).join('');
+  });
+  const p = new URLSearchParams(location.search);
+  if(p.get('t1')) { document.getElementById('inp1').value=p.get('t1'); selectAtivo(p.get('t1'),1); }
+  if(p.get('t2')) { document.getElementById('inp2').value=p.get('t2'); selectAtivo(p.get('t2'),2); }
+  if(!ativo1 && ACOES.length)   selectAtivo(ACOES[0].t, 1);
+  if(!ativo2 && ACOES.length>1) selectAtivo(ACOES[1].t, 2);
+}
+
+function findAtivo(ticker) {
+  const t = ticker.toUpperCase();
+  return [...ACOES,...FIIS].find(d=>d.t===t);
+}
+
+function selectAtivo(ticker, num) {
+  const d = findAtivo(ticker);
+  if(!d) return;
+  if(num===1) ativo1=d; else ativo2=d;
+  renderHeader(d, num);
+  updateAll();
+}
+
+function renderHeader(d, num) {
+  const isUp = d.v>=0;
+  const score = calcScore(d);
+  const scoreHtml = score!==null ? `<div style="margin-top:6px">${scoreBadge(d)}</div>` : '';
+  const staleNote = d.stale ? `<div style="margin-top:4px;font-size:11px;color:var(--stale)" title="Último valor disponível (dado desatualizado)">⚠ dado desatualizado</div>` : '';
+  document.getElementById(`header${num}`).innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+      ${logoHtml(d.t,40)}
+      <div>
+        <div class="cmp-ticker-big" style="color:${num===1?'var(--gold)':'var(--up)'}">${d.t}</div>
+        <div style="font-size:12px;color:var(--text2)">${d.n}</div>
+      </div>
+    </div>
+    <div class="cmp-price-big" style="margin-top:8px${d.stale?';color:var(--stale)':''}">R$ ${d.p.toFixed(2)} <span class="pill ${d.stale?'stale-pill':isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span></div>
+    <div style="font-size:12px;color:var(--text3);margin-top:4px">${d.setor}</div>
+    ${staleNote}
+    ${scoreHtml}`;
+}
+
+async function updateAll() {
+  if(!ativo1||!ativo2) return;
+  document.getElementById('th1').textContent = ativo1.t;
+  document.getElementById('th2').textContent = ativo2.t;
+  document.getElementById('leg1').textContent = ativo1.t;
+  document.getElementById('leg2').textContent = ativo2.t;
+  renderTable();
+  await renderChart();
+}
+
+function fmt(v, sfx='') { return v!=null ? v.toFixed(2)+sfx : '—'; }
+function fmtPct(v) { return v!=null&&v!==0 ? v.toFixed(1)+'%' : '—'; }
+
+// Critério e método para cada indicador
+const CRITERIA = {
+  'DY 12m':       { better:'higher', method:'Bazin: DY > 6% ideal', score: (v)=>v>=6?2:v>=3?1:0 },
+  'P/L':          { better:'lower',  method:'Graham: P/L < 15', score: (v)=>v&&v>0?(v<=15?2:v<=25?1:0):0 },
+  'P/VP':         { better:'lower',  method:'Graham: P/VP < 1.5', score: (v)=>v?(v<1?2:v<1.5?1:0):0 },
+  'ROE':          { better:'higher', method:'Bazin: ROE > 15%', score: (v)=>v?(v>=15?2:v>=10?1:0):0 },
+  'ROIC':         { better:'higher', method:'ROIC > 12%', score: (v)=>v?(v>=12?2:v>=8?1:0):0 },
+  'Mrg. Líquida': { better:'higher', method:'Margem > 10%', score: (v)=>v!=null?(v>10?2:v>0?1:0):0 },
+  'Cresc. 5 anos':{ better:'higher', method:'Crescimento positivo', score: (v)=>v!=null?(v>10?2:v>0?1:0):0 },
+};
+
+function renderTable() {
+  const a=ativo1, b=ativo2;
+
+  const rows = [
+    { label:'Preço',         v1:`R$ ${a.p.toFixed(2)}`, v2:`R$ ${b.p.toFixed(2)}`, cmp:null },
+    { label:'Variação dia',  v1:`${a.v>=0?'+':''}${a.v.toFixed(2)}%`, v2:`${b.v>=0?'+':''}${b.v.toFixed(2)}%`, cmp:(x,y)=>x>y, va:a.v, vb:b.v },
+    { label:'DY 12m',        v1:fmtPct(a.dy), v2:fmtPct(b.dy), cmp:(x,y)=>x>y, va:a.dy, vb:b.dy, crit:'DY 12m' },
+    { label:'P/L',           v1:a.pl?(a.pl>0?fmt(a.pl,'x'):'neg.'):'—', v2:b.pl?(b.pl>0?fmt(b.pl,'x'):'neg.'):'—', cmp:(x,y)=>x<y, va:a.pl>0?a.pl:null, vb:b.pl>0?b.pl:null, crit:'P/L' },
+    { label:'P/VP',          v1:fmt(a.pvp), v2:fmt(b.pvp), cmp:(x,y)=>x<y, va:a.pvp, vb:b.pvp, crit:'P/VP' },
+    { label:'ROE',           v1:fmtPct(a.roe), v2:fmtPct(b.roe), cmp:(x,y)=>x>y, va:a.roe, vb:b.roe, crit:'ROE' },
+    { label:'ROIC',          v1:fmtPct(a.roic), v2:fmtPct(b.roic), cmp:(x,y)=>x>y, va:a.roic, vb:b.roic, crit:'ROIC' },
+    { label:'Mrg. Líquida',  v1:fmtPct(a.mrg_liq), v2:fmtPct(b.mrg_liq), cmp:(x,y)=>x>y, va:a.mrg_liq, vb:b.mrg_liq, crit:'Mrg. Líquida' },
+    { label:'Cresc. 5 anos', v1:fmtPct(a.cresc5a), v2:fmtPct(b.cresc5a), cmp:(x,y)=>x>y, va:a.cresc5a, vb:b.cresc5a, crit:'Cresc. 5 anos' },
+    { label:'Volume',        v1:a.vol, v2:b.vol, cmp:null },
+    { label:'Valor de Mercado', v1:a.vm||'—', v2:b.vm||'—', cmp:null },
+    { label:'Setor',         v1:a.setor, v2:b.setor, cmp:null },
+  ];
+
+  // Calcula pontuação por método
+  let pts1=0, pts2=0, maxPts=0;
+  rows.filter(r=>r.crit && CRITERIA[r.crit]).forEach(r => {
+    const crit = CRITERIA[r.crit];
+    const s1 = crit.score(r.va); const s2 = crit.score(r.vb);
+    pts1+=s1; pts2+=s2; maxPts+=2;
+  });
+  // Adiciona ponto por cada indicador "vencido"
+  let wins1=0, wins2=0, scorable=0;
+  rows.forEach(r => {
+    if(r.cmp && r.va!=null && r.vb!=null && r.va!==r.vb) {
+      scorable++;
+      if(r.cmp(r.va,r.vb)) wins1++; else wins2++;
+    }
+  });
+
+  const pct1 = maxPts>0 ? Math.round(pts1/maxPts*100) : 0;
+  const pct2 = maxPts>0 ? Math.round(pts2/maxPts*100) : 0;
+
+  document.getElementById('cmp-tbody').innerHTML = [
+    ...rows.map(r => {
+      let c1='', c2='', badge1='', badge2='', criterion='';
+      if(r.cmp && r.va!=null && r.vb!=null && r.va!==r.vb) {
+        if(r.cmp(r.va,r.vb)) { c1='winner'; c2='loser'; badge1='✓'; }
+        else { c1='loser'; c2='winner'; badge2='✓'; }
+      }
+      if(r.crit && CRITERIA[r.crit]) {
+        criterion = `<div class="cmp-criterion">${CRITERIA[r.crit].method}</div>`;
+      }
+      return `<tr>
+        <td>${r.label}${criterion}</td>
+        <td class="${c1}">${r.v1}${badge1?`&nbsp;<span style="color:var(--up);font-size:10px">${badge1}</span>`:''}</td>
+        <td class="${c2}">${r.v2}${badge2?`&nbsp;<span style="color:var(--up);font-size:10px">${badge2}</span>`:''}</td>
+      </tr>`;
+    }),
+    // Linha de pontuação total
+    `<tr class="score-total-row">
+      <td style="font-weight:800;color:var(--text)">🏆 Score Total</td>
+      <td style="text-align:right">
+        <span style="font-size:18px;font-weight:800;color:${pct1>=pct2?'var(--gold)':'var(--text2)'}">${pct1}%</span>
+        <div class="score-bar-wrap"><div class="score-bar-fill" style="width:${pct1}%;background:${pct1>=pct2?'var(--gold)':'var(--dn)'}"></div></div>
+        <div style="font-size:10px;color:var(--text3);margin-top:3px">${wins1} critérios ganhos</div>
+      </td>
+      <td style="text-align:right">
+        <span style="font-size:18px;font-weight:800;color:${pct2>pct1?'var(--gold)':'var(--text2)'}">${pct2}%</span>
+        <div class="score-bar-wrap"><div class="score-bar-fill" style="width:${pct2}%;background:${pct2>pct1?'var(--gold)':'var(--dn)'}"></div></div>
+        <div style="font-size:10px;color:var(--text3);margin-top:3px">${wins2} critérios ganhos</div>
+      </td>
+    </tr>`
+  ].join('');
+
+  // Banner do vencedor
+  const wb = document.getElementById('winner-banner');
+  if(pct1!==pct2||wins1!==wins2){
+    const winner = (pct1+wins1)>=(pct2+wins2) ? ativo1.t : ativo2.t;
+    wb.style.display='';
+    wb.innerHTML=`<div class="winner-badge">🏆 ${winner} melhor fundamentalmente</div>`;
+  } else {
+    wb.style.display='none';
+  }
+}
+
+async function renderChart() {
+  if(!ativo1||!ativo2) return;
+  const [h1,h2] = await Promise.all([
+    loadHistoricoCompleto(ativo1.t),
+    loadHistoricoCompleto(ativo2.t)
+  ]);
+  const f1=filterByRange(h1,currentRange), f2=filterByRange(h2,currentRange);
+  const norm=arr=>{ if(!arr?.length) return []; const base=arr[0].close; return arr.map(p=>((p.close-base)/base*100)); };
+  const d1=norm(f1), d2=norm(f2);
+  const labels=(f1?.length>=f2?.length?f1:f2)?.map(p=>p.date)||[];
+
+  if(cmpChart) cmpChart.destroy();
+  cmpChart = new Chart(document.getElementById('cmpChart'), {
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        { label:ativo1.t, data:d1, borderColor:'#F5A623', borderWidth:2, pointRadius:0, fill:false, tension:0.35 },
+        { label:ativo2.t, data:d2, borderColor:'#22C87A', borderWidth:2, pointRadius:0, fill:false, tension:0.35 }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'rgba(17,17,19,0.95)',borderColor:'rgba(245,166,35,0.3)',borderWidth:1,
+          callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y>=0?'+':''}${ctx.parsed.y.toFixed(2)}%`}
+        }
+      },
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},maxTicksLimit:10}},
+        y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},callback:v=>(v>=0?'+':'')+v.toFixed(1)+'%'}}
+      }
+    }
+  });
+}
+
+async function setRange(r,el) {
+  currentRange=r;
+  document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  await renderChart();
+}
+
+init();
+</script>
+</body></html>

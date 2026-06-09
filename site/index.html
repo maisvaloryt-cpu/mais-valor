@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mais Valor — Ações, FIIs e Indicadores da B3</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<div class="container">
+
+  <!-- BANNER -->
+  <div class="banner fade-in" style="margin-top:.5rem">
+    <div class="banner-icon">✦</div>
+    <div>
+      <h3>Análise IA — Novo!</h3>
+      <p>Relatórios fundamentalistas, tearsheets e análise de earnings gerados automaticamente.</p>
+    </div>
+    <button class="banner-btn" onclick="location.href='analise.html'">Acessar →</button>
+  </div>
+
+  <!-- MINI CARDS -->
+  <div class="mini-cards fade-in-1">
+    <div class="mini-card">
+      <div class="mini-label">Ações monitoradas</div>
+      <div class="mini-val" id="mc-acoes">—</div>
+      <div class="mini-sub">B3 · todas as classes</div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-label">FIIs monitorados</div>
+      <div class="mini-val" id="mc-fiis">—</div>
+      <div class="mini-sub">todos os segmentos</div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-label">Maior DY Ações</div>
+      <div class="mini-val gold" id="mc-dy-acao">—</div>
+      <div class="mini-sub" id="mc-dy-acao-ticker">12 meses</div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-label">Maior DY FIIs</div>
+      <div class="mini-val gold" id="mc-dy-fii">—</div>
+      <div class="mini-sub" id="mc-dy-fii-ticker">12 meses</div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-label">CDI atual</div>
+      <div class="mini-val" id="mc-cdi">—</div>
+      <div class="mini-sub">a.a. · Banco Central</div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-label">IPCA 12m</div>
+      <div class="mini-val" id="mc-ipca">—</div>
+      <div class="mini-sub">inflação acumulada</div>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <div class="fade-in-2">
+      <!-- CHART -->
+      <div class="chart-panel">
+        <div class="chart-header">
+          <div>
+            <div class="chart-logo-wrap">
+              <div id="c-logo"></div>
+              <div class="chart-ticker" id="c-ticker">—</div>
+            </div>
+            <div class="chart-price" id="c-price">
+              <span class="loading-dot"></span>
+              <span class="loading-dot"></span>
+              <span class="loading-dot"></span>
+            </div>
+            <div class="chart-meta" id="c-meta"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+            <div style="display:flex;gap:4px">
+              <button class="range-btn" onclick="setRange('1M',this)">1M</button>
+              <button class="range-btn" onclick="setRange('6M',this)">6M</button>
+              <button class="range-btn active" onclick="setRange('1A',this)">1A</button>
+              <button class="range-btn" onclick="setRange('5A',this)">5A</button>
+              <button class="range-btn" onclick="setRange('10A',this)">10A</button>
+            </div>
+            <a id="c-ver-mais" href="#" style="font-size:11px;color:var(--gold);font-weight:700">Ver análise completa →</a>
+          </div>
+        </div>
+        <div style="position:relative;width:100%;height:210px">
+          <canvas id="mainChart" role="img" aria-label="Gráfico histórico do ativo selecionado"></canvas>
+        </div>
+        <div style="font-size:10px;color:var(--text3);margin-top:6px;text-align:center">
+          💡 Clique para travar · Segundo clique para variação · Arraste para período
+        </div>
+        <div class="chart-stats">
+          <div class="chart-stat"><div class="chart-stat-label">DY 12m</div><div class="chart-stat-val gold" id="c-dy">—</div></div>
+          <div class="chart-stat"><div class="chart-stat-label">P/L</div><div class="chart-stat-val" id="c-pl">—</div></div>
+          <div class="chart-stat"><div class="chart-stat-label">P/VP</div><div class="chart-stat-val" id="c-pvp">—</div></div>
+          <div class="chart-stat"><div class="chart-stat-label">Volume</div><div class="chart-stat-val" id="c-vol">—</div></div>
+        </div>
+      </div>
+
+      <!-- TABELA -->
+      <div class="section-header">
+        <div class="section-title">Cotações em destaque</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input class="filter-input" placeholder="Filtrar..." style="width:140px" oninput="filterTable(this.value)" id="filter-input">
+          <div class="tabs" style="margin-bottom:0">
+            <button class="tab active" onclick="switchTab('acoes',this)">Ações</button>
+            <button class="tab" onclick="switchTab('fiis',this)">FIIs</button>
+          </div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th>Ativo</th><th class="r">Preço</th><th class="r">Hoje</th>
+            <th class="r">DY 12m</th><th class="r">P/L</th><th class="r">P/VP</th>
+            <th class="r">Score</th><th class="r">Volume</th>
+          </tr></thead>
+          <tbody id="main-tbody">
+            <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text3)">
+              <span class="loading-dot"></span> <span class="loading-dot"></span> <span class="loading-dot"></span>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="text-align:center;margin-top:1rem">
+        <a id="ver-todos-link" href="acoes.html" style="font-size:13px;color:var(--gold);font-weight:700">Ver todas as ações →</a>
+      </div>
+    </div>
+
+    <div class="sidebar fade-in-3">
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem">
+          <div class="section-title">Maiores Altas</div>
+          <a class="section-link" href="rankings.html">ver →</a>
+        </div>
+        <div id="top-gainers"></div>
+      </div>
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem">
+          <div class="section-title">Maiores Baixas</div>
+          <a class="section-link" href="rankings.html">ver →</a>
+        </div>
+        <div id="top-losers"></div>
+      </div>
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem">
+          <div class="section-title">Ranking DY</div>
+          <a class="section-link" href="rankings.html">ver →</a>
+        </div>
+        <div id="dy-ranking"></div>
+      </div>
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem">
+          <div class="section-title">Próximos Dividendos</div>
+          <a class="section-link" href="dividendos.html">agenda →</a>
+        </div>
+        <div id="div-agenda"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="chart_config.js"></script>
+<script src="data.js"></script>
+<script src="nav.js"></script>
+<script>
+let currentTab='acoes', currentData=[], mainChart=null, sel=null, currentRange='1A';
+const SHOW=20;
+
+function renderTable(arr){
+  const tb = document.getElementById('main-tbody');
+  tb.innerHTML = '';
+  const slice = arr.slice(0, SHOW);
+  if (!slice.length) { tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text3)">Sem dados</td></tr>'; return; }
+  slice.forEach((d, i) => {
+    const tr = document.createElement('tr');
+    tr.style.animationDelay = (i * 0.02) + 's';
+    tr.className = 'fade-in';
+    tr.innerHTML = `
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          ${logoHtml(d.t, 32)}
+          <div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n?.slice(0,22)||''}</div></div>
+        </div>
+      </td>
+      <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
+      <td class="r"><span class="pill ${d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>
+      <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
+      <td class="r">${d.pl?(d.pl>0?d.pl.toFixed(1)+'x':d.pl<0?'neg.':'—'):'—'}</td>
+      <td class="r ${d.pvp&&d.pvp<1?'up':''}">${d.pvp?d.pvp.toFixed(2):'—'}</td>
+      <td class="r">${scoreBadge(d)}</td>
+      <td class="r" style="color:var(--text3)">${d.vol}</td>`;
+    tr.onclick = () => loadChart(d);
+    tb.appendChild(tr);
+  });
+}
+
+async function loadChart(d) {
+  sel = d;
+  const logoEl = document.getElementById('c-logo');
+  if(logoEl) logoEl.innerHTML = logoHtml(d.t, 36);
+  document.getElementById('c-ticker').textContent = d.t;
+  const isUp = d.v >= 0;
+  document.getElementById('c-price').innerHTML = `R$&nbsp;${d.p.toFixed(2)}&nbsp;<span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span>`;
+  document.getElementById('c-meta').textContent = `${d.n} · ${d.setor} · B3`;
+  document.getElementById('c-dy').textContent  = d.dy>0 ? d.dy.toFixed(1)+'%' : '—';
+  document.getElementById('c-pl').textContent  = d.pl ? (d.pl>0?d.pl.toFixed(1)+'x':d.pl<0?'neg.':'—') : '—';
+  document.getElementById('c-pvp').textContent = d.pvp ? d.pvp.toFixed(2) : '—';
+  document.getElementById('c-vol').textContent = d.vol;
+  document.getElementById('c-ver-mais').href = `ativo.html?t=${d.t}${currentTab==='fiis'?'&tipo=fii':''}`;
+
+  const hist = await loadHistoricoCompleto(d.t);
+  let pts, labels;
+  if (hist?.length) { const filt = filterByRange(hist, currentRange); pts = filt.map(p => p.close); labels = filt.map(p => p.date); }
+  else { pts = genHistory(d.p, d.v); labels = genLabels(pts.length); }
+  const color = isUp ? '#1FC96E' : '#E8503A';
+  if (mainChart) mainChart.destroy();
+  mainChart = createChart('mainChart', labels, pts, color, isUp?'rgba(31,201,110,0.06)':'rgba(232,80,58,0.06)');
+}
+
+async function setRange(r, el) {
+  currentRange = r;
+  document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  if (sel) await loadChart(sel);
+}
+
+function filterTable(q) {
+  renderTable(currentData.filter(d =>
+    d.t.toLowerCase().includes(q.toLowerCase()) || d.n.toLowerCase().includes(q.toLowerCase())
+  ));
+}
+
+function switchTab(tab, el) {
+  currentTab = tab;
+  currentData = tab === 'acoes' ? [...ACOES] : [...FIIS];
+  document.querySelectorAll('.tabs .tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('filter-input').value = '';
+  document.getElementById('ver-todos-link').href = tab === 'acoes' ? 'acoes.html' : 'fiis.html';
+  document.getElementById('ver-todos-link').textContent = `Ver ${tab === 'acoes' ? 'todas as ações' : 'todos os FIIs'} →`;
+  renderTable(currentData);
+  if (currentData.length) loadChart(currentData[0]);
+}
+
+function renderSidebar() {
+  const all = [...ACOES, ...FIIS].filter(d => d.p > 0).sort((a,b) => b.v - a.v);
+
+  document.getElementById('top-gainers').innerHTML = all.slice(0,5).map(d => `
+    <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}'">
+      <div style="display:flex;align-items:center;gap:8px">
+        ${logoHtml(d.t,26)}
+        <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      </div>
+      <div style="text-align:right">
+        <div class="mover-price">R$&nbsp;${d.p.toFixed(2)}</div>
+        <div class="mover-chg up">+${d.v.toFixed(2)}%</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('top-losers').innerHTML = all.slice(-5).reverse().map(d => `
+    <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}'">
+      <div style="display:flex;align-items:center;gap:8px">
+        ${logoHtml(d.t,26)}
+        <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      </div>
+      <div style="text-align:right">
+        <div class="mover-price">R$&nbsp;${d.p.toFixed(2)}</div>
+        <div class="mover-chg dn">${d.v.toFixed(2)}%</div>
+      </div>
+    </div>`).join('');
+
+  const byDy = [...ACOES, ...FIIS].filter(d => d.dy > 0).sort((a,b) => b.dy - a.dy).slice(0, 6);
+  const max = byDy[0]?.dy || 1;
+  document.getElementById('dy-ranking').innerHTML = byDy.map((d, i) => `
+    <div class="rank-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}'">
+      <div class="rank-num">${i+1}</div>
+      ${logoHtml(d.t,20)}
+      <div class="rank-bar-wrap">
+        <div class="rank-bar-top">
+          <span class="rank-bar-ticker">${d.t}</span>
+          <span class="rank-bar-val">${d.dy.toFixed(1)}%</span>
+        </div>
+        <div class="rank-bar"><div class="rank-bar-fill" style="width:${(d.dy/max*100).toFixed(0)}%"></div></div>
+      </div>
+    </div>`).join('');
+
+  // Agenda de dividendos: tenta DIVIDENDOS do data.js, fallback para exemplo
+  let agenda = [];
+  if(typeof DIVIDENDOS!=='undefined' && DIVIDENDOS.length) {
+    agenda = DIVIDENDOS.slice(0,5);
+  } else {
+    agenda = [...ACOES,...FIIS].filter(a=>a.dy>0).sort((a,b)=>b.dy-a.dy).slice(0,5).map(a=>({
+      t:a.t, tipo:a.t.endsWith('11')?'Rendimento':'Dividendo',
+      pag:'—', val:+(a.p*(a.dy/100)/12).toFixed(4), dy:a.dy.toFixed(1)+'%'
+    }));
+  }
+  document.getElementById('div-agenda').innerHTML = agenda.map(d => `
+    <div class="agenda-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}'">
+      <div style="display:flex;align-items:center;gap:6px">
+        ${logoHtml(d.t,22)}
+        <div><div class="agenda-ticker">${d.t}</div><div class="agenda-type">${d.tipo}</div></div>
+      </div>
+      <div class="agenda-date">${d.pag||'—'}<small>pagamento</small></div>
+      <div><div class="agenda-value">R$&nbsp;${(d.val||0).toFixed(4)}</div><div class="agenda-yield">${d.dy}</div></div>
+    </div>`).join('');
+}
+
+function updateMiniCards() {
+  document.getElementById('mc-acoes').textContent = ACOES.length || '—';
+  document.getElementById('mc-fiis').textContent  = FIIS.length  || '—';
+  const topAcao = [...ACOES].filter(d => d.dy > 0).sort((a,b) => b.dy - a.dy)[0];
+  if (topAcao) { document.getElementById('mc-dy-acao').textContent=topAcao.dy.toFixed(1)+'%'; document.getElementById('mc-dy-acao-ticker').textContent=topAcao.t+' · 12m'; }
+  const topFii = [...FIIS].filter(d => d.dy > 0).sort((a,b) => b.dy - a.dy)[0];
+  if (topFii)  { document.getElementById('mc-dy-fii').textContent=topFii.dy.toFixed(1)+'%';   document.getElementById('mc-dy-fii-ticker').textContent=topFii.t+' · 12m'; }
+}
+
+async function init() {
+  await loadData();
+  try {
+    const r = await fetch('data/bcb.json?t=' + Date.now());
+    if (r.ok) {
+      const j = await r.json();
+      if (j.cdi?.anual)         { document.getElementById('mc-cdi').textContent  = j.cdi.anual.toFixed(2) + '%'; applyStaleEl('mc-cdi', j.cdi.stale); }
+      if (j.ipca?.acumulado_12m) { document.getElementById('mc-ipca').textContent = j.ipca.acumulado_12m.toFixed(2) + '%'; applyStaleEl('mc-ipca', j.ipca.stale); }
+    }
+  } catch(e) {}
+  currentData = [...ACOES];
+  renderTable(currentData);
+  if (ACOES.length > 0) await loadChart(ACOES[0]);
+  renderSidebar();
+  updateMiniCards();
+}
+init();
+</script>
+</body></html>
