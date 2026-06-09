@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>REITs — Mais Valor</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<div class="page-hero fade-in">
+  <h1>REITs <em>EUA</em></h1>
+  <p>Real Estate Investment Trusts — fundos imobiliários listados nos EUA.
+    <span id="data-timestamp" style="color:var(--gold);font-size:12px"></span></p>
+</div>
+
+<div class="container">
+  <div class="main-grid">
+    <div class="fade-in-1">
+      <div class="filter-bar">
+        <input class="filter-input" placeholder="🔍 Buscar por ticker ou nome..." style="flex:1;max-width:300px" oninput="filterTable()" id="f-search">
+        <select class="filter-select" onchange="filterTable()" id="f-setor">
+          <option value="">Todos os segmentos</option>
+          <option value="Industrial">Industrial/Logística</option>
+          <option value="Varejo">Varejo/Shopping</option>
+          <option value="Residencial">Residencial</option>
+          <option value="Saúde">Saúde</option>
+          <option value="Escritório">Escritório</option>
+          <option value="Diversificado">Diversificado</option>
+          <option value="Data Center">Data Center</option>
+          <option value="Infraestrutura">Infraestrutura</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <div class="ranking-bar">
+          <span class="ranking-label">Ranking por:</span>
+          <div class="ranking-btns">
+            <button class="rank-btn active" data-sort="mktcap" onclick="setRank(this)">Market Cap</button>
+            <button class="rank-btn" data-sort="dy" onclick="setRank(this)">Dividend Yield</button>
+            <button class="rank-btn" data-sort="v12" onclick="setRank(this)">Retorno 12m</button>
+            <button class="rank-btn" data-sort="pvp" onclick="setRank(this)">P/VP</button>
+            <button class="rank-btn" data-sort="liq" onclick="setRank(this)">Liquidez</button>
+          </div>
+        </div>
+        <table class="data-table">
+          <thead><tr>
+            <th>Ativo</th>
+            <th class="r sortable" data-sort="p" onclick="setRank(this)">Preço <span class="sort-arrow"></span></th>
+            <th class="r">Hoje</th>
+            <th class="r sortable" data-sort="mktcap" onclick="setRank(this)">Mkt Cap <span class="sort-arrow"></span></th>
+            <th class="r sortable" data-sort="dy" onclick="setRank(this)">DY 12m <span class="sort-arrow"></span></th>
+            <th class="r sortable" data-sort="pvp" onclick="setRank(this)">P/VP <span class="sort-arrow"></span></th>
+            <th class="r sortable" data-sort="v12" onclick="setRank(this)">Ret. 12m <span class="sort-arrow"></span></th>
+            <th class="r">Segmento</th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="sidebar fade-in-2">
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Maior DY</div></div>
+        <div id="top-dy"><div style="color:var(--text3);font-size:12px">—</div></div>
+      </div>
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Maiores Altas</div></div>
+        <div id="top-altas"><div style="color:var(--text3);font-size:12px">—</div></div>
+      </div>
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">P/VP Abaixo de 1</div></div>
+        <div id="top-pvp"><div style="color:var(--text3);font-size:12px">—</div></div>
+      </div>
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Por Segmento</div></div>
+        <div id="seg-list"><div style="color:var(--text3);font-size:12px">—</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="data.js"></script>
+<script src="nav.js"></script>
+<style>
+.ranking-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 0 8px}
+.ranking-label{font-size:13px;color:var(--text3);white-space:nowrap;font-weight:500}
+.ranking-btns{display:flex;gap:6px;flex-wrap:wrap}
+.rank-btn{background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--text2);padding:5px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;transition:all .18s;white-space:nowrap}
+.rank-btn:hover{border-color:var(--gold);color:var(--gold)}
+.rank-btn.active{background:var(--gold);border-color:var(--gold);color:#000;font-weight:700}
+.sortable{cursor:pointer;user-select:none}
+.sortable:hover{color:var(--gold)}
+.sort-arrow{color:var(--gold);font-size:10px}
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1rem;align-items:center}
+</style>
+<script>
+let currentSort = 'mktcap';
+
+const REITS = [
+  {t:'PLD',  n:'Prologis Inc.',           p:118.40, v:0.65,  mktcap:108e9, dy:3.2, pvp:1.42, v12:5.8,  vol:'US$1.2B', volNum:1.2e9, setor:'Industrial'},
+  {t:'AMT',  n:'American Tower Corp.',    p:192.80, v:0.30,  mktcap:89e9,  dy:3.5, pvp:null,  v12:-2.1, vol:'US$0.9B', volNum:0.9e9, setor:'Infraestrutura'},
+  {t:'EQIX', n:'Equinix Inc.',            p:824.50, v:0.88,  mktcap:78e9,  dy:2.1, pvp:3.20,  v12:12.4, vol:'US$0.6B', volNum:0.6e9, setor:'Data Center'},
+  {t:'WELL', n:'Welltower Inc.',          p:96.20,  v:0.42,  mktcap:42e9,  dy:2.8, pvp:2.85,  v12:28.5, vol:'US$0.5B', volNum:0.5e9, setor:'Saúde'},
+  {t:'SPG',  n:'Simon Property Group',   p:148.60, v:-0.25, mktcap:47e9,  dy:5.4, pvp:null,  v12:8.2,  vol:'US$0.7B', volNum:0.7e9, setor:'Varejo'},
+  {t:'DLR',  n:'Digital Realty Trust',   p:148.20, v:1.20,  mktcap:42e9,  dy:3.0, pvp:2.10,  v12:22.8, vol:'US$0.5B', volNum:0.5e9, setor:'Data Center'},
+  {t:'O',    n:'Realty Income Corp.',     p:54.80,  v:0.15,  mktcap:34e9,  dy:5.8, pvp:1.22,  v12:2.1,  vol:'US$0.8B', volNum:0.8e9, setor:'Varejo'},
+  {t:'VTR',  n:'Ventas Inc.',             p:46.20,  v:0.55,  mktcap:18e9,  dy:3.8, pvp:2.40,  v12:18.4, vol:'US$0.3B', volNum:0.3e9, setor:'Saúde'},
+  {t:'ARE',  n:'Alexandria Real Estate', p:112.40, v:-0.40, mktcap:18e9,  dy:4.5, pvp:1.05,  v12:-14.2,vol:'US$0.2B', volNum:0.2e9, setor:'Saúde'},
+  {t:'EQR',  n:'Equity Residential',     p:66.80,  v:0.22,  mktcap:25e9,  dy:4.0, pvp:2.80,  v12:4.5,  vol:'US$0.4B', volNum:0.4e9, setor:'Residencial'},
+  {t:'AVB',  n:'AvalonBay Communities',  p:194.50, v:0.38,  mktcap:26e9,  dy:3.4, pvp:2.60,  v12:8.2,  vol:'US$0.3B', volNum:0.3e9, setor:'Residencial'},
+  {t:'BXP',  n:'Boston Properties',      p:64.20,  v:-0.80, mktcap:10e9,  dy:5.9, pvp:0.88,  v12:-18.5,vol:'US$0.2B', volNum:0.2e9, setor:'Escritório'},
+];
+
+function fmtCap(v) {
+  if (!v) return '—';
+  if (v >= 1e12) return 'US$' + (v/1e12).toFixed(2) + 'T';
+  if (v >= 1e9)  return 'US$' + (v/1e9).toFixed(0)  + 'B';
+  return 'US$' + (v/1e6).toFixed(0) + 'M';
+}
+
+function setRank(el) {
+  document.querySelectorAll('.rank-btn').forEach(b => b.classList.remove('active'));
+  if (el.classList.contains('rank-btn')) el.classList.add('active');
+  currentSort = el.dataset.sort;
+  document.querySelectorAll('.sort-arrow').forEach(e => e.textContent = '');
+  const th = document.querySelector(`th[data-sort="${currentSort}"] .sort-arrow`);
+  if (th) th.textContent = ' ↓';
+  filterTable();
+}
+
+function renderTable(arr) {
+  const tb = document.getElementById('tbody');
+  if (!arr.length) { tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text3)">Nenhum resultado</td></tr>'; return; }
+  tb.innerHTML = '';
+  arr.forEach((d, i) => {
+    const tr = document.createElement('tr');
+    tr.style.animationDelay = (i * 0.015) + 's';
+    tr.className = 'fade-in'; tr.style.cursor = 'pointer';
+    const vCls = d.v >= 0 ? 'up-pill' : 'dn-pill';
+    const v12Cls = d.v12 >= 0 ? 'up' : 'dn';
+    const pvpCls = d.pvp && d.pvp < 1 ? 'up' : '';
+    tr.innerHTML = `
+      <td><div style="display:flex;align-items:center;gap:10px">
+        ${logoHtml(d.t, 32)}
+        <div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></div>
+      </div></td>
+      <td class="r" style="font-family:var(--font-mono)">US$${d.p.toFixed(2)}</td>
+      <td class="r"><span class="pill ${vCls}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>
+      <td class="r" style="color:var(--text2)">${fmtCap(d.mktcap)}</td>
+      <td class="r gold">${d.dy.toFixed(1)}%</td>
+      <td class="r ${pvpCls}">${d.pvp ? d.pvp.toFixed(2) : '—'}</td>
+      <td class="r ${v12Cls}">${d.v12 >= 0 ? '+' : ''}${d.v12.toFixed(1)}%</td>
+      <td class="r" style="color:var(--text3);font-size:11px">${d.setor}</td>`;
+    tr.onclick = () => location.href = `ativo.html?t=${d.t}&tipo=reit`;
+    tb.appendChild(tr);
+  });
+}
+
+function filterTable() {
+  const q = (document.getElementById('f-search').value || '').toLowerCase();
+  const setor = document.getElementById('f-setor').value;
+  let arr = REITS.filter(d => {
+    const mQ = !q || d.t.toLowerCase().includes(q) || d.n.toLowerCase().includes(q);
+    const mS = !setor || d.setor === setor;
+    return mQ && mS;
+  });
+  const k = currentSort;
+  if      (k === 'dy')    arr.sort((a,b) => b.dy - a.dy);
+  else if (k === 'pvp')   arr.sort((a,b) => (a.pvp||999) - (b.pvp||999));
+  else if (k === 'v12')   arr.sort((a,b) => b.v12 - a.v12);
+  else if (k === 'liq')   arr.sort((a,b) => (b.volNum||0) - (a.volNum||0));
+  else if (k === 'p')     arr.sort((a,b) => b.p - a.p);
+  else                    arr.sort((a,b) => (b.mktcap||0) - (a.mktcap||0));
+  renderTable(arr);
+}
+
+function renderSidebar() {
+  document.getElementById('top-dy').innerHTML = [...REITS].sort((a,b)=>b.dy-a.dy).slice(0,5).map(d=>`
+    <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}&tipo=reit'">
+      <div style="display:flex;align-items:center;gap:8px">
+        ${logoHtml(d.t,26)}
+        <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      </div>
+      <span class="pill gold-pill">${d.dy.toFixed(1)}%</span>
+    </div>`).join('');
+
+  document.getElementById('top-altas').innerHTML = [...REITS].sort((a,b)=>b.v-a.v).slice(0,5).map(d=>`
+    <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}&tipo=reit'">
+      <div style="display:flex;align-items:center;gap:8px">
+        ${logoHtml(d.t,26)}
+        <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      </div>
+      <div style="text-align:right">
+        <div class="mover-price">US$${d.p.toFixed(2)}</div>
+        <div class="mover-chg ${d.v>=0?'up':'dn'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</div>
+      </div>
+    </div>`).join('');
+
+  const desc = [...REITS].filter(d=>d.pvp&&d.pvp<1).sort((a,b)=>a.pvp-b.pvp);
+  document.getElementById('top-pvp').innerHTML = desc.length
+    ? desc.map(d=>`
+      <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}&tipo=reit'">
+        <div style="display:flex;align-items:center;gap:8px">
+          ${logoHtml(d.t,26)}
+          <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+        </div>
+        <span class="pill up-pill">${d.pvp.toFixed(2)}</span>
+      </div>`).join('')
+    : '<div style="color:var(--text3);font-size:12px">Nenhum com P/VP &lt; 1</div>';
+
+  const segs = {};
+  REITS.forEach(d => { segs[d.setor] = (segs[d.setor]||0)+1; });
+  document.getElementById('seg-list').innerHTML = Object.entries(segs).sort((a,b)=>b[1]-a[1]).map(([s,n])=>`
+    <div class="mover-item" style="cursor:pointer" onclick="document.getElementById('f-setor').value='${s}';filterTable()">
+      <span style="font-size:12px;font-weight:700">${s}</span><span class="pill gold-pill">${n}</span>
+    </div>`).join('');
+}
+
+async function init() {
+  await loadData();
+  filterTable();
+  renderSidebar();
+  const ts = document.getElementById('data-timestamp');
+  if (ts) ts.textContent = '· Dados demonstrativos';
+}
+init();
+</script>
+</body>
+</html>

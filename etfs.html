@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ETFs — Mais Valor</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<div class="page-hero fade-in">
+  <h1>ETFs <em>B3 &amp; EUA</em></h1>
+  <p>Exchange Traded Funds — fundos de índice listados na B3 e nas bolsas americanas.
+    <span id="data-timestamp" style="color:var(--gold);font-size:12px"></span></p>
+</div>
+
+<div class="container">
+  <div class="main-grid">
+    <div class="fade-in-1">
+      <div class="filter-bar">
+        <input class="filter-input" placeholder="🔍 Buscar por ticker ou nome..." style="flex:1;max-width:300px" oninput="filterTable()" id="f-search">
+        <select class="filter-select" onchange="filterTable()" id="f-mercado">
+          <option value="">B3 + EUA</option>
+          <option value="BR">🇧🇷 B3</option>
+          <option value="EUA">🇺🇸 EUA</option>
+        </select>
+        <select class="filter-select" onchange="filterTable()" id="f-tipo">
+          <option value="">Todos os tipos</option>
+          <option value="Ações BR">Ações BR</option>
+          <option value="Internacional BR">Internacional BR</option>
+          <option value="Renda Fixa BR">Renda Fixa BR</option>
+          <option value="Ações EUA">Ações EUA</option>
+          <option value="Bonds EUA">Bonds EUA</option>
+          <option value="Setorial EUA">Setorial EUA</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <div class="ranking-bar">
+          <span class="ranking-label">Ranking por:</span>
+          <div class="ranking-btns">
+            <button class="rank-btn active" data-sort="aum" onclick="setRank(this)">Patrimônio</button>
+            <button class="rank-btn" data-sort="dy" onclick="setRank(this)">Dividend Yield</button>
+            <button class="rank-btn" data-sort="v12" onclick="setRank(this)">Retorno 12m</button>
+            <button class="rank-btn" data-sort="liq" onclick="setRank(this)">Liquidez</button>
+            <button class="rank-btn" data-sort="ter" onclick="setRank(this)">Menor Taxa</button>
+          </div>
+        </div>
+        <table class="data-table">
+          <thead><tr>
+            <th>Ativo</th>
+            <th class="r sortable" data-sort="aum" onclick="setRank(this)">Patrimônio <span class="sort-arrow"></span></th>
+            <th class="r sortable" data-sort="ter" onclick="setRank(this)">Taxa a.a. <span class="sort-arrow"></span></th>
+            <th class="r sortable" data-sort="dy" onclick="setRank(this)">DY 12m <span class="sort-arrow"></span></th>
+            <th class="r sortable" data-sort="v12" onclick="setRank(this)">Retorno 12m <span class="sort-arrow"></span></th>
+            <th class="r sortable" data-sort="liq" onclick="setRank(this)">Liquidez <span class="sort-arrow"></span></th>
+            <th class="r">Tipo</th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="sidebar fade-in-2">
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Menores Taxas</div></div>
+        <div id="top-ter"><div style="color:var(--text3);font-size:12px">—</div></div>
+      </div>
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Maiores Retornos 12m</div></div>
+        <div id="top-v12"><div style="color:var(--text3);font-size:12px">—</div></div>
+      </div>
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Por Tipo</div></div>
+        <div id="tipo-list"><div style="color:var(--text3);font-size:12px">—</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="data.js"></script>
+<script src="nav.js"></script>
+<style>
+.ranking-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 0 8px}
+.ranking-label{font-size:13px;color:var(--text3);white-space:nowrap;font-weight:500}
+.ranking-btns{display:flex;gap:6px;flex-wrap:wrap}
+.rank-btn{background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--text2);padding:5px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;transition:all .18s;white-space:nowrap}
+.rank-btn:hover{border-color:var(--gold);color:var(--gold)}
+.rank-btn.active{background:var(--gold);border-color:var(--gold);color:#000;font-weight:700}
+.sortable{cursor:pointer;user-select:none}
+.sortable:hover{color:var(--gold)}
+.sort-arrow{color:var(--gold);font-size:10px}
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1rem;align-items:center}
+</style>
+<script>
+let currentSort = 'aum';
+
+const ETFS = [
+  // Brasil (B3)
+  {t:'BOVA11', n:'iShares Ibovespa',         p:115.80, v:0.42,  aum:12.1e9, ter:0.10, dy:3.2, v12:8.5,  vol:'R$180M', volNum:180e6, tipo:'Ações BR',         mercado:'BR'},
+  {t:'IVVB11', n:'iShares S&P 500 (BR)',     p:312.45, v:0.85,  aum:9.8e9,  ter:0.23, dy:1.2, v12:22.4, vol:'R$95M',  volNum:95e6,  tipo:'Internacional BR', mercado:'BR'},
+  {t:'SMAL11', n:'iShares Small Cap',        p:98.20,  v:-0.31, aum:3.2e9,  ter:0.50, dy:2.8, v12:-4.2, vol:'R$28M',  volNum:28e6,  tipo:'Ações BR',         mercado:'BR'},
+  {t:'DIVO11', n:'It Now IDIV',              p:88.50,  v:0.18,  aum:2.4e9,  ter:0.30, dy:5.8, v12:6.1,  vol:'R$22M',  volNum:22e6,  tipo:'Ações BR',         mercado:'BR'},
+  {t:'XFIX11', n:'XP ETF IFIX',             p:82.40,  v:0.10,  aum:1.1e9,  ter:0.30, dy:8.2, v12:2.1,  vol:'R$8M',   volNum:8e6,   tipo:'Ações BR',         mercado:'BR'},
+  {t:'FIXA11', n:'Trend DI Simples',         p:105.20, v:0.08,  aum:2.8e9,  ter:0.19, dy:12.4,v12:12.8, vol:'R$12M',  volNum:12e6,  tipo:'Renda Fixa BR',    mercado:'BR'},
+  {t:'HASH11', n:'Hashdex Cripto',           p:42.30,  v:3.20,  aum:0.8e9,  ter:1.30, dy:0.0, v12:45.2, vol:'R$12M',  volNum:12e6,  tipo:'Internacional BR', mercado:'BR'},
+  // EUA
+  {t:'SPY',    n:'SPDR S&P 500 ETF',        p:485.20, v:0.55,  aum:4.8e11, ter:0.09, dy:1.3, v12:24.8, vol:'US$18B', volNum:18e9,  tipo:'Ações EUA',        mercado:'EUA'},
+  {t:'QQQ',    n:'Invesco QQQ Trust',        p:412.30, v:1.10,  aum:2.1e11, ter:0.20, dy:0.6, v12:32.1, vol:'US$12B', volNum:12e9,  tipo:'Ações EUA',        mercado:'EUA'},
+  {t:'VTI',    n:'Vanguard Total Stock Mkt', p:228.80, v:0.48,  aum:3.8e11, ter:0.03, dy:1.4, v12:22.5, vol:'US$5B',  volNum:5e9,   tipo:'Ações EUA',        mercado:'EUA'},
+  {t:'VNQ',    n:'Vanguard Real Estate ETF', p:84.50,  v:0.32,  aum:3.2e10, ter:0.13, dy:4.5, v12:5.2,  vol:'US$0.8B',volNum:0.8e9, tipo:'Setorial EUA',    mercado:'EUA'},
+  {t:'BND',    n:'Vanguard Total Bond Mkt',  p:72.40,  v:-0.12, aum:1.1e11, ter:0.03, dy:3.8, v12:-1.2, vol:'US$2B',  volNum:2e9,   tipo:'Bonds EUA',        mercado:'EUA'},
+  {t:'GLD',    n:'SPDR Gold Shares',         p:198.40, v:0.65,  aum:5.8e10, ter:0.40, dy:0.0, v12:14.2, vol:'US$1.2B',volNum:1.2e9, tipo:'Setorial EUA',    mercado:'EUA'},
+];
+
+function fmtAUM(v, mercado) {
+  if (!v) return '—';
+  const prefix = mercado === 'BR' ? 'R$' : 'US$';
+  if (v >= 1e12) return prefix + (v/1e12).toFixed(1) + 'T';
+  if (v >= 1e9)  return prefix + (v/1e9).toFixed(1)  + 'B';
+  if (v >= 1e6)  return prefix + (v/1e6).toFixed(0)  + 'M';
+  return prefix + v.toLocaleString();
+}
+
+function setRank(el) {
+  document.querySelectorAll('.rank-btn').forEach(b => b.classList.remove('active'));
+  if (el.classList.contains('rank-btn')) el.classList.add('active');
+  currentSort = el.dataset.sort;
+  document.querySelectorAll('.sort-arrow').forEach(e => e.textContent = '');
+  const th = document.querySelector(`th[data-sort="${currentSort}"] .sort-arrow`);
+  if (th) th.textContent = ' ↓';
+  filterTable();
+}
+
+function renderTable(arr) {
+  const tb = document.getElementById('tbody');
+  if (!arr.length) { tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text3)">Nenhum resultado</td></tr>'; return; }
+  tb.innerHTML = '';
+  arr.forEach((d, i) => {
+    const tr = document.createElement('tr');
+    tr.style.animationDelay = (i * 0.015) + 's';
+    tr.className = 'fade-in'; tr.style.cursor = 'pointer';
+    const v12Cls = d.v12 >= 0 ? 'up' : 'dn';
+    const pricePrefix = d.mercado === 'BR' ? 'R$' : 'US$';
+    tr.innerHTML = `
+      <td><div style="display:flex;align-items:center;gap:10px">
+        ${logoHtml(d.t, 32)}
+        <div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></div>
+      </div></td>
+      <td class="r" style="color:var(--text2)">${fmtAUM(d.aum, d.mercado)}</td>
+      <td class="r" style="color:var(--text2)">${d.ter.toFixed(2)}%</td>
+      <td class="r gold">${d.dy > 0 ? d.dy.toFixed(1)+'%' : '—'}</td>
+      <td class="r ${v12Cls}">${d.v12 >= 0 ? '+' : ''}${d.v12.toFixed(1)}%</td>
+      <td class="r" style="color:var(--text3);font-size:12px">${d.vol}</td>
+      <td class="r" style="color:var(--text3);font-size:11px">${d.tipo}</td>`;
+    tr.onclick = () => location.href = `ativo.html?t=${d.t}&tipo=etf`;
+    tb.appendChild(tr);
+  });
+}
+
+function filterTable() {
+  const q = (document.getElementById('f-search').value || '').toLowerCase();
+  const mercado = document.getElementById('f-mercado').value;
+  const tipo = document.getElementById('f-tipo').value;
+  let arr = ETFS.filter(d => {
+    const mQ = !q || d.t.toLowerCase().includes(q) || d.n.toLowerCase().includes(q);
+    const mM = !mercado || d.mercado === mercado;
+    const mT = !tipo || d.tipo === tipo;
+    return mQ && mM && mT;
+  });
+  const k = currentSort;
+  if      (k === 'dy')  arr.sort((a,b) => b.dy - a.dy);
+  else if (k === 'ter') arr.sort((a,b) => a.ter - b.ter);
+  else if (k === 'v12') arr.sort((a,b) => b.v12 - a.v12);
+  else if (k === 'liq') arr.sort((a,b) => (b.volNum||0) - (a.volNum||0));
+  else                  arr.sort((a,b) => (b.aum||0) - (a.aum||0));
+  renderTable(arr);
+}
+
+function renderSidebar() {
+  document.getElementById('top-ter').innerHTML = [...ETFS].sort((a,b)=>a.ter-b.ter).slice(0,5).map(d=>`
+    <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}&tipo=etf'">
+      <div style="display:flex;align-items:center;gap:8px">
+        ${logoHtml(d.t,26)}
+        <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.n.slice(0,20)}</div></div>
+      </div>
+      <span class="pill gold-pill">${d.ter.toFixed(2)}%</span>
+    </div>`).join('');
+
+  document.getElementById('top-v12').innerHTML = [...ETFS].sort((a,b)=>b.v12-a.v12).slice(0,5).map(d=>`
+    <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}&tipo=etf'">
+      <div style="display:flex;align-items:center;gap:8px">
+        ${logoHtml(d.t,26)}
+        <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.n.slice(0,20)}</div></div>
+      </div>
+      <span class="pill ${d.v12>=0?'up':'dn'}-pill">${d.v12>=0?'+':''}${d.v12.toFixed(1)}%</span>
+    </div>`).join('');
+
+  const tipos = {};
+  ETFS.forEach(d => { tipos[d.tipo] = (tipos[d.tipo]||0)+1; });
+  document.getElementById('tipo-list').innerHTML = Object.entries(tipos).sort((a,b)=>b[1]-a[1]).map(([s,n])=>`
+    <div class="mover-item" style="cursor:pointer" onclick="document.getElementById('f-tipo').value='${s}';filterTable()">
+      <span style="font-size:12px;font-weight:700">${s}</span><span class="pill gold-pill">${n}</span>
+    </div>`).join('');
+}
+
+async function init() {
+  await loadData();
+  filterTable();
+  renderSidebar();
+  const ts = document.getElementById('data-timestamp');
+  if (ts) ts.textContent = '· Dados demonstrativos';
+}
+init();
+</script>
+</body>
+</html>

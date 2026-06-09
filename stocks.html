@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stocks EUA — Mais Valor</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<div class="page-hero fade-in">
+  <h1>Stocks <em>EUA</em></h1>
+  <p>Ações listadas nas bolsas americanas (NYSE, NASDAQ).
+    <span id="data-timestamp" style="color:var(--gold);font-size:12px"></span></p>
+</div>
+
+<div class="container">
+  <div class="main-grid">
+    <div class="fade-in-1">
+      <div class="filter-bar">
+        <input class="filter-input" placeholder="🔍 Buscar por ticker ou nome..." style="flex:1;max-width:300px" oninput="filterTable()" id="f-search">
+        <select class="filter-select" onchange="filterTable()" id="f-setor">
+          <option value="">Todos os setores</option>
+          <option value="Tecnologia">Tecnologia</option>
+          <option value="Saúde">Saúde</option>
+          <option value="Financeiro">Financeiro</option>
+          <option value="Consumo">Consumo</option>
+          <option value="Energia">Energia</option>
+          <option value="Industrial">Industrial</option>
+          <option value="Comunicação">Comunicação</option>
+        </select>
+        <select class="filter-select" onchange="filterTable()" id="f-bolsa">
+          <option value="">NYSE + NASDAQ</option>
+          <option value="NASDAQ">NASDAQ</option>
+          <option value="NYSE">NYSE</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <div class="ranking-bar">
+          <span class="ranking-label">Ranking por:</span>
+          <div class="ranking-btns">
+            <button class="rank-btn active" data-sort="mktcap" onclick="setRank(this)">Market Cap</button>
+            <button class="rank-btn" data-sort="dy" onclick="setRank(this)">Dividend Yield</button>
+            <button class="rank-btn" data-sort="v12" onclick="setRank(this)">Retorno 12m</button>
+            <button class="rank-btn" data-sort="pl" onclick="setRank(this)">P/L</button>
+            <button class="rank-btn" data-sort="liq" onclick="setRank(this)">Liquidez</button>
+          </div>
+        </div>
+        <table class="data-table">
+          <thead><tr>
+            <th>Ativo</th>
+            <th class="r sortable" data-sort="p" onclick="setRank(this)">Preço <span class="sort-arrow"></span></th>
+            <th class="r">Hoje</th>
+            <th class="r sortable" data-sort="mktcap" onclick="setRank(this)">Mkt Cap <span class="sort-arrow"></span></th>
+            <th class="r sortable" data-sort="dy" onclick="setRank(this)">DY 12m <span class="sort-arrow"></span></th>
+            <th class="r sortable" data-sort="pl" onclick="setRank(this)">P/L <span class="sort-arrow"></span></th>
+            <th class="r sortable" data-sort="v12" onclick="setRank(this)">Ret. 12m <span class="sort-arrow"></span></th>
+            <th class="r">Setor</th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="sidebar fade-in-2">
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Maiores Altas</div></div>
+        <div id="top-altas"><div style="color:var(--text3);font-size:12px">—</div></div>
+      </div>
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Maiores Baixas</div></div>
+        <div id="top-baixas"><div style="color:var(--text3);font-size:12px">—</div></div>
+      </div>
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Maior DY</div></div>
+        <div id="top-dy"><div style="color:var(--text3);font-size:12px">—</div></div>
+      </div>
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Por Setor</div></div>
+        <div id="setor-list"><div style="color:var(--text3);font-size:12px">—</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="data.js"></script>
+<script src="nav.js"></script>
+<style>
+.ranking-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 0 8px}
+.ranking-label{font-size:13px;color:var(--text3);white-space:nowrap;font-weight:500}
+.ranking-btns{display:flex;gap:6px;flex-wrap:wrap}
+.rank-btn{background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--text2);padding:5px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;transition:all .18s;white-space:nowrap}
+.rank-btn:hover{border-color:var(--gold);color:var(--gold)}
+.rank-btn.active{background:var(--gold);border-color:var(--gold);color:#000;font-weight:700}
+.sortable{cursor:pointer;user-select:none}
+.sortable:hover{color:var(--gold)}
+.sort-arrow{color:var(--gold);font-size:10px}
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1rem;align-items:center}
+</style>
+<script>
+let allData = [], currentSort = 'mktcap';
+
+const STOCKS = [
+  {t:'AAPL',  n:'Apple Inc.',             p:189.50, v:0.82,  mktcap:2.95e12, dy:0.5,  pl:29.8, v12:18.2, vol:'US$52B', volNum:52e9,  setor:'Tecnologia',  bolsa:'NASDAQ'},
+  {t:'MSFT',  n:'Microsoft Corp.',         p:415.20, v:0.65,  mktcap:3.08e12, dy:0.7,  pl:36.2, v12:24.5, vol:'US$21B', volNum:21e9,  setor:'Tecnologia',  bolsa:'NASDAQ'},
+  {t:'NVDA',  n:'NVIDIA Corp.',            p:875.40, v:2.10,  mktcap:2.15e12, dy:0.04, pl:68.5, v12:192.4,vol:'US$48B', volNum:48e9,  setor:'Tecnologia',  bolsa:'NASDAQ'},
+  {t:'GOOGL', n:'Alphabet Inc.',           p:172.30, v:0.44,  mktcap:2.12e12, dy:0.0,  pl:25.4, v12:32.1, vol:'US$18B', volNum:18e9,  setor:'Tecnologia',  bolsa:'NASDAQ'},
+  {t:'AMZN',  n:'Amazon.com Inc.',         p:185.60, v:1.20,  mktcap:1.95e12, dy:0.0,  pl:52.1, v12:41.8, vol:'US$35B', volNum:35e9,  setor:'Consumo',     bolsa:'NASDAQ'},
+  {t:'META',  n:'Meta Platforms Inc.',     p:502.30, v:1.85,  mktcap:1.28e12, dy:0.4,  pl:28.6, v12:55.3, vol:'US$22B', volNum:22e9,  setor:'Comunicação', bolsa:'NASDAQ'},
+  {t:'TSLA',  n:'Tesla Inc.',              p:248.50, v:-1.20, mktcap:0.79e12, dy:0.0,  pl:62.4, v12:-12.8,vol:'US$28B', volNum:28e9,  setor:'Consumo',     bolsa:'NASDAQ'},
+  {t:'BRK.B', n:'Berkshire Hathaway B',   p:388.20, v:0.22,  mktcap:0.85e12, dy:0.0,  pl:21.2, v12:14.2, vol:'US$4B',  volNum:4e9,   setor:'Financeiro',  bolsa:'NYSE'},
+  {t:'JPM',   n:'JPMorgan Chase & Co.',   p:198.40, v:0.55,  mktcap:0.57e12, dy:2.2,  pl:12.1, v12:22.8, vol:'US$8B',  volNum:8e9,   setor:'Financeiro',  bolsa:'NYSE'},
+  {t:'JNJ',   n:'Johnson & Johnson',      p:152.80, v:-0.30, mktcap:0.37e12, dy:3.1,  pl:15.8, v12:-4.5, vol:'US$5B',  volNum:5e9,   setor:'Saúde',       bolsa:'NYSE'},
+  {t:'XOM',   n:'Exxon Mobil Corp.',      p:112.60, v:0.40,  mktcap:0.45e12, dy:3.5,  pl:14.2, v12:8.1,  vol:'US$14B', volNum:14e9,  setor:'Energia',     bolsa:'NYSE'},
+  {t:'V',     n:'Visa Inc.',              p:274.50, v:0.35,  mktcap:0.56e12, dy:0.8,  pl:31.4, v12:19.6, vol:'US$7B',  volNum:7e9,   setor:'Financeiro',  bolsa:'NYSE'},
+  {t:'WMT',   n:'Walmart Inc.',           p:168.90, v:0.28,  mktcap:0.46e12, dy:1.3,  pl:28.1, v12:26.4, vol:'US$6B',  volNum:6e9,   setor:'Consumo',     bolsa:'NYSE'},
+  {t:'UNH',   n:'UnitedHealth Group',     p:492.30, v:-0.80, mktcap:0.46e12, dy:1.5,  pl:19.6, v12:-8.2, vol:'US$4B',  volNum:4e9,   setor:'Saúde',       bolsa:'NYSE'},
+  {t:'GE',    n:'GE Aerospace',           p:162.40, v:1.10,  mktcap:0.18e12, dy:0.7,  pl:35.8, v12:82.5, vol:'US$3B',  volNum:3e9,   setor:'Industrial',  bolsa:'NYSE'},
+];
+
+function fmtCap(v) {
+  if (!v) return '—';
+  if (v >= 1e12) return 'US$' + (v/1e12).toFixed(2) + 'T';
+  if (v >= 1e9)  return 'US$' + (v/1e9).toFixed(0)  + 'B';
+  return 'US$' + (v/1e6).toFixed(0) + 'M';
+}
+
+function setRank(el) {
+  document.querySelectorAll('.rank-btn').forEach(b => b.classList.remove('active'));
+  if (el.classList.contains('rank-btn')) el.classList.add('active');
+  currentSort = el.dataset.sort;
+  document.querySelectorAll('.sort-arrow').forEach(e => e.textContent = '');
+  const th = document.querySelector(`th[data-sort="${currentSort}"] .sort-arrow`);
+  if (th) th.textContent = ' ↓';
+  filterTable();
+}
+
+function renderTable(arr) {
+  const tb = document.getElementById('tbody');
+  if (!arr.length) { tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text3)">Nenhum resultado</td></tr>'; return; }
+  tb.innerHTML = '';
+  arr.forEach((d, i) => {
+    const tr = document.createElement('tr');
+    tr.style.animationDelay = (i * 0.015) + 's';
+    tr.className = 'fade-in'; tr.style.cursor = 'pointer';
+    const vCls = d.v >= 0 ? 'up-pill' : 'dn-pill';
+    const v12Cls = d.v12 >= 0 ? 'up' : 'dn';
+    tr.innerHTML = `
+      <td><div style="display:flex;align-items:center;gap:10px">
+        ${logoHtml(d.t, 32)}
+        <div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></div>
+      </div></td>
+      <td class="r" style="font-family:var(--font-mono)">US$${d.p.toFixed(2)}</td>
+      <td class="r"><span class="pill ${vCls}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>
+      <td class="r" style="color:var(--text2)">${fmtCap(d.mktcap)}</td>
+      <td class="r gold">${d.dy > 0 ? d.dy.toFixed(1)+'%' : '—'}</td>
+      <td class="r">${d.pl > 0 ? d.pl.toFixed(1)+'x' : '—'}</td>
+      <td class="r ${v12Cls}">${d.v12 >= 0 ? '+' : ''}${d.v12.toFixed(1)}%</td>
+      <td class="r" style="color:var(--text3);font-size:11px">${d.setor}</td>`;
+    tr.onclick = () => location.href = `ativo.html?t=${d.t}&tipo=stock`;
+    tb.appendChild(tr);
+  });
+}
+
+function filterTable() {
+  const q = (document.getElementById('f-search').value || '').toLowerCase();
+  const setor = document.getElementById('f-setor').value;
+  const bolsa = document.getElementById('f-bolsa').value;
+  let arr = STOCKS.filter(d => {
+    const mQ = !q || d.t.toLowerCase().includes(q) || d.n.toLowerCase().includes(q);
+    const mS = !setor || d.setor === setor;
+    const mB = !bolsa || d.bolsa === bolsa;
+    return mQ && mS && mB;
+  });
+  const k = currentSort;
+  if      (k === 'dy')    arr.sort((a,b) => b.dy - a.dy);
+  else if (k === 'pl')    arr.sort((a,b) => (a.pl||999) - (b.pl||999));
+  else if (k === 'v12')   arr.sort((a,b) => b.v12 - a.v12);
+  else if (k === 'liq')   arr.sort((a,b) => (b.volNum||0) - (a.volNum||0));
+  else if (k === 'p')     arr.sort((a,b) => b.p - a.p);
+  else                    arr.sort((a,b) => (b.mktcap||0) - (a.mktcap||0));
+  renderTable(arr);
+}
+
+function renderSidebar() {
+  const sorted = [...STOCKS].sort((a,b) => b.v - a.v);
+
+  document.getElementById('top-altas').innerHTML = sorted.slice(0,5).map(d => `
+    <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}&tipo=stock'">
+      <div style="display:flex;align-items:center;gap:8px">
+        ${logoHtml(d.t,26)}
+        <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      </div>
+      <div style="text-align:right">
+        <div class="mover-price">US$${d.p.toFixed(2)}</div>
+        <div class="mover-chg up">+${d.v.toFixed(2)}%</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('top-baixas').innerHTML = [...sorted].reverse().slice(0,5).map(d => `
+    <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}&tipo=stock'">
+      <div style="display:flex;align-items:center;gap:8px">
+        ${logoHtml(d.t,26)}
+        <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      </div>
+      <div style="text-align:right">
+        <div class="mover-price">US$${d.p.toFixed(2)}</div>
+        <div class="mover-chg dn">${d.v.toFixed(2)}%</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('top-dy').innerHTML = [...STOCKS].filter(d=>d.dy>0).sort((a,b)=>b.dy-a.dy).slice(0,5).map(d => `
+    <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}&tipo=stock'">
+      <div style="display:flex;align-items:center;gap:8px">
+        ${logoHtml(d.t,26)}
+        <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.n.slice(0,20)}</div></div>
+      </div>
+      <span class="pill gold-pill">${d.dy.toFixed(1)}%</span>
+    </div>`).join('');
+
+  const setores = {};
+  STOCKS.forEach(d => { setores[d.setor] = (setores[d.setor]||0)+1; });
+  document.getElementById('setor-list').innerHTML = Object.entries(setores).sort((a,b)=>b[1]-a[1]).map(([s,n])=>`
+    <div class="mover-item" style="cursor:pointer" onclick="document.getElementById('f-setor').value='${s}';filterTable()">
+      <span style="font-size:12px;font-weight:700">${s}</span><span class="pill gold-pill">${n}</span>
+    </div>`).join('');
+}
+
+async function init() {
+  await loadData();
+  filterTable();
+  renderSidebar();
+  const ts = document.getElementById('data-timestamp');
+  if (ts) ts.textContent = '· Dados demonstrativos';
+}
+init();
+</script>
+</body>
+</html>
