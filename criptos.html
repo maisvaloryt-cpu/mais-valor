@@ -8,6 +8,13 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<style>
+.sortable-th{cursor:pointer;user-select:none;white-space:nowrap}
+.sortable-th:hover{color:var(--gold)}
+.th-arrow{margin-left:4px;font-size:10px;color:var(--gold);opacity:0}
+.sortable-th.th-active .th-arrow{opacity:1}
+.sortable-th.th-active{color:var(--gold)}
+</style>
 <div id="nav-placeholder"></div>
 
 <div class="page-hero fade-in">
@@ -72,12 +79,12 @@
         <table class="data-table">
           <thead><tr>
             <th>#</th>
-            <th>Cripto</th>
-            <th class="r">Preço (USD)</th>
-            <th class="r">24h</th>
-            <th class="r">7 dias</th>
-            <th class="r">Market Cap</th>
-            <th class="r">Volume 24h</th>
+            <th class="sortable-th" onclick="thSort('name')"><span>Cripto</span><span class="th-arrow" id="arr-name"></span></th>
+            <th class="sortable-th r" onclick="thSort('price')"><span>Preço (USD)</span><span class="th-arrow" id="arr-price"></span></th>
+            <th class="sortable-th r" onclick="thSort('chg24')"><span>24h</span><span class="th-arrow" id="arr-chg24"></span></th>
+            <th class="sortable-th r" onclick="thSort('chg7')"><span>7 dias</span><span class="th-arrow" id="arr-chg7"></span></th>
+            <th class="sortable-th r" onclick="thSort('mcap')"><span>Market Cap</span><span class="th-arrow" id="arr-mcap"></span></th>
+            <th class="sortable-th r" onclick="thSort('vol')"><span>Volume 24h</span><span class="th-arrow" id="arr-vol"></span></th>
           </tr></thead>
           <tbody id="crypto-tbody">
             <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text3)">
@@ -118,6 +125,30 @@
 <script src="nav.js"></script>
 <script>
 let allCryptos = [];
+let thSortDirC = {};
+
+function thSort(col) {
+  thSortDirC[col] = thSortDirC[col] === 'asc' ? 'desc' : 'asc';
+  const asc = thSortDirC[col] === 'asc';
+  document.querySelectorAll('.sortable-th').forEach(th => {
+    th.classList.remove('th-active');
+    const a = th.querySelector('.th-arrow'); if(a) a.textContent='';
+  });
+  const arrEl = document.getElementById('arr-' + col);
+  if(arrEl){ arrEl.closest('.sortable-th').classList.add('th-active'); arrEl.textContent = asc ? '▲' : '▼'; }
+
+  const sorted = [...allCryptos].sort((a, b) => {
+    let va, vb;
+    if(col==='name')  { va=a.name; vb=b.name; return asc ? va.localeCompare(vb) : vb.localeCompare(va); }
+    if(col==='price') { va=a.current_price||0; vb=b.current_price||0; }
+    if(col==='chg24') { va=a.price_change_percentage_24h||0; vb=b.price_change_percentage_24h||0; }
+    if(col==='chg7')  { va=a.price_change_percentage_7d_in_currency||0; vb=b.price_change_percentage_7d_in_currency||0; }
+    if(col==='mcap')  { va=a.market_cap||0; vb=b.market_cap||0; }
+    if(col==='vol')   { va=a.total_volume||0; vb=b.total_volume||0; }
+    return asc ? va-vb : vb-va;
+  });
+  renderTable(sorted);
+}
 let displayLimit = 250;
 
 function fmtUSD(v){

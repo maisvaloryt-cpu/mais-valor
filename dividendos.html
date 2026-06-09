@@ -8,6 +8,13 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<style>
+.sortable-th{cursor:pointer;user-select:none;white-space:nowrap}
+.sortable-th:hover{color:var(--gold)}
+.th-arrow{margin-left:4px;font-size:10px;color:var(--gold);opacity:0}
+.sortable-th.th-active .th-arrow{opacity:1}
+.sortable-th.th-active{color:var(--gold)}
+</style>
 <div id="nav-placeholder"></div>
 
 <div class="page-hero fade-in">
@@ -58,9 +65,12 @@
       <div class="table-wrap">
         <table class="data-table">
           <thead><tr>
-            <th>Ativo</th><th>Tipo</th>
-            <th class="r">Data Com</th><th class="r">Pagamento</th>
-            <th class="r">Valor / cota</th><th class="r">DY estimado</th>
+            <th class="sortable-th" onclick="thSort('t')"><span>Ativo</span><span class="th-arrow" id="arr-t"></span></th>
+            <th>Tipo</th>
+            <th class="sortable-th r" onclick="thSort('com')"><span>Data Com</span><span class="th-arrow" id="arr-com"></span></th>
+            <th class="sortable-th r" onclick="thSort('pag')"><span>Pagamento</span><span class="th-arrow" id="arr-pag"></span></th>
+            <th class="sortable-th r" onclick="thSort('val')"><span>Valor / cota</span><span class="th-arrow" id="arr-val"></span></th>
+            <th class="sortable-th r" onclick="thSort('dy')"><span>DY estimado</span><span class="th-arrow" id="arr-dy"></span></th>
           </tr></thead>
           <tbody id="tbody">
             <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text3)">
@@ -98,6 +108,41 @@
 <script src="data.js"></script><script src="nav.js"></script>
 <script>
 let allDivs = [];
+let thSortDirD = {};
+
+function thSort(col) {
+  thSortDirD[col] = thSortDirD[col] === 'asc' ? 'desc' : 'asc';
+  const asc = thSortDirD[col] === 'asc';
+  document.querySelectorAll('.sortable-th').forEach(th => {
+    th.classList.remove('th-active');
+    const a = th.querySelector('.th-arrow'); if(a) a.textContent='';
+  });
+  const arrEl = document.getElementById('arr-' + col);
+  if(arrEl){ arrEl.closest('.sortable-th').classList.add('th-active'); arrEl.textContent = asc ? '▲' : '▼'; }
+
+  // Reaplica filtro atual e então ordena
+  const q = document.getElementById('f-search').value.toLowerCase();
+  const tipo = document.getElementById('f-tipo').value;
+  const periodo = parseInt(document.getElementById('f-periodo').value)||999;
+  const now = new Date(); now.setHours(0,0,0,0);
+  const limit = new Date(now); limit.setDate(now.getDate()+periodo);
+  let filtered = allDivs.filter(d => {
+    if(q && !d.t.toLowerCase().includes(q) && !(d.n||'').toLowerCase().includes(q)) return false;
+    if(tipo && d.tipo!==tipo) return false;
+    if(periodo<999){ const dt=parseDateBR(d.pag||d.com); if(!dt||dt<now||dt>limit) return false; }
+    return true;
+  });
+
+  filtered.sort((a, b) => {
+    if(col==='t')   return asc ? a.t.localeCompare(b.t) : b.t.localeCompare(a.t);
+    if(col==='com') return asc ? (a.com||'').localeCompare(b.com||'') : (b.com||'').localeCompare(a.com||'');
+    if(col==='pag') return asc ? (a.pag||'').localeCompare(b.pag||'') : (b.pag||'').localeCompare(a.pag||'');
+    if(col==='val') return asc ? (a.val||0)-(b.val||0) : (b.val||0)-(a.val||0);
+    if(col==='dy')  return asc ? parseFloat(a.dy||0)-parseFloat(b.dy||0) : parseFloat(b.dy||0)-parseFloat(a.dy||0);
+    return 0;
+  });
+  renderTable(filtered);
+}
 
 function parseDateBR(str){
   // aceita YYYY-MM-DD ou DD/MM/YYYY

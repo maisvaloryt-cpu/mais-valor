@@ -8,6 +8,13 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<style>
+.sortable-th{cursor:pointer;user-select:none;white-space:nowrap}
+.sortable-th:hover{color:var(--gold)}
+.th-arrow{margin-left:4px;font-size:10px;color:var(--gold);opacity:0}
+.sortable-th.th-active .th-arrow{opacity:1}
+.sortable-th.th-active{color:var(--gold)}
+</style>
 <div id="nav-placeholder"></div>
 <div class="page-hero fade-in">
   <h1>RANKINGS <em>B3</em></h1>
@@ -60,6 +67,38 @@
 <script src="data.js"></script><script src="nav.js"></script>
 <script>
 let currentData=[], currentConfig=null;
+let thSortDirR = {};
+
+function sth(col, label, cls='') {
+  return `<th class="sortable-th ${cls}" onclick="thSortR('${col}')"><span>${label}</span><span class="th-arrow" id="arr-${col}"></span></th>`;
+}
+
+function thSortR(col) {
+  thSortDirR[col] = thSortDirR[col] === 'asc' ? 'desc' : 'asc';
+  const asc = thSortDirR[col] === 'asc';
+  document.querySelectorAll('.sortable-th').forEach(th => {
+    th.classList.remove('th-active');
+    const a = th.querySelector('.th-arrow'); if(a) a.textContent='';
+  });
+  const arrEl = document.getElementById('arr-' + col);
+  if(arrEl){ arrEl.closest('.sortable-th').classList.add('th-active'); arrEl.textContent = asc ? '▲' : '▼'; }
+
+  let sorted = [...currentConfig.getData()];
+  sorted.sort((a, b) => {
+    if(col==='t')      return asc ? a.t.localeCompare(b.t) : b.t.localeCompare(a.t);
+    if(col==='p')      return asc ? (a.p||0)-(b.p||0)       : (b.p||0)-(a.p||0);
+    if(col==='dy')     return asc ? (a.dy||0)-(b.dy||0)     : (b.dy||0)-(a.dy||0);
+    if(col==='pl')     return asc ? (a.pl||0)-(b.pl||0)     : (b.pl||0)-(a.pl||0);
+    if(col==='pvp')    return asc ? (a.pvp||0)-(b.pvp||0)   : (b.pvp||0)-(a.pvp||0);
+    if(col==='roe')    return asc ? (a.roe||0)-(b.roe||0)   : (b.roe||0)-(a.roe||0);
+    if(col==='roic')   return asc ? (a.roic||0)-(b.roic||0) : (b.roic||0)-(a.roic||0);
+    if(col==='v')      return asc ? (a.v||0)-(b.v||0)       : (b.v||0)-(a.v||0);
+    if(col==='vol')    return asc ? (a.volNum||0)-(b.volNum||0) : (b.volNum||0)-(a.volNum||0);
+    if(col==='cresc')  return asc ? (a.cresc5a||0)-(b.cresc5a||0) : (b.cresc5a||0)-(a.cresc5a||0);
+    return 0;
+  });
+  renderTable(sorted);
+}
 
 function assetCell(d){
   return `<td>
@@ -79,7 +118,7 @@ function assetCell(d){
 const configs = {
   'dy-acoes':{title:'Maiores Dividend Yield — Ações',
     getData:()=>[...ACOES].filter(d=>d.dy>0&&d.dy<=50).sort((a,b)=>b.dy-a.dy),
-    head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">DY 12m</th><th class="r">P/L</th><th class="r">Setor</th><th class="r">Hoje</th>',
+    head:`<th>Pos.</th>${sth('t','Ativo')}${sth('p','Preço','r')}${sth('dy','DY 12m','r')}${sth('pl','P/L','r')}${sth('setor','Setor','r')}${sth('v','Hoje','r')}`,
     row:(d,i)=>`<td style="color:var(--text3);font-weight:700">#${i+1}</td>
       ${assetCell(d)}
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
@@ -90,7 +129,7 @@ const configs = {
 
   'dy-fiis':{title:'Maiores Dividend Yield — FIIs',
     getData:()=>[...FIIS].filter(d=>d.dy>0&&d.dy<=50).sort((a,b)=>b.dy-a.dy),
-    head:'<th>Pos.</th><th>FII</th><th class="r">Cota</th><th class="r">DY 12m</th><th class="r">P/VP</th><th class="r">Segmento</th><th class="r">Hoje</th>',
+    head:`<th>Pos.</th>${sth('t','FII')}${sth('p','Cota','r')}${sth('dy','DY 12m','r')}${sth('pvp','P/VP','r')}${sth('setor','Segmento','r')}${sth('v','Hoje','r')}`,
     row:(d,i)=>`<td style="color:var(--text3);font-weight:700">#${i+1}</td>
       ${assetCell(d)}
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
@@ -101,7 +140,7 @@ const configs = {
 
   'altas':{title:'Maiores Altas do Dia',
     getData:()=>[...ACOES,...FIIS].filter(d=>d.v>0).sort((a,b)=>b.v-a.v),
-    head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">Hoje</th><th class="r">DY</th><th class="r">Volume</th>',
+    head:`<th>Pos.</th>${sth('t','Ativo')}${sth('p','Preço','r')}${sth('v','Hoje','r')}${sth('dy','DY','r')}${sth('vol','Volume','r')}`,
     row:(d,i)=>`<td style="color:var(--text3);font-weight:700">#${i+1}</td>
       ${assetCell(d)}
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
@@ -111,7 +150,7 @@ const configs = {
 
   'baixas':{title:'Maiores Baixas do Dia',
     getData:()=>[...ACOES,...FIIS].filter(d=>d.v<0).sort((a,b)=>a.v-b.v),
-    head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">Hoje</th><th class="r">DY</th><th class="r">Volume</th>',
+    head:`<th>Pos.</th>${sth('t','Ativo')}${sth('p','Preço','r')}${sth('v','Hoje','r')}${sth('dy','DY','r')}${sth('vol','Volume','r')}`,
     row:(d,i)=>`<td style="color:var(--text3);font-weight:700">#${i+1}</td>
       ${assetCell(d)}
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
@@ -121,7 +160,7 @@ const configs = {
 
   'pl':{title:'Menor P/L — Ações mais baratas pelo lucro',
     getData:()=>[...ACOES].filter(d=>d.pl&&d.pl>0&&d.pl<100).sort((a,b)=>a.pl-b.pl),
-    head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">P/L</th><th class="r">DY</th><th class="r">ROE</th><th class="r">Setor</th>',
+    head:`<th>Pos.</th>${sth('t','Ativo')}${sth('p','Preço','r')}${sth('pl','P/L','r')}${sth('dy','DY','r')}${sth('roe','ROE','r')}${sth('setor','Setor','r')}`,
     row:(d,i)=>`<td style="color:var(--text3);font-weight:700">#${i+1}</td>
       ${assetCell(d)}
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
@@ -132,7 +171,7 @@ const configs = {
 
   'pvp-acoes':{title:'Menor P/VP — Ações abaixo do valor patrimonial',
     getData:()=>[...ACOES].filter(d=>d.pvp&&d.pvp>0&&d.pvp<5).sort((a,b)=>a.pvp-b.pvp),
-    head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">P/VP</th><th class="r">DY</th><th class="r">P/L</th><th class="r">Setor</th>',
+    head:`<th>Pos.</th>${sth('t','Ativo')}${sth('p','Preço','r')}${sth('pvp','P/VP','r')}${sth('dy','DY','r')}${sth('pl','P/L','r')}${sth('setor','Setor','r')}`,
     row:(d,i)=>`<td style="color:var(--text3);font-weight:700">#${i+1}</td>
       ${assetCell(d)}
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
@@ -143,7 +182,7 @@ const configs = {
 
   'pvp-fiis':{title:'Menor P/VP — FIIs abaixo do valor patrimonial',
     getData:()=>[...FIIS].filter(d=>d.pvp&&d.pvp>0&&d.pvp<2).sort((a,b)=>a.pvp-b.pvp),
-    head:'<th>Pos.</th><th>FII</th><th class="r">Cota</th><th class="r">P/VP</th><th class="r">DY</th><th class="r">Segmento</th>',
+    head:`<th>Pos.</th>${sth('t','FII')}${sth('p','Cota','r')}${sth('pvp','P/VP','r')}${sth('dy','DY','r')}${sth('setor','Segmento','r')}`,
     row:(d,i)=>`<td style="color:var(--text3);font-weight:700">#${i+1}</td>
       ${assetCell(d)}
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
@@ -153,7 +192,7 @@ const configs = {
 
   'roe':{title:'Maior ROE — Retorno sobre Patrimônio',
     getData:()=>[...ACOES].filter(d=>d.roe&&d.roe>0&&d.roe<200).sort((a,b)=>b.roe-a.roe),
-    head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">ROE</th><th class="r">ROIC</th><th class="r">DY</th><th class="r">Setor</th>',
+    head:`<th>Pos.</th>${sth('t','Ativo')}${sth('p','Preço','r')}${sth('roe','ROE','r')}${sth('roic','ROIC','r')}${sth('dy','DY','r')}${sth('setor','Setor','r')}`,
     row:(d,i)=>`<td style="color:var(--text3);font-weight:700">#${i+1}</td>
       ${assetCell(d)}
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
@@ -164,7 +203,7 @@ const configs = {
 
   'cresc':{title:'Maior Crescimento de Receita — 5 anos',
     getData:()=>[...ACOES].filter(d=>d.cresc5a&&d.cresc5a>0&&d.cresc5a<500).sort((a,b)=>b.cresc5a-a.cresc5a),
-    head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">Cresc. 5a</th><th class="r">ROE</th><th class="r">DY</th><th class="r">Setor</th>',
+    head:`<th>Pos.</th>${sth('t','Ativo')}${sth('p','Preço','r')}${sth('cresc','Cresc. 5a','r')}${sth('roe','ROE','r')}${sth('dy','DY','r')}${sth('setor','Setor','r')}`,
     row:(d,i)=>`<td style="color:var(--text3);font-weight:700">#${i+1}</td>
       ${assetCell(d)}
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>

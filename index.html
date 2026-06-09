@@ -8,6 +8,13 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<style>
+.sortable-th{cursor:pointer;user-select:none;white-space:nowrap}
+.sortable-th:hover{color:var(--gold)}
+.th-arrow{margin-left:4px;font-size:10px;color:var(--gold);opacity:0}
+.sortable-th.th-active .th-arrow{opacity:1}
+.sortable-th.th-active{color:var(--gold)}
+</style>
 <div id="nav-placeholder"></div>
 
 <div class="container">
@@ -112,9 +119,14 @@
       <div class="table-wrap">
         <table class="data-table">
           <thead><tr>
-            <th>Ativo</th><th class="r">Preço</th><th class="r">Hoje</th>
-            <th class="r">DY 12m</th><th class="r">P/L</th><th class="r">P/VP</th>
-            <th class="r">Score</th><th class="r">Volume</th>
+            <th class="sortable-th" onclick="thSortIdx('t')"><span>Ativo</span><span class="th-arrow" id="arr-t"></span></th>
+            <th class="sortable-th r" onclick="thSortIdx('p')"><span>Preço</span><span class="th-arrow" id="arr-p"></span></th>
+            <th class="sortable-th r" onclick="thSortIdx('v')"><span>Hoje</span><span class="th-arrow" id="arr-v"></span></th>
+            <th class="sortable-th r" onclick="thSortIdx('dy')"><span>DY 12m</span><span class="th-arrow" id="arr-dy"></span></th>
+            <th class="sortable-th r" onclick="thSortIdx('pl')"><span>P/L</span><span class="th-arrow" id="arr-pl"></span></th>
+            <th class="sortable-th r" onclick="thSortIdx('pvp')"><span>P/VP</span><span class="th-arrow" id="arr-pvp"></span></th>
+            <th class="r">Score</th>
+            <th class="sortable-th r" onclick="thSortIdx('vol')"><span>Volume</span><span class="th-arrow" id="arr-vol"></span></th>
           </tr></thead>
           <tbody id="main-tbody">
             <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text3)">
@@ -169,6 +181,31 @@
 <script>
 let currentTab='acoes', currentData=[], mainChart=null, sel=null, currentRange='1A';
 const SHOW=20;
+let thSortDirIdx = {};
+
+function thSortIdx(col) {
+  thSortDirIdx[col] = thSortDirIdx[col] === 'asc' ? 'desc' : 'asc';
+  const asc = thSortDirIdx[col] === 'asc';
+  document.querySelectorAll('.sortable-th').forEach(th => {
+    th.classList.remove('th-active');
+    const a = th.querySelector('.th-arrow'); if(a) a.textContent='';
+  });
+  const arrEl = document.getElementById('arr-' + col);
+  if(arrEl){ arrEl.closest('.sortable-th').classList.add('th-active'); arrEl.textContent = asc ? '▲' : '▼'; }
+
+  let sorted = [...currentData];
+  sorted.sort((a, b) => {
+    if(col==='t')   return asc ? a.t.localeCompare(b.t) : b.t.localeCompare(a.t);
+    if(col==='p')   return asc ? (a.p||0)-(b.p||0)     : (b.p||0)-(a.p||0);
+    if(col==='v')   return asc ? (a.v||0)-(b.v||0)     : (b.v||0)-(a.v||0);
+    if(col==='dy')  return asc ? (a.dy||0)-(b.dy||0)   : (b.dy||0)-(a.dy||0);
+    if(col==='pl')  return asc ? (a.pl||0)-(b.pl||0)   : (b.pl||0)-(a.pl||0);
+    if(col==='pvp') return asc ? (a.pvp||0)-(b.pvp||0) : (b.pvp||0)-(a.pvp||0);
+    if(col==='vol') return asc ? (a.volNum||0)-(b.volNum||0) : (b.volNum||0)-(a.volNum||0);
+    return 0;
+  });
+  renderTable(sorted);
+}
 
 function renderTable(arr){
   const tb = document.getElementById('main-tbody');
