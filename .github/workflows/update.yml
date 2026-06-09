@@ -144,4 +144,5 @@ jobs:
           git config user.email "bot@maisvalor.com"
           git add data/
           git diff --staged --quiet || git commit -m "📊 Atualização $(date +'%d/%m/%Y %H:%M') — ${{ steps.modo.outputs.modo }}"
+          git pull --rebase origin main
           git push
