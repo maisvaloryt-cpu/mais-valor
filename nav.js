@@ -449,7 +449,6 @@ function renderNav() {
     return `<a href="${l.href}" class="${cls}" style="${style}">${l.label}</a>`;
   }).join('');
 
-  // Injeta CSS do dropdown no <head> para garantir aplicação correta
   if (!document.getElementById('mv-dropdown-style')) {
     const s = document.createElement('style');
     s.id = 'mv-dropdown-style';
@@ -458,7 +457,7 @@ function renderNav() {
       .nav-dropdown-btn{background:transparent;border:none;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;padding:4px 6px;border-radius:6px;transition:color .15s;white-space:nowrap;font-family:inherit}
       .nav-dropdown-btn:hover,.nav-dropdown-btn.active{color:var(--gold)}
       .nav-dropdown{display:none;position:absolute;top:calc(100% + 8px);left:0;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:6px;min-width:160px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.4)}
-      .nav-dropdown-wrap.open .nav-dropdown{display:flex;flex-direction:column;gap:2px}
+      .nav-dropdown-wrap.open .nav-dropdown{display:flex !important;flex-direction:column;gap:2px}
       .nav-dropdown-item{display:block;padding:8px 12px;border-radius:7px;font-size:13px;color:var(--text2);text-decoration:none;transition:background .12s,color .12s;white-space:nowrap}
       .nav-dropdown-item:hover,.nav-dropdown-item.active{background:var(--bg3);color:var(--gold)}
     `;
