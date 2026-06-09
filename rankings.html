@@ -11,11 +11,10 @@
 <div id="nav-placeholder"></div>
 <div class="page-hero fade-in">
   <h1>RANKINGS <em>B3</em></h1>
-  <p>Os melhores e piores desempenhos por diferentes critérios.
-    <span id="data-timestamp" style="color:var(--gold);font-size:12px"></span></p>
+  <p>Os melhores e piores desempenhos por diferentes critérios.</p>
 </div>
 <div class="container">
-  <div class="tabs fade-in-1" style="margin-bottom:1.5rem;flex-wrap:wrap">
+  <div class="tabs fade-in-1">
     <button class="tab active" onclick="render('dy-acoes',this)">DY Ações</button>
     <button class="tab" onclick="render('dy-fiis',this)">DY FIIs</button>
     <button class="tab" onclick="render('altas',this)">Maiores Altas</button>
@@ -40,6 +39,7 @@
         </table>
       </div>
     </div>
+
     <div class="sidebar fade-in-3">
       <div class="card">
         <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Pódio DY Ações</div></div>
@@ -61,86 +61,117 @@
 <script>
 let currentData=[], currentConfig=null;
 
+function assetCell(d){
+  return `<td>
+    <div style="display:flex;align-items:center;gap:10px">
+      ${logoHtml(d.t, 32)}
+      <div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="asset-ticker">${d.t}</div>
+          ${scoreBadge(d)}
+        </div>
+        <div class="asset-name">${d.n?.slice(0,26)||''}</div>
+      </div>
+    </div>
+  </td>`;
+}
+
 const configs = {
-  'dy-acoes':{title:'Maiores Dividend Yield — Ações',getData:()=>[...ACOES].filter(d=>d.dy>0&&d.dy<=50).sort((a,b)=>b.dy-a.dy),
+  'dy-acoes':{title:'Maiores Dividend Yield — Ações',
+    getData:()=>[...ACOES].filter(d=>d.dy>0&&d.dy<=50).sort((a,b)=>b.dy-a.dy),
     head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">DY 12m</th><th class="r">P/L</th><th class="r">Setor</th><th class="r">Hoje</th>',
     row:(d,i)=>`<td style="color:var(--text3);font-weight:700">#${i+1}</td>
-      <td><div style="display:flex;align-items:center;gap:8px">${logoImg(d.t)}<div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></div></div></td>
+      ${assetCell(d)}
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
       <td class="r" style="font-size:16px;font-weight:800;color:var(--gold)">${d.dy.toFixed(1)}%</td>
       <td class="r">${d.pl?(d.pl>0?d.pl.toFixed(1)+'x':'neg.'):'—'}</td>
-      <td class="r" style="color:var(--text3)">${d.setor}</td>
+      <td class="r" style="color:var(--text3);font-size:11px">${d.setor}</td>
       <td class="r"><span class="pill ${d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>`},
-  'dy-fiis':{title:'Maiores Dividend Yield — FIIs',getData:()=>[...FIIS].filter(d=>d.dy>0&&d.dy<=50).sort((a,b)=>b.dy-a.dy),
+
+  'dy-fiis':{title:'Maiores Dividend Yield — FIIs',
+    getData:()=>[...FIIS].filter(d=>d.dy>0&&d.dy<=50).sort((a,b)=>b.dy-a.dy),
     head:'<th>Pos.</th><th>FII</th><th class="r">Cota</th><th class="r">DY 12m</th><th class="r">P/VP</th><th class="r">Segmento</th><th class="r">Hoje</th>',
     row:(d,i)=>`<td style="color:var(--text3);font-weight:700">#${i+1}</td>
-      <td><div style="display:flex;align-items:center;gap:8px">${logoImg(d.t)}<div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></div></div></td>
+      ${assetCell(d)}
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
       <td class="r" style="font-size:16px;font-weight:800;color:var(--gold)">${d.dy.toFixed(1)}%</td>
       <td class="r ${d.pvp&&d.pvp<1?'up':''}">${d.pvp?d.pvp.toFixed(2):'—'}</td>
-      <td class="r" style="color:var(--text3)">${d.setor}</td>
+      <td class="r" style="color:var(--text3);font-size:11px">${d.setor}</td>
       <td class="r"><span class="pill ${d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>`},
-  'altas':{title:'Maiores Altas do Dia',getData:()=>[...ACOES,...FIIS].filter(d=>d.v>0).sort((a,b)=>b.v-a.v),
+
+  'altas':{title:'Maiores Altas do Dia',
+    getData:()=>[...ACOES,...FIIS].filter(d=>d.v>0).sort((a,b)=>b.v-a.v),
     head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">Hoje</th><th class="r">DY</th><th class="r">Volume</th>',
     row:(d,i)=>`<td style="color:var(--text3);font-weight:700">#${i+1}</td>
-      <td><div style="display:flex;align-items:center;gap:8px">${logoImg(d.t)}<div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></div></div></td>
+      ${assetCell(d)}
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
       <td class="r"><span class="pill up-pill">+${d.v.toFixed(2)}%</span></td>
       <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
       <td class="r" style="color:var(--text3)">${d.vol}</td>`},
-  'baixas':{title:'Maiores Baixas do Dia',getData:()=>[...ACOES,...FIIS].filter(d=>d.v<0).sort((a,b)=>a.v-b.v),
+
+  'baixas':{title:'Maiores Baixas do Dia',
+    getData:()=>[...ACOES,...FIIS].filter(d=>d.v<0).sort((a,b)=>a.v-b.v),
     head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">Hoje</th><th class="r">DY</th><th class="r">Volume</th>',
     row:(d,i)=>`<td style="color:var(--text3);font-weight:700">#${i+1}</td>
-      <td><div style="display:flex;align-items:center;gap:8px">${logoImg(d.t)}<div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></div></div></td>
+      ${assetCell(d)}
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
       <td class="r"><span class="pill dn-pill">${d.v.toFixed(2)}%</span></td>
       <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
       <td class="r" style="color:var(--text3)">${d.vol}</td>`},
-  'pl':{title:'Menor P/L — Ações mais baratas pelo lucro',getData:()=>[...ACOES].filter(d=>d.pl&&d.pl>0&&d.pl<100).sort((a,b)=>a.pl-b.pl),
+
+  'pl':{title:'Menor P/L — Ações mais baratas pelo lucro',
+    getData:()=>[...ACOES].filter(d=>d.pl&&d.pl>0&&d.pl<100).sort((a,b)=>a.pl-b.pl),
     head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">P/L</th><th class="r">DY</th><th class="r">ROE</th><th class="r">Setor</th>',
     row:(d,i)=>`<td style="color:var(--text3);font-weight:700">#${i+1}</td>
-      <td><div style="display:flex;align-items:center;gap:8px">${logoImg(d.t)}<div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></div></div></td>
+      ${assetCell(d)}
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
       <td class="r" style="font-size:16px;font-weight:800;color:var(--up)">${d.pl.toFixed(1)}x</td>
       <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
       <td class="r ${d.roe&&d.roe>15?'up':''}">${d.roe?d.roe.toFixed(1)+'%':'—'}</td>
-      <td class="r" style="color:var(--text3)">${d.setor}</td>`},
-  'pvp-acoes':{title:'Menor P/VP — Ações abaixo do valor patrimonial',getData:()=>[...ACOES].filter(d=>d.pvp&&d.pvp>0&&d.pvp<5).sort((a,b)=>a.pvp-b.pvp),
+      <td class="r" style="color:var(--text3);font-size:11px">${d.setor}</td>`},
+
+  'pvp-acoes':{title:'Menor P/VP — Ações abaixo do valor patrimonial',
+    getData:()=>[...ACOES].filter(d=>d.pvp&&d.pvp>0&&d.pvp<5).sort((a,b)=>a.pvp-b.pvp),
     head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">P/VP</th><th class="r">DY</th><th class="r">P/L</th><th class="r">Setor</th>',
     row:(d,i)=>`<td style="color:var(--text3);font-weight:700">#${i+1}</td>
-      <td><div style="display:flex;align-items:center;gap:8px">${logoImg(d.t)}<div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></div></div></td>
+      ${assetCell(d)}
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
       <td class="r" style="font-size:16px;font-weight:800;color:var(--up)">${d.pvp.toFixed(2)}</td>
       <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
       <td class="r">${d.pl?(d.pl>0?d.pl.toFixed(1)+'x':'neg.'):'—'}</td>
-      <td class="r" style="color:var(--text3)">${d.setor}</td>`},
-  'pvp-fiis':{title:'Menor P/VP — FIIs abaixo do valor patrimonial',getData:()=>[...FIIS].filter(d=>d.pvp&&d.pvp>0&&d.pvp<2).sort((a,b)=>a.pvp-b.pvp),
-    head:'<th>Pos.</th><th>FII</th><th class="r">Cota</th><th class="r">P/VP</th><th class="r">DY</th><th class="r">Segmento</th><th class="r">Vacância</th>',
+      <td class="r" style="color:var(--text3);font-size:11px">${d.setor}</td>`},
+
+  'pvp-fiis':{title:'Menor P/VP — FIIs abaixo do valor patrimonial',
+    getData:()=>[...FIIS].filter(d=>d.pvp&&d.pvp>0&&d.pvp<2).sort((a,b)=>a.pvp-b.pvp),
+    head:'<th>Pos.</th><th>FII</th><th class="r">Cota</th><th class="r">P/VP</th><th class="r">DY</th><th class="r">Segmento</th>',
     row:(d,i)=>`<td style="color:var(--text3);font-weight:700">#${i+1}</td>
-      <td><div style="display:flex;align-items:center;gap:8px">${logoImg(d.t)}<div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></div></div></td>
+      ${assetCell(d)}
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
       <td class="r" style="font-size:16px;font-weight:800;color:var(--up)">${d.pvp.toFixed(2)}</td>
       <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
-      <td class="r" style="color:var(--text3)">${d.setor}</td>
-      <td class="r">${d.vacancia!=null?d.vacancia.toFixed(1)+'%':'—'}</td>`},
-  'roe':{title:'Maior ROE — Retorno sobre Patrimônio',getData:()=>[...ACOES].filter(d=>d.roe&&d.roe>0&&d.roe<200).sort((a,b)=>b.roe-a.roe),
+      <td class="r" style="color:var(--text3);font-size:11px">${d.setor}</td>`},
+
+  'roe':{title:'Maior ROE — Retorno sobre Patrimônio',
+    getData:()=>[...ACOES].filter(d=>d.roe&&d.roe>0&&d.roe<200).sort((a,b)=>b.roe-a.roe),
     head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">ROE</th><th class="r">ROIC</th><th class="r">DY</th><th class="r">Setor</th>',
     row:(d,i)=>`<td style="color:var(--text3);font-weight:700">#${i+1}</td>
-      <td><div style="display:flex;align-items:center;gap:8px">${logoImg(d.t)}<div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></div></div></td>
+      ${assetCell(d)}
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
       <td class="r" style="font-size:16px;font-weight:800;color:var(--up)">${d.roe.toFixed(1)}%</td>
       <td class="r ${d.roic&&d.roic>12?'up':''}">${d.roic?d.roic.toFixed(1)+'%':'—'}</td>
       <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
-      <td class="r" style="color:var(--text3)">${d.setor}</td>`},
-  'cresc':{title:'Maior Crescimento de Receita — 5 anos',getData:()=>[...ACOES].filter(d=>d.cresc5a&&d.cresc5a>0&&d.cresc5a<500).sort((a,b)=>b.cresc5a-a.cresc5a),
+      <td class="r" style="color:var(--text3);font-size:11px">${d.setor}</td>`},
+
+  'cresc':{title:'Maior Crescimento de Receita — 5 anos',
+    getData:()=>[...ACOES].filter(d=>d.cresc5a&&d.cresc5a>0&&d.cresc5a<500).sort((a,b)=>b.cresc5a-a.cresc5a),
     head:'<th>Pos.</th><th>Ativo</th><th class="r">Preço</th><th class="r">Cresc. 5a</th><th class="r">ROE</th><th class="r">DY</th><th class="r">Setor</th>',
     row:(d,i)=>`<td style="color:var(--text3);font-weight:700">#${i+1}</td>
-      <td><div style="display:flex;align-items:center;gap:8px">${logoImg(d.t)}<div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></div></div></td>
+      ${assetCell(d)}
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
       <td class="r" style="font-size:16px;font-weight:800;color:var(--up)">${d.cresc5a.toFixed(1)}%</td>
       <td class="r ${d.roe&&d.roe>15?'up':''}">${d.roe?d.roe.toFixed(1)+'%':'—'}</td>
       <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
-      <td class="r" style="color:var(--text3)">${d.setor}</td>`},
+      <td class="r" style="color:var(--text3);font-size:11px">${d.setor}</td>`},
 };
 
 function render(key, el) {
@@ -153,14 +184,9 @@ function render(key, el) {
   renderTable(currentData);
 }
 
-function logoImg(ticker, size=22) {
-  return `<img src="https://raw.githubusercontent.com/thefintz/icones-b3/main/icones/${ticker}.png"
-    onerror="this.style.display='none'"
-    style="width:${size}px;height:${size}px;border-radius:50%;object-fit:contain;background:#fff;flex-shrink:0">`;
-}
 function renderTable(arr){
   document.getElementById('rank-tbody').innerHTML=arr.slice(0,100).map((d,i)=>
-    `<tr onclick="location.href='ativo.html?t=${d.t}${d.t.endsWith('11')?'&tipo=fii':''}'" class="fade-in" style="cursor:pointer;animation-delay:${i*0.015}s">${currentConfig.row(d,i)}</tr>`
+    `<tr onclick="location.href='ativo.html?t=${d.t}${d.t.endsWith('11')?'&tipo=fii':''}'" class="fade-in" style="cursor:pointer;animation-delay:${i*0.012}s">${currentConfig.row(d,i)}</tr>`
   ).join('');
 }
 
@@ -178,21 +204,28 @@ function renderSidebar(){
     <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}'">
       <div style="display:flex;align-items:center;gap:8px">
         <span style="font-size:18px">${medal(i)}</span>
+        ${logoHtml(d.t,26)}
         <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
       </div>
       <span class="pill gold-pill">${d.dy.toFixed(1)}%</span></div>`).join('');
+
   const topF=[...FIIS].filter(d=>d.dy>0&&d.dy<=50).sort((a,b)=>b.dy-a.dy).slice(0,3);
   document.getElementById('podio-fiis').innerHTML=topF.map((d,i)=>`
     <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}&tipo=fii'">
       <div style="display:flex;align-items:center;gap:8px">
         <span style="font-size:18px">${medal(i)}</span>
+        ${logoHtml(d.t,26)}
         <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
       </div>
       <span class="pill gold-pill">${d.dy.toFixed(1)}%</span></div>`).join('');
+
   const altas=[...ACOES,...FIIS].filter(d=>d.v>0).sort((a,b)=>b.v-a.v).slice(0,5);
   document.getElementById('top-altas').innerHTML=altas.map(d=>`
     <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}'">
-      <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${logoHtml(d.t,26)}
+        <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      </div>
       <span class="pill up-pill">+${d.v.toFixed(2)}%</span></div>`).join('');
 }
 

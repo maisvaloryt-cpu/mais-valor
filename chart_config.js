@@ -1,21 +1,31 @@
-// chart_config.js — crosshair instantâneo via overlay canvas
+// chart_config.js — crosshair, pin-on-click, seleção de período por drag
 
 function createChart(canvasId, labels, data, color, bgColor) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return null;
 
-  // Cria overlay transparente sobre o canvas para capturar mouse
   const wrapper = canvas.parentElement;
   wrapper.style.position = 'relative';
 
   // Remove overlay antigo se existir
-  const oldOverlay = wrapper.querySelector('.chart-overlay');
-  if (oldOverlay) oldOverlay.remove();
+  wrapper.querySelectorAll('.chart-overlay, .chart-range-bar, .chart-pin-box').forEach(el => el.remove());
 
   const overlay = document.createElement('canvas');
   overlay.className = 'chart-overlay';
-  overlay.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;';
+  overlay.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2;';
   wrapper.appendChild(overlay);
+
+  // Info box (pin e seleção de range)
+  const infoBox = document.createElement('div');
+  infoBox.className = 'chart-pin-box';
+  infoBox.style.cssText = `
+    display:none;position:absolute;top:8px;left:50%;transform:translateX(-50%);
+    background:rgba(17,17,19,0.96);border:1px solid rgba(245,166,35,0.5);
+    border-radius:10px;padding:8px 16px;font-family:'JetBrains Mono',monospace;
+    font-size:12px;color:#F0EDE8;z-index:10;pointer-events:none;text-align:center;
+    box-shadow:0 4px 20px rgba(0,0,0,0.5);white-space:nowrap;
+  `;
+  wrapper.appendChild(infoBox);
 
   const chart = new Chart(canvas, {
     type: 'line',
@@ -36,24 +46,21 @@ function createChart(canvasId, labels, data, color, bgColor) {
       responsive: true,
       maintainAspectRatio: false,
       animation: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { enabled: false } // desativa tooltip nativo
-      },
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
       scales: {
         x: {
           grid: { color: 'rgba(255,255,255,.04)' },
-          ticks: { color: '#5E5C58', font: { size: 10, family: 'DM Mono' }, maxTicksLimit: 10, maxRotation: 0 }
+          ticks: { color: '#5E5C58', font: { size: 10, family: 'JetBrains Mono' }, maxTicksLimit: 10, maxRotation: 0 }
         },
         y: {
           grid: { color: 'rgba(255,255,255,.04)' },
-          ticks: { color: '#5E5C58', font: { size: 10, family: 'DM Mono' }, callback: v => 'R$' + (v >= 1000 ? (v/1000).toFixed(1)+'k' : v.toFixed(0)) }
+          ticks: { color: '#5E5C58', font: { size: 10, family: 'JetBrains Mono' }, callback: v => 'R$' + (v >= 1000 ? (v/1000).toFixed(1)+'k' : v.toFixed(0)) }
         }
       }
     }
   });
 
-  // Tooltip customizado
+  // Tooltip flutuante (hover livre)
   let tooltip = document.getElementById('chart-tooltip-global');
   if (!tooltip) {
     tooltip = document.createElement('div');
@@ -61,105 +68,254 @@ function createChart(canvasId, labels, data, color, bgColor) {
     tooltip.style.cssText = `
       position:fixed;pointer-events:none;z-index:9999;
       background:rgba(17,17,19,0.95);border:1px solid rgba(245,166,35,0.4);
-      border-radius:8px;padding:8px 12px;font-family:'DM Mono',monospace;
+      border-radius:8px;padding:8px 12px;font-family:'JetBrains Mono',monospace;
       font-size:12px;color:#F0EDE8;display:none;
       box-shadow:0 4px 20px rgba(0,0,0,0.5);min-width:120px;
     `;
     document.body.appendChild(tooltip);
   }
 
-  // Handler de mouse
   wrapper.style.pointerEvents = 'all';
   canvas.style.pointerEvents = 'all';
 
-  function onMouseMove(e) {
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+  // ── Estado ───────────────────────────────────────────────────────
+  let pinIdx = null;       // índice travado (clique)
+  let isDragging = false;
+  let dragStart = null;    // índice início do drag
+  let dragEnd   = null;    // índice fim do drag
 
+  function getIdx(mouseX) {
     const ca = chart.chartArea;
-    if (!ca || mouseX < ca.left || mouseX > ca.right || mouseY < ca.top || mouseY > ca.bottom) {
-      overlay.getContext('2d').clearRect(0, 0, overlay.width, overlay.height);
-      tooltip.style.display = 'none';
-      return;
-    }
-
-    // Sincroniza tamanho do overlay
-    overlay.width = canvas.width;
-    overlay.height = canvas.height;
-
-    // Encontra o ponto mais próximo
-    const xScale = chart.scales.x;
-    const yScale = chart.scales.y;
+    if (!ca) return null;
     const pct = (mouseX - ca.left) / (ca.right - ca.left);
-    const idx = Math.round(pct * (data.length - 1));
-    const clampedIdx = Math.max(0, Math.min(data.length - 1, idx));
+    return Math.max(0, Math.min(data.length - 1, Math.round(pct * (data.length - 1))));
+  }
 
-    const px = xScale.getPixelForValue(clampedIdx);
-    const py = yScale.getPixelForValue(data[clampedIdx]);
+  function syncOverlaySize() {
+    overlay.width  = canvas.width;
+    overlay.height = canvas.height;
+  }
 
-    // Desenha crosshair
+  function drawCrosshair(idx, pinned = false) {
+    syncOverlaySize();
     const ctx = overlay.getContext('2d');
     ctx.clearRect(0, 0, overlay.width, overlay.height);
+    const ca = chart.chartArea;
+    const xScale = chart.scales.x;
+    const yScale = chart.scales.y;
+    const px = xScale.getPixelForValue(idx);
+    const py = yScale.getPixelForValue(data[idx]);
 
-    // Linha vertical
     ctx.save();
+    // Linha vertical
     ctx.beginPath();
     ctx.moveTo(px, ca.top);
     ctx.lineTo(px, ca.bottom);
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = 'rgba(245,166,35,0.7)';
-    ctx.setLineDash([4, 4]);
+    ctx.lineWidth = pinned ? 2 : 1;
+    ctx.strokeStyle = pinned ? 'rgba(245,166,35,0.9)' : 'rgba(245,166,35,0.7)';
+    ctx.setLineDash(pinned ? [] : [4, 4]);
     ctx.stroke();
 
-    // Ponto destacado
+    // Ponto
     ctx.beginPath();
-    ctx.arc(px, py, 5, 0, Math.PI * 2);
-    ctx.fillStyle = color;
+    ctx.arc(px, py, pinned ? 6 : 5, 0, Math.PI * 2);
+    ctx.fillStyle = pinned ? '#F5A623' : color;
     ctx.fill();
     ctx.strokeStyle = '#fff';
     ctx.lineWidth = 2;
     ctx.setLineDash([]);
     ctx.stroke();
     ctx.restore();
+  }
 
-    // Tooltip
-    const val = data[clampedIdx];
-    const label = labels[clampedIdx] || '';
-    const prev = clampedIdx > 0 ? data[clampedIdx - 1] : null;
-    const chg = prev ? ((val - prev) / prev * 100) : 0;
+  function drawRangeSelection(i1, i2) {
+    syncOverlaySize();
+    const ctx = overlay.getContext('2d');
+    ctx.clearRect(0, 0, overlay.width, overlay.height);
+    const ca = chart.chartArea;
+    const xScale = chart.scales.x;
+    const from = Math.min(i1, i2), to = Math.max(i1, i2);
+    const x1 = xScale.getPixelForValue(from);
+    const x2 = xScale.getPixelForValue(to);
+
+    // Sombra de seleção
+    ctx.save();
+    ctx.fillStyle = 'rgba(245,166,35,0.08)';
+    ctx.fillRect(x1, ca.top, x2 - x1, ca.bottom - ca.top);
+    ctx.strokeStyle = 'rgba(245,166,35,0.5)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(x1, ca.top); ctx.lineTo(x1, ca.bottom); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x2, ca.top); ctx.lineTo(x2, ca.bottom); ctx.stroke();
+
+    // Pontos
+    [from, to].forEach(idx => {
+      const yScale = chart.scales.y;
+      const px = xScale.getPixelForValue(idx);
+      const py = yScale.getPixelForValue(data[idx]);
+      ctx.beginPath();
+      ctx.arc(px, py, 5, 0, Math.PI * 2);
+      ctx.fillStyle = '#F5A623';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    });
+    ctx.restore();
+
+    // Info box com variação do período
+    const v1 = data[from], v2 = data[to];
+    const chgPct = ((v2 - v1) / v1 * 100);
+    const chgSign = chgPct >= 0 ? '+' : '';
+    const chgColor = chgPct >= 0 ? '#1FC96E' : '#E8503A';
+    infoBox.innerHTML = `
+      <span style="color:#9B9896;font-size:10px">${labels[from]} → ${labels[to]}</span><br>
+      <span>R$ ${v1.toFixed(2)}</span>
+      <span style="color:var(--text3)"> → </span>
+      <span>R$ ${v2.toFixed(2)}</span>
+      &nbsp;<span style="color:${chgColor};font-weight:700">${chgSign}${chgPct.toFixed(2)}%</span>
+    `;
+    infoBox.style.display = 'block';
+  }
+
+  function showTooltip(e, idx) {
+    const val  = data[idx];
+    const lbl  = labels[idx] || '';
+    const prev = idx > 0 ? data[idx - 1] : null;
+    const chg  = prev ? ((val - prev) / prev * 100) : 0;
     const chgStr = prev ? `${chg >= 0 ? '▲' : '▼'} ${Math.abs(chg).toFixed(2)}%` : '';
     const chgColor = chg >= 0 ? '#22C87A' : '#E8503A';
-
     tooltip.innerHTML = `
-      <div style="color:#9B9896;font-size:10px;margin-bottom:4px">${label}</div>
+      <div style="color:#9B9896;font-size:10px;margin-bottom:4px">${lbl}</div>
       <div style="font-size:15px;font-weight:700">R$ ${val.toFixed(2)}</div>
       ${chgStr ? `<div style="color:${chgColor};font-size:11px;margin-top:2px">${chgStr}</div>` : ''}
     `;
-
-    // Posiciona tooltip
-    let tx = e.clientX + 16;
-    let ty = e.clientY - 40;
-    if (tx + 150 > window.innerWidth) tx = e.clientX - 150;
+    let tx = e.clientX + 16, ty = e.clientY - 40;
+    if (tx + 160 > window.innerWidth) tx = e.clientX - 160;
     if (ty < 0) ty = e.clientY + 16;
-
     tooltip.style.left = tx + 'px';
-    tooltip.style.top = ty + 'px';
+    tooltip.style.top  = ty + 'px';
     tooltip.style.display = 'block';
   }
 
-  function onMouseLeave() {
+  function hideTooltip() { tooltip.style.display = 'none'; }
+
+  function clearAll() {
+    syncOverlaySize();
     overlay.getContext('2d').clearRect(0, 0, overlay.width, overlay.height);
-    tooltip.style.display = 'none';
+    infoBox.style.display = 'none';
+    hideTooltip();
   }
 
-  canvas.addEventListener('mousemove', onMouseMove);
-  canvas.addEventListener('mouseleave', onMouseLeave);
+  // ── Eventos ──────────────────────────────────────────────────────
+  canvas.addEventListener('mousedown', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const ca = chart.chartArea;
+    if (!ca || mouseX < ca.left || mouseX > ca.right) return;
+    isDragging = true;
+    dragStart = getIdx(mouseX);
+    dragEnd   = null;
+  });
 
-  // Guarda referência para limpar depois
+  canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const ca = chart.chartArea;
+    if (!ca || mouseX < ca.left || mouseX > ca.right || mouseY < ca.top || mouseY > ca.bottom) {
+      if (!pinIdx && !isDragging) clearAll();
+      return;
+    }
+    const idx = getIdx(mouseX);
+
+    if (isDragging && dragStart !== null) {
+      dragEnd = idx;
+      if (Math.abs(dragEnd - dragStart) > 1) {
+        drawRangeSelection(dragStart, dragEnd);
+        hideTooltip();
+      } else {
+        drawCrosshair(idx, false);
+        showTooltip(e, idx);
+      }
+    } else if (pinIdx !== null) {
+      // Pinado: mostra crosshair pin + tooltip para ponto atual
+      drawCrosshair(pinIdx, true);
+      // Mostra variação do pin até o cursor
+      const v1 = data[pinIdx], v2 = data[idx];
+      const chgPct = ((v2 - v1) / v1 * 100);
+      const chgSign = chgPct >= 0 ? '+' : '';
+      const chgColor = chgPct >= 0 ? '#1FC96E' : '#E8503A';
+      tooltip.innerHTML = `
+        <div style="color:#9B9896;font-size:10px;margin-bottom:4px">${labels[pinIdx]} → ${labels[idx]}</div>
+        <div style="font-size:13px">Pin: <strong>R$ ${v1.toFixed(2)}</strong></div>
+        <div style="font-size:13px">Agora: <strong>R$ ${v2.toFixed(2)}</strong></div>
+        <div style="color:${chgColor};font-size:12px;margin-top:3px;font-weight:700">${chgSign}${chgPct.toFixed(2)}%</div>
+      `;
+      let tx = e.clientX + 16, ty = e.clientY - 40;
+      if (tx + 170 > window.innerWidth) tx = e.clientX - 170;
+      tooltip.style.left = tx + 'px';
+      tooltip.style.top  = ty + 'px';
+      tooltip.style.display = 'block';
+    } else {
+      drawCrosshair(idx, false);
+      showTooltip(e, idx);
+    }
+  });
+
+  canvas.addEventListener('mouseup', (e) => {
+    if (!isDragging) return;
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const ca = chart.chartArea;
+    isDragging = false;
+
+    if (dragEnd !== null && Math.abs(dragEnd - dragStart) > 1) {
+      // Drag finalizado — mostra seleção de período
+      drawRangeSelection(dragStart, dragEnd);
+      pinIdx = null;
+    } else {
+      // Click simples — toggle pin
+      if (ca && mouseX >= ca.left && mouseX <= ca.right) {
+        const idx = getIdx(mouseX);
+        if (pinIdx === idx) {
+          // Segundo clique no mesmo ponto = despin
+          pinIdx = null;
+          infoBox.style.display = 'none';
+          clearAll();
+        } else if (pinIdx !== null) {
+          // Segundo clique em outro ponto = mostra variação
+          const from = Math.min(pinIdx, idx), to = Math.max(pinIdx, idx);
+          drawRangeSelection(from, to);
+          pinIdx = null;
+        } else {
+          // Primeiro clique = trava
+          pinIdx = idx;
+          infoBox.innerHTML = `
+            <span style="color:#F5A623;font-weight:700">📌 ${labels[idx]}</span>
+            &nbsp;R$ ${data[idx].toFixed(2)}
+            <span style="color:var(--text3);font-size:10px"> — clique em outro ponto para ver a variação</span>
+          `;
+          infoBox.style.display = 'block';
+          drawCrosshair(idx, true);
+        }
+      }
+    }
+    dragStart = null; dragEnd = null;
+  });
+
+  canvas.addEventListener('mouseleave', () => {
+    isDragging = false;
+    if (pinIdx === null) clearAll();
+    else hideTooltip(); // mantém pin mas esconde tooltip flutuante
+  });
+
+  // Duplo clique = limpa tudo
+  canvas.addEventListener('dblclick', () => {
+    pinIdx = null; dragStart = null; dragEnd = null;
+    clearAll();
+  });
+
   chart._overlayCanvas = overlay;
-  chart._onMouseMove = onMouseMove;
-  chart._onMouseLeave = onMouseLeave;
-
   return chart;
 }

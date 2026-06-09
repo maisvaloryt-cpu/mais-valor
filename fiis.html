@@ -44,21 +44,30 @@
       <div class="chart-panel">
         <div class="chart-header">
           <div>
-            <div class="chart-ticker" id="c-ticker">—</div>
+            <div class="chart-logo-wrap">
+              <div id="c-logo"></div>
+              <div class="chart-ticker" id="c-ticker">—</div>
+            </div>
             <div class="chart-price" id="c-price">
               <span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>
             </div>
             <div class="chart-meta" id="c-meta"></div>
           </div>
-          <div style="display:flex;gap:4px">
-            <button class="range-btn" onclick="setRange('1M',this)">1M</button>
-            <button class="range-btn" onclick="setRange('6M',this)">6M</button>
-            <button class="range-btn active" onclick="setRange('1A',this)">1A</button>
-            <button class="range-btn" onclick="setRange('5A',this)">5A</button>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+            <div style="display:flex;gap:4px">
+              <button class="range-btn" onclick="setRange('1M',this)">1M</button>
+              <button class="range-btn" onclick="setRange('6M',this)">6M</button>
+              <button class="range-btn active" onclick="setRange('1A',this)">1A</button>
+              <button class="range-btn" onclick="setRange('5A',this)">5A</button>
+            </div>
+            <button class="btn-fav" id="btn-fav" onclick="toggleFav()">☆ Favoritar</button>
           </div>
         </div>
         <div style="position:relative;width:100%;height:210px">
           <canvas id="mainChart" role="img" aria-label="Histórico do FII selecionado"></canvas>
+        </div>
+        <div style="font-size:10px;color:var(--text3);margin-top:6px;text-align:center">
+          💡 Clique para travar · Segundo clique para variação · Arraste para período
         </div>
         <div class="chart-stats">
           <div class="chart-stat"><div class="chart-stat-label">DY 12m</div><div class="chart-stat-val up" id="c-dy">—</div></div>
@@ -69,15 +78,16 @@
       </div>
 
       <div class="filter-bar">
-        <input class="filter-input" placeholder="🔍 Buscar FII..." style="flex:1;max-width:280px" oninput="filter()" id="f-search">
-        <select class="filter-select" onchange="filter()" id="f-setor">
+        <input class="filter-input" placeholder="🔍 Buscar FII..." style="flex:1;max-width:280px" oninput="filterTable()" id="f-search">
+        <select class="filter-select" onchange="filterTable()" id="f-setor">
           <option value="">Todos os segmentos</option>
           <option>Papel</option><option>Logística</option><option>Shoppings</option>
           <option>Híbrido</option><option>FOF</option><option>Lajes</option>
         </select>
-        <select class="filter-select" onchange="sortBy(this.value)">
-          <option value="t">Ticker A-Z</option>
+        <select class="filter-select" id="f-sort" onchange="sortBy(this.value)">
+          <option value="liq">Maior Liquidez</option>
           <option value="dy">Maior DY</option>
+          <option value="t">Ticker A-Z</option>
           <option value="v">Variação dia</option>
           <option value="pvp">Menor P/VP</option>
         </select>
@@ -123,20 +133,50 @@
 <script>
 let data=[], mainChart=null, sel=null, currentRange='1A';
 
-function logoImg(ticker, size=22) {
-  return `<img src="https://raw.githubusercontent.com/thefintz/icones-b3/main/icones/${ticker}.png"
-    onerror="this.style.display='none'"
-    style="width:${size}px;height:${size}px;border-radius:50%;object-fit:contain;background:#fff;flex-shrink:0">`;
+// Watchlist
+function getWatchlist(){ try{ return JSON.parse(localStorage.getItem('mv_watchlist')||'[]'); }catch{ return []; } }
+function toggleFav(){
+  if(!sel) return;
+  let wl=getWatchlist();
+  if(wl.includes(sel.t)) wl=wl.filter(x=>x!==sel.t); else wl.push(sel.t);
+  localStorage.setItem('mv_watchlist',JSON.stringify(wl)); updateFavBtn();
 }
+function updateFavBtn(){
+  const btn=document.getElementById('btn-fav'); if(!btn||!sel) return;
+  const fav=getWatchlist().includes(sel.t);
+  btn.textContent=fav?'★ Favoritado':'☆ Favoritar'; btn.classList.toggle('active',fav);
+}
+
+// Avatar FII — estilo azul com ticker
+function fiiAvatar(ticker, size=32){
+  const initials=ticker.replace(/\d+/g,'').slice(0,3)||ticker.slice(0,3);
+  const fs=Math.round(size*0.32);
+  return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:linear-gradient(135deg,#1A3A5C,#2563a8);display:flex;align-items:center;justify-content:center;font-size:${fs}px;font-weight:800;color:#fff;font-family:var(--font-mono);flex-shrink:0;letter-spacing:-1px">${initials}</div>`;
+}
+
+function fiiLogoOrAvatar(ticker, size=32){
+  const initials=ticker.replace(/\d+/g,'').slice(0,3)||ticker.slice(0,3);
+  const fs=Math.round(size*0.32);
+  return `<img src="https://raw.githubusercontent.com/thefintz/icones-b3/main/icones/${ticker}.png"
+    style="width:${size}px;height:${size}px;border-radius:50%;object-fit:contain;background:#fff;flex-shrink:0"
+    onerror="this.outerHTML='<div style=\\'width:${size}px;height:${size}px;border-radius:50%;background:linear-gradient(135deg,#1A3A5C,#2563a8);display:flex;align-items:center;justify-content:center;font-size:${fs}px;font-weight:800;color:#fff;font-family:var(--font-mono);flex-shrink:0\\'>${initials}</div>'"
+    loading="lazy">`;
+}
+
 function renderTable(arr){
   const tb=document.getElementById('tbody'); tb.innerHTML='';
   if(!arr.length){ tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text3)">Nenhum FII encontrado</td></tr>'; return; }
   arr.forEach((d,i)=>{
     const pvpClass=d.pvp<1?'up':d.pvp>1.1?'dn':'';
     const tr=document.createElement('tr');
-    tr.style.animationDelay=(i*0.02)+'s'; tr.className='fade-in';
+    tr.style.animationDelay=(i*0.015)+'s'; tr.className='fade-in';
     tr.innerHTML=`
-      <td><div style="display:flex;align-items:center;gap:8px">${logoImg(d.t)}<div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></div></div></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          ${fiiLogoOrAvatar(d.t, 32)}
+          <div><div class="asset-ticker">${d.t}</div></div>
+        </div>
+      </td>
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
       <td class="r"><span class="pill ${d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>
       <td class="r ${d.v7>=0?'up':'dn'}">${d.v7>=0?'+':''}${d.v7.toFixed(2)}%</td>
@@ -163,14 +203,17 @@ async function loadHistoricoFii(ticker){
 
 async function loadChart(d){
   sel=d;
+  const logoEl=document.getElementById('c-logo');
+  if(logoEl) logoEl.innerHTML=fiiLogoOrAvatar(d.t,36);
   document.getElementById('c-ticker').textContent=d.t;
   const isUp=d.v>=0;
   document.getElementById('c-price').innerHTML=`R$&nbsp;${d.p.toFixed(2)}&nbsp;<span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span>`;
-  document.getElementById('c-meta').textContent=`${d.n} · ${d.setor} · B3`;
+  document.getElementById('c-meta').textContent=`${d.t} · ${d.setor} · B3`;
   document.getElementById('c-dy').textContent=d.dy.toFixed(1)+'%';
   document.getElementById('c-pvp').textContent=d.pvp?d.pvp.toFixed(2):'—';
   document.getElementById('c-vol').textContent=d.vol;
   document.getElementById('c-cotas').textContent=d.vm||'—';
+  updateFavBtn();
   const hist=await loadHistoricoFii(d.t);
   let pts,labels;
   if(hist?.length){ const filt=filterByRange(hist,currentRange); pts=filt.map(p=>p.close); labels=filt.map(p=>p.date); }
@@ -181,16 +224,20 @@ async function loadChart(d){
 }
 
 function setRange(r,el){ currentRange=r; document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); if(sel)loadChart(sel); }
-function filter(){
+function filterTable(){
   const q=document.getElementById('f-search').value.toLowerCase();
   const s=document.getElementById('f-setor').value;
+  const sort=document.getElementById('f-sort').value;
   data=FIIS.filter(d=>(d.t.toLowerCase().includes(q)||d.n.toLowerCase().includes(q))&&(!s||d.setor===s));
-  renderTable(data);
+  applySort(sort);
 }
-function sortBy(k){
-  if(k==='t')data.sort((a,b)=>a.t.localeCompare(b.t));
-  else if(k==='pvp')data.sort((a,b)=>a.pvp-b.pvp);
-  else data.sort((a,b)=>b[k]-a[k]);
+function sortBy(k){ applySort(k); }
+function applySort(k){
+  if(k==='t') data.sort((a,b)=>a.t.localeCompare(b.t));
+  else if(k==='pvp') data.sort((a,b)=>a.pvp-b.pvp);
+  else if(k==='dy') data.sort((a,b)=>b.dy-a.dy);
+  else if(k==='v') data.sort((a,b)=>b.v-a.v);
+  else data.sort((a,b)=>(b.volNum||0)-(a.volNum||0));
   renderTable(data);
 }
 
@@ -198,17 +245,25 @@ function renderSidebar(){
   const segs={};
   FIIS.forEach(d=>{segs[d.setor]=(segs[d.setor]||0)+1;});
   document.getElementById('seg-list').innerHTML=Object.entries(segs).sort((a,b)=>b[1]-a[1]).map(([s,n])=>`
-    <div class="mover-item" style="cursor:pointer" onclick="document.getElementById('f-setor').value='${s}';filter()">
+    <div class="mover-item" style="cursor:pointer" onclick="document.getElementById('f-setor').value='${s}';filterTable()">
       <span style="font-size:12px;font-weight:700">${s}</span><span class="pill gold-pill">${n}</span></div>`).join('');
-  const topDy=[...FIIS].sort((a,b)=>b.dy-a.dy).slice(0,5);
+
+  const topDy=[...FIIS].filter(d=>d.dy>0).sort((a,b)=>b.dy-a.dy).slice(0,5);
   document.getElementById('top-dy').innerHTML=topDy.map(d=>`
     <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}&tipo=fii'">
-      <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${fiiLogoOrAvatar(d.t,26)}
+        <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      </div>
       <span class="pill gold-pill">${d.dy.toFixed(1)}%</span></div>`).join('');
+
   const belowVP=[...FIIS].filter(d=>d.pvp&&d.pvp<0.95).sort((a,b)=>a.pvp-b.pvp).slice(0,5);
   document.getElementById('below-vp').innerHTML=belowVP.length?belowVP.map(d=>`
     <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}&tipo=fii'">
-      <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${fiiLogoOrAvatar(d.t,26)}
+        <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      </div>
       <span class="pill up-pill">P/VP ${d.pvp.toFixed(2)}</span></div>`).join('')
     :'<div style="color:var(--text3);font-size:12px">Nenhum abaixo de 0.95</div>';
 }
@@ -216,9 +271,7 @@ function renderSidebar(){
 function updateMiniCards(){
   document.getElementById('mc-total').textContent=FIIS.length||'—';
   const dyVals=FIIS.filter(d=>d.dy>0).map(d=>d.dy);
-  if(dyVals.length){
-    document.getElementById('mc-dy-med').textContent=(dyVals.reduce((a,b)=>a+b,0)/dyVals.length).toFixed(1)+'%';
-  }
+  if(dyVals.length) document.getElementById('mc-dy-med').textContent=(dyVals.reduce((a,b)=>a+b,0)/dyVals.length).toFixed(1)+'%';
   const pvpVals=FIIS.filter(d=>d.pvp&&d.pvp>0).map(d=>d.pvp);
   if(pvpVals.length){
     const med=(pvpVals.reduce((a,b)=>a+b,0)/pvpVals.length);
@@ -229,13 +282,12 @@ function updateMiniCards(){
 
 async function init(){
   await loadData();
-  data=[...FIIS];
+  data=[...FIIS].sort((a,b)=>(b.volNum||0)-(a.volNum||0));
   const params=new URLSearchParams(location.search);
-  if(params.get('q')){ document.getElementById('f-search').value=params.get('q'); filter(); }
+  if(params.get('q')){ document.getElementById('f-search').value=params.get('q'); filterTable(); }
   else renderTable(data);
-  if(FIIS.length>0) await loadChart(FIIS[0]);
-  renderSidebar();
-  updateMiniCards();
+  if(FIIS.length>0) await loadChart(data[0]);
+  renderSidebar(); updateMiniCards();
 }
 init();
 </script>

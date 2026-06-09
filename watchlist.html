@@ -14,38 +14,115 @@
   <p>Seus ativos favoritos em um só lugar. Dados salvos localmente no seu navegador.</p>
 </div>
 <div class="container">
-  <div id="empty-msg" style="display:none" class="empty-state">
+  <div id="empty-msg" class="empty-state" style="display:none">
     <div class="empty-state-icon">☆</div>
     <h2>Nenhum ativo favorito ainda</h2>
-    <p>Acesse a página de qualquer ativo e clique em "Favoritar"</p>
-    <a href="acoes.html" class="banner-btn" style="display:inline-block">Ver ações →</a>
+    <p>Acesse a página de qualquer ativo e clique em <strong>"☆ Favoritar"</strong> para adicioná-lo aqui.</p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <a href="acoes.html" class="banner-btn" style="display:inline-block">Ver Ações →</a>
+      <a href="fiis.html" class="banner-btn" style="display:inline-block;background:var(--bg4);color:var(--text)">Ver FIIs →</a>
+    </div>
   </div>
 
   <div id="watchlist-content" class="fade-in-1">
     <div class="mini-cards" id="wl-summary" style="margin-bottom:1.5rem"></div>
+
+    <!-- Alertas de preço -->
+    <div id="alerts-section" style="margin-bottom:1.5rem;display:none">
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem">
+          <div class="section-title">🔔 Alertas de Preço</div>
+          <button onclick="showAddAlert()" style="background:var(--gold);color:#0A0A0A;border:none;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body)">+ Novo Alerta</button>
+        </div>
+        <div id="alerts-list"></div>
+      </div>
+    </div>
+
     <div class="table-wrap">
       <table class="data-table">
         <thead><tr>
           <th>Ativo</th><th class="r">Preço</th><th class="r">Hoje</th>
           <th class="r">DY 12m</th><th class="r">P/L</th><th class="r">P/VP</th>
-          <th class="r">Volume</th><th class="r">Ação</th>
+          <th class="r">Score</th><th class="r">Volume</th><th class="r">Ação</th>
         </tr></thead>
         <tbody id="wl-tbody"></tbody>
       </table>
     </div>
   </div>
 </div>
+
+<!-- Modal de alerta -->
+<div id="alert-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeAlertModal()">
+  <div class="modal-box">
+    <div style="font-size:16px;font-weight:700;margin-bottom:1rem">🔔 Novo Alerta de Preço</div>
+    <label class="calc-label">Ticker</label>
+    <input class="calc-input" id="alert-ticker" placeholder="Ex: PETR4" style="margin-bottom:.75rem">
+    <label class="calc-label">Tipo de alerta</label>
+    <select class="filter-select" id="alert-type" style="width:100%;margin-bottom:.75rem;padding:10px 12px">
+      <option value="above">Preço acima de</option>
+      <option value="below">Preço abaixo de</option>
+    </select>
+    <label class="calc-label">Preço alvo (R$)</label>
+    <input class="calc-input" id="alert-price" type="number" step="0.01" placeholder="0,00" style="margin-bottom:1rem">
+    <div style="display:flex;gap:8px">
+      <button onclick="saveAlert()" style="flex:1;background:var(--gold);color:#0A0A0A;border:none;border-radius:9px;padding:11px;font-weight:800;cursor:pointer;font-family:var(--font-body)">Salvar Alerta</button>
+      <button onclick="closeAlertModal()" style="background:var(--bg4);color:var(--text);border:1px solid var(--border);border-radius:9px;padding:11px 16px;cursor:pointer;font-family:var(--font-body)">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <div id="footer-placeholder"></div>
 <script src="data.js"></script><script src="nav.js"></script>
 <script>
+// ── Watchlist ─────────────────────────────────────────────────────
 function getWatchlist(){ try{ return JSON.parse(localStorage.getItem('mv_watchlist')||'[]'); }catch{ return []; } }
 function removeFromWatchlist(t){ localStorage.setItem('mv_watchlist',JSON.stringify(getWatchlist().filter(x=>x!==t))); renderWatchlist(); }
 
-function logoImg(ticker, size=22) {
-  return `<img src="https://raw.githubusercontent.com/thefintz/icones-b3/main/icones/${ticker}.png"
-    onerror="this.style.display='none'"
-    style="width:${size}px;height:${size}px;border-radius:50%;object-fit:contain;background:#fff;flex-shrink:0">`;
+// ── Alertas ───────────────────────────────────────────────────────
+function getAlerts(){ try{ return JSON.parse(localStorage.getItem('mv_alerts')||'[]'); }catch{ return []; } }
+function saveAlerts(a){ localStorage.setItem('mv_alerts',JSON.stringify(a)); }
+function showAddAlert(){ document.getElementById('alert-modal').style.display='flex'; }
+function closeAlertModal(){ document.getElementById('alert-modal').style.display='none'; }
+function saveAlert(){
+  const ticker=document.getElementById('alert-ticker').value.toUpperCase().trim();
+  const type=document.getElementById('alert-type').value;
+  const price=parseFloat(document.getElementById('alert-price').value);
+  if(!ticker||!price) return;
+  const alerts=getAlerts();
+  alerts.push({ ticker, type, price, created: new Date().toLocaleDateString('pt-BR') });
+  saveAlerts(alerts);
+  closeAlertModal();
+  renderAlerts();
 }
+function removeAlert(i){ const a=getAlerts(); a.splice(i,1); saveAlerts(a); renderAlerts(); }
+
+function renderAlerts(){
+  const alerts=getAlerts();
+  const all=[...ACOES,...FIIS];
+  const section=document.getElementById('alerts-section');
+  const list=document.getElementById('alerts-list');
+  if(!alerts.length){ section.style.display='none'; return; }
+  section.style.display='';
+  list.innerHTML=alerts.map((a,i)=>{
+    const ativo=all.find(d=>d.t===a.ticker);
+    const cur=ativo?.p;
+    const triggered= cur!=null && (a.type==='above'?cur>=a.price:cur<=a.price);
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:10px">
+        ${logoHtml(a.ticker,26)}
+        <div>
+          <div style="font-weight:700;font-size:13px">${a.ticker}</div>
+          <div style="font-size:11px;color:var(--text3)">${a.type==='above'?'Acima de':'Abaixo de'} R$ ${a.price.toFixed(2)}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${triggered?`<span class="pill up-pill">🔔 Atingido! R$${cur?.toFixed(2)}</span>`:cur!=null?`<span style="font-size:12px;font-family:var(--font-mono);color:var(--text2)">Atual: R$${cur.toFixed(2)}</span>`:''}
+        <button onclick="removeAlert(${i})" style="background:var(--dn-bg);color:var(--dn);border:none;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:11px">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function renderWatchlist(){
   const tickers=getWatchlist();
   const all=[...ACOES,...FIIS];
@@ -59,29 +136,39 @@ function renderWatchlist(){
   const ativos=tickers.map(t=>all.find(a=>a.t===t)).filter(Boolean);
   const avgDY=ativos.filter(a=>a.dy>0).reduce((s,a,_,arr)=>s+a.dy/arr.length,0);
   const altas=ativos.filter(a=>a.v>0).length;
+
   document.getElementById('wl-summary').innerHTML=`
     <div class="mini-card"><div class="mini-label">Ativos favoritados</div><div class="mini-val">${ativos.length}</div></div>
     <div class="mini-card"><div class="mini-label">Em alta hoje</div><div class="mini-val up">${altas}</div><div class="mini-sub">${ativos.length-altas} em baixa</div></div>
     <div class="mini-card"><div class="mini-label">DY médio</div><div class="mini-val gold">${avgDY>0?avgDY.toFixed(1)+'%':'—'}</div></div>
     <div class="mini-card"><div class="mini-label">Última atualização</div><div class="mini-val" style="font-size:13px">${DATA_UPDATED_AT||'—'}</div></div>`;
+
   document.getElementById('wl-tbody').innerHTML=ativos.map((d,i)=>`
     <tr onclick="location.href='ativo.html?t=${d.t}${d.t.endsWith('11')?'&tipo=fii':''}'" class="fade-in" style="cursor:pointer;animation-delay:${i*0.03}s">
-      <td><div style="display:flex;align-items:center;gap:8px">${logoImg(d.t)}<div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></div></div></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          ${logoHtml(d.t,32)}
+          <div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n.slice(0,28)}</div></div>
+        </div>
+      </td>
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
       <td class="r"><span class="pill ${d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>
       <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
       <td class="r">${d.pl?(d.pl>0?d.pl.toFixed(1)+'x':'neg.'):'—'}</td>
       <td class="r">${d.pvp?d.pvp.toFixed(2):'—'}</td>
+      <td class="r">${scoreBadge(d)}</td>
       <td class="r" style="color:var(--text3)">${d.vol}</td>
       <td class="r">
         <button onclick="event.stopPropagation();removeFromWatchlist('${d.t}')"
           style="background:var(--dn-bg);color:var(--dn);border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px;font-weight:700;transition:all .15s"
           onmouseover="this.style.background='var(--dn)';this.style.color='#fff'"
           onmouseout="this.style.background='var(--dn-bg)';this.style.color='var(--dn)'">
-          ✕ Remover
+          ✕
         </button>
       </td>
     </tr>`).join('');
+
+  renderAlerts();
 }
 
 async function init(){ await loadData(); renderWatchlist(); }

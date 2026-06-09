@@ -14,12 +14,12 @@
 
   <!-- BANNER -->
   <div class="banner fade-in" style="margin-top:.5rem">
-    <div class="banner-icon">📅</div>
+    <div class="banner-icon">✦</div>
     <div>
-      <h3>Agenda de Dividendos</h3>
-      <p>Confira os próximos pagamentos de dividendos e rendimentos de FIIs.</p>
+      <h3>Análise IA — Novo!</h3>
+      <p>Relatórios fundamentalistas, tearsheets e análise de earnings gerados automaticamente.</p>
     </div>
-    <button class="banner-btn" onclick="location.href='dividendos.html'">Ver agenda →</button>
+    <button class="banner-btn" onclick="location.href='analise.html'">Acessar →</button>
   </div>
 
   <!-- MINI CARDS -->
@@ -62,7 +62,10 @@
       <div class="chart-panel">
         <div class="chart-header">
           <div>
-            <div class="chart-ticker" id="c-ticker">—</div>
+            <div class="chart-logo-wrap">
+              <div id="c-logo"></div>
+              <div class="chart-ticker" id="c-ticker">—</div>
+            </div>
             <div class="chart-price" id="c-price">
               <span class="loading-dot"></span>
               <span class="loading-dot"></span>
@@ -83,6 +86,9 @@
         </div>
         <div style="position:relative;width:100%;height:210px">
           <canvas id="mainChart" role="img" aria-label="Gráfico histórico do ativo selecionado"></canvas>
+        </div>
+        <div style="font-size:10px;color:var(--text3);margin-top:6px;text-align:center">
+          💡 Clique para travar · Segundo clique para variação · Arraste para período
         </div>
         <div class="chart-stats">
           <div class="chart-stat"><div class="chart-stat-label">DY 12m</div><div class="chart-stat-val gold" id="c-dy">—</div></div>
@@ -108,7 +114,7 @@
           <thead><tr>
             <th>Ativo</th><th class="r">Preço</th><th class="r">Hoje</th>
             <th class="r">DY 12m</th><th class="r">P/L</th><th class="r">P/VP</th>
-            <th class="r">Volume</th><th class="r">Ver</th>
+            <th class="r">Score</th><th class="r">Volume</th>
           </tr></thead>
           <tbody id="main-tbody">
             <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text3)">
@@ -164,36 +170,29 @@
 let currentTab='acoes', currentData=[], mainChart=null, sel=null, currentRange='1A';
 const SHOW=20;
 
-function logoImg(ticker, size=24) {
-  return `<img src="https://raw.githubusercontent.com/thefintz/icones-b3/main/icones/${ticker}.png"
-    onerror="this.style.display='none'"
-    style="width:${size}px;height:${size}px;border-radius:50%;object-fit:contain;background:#fff;flex-shrink:0">`;
-}
-
 function renderTable(arr){
   const tb = document.getElementById('main-tbody');
   tb.innerHTML = '';
   const slice = arr.slice(0, SHOW);
-  if (!slice.length) {
-    tb.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text3)">Sem dados</td></tr>';
-    return;
-  }
+  if (!slice.length) { tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text3)">Sem dados</td></tr>'; return; }
   slice.forEach((d, i) => {
     const tr = document.createElement('tr');
-    tr.style.animationDelay = (i * 0.025) + 's';
+    tr.style.animationDelay = (i * 0.02) + 's';
     tr.className = 'fade-in';
     tr.innerHTML = `
-      <td><div style="display:flex;align-items:center;gap:8px">${logoImg(d.t)}
-        <div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></div></div></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          ${logoHtml(d.t, 32)}
+          <div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n?.slice(0,22)||''}</div></div>
+        </div>
+      </td>
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
       <td class="r"><span class="pill ${d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>
       <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'—'}</td>
       <td class="r">${d.pl?(d.pl>0?d.pl.toFixed(1)+'x':d.pl<0?'neg.':'—'):'—'}</td>
       <td class="r ${d.pvp&&d.pvp<1?'up':''}">${d.pvp?d.pvp.toFixed(2):'—'}</td>
-      <td class="r" style="color:var(--text3)">${d.vol}</td>
-      <td class="r"><a href="ativo.html?t=${d.t}${currentTab==='fiis'?'&tipo=fii':''}"
-        style="color:var(--gold);font-size:11px;font-weight:700"
-        onclick="event.stopPropagation()">ver →</a></td>`;
+      <td class="r">${scoreBadge(d)}</td>
+      <td class="r" style="color:var(--text3)">${d.vol}</td>`;
     tr.onclick = () => loadChart(d);
     tb.appendChild(tr);
   });
@@ -201,29 +200,25 @@ function renderTable(arr){
 
 async function loadChart(d) {
   sel = d;
+  const logoEl = document.getElementById('c-logo');
+  if(logoEl) logoEl.innerHTML = logoHtml(d.t, 36);
   document.getElementById('c-ticker').textContent = d.t;
   const isUp = d.v >= 0;
-  document.getElementById('c-price').innerHTML =
-    `R$&nbsp;${d.p.toFixed(2)}&nbsp;<span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span>`;
+  document.getElementById('c-price').innerHTML = `R$&nbsp;${d.p.toFixed(2)}&nbsp;<span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span>`;
   document.getElementById('c-meta').textContent = `${d.n} · ${d.setor} · B3`;
   document.getElementById('c-dy').textContent  = d.dy>0 ? d.dy.toFixed(1)+'%' : '—';
   document.getElementById('c-pl').textContent  = d.pl ? (d.pl>0?d.pl.toFixed(1)+'x':d.pl<0?'neg.':'—') : '—';
   document.getElementById('c-pvp').textContent = d.pvp ? d.pvp.toFixed(2) : '—';
   document.getElementById('c-vol').textContent = d.vol;
-  document.getElementById('c-ver-mais').href   = `ativo.html?t=${d.t}${currentTab==='fiis'?'&tipo=fii':''}`;
+  document.getElementById('c-ver-mais').href = `ativo.html?t=${d.t}${currentTab==='fiis'?'&tipo=fii':''}`;
 
   const hist = await loadHistoricoCompleto(d.t);
   let pts, labels;
-  if (hist?.length) {
-    const filt = filterByRange(hist, currentRange);
-    pts = filt.map(p => p.close); labels = filt.map(p => p.date);
-  } else {
-    pts = genHistory(d.p, d.v); labels = genLabels(pts.length);
-  }
-  const color   = isUp ? '#1FC96E' : '#E8503A';
-  const bgColor = isUp ? 'rgba(31,201,110,0.06)' : 'rgba(232,80,58,0.06)';
+  if (hist?.length) { const filt = filterByRange(hist, currentRange); pts = filt.map(p => p.close); labels = filt.map(p => p.date); }
+  else { pts = genHistory(d.p, d.v); labels = genLabels(pts.length); }
+  const color = isUp ? '#1FC96E' : '#E8503A';
   if (mainChart) mainChart.destroy();
-  mainChart = createChart('mainChart', labels, pts, color, bgColor);
+  mainChart = createChart('mainChart', labels, pts, color, isUp?'rgba(31,201,110,0.06)':'rgba(232,80,58,0.06)');
 }
 
 async function setRange(r, el) {
@@ -235,8 +230,7 @@ async function setRange(r, el) {
 
 function filterTable(q) {
   renderTable(currentData.filter(d =>
-    d.t.toLowerCase().includes(q.toLowerCase()) ||
-    d.n.toLowerCase().includes(q.toLowerCase())
+    d.t.toLowerCase().includes(q.toLowerCase()) || d.n.toLowerCase().includes(q.toLowerCase())
   ));
 }
 
@@ -247,7 +241,7 @@ function switchTab(tab, el) {
   el.classList.add('active');
   document.getElementById('filter-input').value = '';
   document.getElementById('ver-todos-link').href = tab === 'acoes' ? 'acoes.html' : 'fiis.html';
-  document.getElementById('ver-todos-link').textContent = `Ver todos os ${tab === 'acoes' ? 'Ações' : 'FIIs'} →`;
+  document.getElementById('ver-todos-link').textContent = `Ver ${tab === 'acoes' ? 'todas as ações' : 'todos os FIIs'} →`;
   renderTable(currentData);
   if (currentData.length) loadChart(currentData[0]);
 }
@@ -258,8 +252,7 @@ function renderSidebar() {
   document.getElementById('top-gainers').innerHTML = all.slice(0,5).map(d => `
     <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}'">
       <div style="display:flex;align-items:center;gap:8px">
-        <div class="mover-dot" style="background:var(--up)"></div>
-        ${logoImg(d.t,20)}
+        ${logoHtml(d.t,26)}
         <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
       </div>
       <div style="text-align:right">
@@ -271,8 +264,7 @@ function renderSidebar() {
   document.getElementById('top-losers').innerHTML = all.slice(-5).reverse().map(d => `
     <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}'">
       <div style="display:flex;align-items:center;gap:8px">
-        <div class="mover-dot" style="background:var(--dn)"></div>
-        ${logoImg(d.t,20)}
+        ${logoHtml(d.t,26)}
         <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
       </div>
       <div style="text-align:right">
@@ -286,6 +278,7 @@ function renderSidebar() {
   document.getElementById('dy-ranking').innerHTML = byDy.map((d, i) => `
     <div class="rank-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}'">
       <div class="rank-num">${i+1}</div>
+      ${logoHtml(d.t,20)}
       <div class="rank-bar-wrap">
         <div class="rank-bar-top">
           <span class="rank-bar-ticker">${d.t}</span>
@@ -295,18 +288,24 @@ function renderSidebar() {
       </div>
     </div>`).join('');
 
-  const agenda = [
-    {t:'MXRF11',tipo:'Rendimento',pag:'12/06',val:0.10,dy:'13.8%'},
-    {t:'HGLG11',tipo:'Rendimento',pag:'14/06',val:1.28,dy:'9.2%'},
-    {t:'BBAS3', tipo:'Dividendo', pag:'15/06',val:0.48,dy:'9.3%'},
-    {t:'CPTS11',tipo:'Rendimento',pag:'18/06',val:0.10,dy:'14.2%'},
-    {t:'PETR4', tipo:'Dividendo', pag:'30/06',val:1.84,dy:'12.4%'},
-  ];
+  // Agenda de dividendos: tenta DIVIDENDOS do data.js, fallback para exemplo
+  let agenda = [];
+  if(typeof DIVIDENDOS!=='undefined' && DIVIDENDOS.length) {
+    agenda = DIVIDENDOS.slice(0,5);
+  } else {
+    agenda = [...ACOES,...FIIS].filter(a=>a.dy>0).sort((a,b)=>b.dy-a.dy).slice(0,5).map(a=>({
+      t:a.t, tipo:a.t.endsWith('11')?'Rendimento':'Dividendo',
+      pag:'—', val:+(a.p*(a.dy/100)/12).toFixed(4), dy:a.dy.toFixed(1)+'%'
+    }));
+  }
   document.getElementById('div-agenda').innerHTML = agenda.map(d => `
     <div class="agenda-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}'">
-      <div><div class="agenda-ticker">${d.t}</div><div class="agenda-type">${d.tipo}</div></div>
-      <div class="agenda-date">${d.pag}<small>pagamento</small></div>
-      <div><div class="agenda-value">R$&nbsp;${d.val.toFixed(2)}</div><div class="agenda-yield">${d.dy}</div></div>
+      <div style="display:flex;align-items:center;gap:6px">
+        ${logoHtml(d.t,22)}
+        <div><div class="agenda-ticker">${d.t}</div><div class="agenda-type">${d.tipo}</div></div>
+      </div>
+      <div class="agenda-date">${d.pag||'—'}<small>pagamento</small></div>
+      <div><div class="agenda-value">R$&nbsp;${(d.val||0).toFixed(4)}</div><div class="agenda-yield">${d.dy}</div></div>
     </div>`).join('');
 }
 
@@ -314,15 +313,9 @@ function updateMiniCards() {
   document.getElementById('mc-acoes').textContent = ACOES.length || '—';
   document.getElementById('mc-fiis').textContent  = FIIS.length  || '—';
   const topAcao = [...ACOES].filter(d => d.dy > 0).sort((a,b) => b.dy - a.dy)[0];
-  if (topAcao) {
-    document.getElementById('mc-dy-acao').textContent       = topAcao.dy.toFixed(1) + '%';
-    document.getElementById('mc-dy-acao-ticker').textContent = topAcao.t + ' · 12m';
-  }
+  if (topAcao) { document.getElementById('mc-dy-acao').textContent=topAcao.dy.toFixed(1)+'%'; document.getElementById('mc-dy-acao-ticker').textContent=topAcao.t+' · 12m'; }
   const topFii = [...FIIS].filter(d => d.dy > 0).sort((a,b) => b.dy - a.dy)[0];
-  if (topFii) {
-    document.getElementById('mc-dy-fii').textContent        = topFii.dy.toFixed(1) + '%';
-    document.getElementById('mc-dy-fii-ticker').textContent  = topFii.t + ' · 12m';
-  }
+  if (topFii)  { document.getElementById('mc-dy-fii').textContent=topFii.dy.toFixed(1)+'%';   document.getElementById('mc-dy-fii-ticker').textContent=topFii.t+' · 12m'; }
 }
 
 async function init() {
@@ -331,9 +324,8 @@ async function init() {
     const r = await fetch('data/bcb.json?t=' + Date.now());
     if (r.ok) {
       const j = await r.json();
-      window.BCB_DATA = j;
-      if (j.cdi?.anual)          document.getElementById('mc-cdi').textContent  = j.cdi.anual.toFixed(2) + '%';
-      if (j.ipca?.acumulado_12m)  document.getElementById('mc-ipca').textContent = j.ipca.acumulado_12m.toFixed(2) + '%';
+      if (j.cdi?.anual)         document.getElementById('mc-cdi').textContent  = j.cdi.anual.toFixed(2) + '%';
+      if (j.ipca?.acumulado_12m) document.getElementById('mc-ipca').textContent = j.ipca.acumulado_12m.toFixed(2) + '%';
     }
   } catch(e) {}
   currentData = [...ACOES];

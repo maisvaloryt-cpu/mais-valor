@@ -7,36 +7,41 @@
 <title id="page-title">Ativo — Mais Valor</title>
 <link rel="stylesheet" href="style.css">
 <style>
-.ativo-hero{padding:1.5rem 2rem;background:var(--bg2);border-bottom:1px solid var(--border)}
+.ativo-hero{padding:1.75rem 2rem;background:var(--bg2);border-bottom:1px solid var(--border)}
 .ativo-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem}
-.ativo-logo{width:56px;height:56px;border-radius:12px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--gold);letter-spacing:1px;flex-shrink:0}
-.ativo-info h1{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px}
-.ativo-info h1 em{color:var(--gold);font-style:normal}
+.ativo-logo-wrap{display:flex;align-items:center;gap:14px}
+.ativo-logo{width:56px;height:56px;border-radius:14px;background:var(--bg3);border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ativo-logo img{width:100%;height:100%;object-fit:contain}
+.ativo-logo-av{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#1A3A5C,#2563a8);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;font-family:var(--font-mono);flex-shrink:0;letter-spacing:-1px}
+.ativo-info h1{font-family:var(--font-display);font-size:34px;font-weight:400;letter-spacing:.5px}
+.ativo-info h1 em{color:var(--gold);font-style:italic}
 .ativo-preco{text-align:right}
-.ativo-preco .preco{font-family:'DM Mono',monospace;font-size:32px;font-weight:700}
+.ativo-preco .preco{font-family:var(--font-mono);font-size:30px;font-weight:700}
 .ativo-tabs{display:flex;gap:4px;margin-top:1rem;border-bottom:1px solid var(--border);flex-wrap:wrap}
 .ativo-tab{padding:8px 16px;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
 .ativo-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
 .ind-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem}
-.ind-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:.85rem 1rem}
+.ind-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:.85rem 1rem;transition:var(--transition)}
+.ind-card:hover{border-color:var(--border3)}
 .ind-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:4px}
-.ind-val{font-size:20px;font-weight:800;font-family:'DM Mono',monospace}
+.ind-val{font-size:20px;font-weight:800;font-family:var(--font-mono)}
 .ind-desc{font-size:10px;color:var(--text3);margin-top:2px}
 .section-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1.5rem}
-.section-box h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
-.section-box h3::before{content:'';width:3px;height:14px;background:var(--gold);border-radius:2px}
+.section-box h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.section-box h3::before{content:'';width:3px;height:14px;background:var(--gold);border-radius:2px;box-shadow:0 0 8px var(--gold-glow)}
 .tab-content{display:none}
 .tab-content.active{display:block}
-.watchlist-btn{padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-size:12px;font-weight:600;font-family:'Manrope',sans-serif;transition:all .15s;display:flex;align-items:center;gap:6px}
+.watchlist-btn{padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-size:12px;font-weight:700;font-family:var(--font-body);transition:all .15s;display:flex;align-items:center;gap:6px}
 .watchlist-btn.saved{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
 .score-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:4px}
 .score-fill{height:100%;border-radius:3px;transition:width .5s}
 .div-bar-chart{display:flex;align-items:flex-end;gap:3px;height:80px;margin-top:.5rem}
 .div-bar{flex:1;background:var(--gold-dim);border-radius:3px 3px 0 0;border:1px solid rgba(245,166,35,0.3);transition:all .2s;cursor:pointer;position:relative}
 .div-bar:hover{background:rgba(245,166,35,0.3)}
-.div-bar-tooltip{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:10px;font-family:'DM Mono',monospace;white-space:nowrap;display:none;margin-bottom:4px;z-index:10}
+.div-bar-tooltip{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:10px;font-family:var(--font-mono);white-space:nowrap;display:none;margin-bottom:4px;z-index:10}
 .div-bar:hover .div-bar-tooltip{display:block}
 .oportunidade-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;margin-right:6px;margin-bottom:6px}
+@media(max-width:600px){.ind-grid{grid-template-columns:repeat(2,1fr)}.ativo-preco .preco{font-size:22px}}
 </style>
 </head>
 <body>
@@ -44,20 +49,24 @@
 
 <div class="ativo-hero" id="ativo-hero">
   <div class="ativo-header">
-    <div style="display:flex;align-items:center;gap:1rem">
-      <div class="ativo-logo" id="ativo-logo">—</div>
+    <div class="ativo-logo-wrap">
+      <div id="ativo-logo-wrap"></div>
       <div class="ativo-info">
-        <h1 id="ativo-titulo">—</h1>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <h1 id="ativo-titulo">—</h1>
+          <div id="ativo-score-badge"></div>
+        </div>
         <div style="font-size:14px;color:var(--text2)" id="ativo-nome">Carregando...</div>
         <div style="font-size:12px;color:var(--text3)" id="ativo-setor"></div>
       </div>
     </div>
     <div class="ativo-preco">
       <div class="preco" id="ativo-preco">—</div>
-      <div style="font-size:14px;font-family:'DM Mono',monospace;margin-top:4px" id="ativo-var">—</div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+      <div style="font-size:14px;font-family:var(--font-mono);margin-top:4px" id="ativo-var">—</div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap">
         <button class="watchlist-btn" id="watchlist-btn" onclick="toggleWatchlist()">☆ Favoritar</button>
-        <a id="comparar-btn" href="comparador.html" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);color:var(--text2);font-size:12px;font-weight:600;text-decoration:none">⇄ Comparar</a>
+        <a id="comparar-btn" href="comparador.html" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);color:var(--text2);font-size:12px;font-weight:700;text-decoration:none;font-family:var(--font-body)">⇄ Comparar</a>
+        <a id="analise-btn" href="analise.html" style="padding:6px 14px;border-radius:8px;background:var(--gold-dim);border:1px solid var(--border2);color:var(--gold);font-size:12px;font-weight:700;text-decoration:none;font-family:var(--font-body)">✦ Análise IA</a>
       </div>
     </div>
   </div>
@@ -89,6 +98,9 @@
           </div>
           <div style="position:relative;height:260px">
             <canvas id="mainChart" role="img" aria-label="Histórico"></canvas>
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-top:6px;text-align:center">
+            💡 Clique para travar · Segundo clique para variação · Arraste para período
           </div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:1rem">
             <div class="ind-card"><div class="ind-label">Mín. período</div><div class="ind-val dn" id="ch-min">—</div></div>
@@ -198,8 +210,16 @@ function initWatchlist(){
 
 function renderHero(d){
   document.title=`${d.t} — ${d.n} — Mais Valor`;
-  document.getElementById('ativo-logo').textContent=d.t.slice(0,4);
-  document.getElementById('ativo-titulo').innerHTML=`${d.t}`;
+  // Logo com fallback avatar
+  const initials=d.t.replace(/\d+/g,'').slice(0,3)||d.t.slice(0,3);
+  document.getElementById('ativo-logo-wrap').innerHTML=`
+    <img src="https://raw.githubusercontent.com/thefintz/icones-b3/main/icones/${d.t}.png"
+      style="width:56px;height:56px;border-radius:14px;object-fit:contain;background:#fff;border:1px solid var(--border);flex-shrink:0"
+      onerror="this.outerHTML='<div class=\\'ativo-logo-av\\'>${initials}</div>'"
+      loading="lazy">`;
+  document.getElementById('ativo-titulo').textContent=d.t;
+  // Score badge
+  document.getElementById('ativo-score-badge').innerHTML=scoreBadge(d);
   document.getElementById('ativo-nome').textContent=d.n;
   document.getElementById('ativo-setor').textContent=d.setor;
   const isUp=d.v>=0;
@@ -207,6 +227,7 @@ function renderHero(d){
   document.getElementById('ativo-preco').className='preco '+(isUp?'up':'dn');
   document.getElementById('ativo-var').innerHTML=`<span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span> hoje`;
   document.getElementById('comparar-btn').href=`comparador.html?t1=${d.t}&t2=VALE3`;
+  document.getElementById('analise-btn').href=`analise.html?t=${d.t}`;
 }
 
 function fmtPct(v){return v!=null&&v!==0?v.toFixed(1)+'%':'—';}

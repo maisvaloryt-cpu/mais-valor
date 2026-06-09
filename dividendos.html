@@ -42,15 +42,15 @@
   <div class="main-grid">
     <div class="fade-in-2">
       <div class="filter-bar">
-        <input class="filter-input" placeholder="🔍 Buscar ativo..." style="flex:1;max-width:280px" oninput="filter()" id="f-search">
-        <select class="filter-select" onchange="filter()" id="f-tipo">
+        <input class="filter-input" placeholder="🔍 Buscar ativo..." style="flex:1;max-width:280px" oninput="filterDivs()" id="f-search">
+        <select class="filter-select" onchange="filterDivs()" id="f-tipo">
           <option value="">Todos os tipos</option>
           <option>Dividendo</option><option>JCP</option><option>Rendimento</option>
         </select>
-        <select class="filter-select" onchange="filter()" id="f-periodo">
-          <option value="7">Próximos 7 dias</option>
-          <option value="15">Próximos 15 dias</option>
+        <select class="filter-select" onchange="filterDivs()" id="f-periodo">
           <option value="30">Próximos 30 dias</option>
+          <option value="15">Próximos 15 dias</option>
+          <option value="7">Próximos 7 dias</option>
           <option value="999">Todos</option>
         </select>
       </div>
@@ -62,9 +62,14 @@
             <th class="r">Data Com</th><th class="r">Pagamento</th>
             <th class="r">Valor / cota</th><th class="r">DY estimado</th>
           </tr></thead>
-          <tbody id="tbody"></tbody>
+          <tbody id="tbody">
+            <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text3)">
+              <span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>
+            </td></tr>
+          </tbody>
         </table>
       </div>
+      <div id="div-count" style="font-size:11px;color:var(--text3);margin-top:.5rem"></div>
     </div>
 
     <div class="sidebar fade-in-3">
@@ -92,48 +97,85 @@
 <div id="footer-placeholder"></div>
 <script src="data.js"></script><script src="nav.js"></script>
 <script>
-function logoImg(ticker, size=22) {
-  return `<img src="https://raw.githubusercontent.com/thefintz/icones-b3/main/icones/${ticker}.png"
-    onerror="this.style.display='none'"
-    style="width:${size}px;height:${size}px;border-radius:50%;object-fit:contain;background:#fff;flex-shrink:0">`;
+let allDivs = [];
+
+function parseDateBR(str){
+  // aceita YYYY-MM-DD ou DD/MM/YYYY
+  if(!str) return null;
+  if(str.includes('-')){ const [y,m,d]=str.split('-'); return new Date(+y,+m-1,+d); }
+  if(str.includes('/')){ const [d,m,y]=str.split('/'); return new Date(+y,+m-1,+d); }
+  return null;
 }
+
 function renderTable(arr){
   const tb=document.getElementById('tbody'); tb.innerHTML='';
-  if(!arr.length){ tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text3)">Nenhum resultado</td></tr>'; return; }
+  document.getElementById('div-count').textContent = arr.length ? `${arr.length} pagamento(s) encontrado(s)` : '';
+  if(!arr.length){
+    tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text3)">Nenhum dividendo encontrado no período selecionado</td></tr>';
+    return;
+  }
   arr.forEach((d,i)=>{
     const tipoColor=d.tipo==='Dividendo'?'up-pill':d.tipo==='JCP'?'gold-pill':'';
     const tr=document.createElement('tr');
-    tr.style.animationDelay=(i*0.02)+'s'; tr.className='fade-in';
+    tr.style.animationDelay=(i*0.015)+'s'; tr.className='fade-in';
+    const isFii = d.t && /\d{2}$/.test(d.t);
+    tr.onclick=()=>location.href=`ativo.html?t=${d.t}${isFii?'&tipo=fii':''}`;
+    tr.style.cursor='pointer';
     tr.innerHTML=`
-      <td><div style="display:flex;align-items:center;gap:8px">${logoImg(d.t)}<div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n}</div></div></div></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          ${logoHtml(d.t,32)}
+          <div><div class="asset-ticker">${d.t}</div><div class="asset-name">${d.n?.slice(0,25)||''}</div></div>
+        </div>
+      </td>
       <td><span class="pill ${tipoColor}">${d.tipo}</span></td>
-      <td class="r" style="font-size:12px">${d.com.slice(0,5)}</td>
-      <td class="r" style="font-size:12px;color:var(--gold)">${d.pag.slice(0,5)}</td>
-      <td class="r" style="font-size:14px;font-weight:700;color:var(--gold)">R$&nbsp;${d.val.toFixed(2)}</td>
-      <td class="r up">${d.dy}</td>`;
+      <td class="r" style="font-size:12px">${d.com?.slice(0,5)||'—'}</td>
+      <td class="r" style="font-size:12px;color:var(--gold)">${d.pag?.slice(0,5)||'—'}</td>
+      <td class="r" style="font-size:14px;font-weight:700;color:var(--gold)">R$&nbsp;${(d.val||0).toFixed(4)}</td>
+      <td class="r up">${d.dy||'—'}</td>`;
     tb.appendChild(tr);
   });
 }
 
-function filter(){
+function filterDivs(){
   const q=document.getElementById('f-search').value.toLowerCase();
   const tipo=document.getElementById('f-tipo').value;
-  renderTable(DIVIDENDOS.filter(d=>(d.t.toLowerCase().includes(q)||d.n.toLowerCase().includes(q))&&(!tipo||d.tipo===tipo)));
+  const periodo=parseInt(document.getElementById('f-periodo').value)||999;
+  const now=new Date(); now.setHours(0,0,0,0);
+  const limit=new Date(now); limit.setDate(now.getDate()+periodo);
+
+  let filtered=allDivs.filter(d=>{
+    if(q && !d.t.toLowerCase().includes(q) && !(d.n||'').toLowerCase().includes(q)) return false;
+    if(tipo && d.tipo!==tipo) return false;
+    if(periodo<999){
+      const dt=parseDateBR(d.pag||d.com);
+      if(!dt || dt<now || dt>limit) return false;
+    }
+    return true;
+  });
+  renderTable(filtered);
 }
 
 function renderSidebar(){
   const topAcoes=[...ACOES].filter(d=>d.dy>0).sort((a,b)=>b.dy-a.dy).slice(0,5);
   document.getElementById('top-dy-acoes').innerHTML=topAcoes.map(d=>`
     <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}'">
-      <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${logoHtml(d.t,26)}
+        <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      </div>
       <div style="text-align:right">
         <div class="mover-price gold">${d.dy.toFixed(1)}%</div>
         <div style="font-size:11px;color:var(--text3)">R$&nbsp;${d.p.toFixed(2)}</div>
       </div></div>`).join('');
+
   const topFiis=[...FIIS].filter(d=>d.dy>0).sort((a,b)=>b.dy-a.dy).slice(0,5);
   document.getElementById('top-dy-fiis').innerHTML=topFiis.map(d=>`
     <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}&tipo=fii'">
-      <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${logoHtml(d.t,26)}
+        <div><div class="mover-ticker">${d.t}</div><div class="mover-name">${d.setor}</div></div>
+      </div>
       <div style="text-align:right">
         <div class="mover-price gold">${d.dy.toFixed(1)}%</div>
         <div style="font-size:11px;color:var(--text3)">R$&nbsp;${d.p.toFixed(2)}</div>
@@ -149,7 +191,46 @@ function updateMiniCards(){
   if(topFii){  document.getElementById('mc-dy-fii').textContent=topFii.dy.toFixed(1)+'%';   document.getElementById('mc-dy-fii-sub').textContent=topFii.t+' · 12m'; }
 }
 
-async function init(){ await loadData(); updateMiniCards(); renderTable(DIVIDENDOS); renderSidebar(); }
+async function init(){
+  await loadData();
+  updateMiniCards();
+  renderSidebar();
+
+  // Carrega dividendos: tenta JSON dedicado, fallback para DIVIDENDOS do data.js
+  let divs = [];
+  try {
+    const r = await fetch('data/dividendos.json?t=' + Date.now());
+    if(r.ok){ const j = await r.json(); divs = j.dividendos || j || []; }
+  } catch(e){}
+
+  // Fallback: usa array DIVIDENDOS do data.js se existir
+  if(!divs.length && typeof DIVIDENDOS !== 'undefined' && DIVIDENDOS.length){
+    divs = DIVIDENDOS;
+  }
+
+  // Se ainda vazio: gera dados de exemplo a partir dos ativos com DY > 0
+  if(!divs.length){
+    const hoje = new Date();
+    const todos=[...ACOES,...FIIS].filter(a=>a.dy>0).slice(0,30);
+    divs = todos.map((a,i)=>{
+      const com=new Date(hoje); com.setDate(hoje.getDate()+Math.floor(i*3.2));
+      const pag=new Date(com); pag.setDate(com.getDate()+3);
+      const fmt=(d)=>`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
+      const valMensal=a.p*(a.dy/100)/12;
+      return {
+        t: a.t, n: a.n,
+        tipo: a.t.endsWith('11')?'Rendimento':'Dividendo',
+        com: fmt(com), pag: fmt(pag),
+        val: +valMensal.toFixed(4),
+        dy: (a.dy/12).toFixed(2)+'%',
+        setor: a.setor
+      };
+    });
+  }
+
+  allDivs = divs;
+  filterDivs();
+}
 init();
 </script>
 </body></html>

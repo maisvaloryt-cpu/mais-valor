@@ -19,6 +19,7 @@
     <button class="tab" onclick="show('carteira',this)">Calculadora de Carteira</button>
     <button class="tab" onclick="show('aposentadoria',this)">Aposentadoria</button>
     <button class="tab" onclick="show('dy-calc',this)">Calculadora DY</button>
+    <button class="tab" onclick="show('dcf',this)">Valuation DCF</button>
   </div>
 
   <!-- JUROS COMPOSTOS -->
@@ -142,6 +143,61 @@
       </div>
     </div>
   </div>
+  <!-- DCF VALUATION -->
+  <div id="tool-dcf" style="display:none">
+    <div class="tool-grid">
+      <div class="calc-box">
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">💰 Valuation por DCF Simplificado</div>
+        <label class="calc-label">Lucro por ação (LPA) atual — R$</label>
+        <input class="calc-input" type="number" id="dcf-lpa" value="5.00" step="0.01" oninput="calcDCF()">
+        <label class="calc-label">Taxa de crescimento anual (%)</label>
+        <input class="calc-input" type="number" id="dcf-cresc" value="10" step="0.5" oninput="calcDCF()">
+        <label class="calc-label">Taxa de desconto / WACC (%)</label>
+        <input class="calc-input" type="number" id="dcf-wacc" value="12" step="0.5" oninput="calcDCF()">
+        <label class="calc-label">Período de crescimento (anos)</label>
+        <input class="calc-input" type="number" id="dcf-anos" value="10" oninput="calcDCF()">
+        <label class="calc-label">Múltiplo terminal (P/L estável)</label>
+        <input class="calc-input" type="number" id="dcf-mult" value="12" step="0.5" oninput="calcDCF()">
+        <label class="calc-label">Margem de segurança (%)</label>
+        <input class="calc-input" type="number" id="dcf-ms" value="30" oninput="calcDCF()">
+
+        <div class="calc-result">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+            <div>
+              <div class="calc-result-label">Valor justo estimado</div>
+              <div class="calc-result-val" id="dcf-vj">—</div>
+            </div>
+            <div>
+              <div class="calc-result-label">Preço c/ margem segurança</div>
+              <div style="font-size:22px;font-weight:800;font-family:var(--font-mono);color:var(--up)" id="dcf-preco-ms">—</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+            <div>
+              <div class="calc-result-label">Valor do fluxo (10 anos)</div>
+              <div style="font-size:16px;font-weight:700;font-family:var(--font-mono);color:var(--text2)" id="dcf-vp">—</div>
+            </div>
+            <div>
+              <div class="calc-result-label">Valor terminal</div>
+              <div style="font-size:16px;font-weight:700;font-family:var(--font-mono);color:var(--text2)" id="dcf-vt">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="calc-box">
+        <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Fluxo de caixa descontado por ano</div>
+        <div style="position:relative;height:260px"><canvas id="dcfChart"></canvas></div>
+        <div style="margin-top:1.25rem;padding:1rem;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.8">
+          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">📌 Como interpretar:</div>
+          <div>• <strong style="color:var(--text)">Valor justo</strong>: VP dos fluxos futuros + valor terminal</div>
+          <div>• <strong style="color:var(--text)">Margem de segurança</strong>: desconto para proteger contra incertezas</div>
+          <div>• <strong style="color:var(--text)">WACC</strong>: custo médio ponderado de capital (use 10-15%)</div>
+          <div>• É uma estimativa — use como referência, não como verdade absoluta</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <div id="footer-placeholder"></div>
@@ -161,15 +217,16 @@ const CHART_OPTS = {
 };
 
 function show(id,el){
-  ['juros','carteira','aposentadoria','dy-calc'].forEach(t=>{
-    const el=document.getElementById('tool-'+t);
-    if(el){ el.style.display='none'; el.classList.remove('fade-in-2'); }
+  ['juros','carteira','aposentadoria','dy-calc','dcf'].forEach(t=>{
+    const el2=document.getElementById('tool-'+t);
+    if(el2){ el2.style.display='none'; el2.classList.remove('fade-in-2'); }
   });
   const shown=document.getElementById('tool-'+id);
-  shown.style.display='';
-  shown.classList.add('fade-in-2');
+  if(shown){ shown.style.display=''; shown.classList.add('fade-in-2'); }
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
+  if(el) el.classList.add('active');
+  if(id==='dcf') calcDCF();
+}
   if(id==='juros')calcJuros();
   if(id==='aposentadoria')calcAp();
   if(id==='dy-calc')calcDY();
@@ -290,6 +347,57 @@ function renderCarteira(){
   carteiraChart=new Chart(document.getElementById('carteiraChart'),{type:'doughnut',
     data:{labels:carteira.map(c=>c.t),datasets:[{data:carteira.map(c=>+(c.p*(c.dy/100/12)*c.qtd).toFixed(2)),backgroundColor:['#F5A623','#1FC96E','#E8503A','#5E8EE0','#A78BFA','#34D399','#F87171','#60A5FA']}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#8A8884',font:{size:11}}}}}
+  });
+}
+
+let dcfChart=null;
+function calcDCF(){
+  const lpa=parseFloat(document.getElementById('dcf-lpa').value)||5;
+  const cresc=parseFloat(document.getElementById('dcf-cresc').value)/100||0.10;
+  const wacc=parseFloat(document.getElementById('dcf-wacc').value)/100||0.12;
+  const anos=parseInt(document.getElementById('dcf-anos').value)||10;
+  const mult=parseFloat(document.getElementById('dcf-mult').value)||12;
+  const ms=parseFloat(document.getElementById('dcf-ms').value)/100||0.30;
+
+  // Calcula fluxos descontados
+  const fluxos=[], labels=[];
+  let lucro=lpa, vpTotal=0;
+  for(let a=1;a<=anos;a++){
+    lucro*=(1+cresc);
+    const vp=lucro/Math.pow(1+wacc,a);
+    fluxos.push(+vp.toFixed(2));
+    vpTotal+=vp;
+    labels.push('Ano '+a);
+  }
+
+  // Valor terminal
+  const lucroFinal=lpa*Math.pow(1+cresc,anos);
+  const vt=lucroFinal*mult/Math.pow(1+wacc,anos);
+  const valorJusto=vpTotal+vt;
+  const precoMs=valorJusto*(1-ms);
+
+  const fmt=(v)=>'R$ '+v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+  document.getElementById('dcf-vj').textContent=fmt(valorJusto);
+  document.getElementById('dcf-preco-ms').textContent=fmt(precoMs);
+  document.getElementById('dcf-vp').textContent=fmt(vpTotal);
+  document.getElementById('dcf-vt').textContent=fmt(vt);
+
+  // Gráfico de barras
+  const canvas=document.getElementById('dcfChart');
+  if(!canvas) return;
+  if(dcfChart) dcfChart.destroy();
+  dcfChart=new Chart(canvas,{
+    type:'bar',
+    data:{labels,datasets:[{label:'VP dos Fluxos (R$)',data:fluxos,
+      backgroundColor:'rgba(245,166,35,0.3)',borderColor:'var(--gold)',borderWidth:1,borderRadius:4}]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`R$ ${ctx.parsed.y.toFixed(2)}`}}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10}}},
+        y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},callback:v=>'R$'+v.toFixed(0)}}
+      }
+    }
   });
 }
 
