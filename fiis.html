@@ -51,22 +51,23 @@
           <div class="ranking-btns">
             <button class="rank-btn active" data-sort="vp" onclick="setRank(this)">Valor Patrimonial</button>
             <button class="rank-btn" data-sort="dy" onclick="setRank(this)">Dividend Yield</button>
-            <button class="rank-btn" data-sort="liq" onclick="setRank(this)">Liquidez</button>
             <button class="rank-btn" data-sort="pvp" onclick="setRank(this)">Menores P/VP</button>
-            <button class="rank-btn" data-sort="v" onclick="setRank(this)">Variação dia</button>
+            <button class="rank-btn" data-sort="vac" onclick="setRank(this)">Menor Vacância</button>
+            <button class="rank-btn" data-sort="liq" onclick="setRank(this)">Liquidez</button>
           </div>
         </div>
         <table class="data-table">
           <thead><tr>
             <th>Ativos</th>
-            <th class="r">Patrimônio Líquido</th>
-            <th class="r">P/VP</th>
-            <th class="r">Dividend Yield</th>
-            <th class="r">Variação 12m</th>
-            <th class="r">Segmento</th>
+            <th class="r sortable" data-sort="vp" onclick="setRank(this)" title="Ordenar por Patrimônio Líquido">Patrimônio Líquido <span class="sort-arrow"></span></th>
+            <th class="r sortable" data-sort="pvp" onclick="setRank(this)" title="Ordenar por P/VP">P/VP <span class="sort-arrow"></span></th>
+            <th class="r sortable" data-sort="dy" onclick="setRank(this)" title="Ordenar por Dividend Yield">DY 12m <span class="sort-arrow"></span></th>
+            <th class="r sortable" data-sort="vac" onclick="setRank(this)" title="Menor vacância = melhor">Vacância <span class="sort-arrow"></span></th>
+            <th class="r sortable" data-sort="liq" onclick="setRank(this)" title="Ordenar por Liquidez Diária">Liquidez Diária <span class="sort-arrow"></span></th>
+            <th class="r sortable" data-sort="v12" onclick="setRank(this)" title="Ordenar por Variação Anual">Variação Anual <span class="sort-arrow"></span></th>
           </tr></thead>
           <tbody id="tbody">
-            <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text3)">
+            <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text3)">
               <span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>
             </td></tr>
           </tbody>
@@ -101,6 +102,9 @@
 .rank-btn{background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--text2);padding:5px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;transition:all .18s;white-space:nowrap}
 .rank-btn:hover{border-color:var(--gold);color:var(--gold)}
 .rank-btn.active{background:var(--gold);border-color:var(--gold);color:#000;font-weight:700}
+.sortable{cursor:pointer;user-select:none;transition:color .15s}
+.sortable:hover{color:var(--gold)}
+.sort-arrow{color:var(--gold);font-size:10px}
 </style>
 <script>
 let data = [];
@@ -114,14 +118,8 @@ function fmtBi(v) {
   return v.toLocaleString('pt-BR');
 }
 
-function fiiLogoOrAvatar(ticker, size=32){
-  const initials = ticker.replace(/\d+/g,'').slice(0,3) || ticker.slice(0,3);
-  const fs = Math.round(size * 0.32);
-  return `<img src="https://raw.githubusercontent.com/thefintz/icones-b3/main/icones/${ticker}.png"
-    style="width:${size}px;height:${size}px;border-radius:50%;object-fit:contain;background:#fff;flex-shrink:0"
-    onerror="this.outerHTML='<div style=\\'width:${size}px;height:${size}px;border-radius:50%;background:linear-gradient(135deg,#1A3A5C,#2563a8);display:flex;align-items:center;justify-content:center;font-size:${fs}px;font-weight:800;color:#fff;font-family:var(--font-mono);flex-shrink:0\\'>${initials}</div>'"
-    loading="lazy">`;
-}
+// fiiLogoOrAvatar removida — usando logoHtml() de nav.js (com cache + cascata de fontes)
+function fiiLogoOrAvatar(ticker, size=32){ return logoHtml(ticker, size); }
 
 function setRank(el) {
   document.querySelectorAll('.rank-btn').forEach(b => b.classList.remove('active'));
@@ -135,23 +133,39 @@ function renderTable(arr) {
   const tb = document.getElementById('tbody');
   tb.innerHTML = '';
   if (!arr.length) {
-    tb.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text3)">Nenhum FII encontrado</td></tr>';
+    tb.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text3)">Nenhum FII encontrado</td></tr>';
     return;
   }
+  // Atualiza seta do header ativo
+  document.querySelectorAll('.sort-arrow').forEach(el => el.textContent = '');
+  const activeBtn = document.querySelector(`.rank-btn.active`);
+  const activeSort = activeBtn ? activeBtn.dataset.sort : currentSort;
+  const activeTh = document.querySelector(`th[data-sort="${activeSort}"] .sort-arrow`);
+  if (activeTh) activeTh.textContent = ' ↓';
+
   arr.forEach((d, i) => {
     const tr = document.createElement('tr');
     tr.style.animationDelay = (i * 0.015) + 's';
     tr.className = 'fade-in';
     tr.style.cursor = 'pointer';
     if (d.stale) tr.setAttribute('data-stale', 'true');
+
     const pvpClass = d.pvp < 1 ? 'up' : d.pvp > 1.1 ? 'dn' : '';
 
-    // Variação 12m — só mostra se existir, senão '—'
+    // Vacância
+    const vac = d.vacancia != null ? d.vacancia : null;
+    const vacTxt = vac !== null ? vac.toFixed(1) + '%' : '—';
+    const vacClass = vac !== null ? (vac <= 5 ? 'up' : vac >= 20 ? 'dn' : '') : '';
+
+    // Liquidez diária
+    const liqTxt = d.volNum > 0 ? fmtBi(d.volNum) : '—';
+
+    // Variação anual
     const v12 = d.v12 !== undefined ? d.v12 : null;
     const v12Class = v12 !== null ? (v12 >= 0 ? 'up' : 'dn') : '';
-    const v12Txt = v12 !== null ? `${v12 >= 0 ? '+' : ''}${v12.toFixed(2)}%` : '—';
+    const v12Txt = v12 !== null ? (v12 >= 0 ? '+' : '') + v12.toFixed(2) + '%' : '—';
 
-    // Patrimônio líquido — usa d.pl_val (valor numérico) ou d.vm ou d.mcap
+    // Patrimônio líquido
     const vpVal = d.pl_val || d.mcap || d.vmNum || null;
 
     tr.innerHTML = `
@@ -167,8 +181,9 @@ function renderTable(arr) {
       <td class="r" style="color:var(--text2)">${vpVal ? fmtBi(vpVal) : '—'}</td>
       <td class="r ${pvpClass}">${d.pvp > 0 ? d.pvp.toFixed(2) : '—'}</td>
       <td class="r gold">${d.dy > 0 ? d.dy.toFixed(1) + '%' : '—'}</td>
-      <td class="r ${v12Class}">${v12Txt}</td>
-      <td class="r" style="color:var(--text3);font-size:11px">${d.setor || '—'}</td>`;
+      <td class="r ${vacClass}">${vacTxt}</td>
+      <td class="r" style="color:var(--text2);font-size:12px">${liqTxt}</td>
+      <td class="r ${v12Class}">${v12Txt}</td>`;
     tr.onclick = () => location.href = `ativo.html?t=${d.t}&tipo=fii`;
     tb.appendChild(tr);
   });
@@ -186,14 +201,27 @@ function filterTable() {
 }
 
 function applySort(k) {
-  if (k === 't')    data.sort((a, b) => a.t.localeCompare(b.t));
-  else if (k === 'v')   data.sort((a, b) => b.v - a.v);
-  else if (k === 'dy')  data.sort((a, b) => b.dy - a.dy);
+  if (k === 'dy')  data.sort((a, b) => b.dy - a.dy);
   else if (k === 'pvp') {
     data = data.filter(d => d.pvp && d.pvp > 0);
     data.sort((a, b) => a.pvp - b.pvp);
   }
+  else if (k === 'vac') {
+    // Menor vacância primeiro; sem dados vai pro fim
+    data.sort((a, b) => {
+      const av = a.vacancia != null ? a.vacancia : 9999;
+      const bv = b.vacancia != null ? b.vacancia : 9999;
+      return av - bv;
+    });
+  }
   else if (k === 'liq') data.sort((a, b) => (b.volNum || 0) - (a.volNum || 0));
+  else if (k === 'v12') {
+    data.sort((a, b) => {
+      const av = a.v12 != null ? a.v12 : -9999;
+      const bv = b.v12 != null ? b.v12 : -9999;
+      return bv - av;
+    });
+  }
   else /* vp / default */ data.sort((a, b) => (b.pl_val || b.mcap || b.vmNum || 0) - (a.pl_val || a.mcap || a.vmNum || 0));
   renderTable(data);
 }

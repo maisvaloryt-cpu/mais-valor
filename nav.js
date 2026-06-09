@@ -26,17 +26,173 @@ function applyTheme(t) {
 }
 function toggleTheme() { applyTheme(getTheme() === 'dark' ? 'light' : 'dark'); }
 
-// ── Logo helper ───────────────────────────────────────────────────
-function logoHtml(ticker, size = 32, cls = 'asset-logo') {
-  const initials = ticker.replace(/\d+/g, '').slice(0, 3) || ticker.slice(0, 3);
-  const avCls = size <= 26 ? 'logo-sm-avatar' : 'logo-avatar';
-  const imgSize = size <= 26 ? 'logo-sm' : 'asset-logo';
-  return `<img
-    src="https://raw.githubusercontent.com/thefintz/icones-b3/main/icones/${ticker}.png"
-    style="width:${size}px;height:${size}px;border-radius:50%;object-fit:contain;background:#fff;flex-shrink:0"
-    onerror="this.outerHTML='<div class=\\'${avCls}\\' style=\\'width:${size}px;height:${size}px;font-size:${Math.round(size*0.35)}px\\'>${initials}</div>'"
-    loading="lazy">`;
+// ── Logo Cache (IndexedDB) ────────────────────────────────────────
+const _logoCache = (() => {
+  const DB_NAME = 'mv_logo_cache', STORE = 'logos', VERSION = 1;
+  let _db = null;
+
+  function openDB() {
+    if (_db) return Promise.resolve(_db);
+    return new Promise((res, rej) => {
+      const req = indexedDB.open(DB_NAME, VERSION);
+      req.onupgradeneeded = e => e.target.result.createObjectStore(STORE, { keyPath: 'ticker' });
+      req.onsuccess = e => { _db = e.target.result; res(_db); };
+      req.onerror = () => rej(req.error);
+    });
+  }
+
+  async function get(ticker) {
+    try {
+      const db = await openDB();
+      return new Promise((res) => {
+        const tx = db.transaction(STORE, 'readonly');
+        const req = tx.objectStore(STORE).get(ticker);
+        req.onsuccess = () => res(req.result?.url || null);
+        req.onerror = () => res(null);
+      });
+    } catch { return null; }
+  }
+
+  async function set(ticker, url) {
+    try {
+      const db = await openDB();
+      return new Promise((res) => {
+        const tx = db.transaction(STORE, 'readwrite');
+        tx.objectStore(STORE).put({ ticker, url, ts: Date.now() });
+        tx.oncomplete = () => res(true);
+        tx.onerror = () => res(false);
+      });
+    } catch { return false; }
+  }
+
+  return { get, set };
+})();
+
+// ── Logo sources cascade ──────────────────────────────────────────
+// Ordem de tentativa para cada ticker
+function _logoSources(ticker) {
+  return [
+    `https://raw.githubusercontent.com/thefintz/icones-b3/main/icones/${ticker}.png`,
+    `https://brapi.dev/favicon.svg`,  // placeholder — substituído abaixo por URL real
+    `https://cdn.jsdelivr.net/gh/thefintz/icones-b3@main/icones/${ticker}.png`,
+  ].filter(Boolean);
 }
+
+// Fontes reais por prioridade
+function _logoSourcesReal(ticker) {
+  return [
+    `https://raw.githubusercontent.com/thefintz/icones-b3/main/icones/${ticker}.png`,
+    `https://cdn.jsdelivr.net/gh/thefintz/icones-b3@main/icones/${ticker}.png`,
+    `https://brapi.dev/api/quote/${ticker}?token=demo`,  // usado apenas para fallback via fetch
+  ];
+}
+
+// ── Gerar avatar SVG inline como data URI ────────────────────────
+function _avatarDataUri(ticker, size) {
+  // Remove APENAS dígitos do FINAL do ticker: ANCR11 → ANCR, KNRI11 → KNRI, PETR4 → PETR
+  const initials = ticker.replace(/\d+$/, '').slice(0, 4) || ticker.slice(0, 4);
+  const fs = Math.round(size * 0.30);
+  // Paleta de cores baseada no hash do ticker para consistência visual
+  const colors = [
+    ['#1A3A5C','#2563a8'],['#1A4731','#16a34a'],['#4A1A2C','#be185d'],
+    ['#2D1A4A','#7c3aed'],['#4A2A00','#b45309'],['#1A3A4A','#0891b2'],
+    ['#3A1A1A','#dc2626'],['#1A3A3A','#0d9488'],
+  ];
+  let hash = 0;
+  for (let i = 0; i < ticker.length; i++) hash = (hash * 31 + ticker.charCodeAt(i)) & 0xffffffff;
+  const [c1, c2] = colors[Math.abs(hash) % colors.length];
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}' viewBox='0 0 ${size} ${size}'>`
+    + `<defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'>`
+    + `<stop offset='0%' stop-color='${c1}'/><stop offset='100%' stop-color='${c2}'/>`
+    + `</linearGradient></defs>`
+    + `<circle cx='${size/2}' cy='${size/2}' r='${size/2}' fill='url(#g)'/>`
+    + `<text x='50%' y='50%' dominant-baseline='central' text-anchor='middle' `
+    + `font-family='Inter,sans-serif' font-weight='800' font-size='${fs}' fill='#fff'>${initials}</text>`
+    + `</svg>`;
+  return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
+}
+
+// ── Renderiza logo com cascata + cache ────────────────────────────
+// Retorna HTML imediato com avatar; substitui assincronamente se achar logo real
+function logoHtml(ticker, size = 32) {
+  const uid = `logo-${ticker}-${size}-${Math.random().toString(36).slice(2,7)}`;
+  const avatarSrc = _avatarDataUri(ticker, size);
+  const baseStyle = `width:${size}px;height:${size}px;border-radius:50%;object-fit:contain;flex-shrink:0;`;
+
+  // Renderiza avatar imediatamente (sem flash branco)
+  const html = `<img id="${uid}" src="${avatarSrc}"
+    style="${baseStyle}background:transparent;"
+    loading="lazy" data-ticker="${ticker}" data-size="${size}">`;
+
+  // Tenta carregar logo real de forma assíncrona
+  requestAnimationFrame(() => _loadLogoAsync(uid, ticker, size, avatarSrc));
+
+  return html;
+}
+
+async function _loadLogoAsync(uid, ticker, size, avatarSrc) {
+  // 1. Verificar cache
+  const cached = await _logoCache.get(ticker);
+  if (cached) {
+    _applyLogo(uid, cached, size);
+    return;
+  }
+
+  // 2. Tentar fontes em cascata
+  const sources = [
+    `https://raw.githubusercontent.com/thefintz/icones-b3/main/icones/${ticker}.png`,
+    `https://cdn.jsdelivr.net/gh/thefintz/icones-b3@main/icones/${ticker}.png`,
+  ];
+
+  for (const src of sources) {
+    const ok = await _testImage(src);
+    if (ok) {
+      await _logoCache.set(ticker, src);
+      _applyLogo(uid, src, size);
+      return;
+    }
+  }
+
+  // 3. Tentar brapi para obter URL de logo
+  try {
+    const r = await fetch(`https://brapi.dev/api/quote/${ticker}?fundamental=false&token=demo`, { signal: AbortSignal.timeout(4000) });
+    if (r.ok) {
+      const j = await r.json();
+      const logoUrl = j?.results?.[0]?.logourl || j?.results?.[0]?.logo_url;
+      if (logoUrl) {
+        const ok = await _testImage(logoUrl);
+        if (ok) {
+          await _logoCache.set(ticker, logoUrl);
+          _applyLogo(uid, logoUrl, size);
+          return;
+        }
+      }
+    }
+  } catch {}
+
+  // 4. Sem logo — salvar sentinel no cache para não tentar de novo
+  await _logoCache.set(ticker, '__avatar__');
+}
+
+function _testImage(src) {
+  return new Promise(res => {
+    const img = new Image();
+    img.onload  = () => res(img.naturalWidth > 1);
+    img.onerror = () => res(false);
+    img.src = src;
+    setTimeout(() => res(false), 5000);
+  });
+}
+
+function _applyLogo(uid, src, size) {
+  if (src === '__avatar__') return; // mantém avatar gerado
+  const el = document.getElementById(uid);
+  if (!el) return;
+  el.style.background = '#fff';
+  el.src = src;
+  el.onerror = () => { el.style.background = 'transparent'; };
+}
+
 window.logoHtml = logoHtml;
 
 // ── Score fundamentalista (Graham/Bazin simplificado) ─────────────
