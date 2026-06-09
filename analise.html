@@ -266,7 +266,10 @@ async function generateAnalysis(){
     const prompt = buildPrompt(tickerRaw, ativo);
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
@@ -274,7 +277,10 @@ async function generateAnalysis(){
       })
     });
 
-    if(!response.ok) throw new Error('Erro na API');
+    if(!response.ok) {
+      const errBody = await response.text().catch(()=>'');
+      throw new Error(`HTTP ${response.status}${errBody ? ': ' + errBody.slice(0,120) : ''}`);
+    }
     const data = await response.json();
     const text = data.content?.find(b=>b.type==='text')?.text || 'Sem resposta.';
 
