@@ -651,6 +651,7 @@ const CLASSES_DEF = [
     id: 'acao', icon: '📈', name: 'Ações', sub: 'B3', color: '#5b8def',
     indicadores: [
       { ticker: 'IBOV',  desc: 'Ibovespa' },
+      { ticker: 'IBXL',  desc: 'IBrX 50' },
       { ticker: 'IBRA',  desc: 'Brasil A.' },
       { ticker: 'SMLL',  desc: 'Small Cap' },
       { ticker: 'IDIV',  desc: 'Dividendos' },
@@ -664,9 +665,9 @@ const CLASSES_DEF = [
     id: 'fii', icon: '🏢', name: 'FIIs', sub: 'Fundos Imob.', color: '#1FC96E',
     indicadores: [
       { ticker: 'IFIX',  desc: 'Índice FII' },
-      { ticker: 'IMOB',  desc: 'Imobiliário' },
       { ticker: 'IPCA',  desc: 'Inflação' },
       { ticker: 'CDI',   desc: 'CDI' },
+      { ticker: 'IBOV',  desc: 'Ibovespa' },
     ],
     defaultTickers: ['MXRF11','HGLG11','KNRI11','XPML11','VISC11'],
     exampleTickers: ['MXRF11','HGLG11','KNRI11','XPML11','VISC11','BCFF11','RBRF11','BTLG11','HGRU11','IRDM11'],
@@ -674,20 +675,24 @@ const CLASSES_DEF = [
   {
     id: 'rf', icon: '💵', name: 'Renda Fixa', sub: 'CDI, Tesouro', color: '#F5A623',
     indicadores: [
-      { ticker: 'CDI',   desc: 'CDI' },
-      { ticker: 'IPCA',  desc: 'IPCA' },
-      { ticker: 'IMAB',  desc: 'IMA-B' },
-      { ticker: 'IMAB5', desc: 'IMA-B5' },
-      { ticker: 'IMA',   desc: 'IMA Geral' },
+      { ticker: 'CDI',    desc: 'CDI' },
+      { ticker: 'IMAS',   desc: 'IMA-S Selic' },
+      { ticker: 'IPCA',   desc: 'IPCA' },
+      { ticker: 'IMAB',   desc: 'IMA-B' },
+      { ticker: 'IMAB5',  desc: 'IMA-B5' },
+      { ticker: 'IMAB5P', desc: 'IMA-B5+' },
+      { ticker: 'IRFM',   desc: 'IRF-M Pré' },
+      { ticker: 'IMA',    desc: 'IMA Geral' },
     ],
     defaultTickers: ['CDI'],
-    exampleTickers: ['CDI','IPCA','IMAB','IMAB5','IMA'],
+    exampleTickers: ['CDI','IPCA','IMAB','IMAB5','IMAS','IRFM','IMA'],
   },
   {
     id: 'ext', icon: '🌍', name: 'Exterior', sub: 'BDRs, REITs, USD', color: '#9b72ef',
     indicadores: [
-      { ticker: 'IVVB11', desc: 'S&P 500' },
-      { ticker: 'SPXI11', desc: 'S&P ETF' },
+      { ticker: 'SPXBRL', desc: 'S&P 500 BRL' },
+      { ticker: 'IVVB11', desc: 'S&P 500 ETF' },
+      { ticker: 'USDBRL', desc: 'USD/BRL' },
       { ticker: 'IPCA',   desc: 'IPCA' },
       { ticker: 'CDI',    desc: 'CDI' },
     ],
@@ -697,8 +702,8 @@ const CLASSES_DEF = [
   {
     id: 'cripto', icon: '₿', name: 'Cripto', sub: 'HASH11, QBTC', color: '#f7931a',
     indicadores: [
+      { ticker: 'BTCBRL', desc: 'Bitcoin BRL' },
       { ticker: 'HASH11', desc: 'Cripto B3' },
-      { ticker: 'QBTC11', desc: 'Bitcoin B3' },
       { ticker: 'IBOV',   desc: 'Ibovespa' },
       { ticker: 'CDI',    desc: 'CDI' },
     ],
@@ -708,10 +713,9 @@ const CLASSES_DEF = [
   {
     id: 'etf', icon: '📦', name: 'ETFs', sub: 'ETFs B3', color: '#e05c5c',
     indicadores: [
-      { ticker: 'BOVA11', desc: 'ETF Ibov' },
-      { ticker: 'SMAL11', desc: 'Small Cap' },
-      { ticker: 'IVVB11', desc: 'S&P 500' },
       { ticker: 'IBOV',   desc: 'Ibovespa' },
+      { ticker: 'SMLL',   desc: 'Small Cap' },
+      { ticker: 'SPXBRL', desc: 'S&P 500 BRL' },
       { ticker: 'CDI',    desc: 'CDI' },
     ],
     defaultTickers: ['BOVA11','SMAL11','DIVO11'],
@@ -720,10 +724,11 @@ const CLASSES_DEF = [
   {
     id: 'commodity', icon: '🥇', name: 'Commodities', sub: 'Ouro, Prata, Agro', color: '#56c8d8',
     indicadores: [
-      { ticker: 'GOLD11', desc: 'Ouro B3' },
-      { ticker: 'IPCA',   desc: 'IPCA' },
-      { ticker: 'CDI',    desc: 'CDI' },
-      { ticker: 'IBOV',   desc: 'Ibovespa' },
+      { ticker: 'OURO',  desc: 'Ouro BRL' },
+      { ticker: 'GOLD11',desc: 'Ouro B3' },
+      { ticker: 'IPCA',  desc: 'IPCA' },
+      { ticker: 'CDI',   desc: 'CDI' },
+      { ticker: 'IBOV',  desc: 'Ibovespa' },
     ],
     defaultTickers: ['GOLD11'],
     exampleTickers: ['GOLD11','OGLD11','SLVR11','AGRI11','VALE3','PETR4'],
@@ -746,24 +751,127 @@ let _divCache   = {};   // ticker → {'YYYY-MM': valor}
 
 // ══════════════════════════════════════════════════════════════
 // DADOS REAIS — única fonte de verdade
-// Retorna {'YYYY-MM': price} ou null se não existe arquivo
+//
+// Prioridade:
+//   1. data/historico/TICKER.json (dados salvos no site)
+//   2. localStorage (cache client-side de busca anterior)
+//   3. Busca client-side em tempo real (última prioridade)
+//      → só se não tiver dado local e usuário estiver online
 // ══════════════════════════════════════════════════════════════
+
+// Converte array [{date, close}] para mapa {'YYYY-MM': price}
+function histToMap(history) {
+  const map = {};
+  (history || []).forEach(pt => {
+    if (pt.date && pt.close != null) map[pt.date.slice(0,7)] = pt.close;
+  });
+  return Object.keys(map).length > 0 ? map : null;
+}
+
+// Busca client-side para cripto (CoinGecko) como último recurso
+async function fetchClientSideCripto(ticker) {
+  const cgMap = { 'BTCBRL': 'bitcoin', 'ETHBRL': 'ethereum', 'HASH11': null, 'QBTC11': null };
+  const cgId = cgMap[ticker];
+  if (!cgId) return null;
+  try {
+    const url = `https://api.coingecko.com/api/v3/coins/${cgId}/market_chart?vs_currency=brl&days=1825&interval=monthly`;
+    const r = await fetch(url);
+    if (!r.ok) return null;
+    const data = await r.json();
+    const prices = data.prices || [];
+    const por_mes = {};
+    prices.forEach(([ts, price]) => {
+      const d = new Date(ts);
+      const chave = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+      por_mes[chave] = price;
+    });
+    const map = {};
+    Object.entries(por_mes).forEach(([k, v]) => { map[k] = round(v, 2); });
+    return Object.keys(map).length > 0 ? map : null;
+  } catch { return null; }
+}
+
+// Busca client-side para câmbio (AwesomeAPI) como último recurso
+async function fetchClientSideCambio(ticker) {
+  const pairMap = { 'USDBRL': 'USD-BRL', 'EURBRL': 'EUR-BRL' };
+  const pair = pairMap[ticker];
+  if (!pair) return null;
+  try {
+    const r = await fetch(`https://economia.awesomeapi.com.br/json/daily/${pair}/1500`);
+    if (!r.ok) return null;
+    const data = await r.json();
+    const por_mes = {};
+    data.forEach(d => {
+      const ts = d.timestamp;
+      const bid = parseFloat(d.bid || d.ask || 0);
+      if (!ts || !bid) return;
+      const dt = new Date(parseInt(ts) * 1000);
+      const chave = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`;
+      por_mes[chave] = bid;
+    });
+    const map = {};
+    Object.entries(por_mes).forEach(([k, v]) => { map[k] = round(v, 4); });
+    return Object.keys(map).length > 0 ? map : null;
+  } catch { return null; }
+}
+
+const round = (v, d) => parseFloat(v.toFixed(d));
+
+// Tickers que têm fallback client-side disponível
+const CLIENT_SIDE_TICKERS = new Set(['BTCBRL','ETHBRL','USDBRL','EURBRL']);
+
 async function loadRealPrices(ticker) {
   if (ticker in _priceCache) return _priceCache[ticker];
+
+  // 1. Tenta arquivo local do site
   try {
     const r = await fetch(`data/historico/${ticker}.json?t=${Date.now()}`);
-    if (!r.ok) throw new Error('not found');
-    const j = await r.json();
-    const map = {};
-    (j.history || []).forEach(pt => {
-      if (pt.date && pt.close != null) map[pt.date.slice(0,7)] = pt.close;
-    });
-    _priceCache[ticker] = Object.keys(map).length > 0 ? map : null;
-    return _priceCache[ticker];
-  } catch {
-    _priceCache[ticker] = null;
-    return null;
+    if (r.ok) {
+      const j = await r.json();
+      const map = histToMap(j.history);
+      if (map) {
+        _priceCache[ticker] = map;
+        return map;
+      }
+    }
+  } catch {}
+
+  // 2. Tenta localStorage (cache de busca anterior)
+  try {
+    const cached = localStorage.getItem(`hist_${ticker}`);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      const map = histToMap(parsed.history);
+      if (map) {
+        _priceCache[ticker] = map;
+        return map;
+      }
+    }
+  } catch {}
+
+  // 3. Busca client-side em tempo real (última prioridade)
+  if (CLIENT_SIDE_TICKERS.has(ticker) && navigator.onLine) {
+    let map = null;
+    if (ticker === 'BTCBRL' || ticker === 'ETHBRL') {
+      map = await fetchClientSideCripto(ticker);
+    } else if (ticker === 'USDBRL' || ticker === 'EURBRL') {
+      map = await fetchClientSideCambio(ticker);
+    }
+    if (map) {
+      // Salva no localStorage para próximas visitas
+      try {
+        const history = Object.entries(map).map(([k, v]) => ({ date: k + '-01', close: v }));
+        localStorage.setItem(`hist_${ticker}`, JSON.stringify({
+          history, updated_at: new Date().toISOString()
+        }));
+      } catch {}
+      _priceCache[ticker] = map;
+      return map;
+    }
   }
+
+  _priceCache[ticker] = null;
+  return null;
 }
 
 async function loadRealDividends(ticker) {
