@@ -253,6 +253,36 @@ async function loadIndices() {
   } catch(e) {}
 }
 
+// ─── Deduplicação de tickers ──────────────────────────────────────────────────
+// Tickers secundários → mostrar só o principal de cada empresa
+const TICKER_PRINCIPAL = {
+  PETR3:'PETR4', ITUB3:'ITUB4', BBDC3:'BBDC4', GGBR3:'GGBR4',
+  GOAU3:'GOAU4', BRAP3:'BRAP4', ITSA3:'ITSA4', TAEE3:'TAEE11',
+  ALUP3:'ALUP11', ENGI3:'ENGI11', KLBN3:'KLBN11', SANB3:'SANB11',
+  BPAC3:'BPAC11', BPAC5:'BPAC11', CMIG3:'CMIG4', USIM3:'USIM5',
+  SAPR3:'SAPR11', TRPL3:'TRPL4', CESP3:'CESP6', BRSR3:'BRSR6',
+  CYRE3:'CYRE4', UNIP3:'UNIP6', KLBN4:'KLBN11', TAEE4:'TAEE11',
+  ALUP4:'ALUP11', ENGI4:'ENGI11', SANB4:'SANB11', IGTI3:'IGTI11',
+  GGBR3:'GGBR4', USIM6:'USIM5', BRSR5:'BRSR6', CESP6:'CESP6',
+  TRPL4:'TRPL4', UNIP5:'UNIP6', BMEB3:'BMEB4', PINE3:'PINE4',
+  BGIP3:'BGIP4', BMIN3:'BMIN4', BEES3:'BEES4', CMIG3:'CMIG4',
+  EALT3:'EALT4', GEPA3:'GEPA4', ISAE3:'ISAE4', WLMM3:'WLMM4',
+  CGRA3:'CGRA4', DEXP3:'DEXP4', KLBN3:'KLBN11', EUCA3:'EUCA4',
+  CRPG3:'CRPG6', CRPG5:'CRPG6', CTKA3:'CTKA4', TASA3:'TASA4',
+  BALM3:'BALM4', RPAD3:'RPAD6', RPAD5:'RPAD6', PATI3:'PATI4',
+  PTNT3:'PTNT4', RCSL3:'RCSL4', HAGA3:'HAGA4', MAPT3:'MAPT4',
+  JOPA3:'JOPA4', CEDO3:'CEDO4', TXRX3:'TXRX4', AZEV3:'AZEV4',
+  ALPA3:'ALPA4', BDLL3:'BDLL4', BLUT3:'BLUT4', BSLI3:'BSLI4',
+  PEAB3:'PEAB4', CTSA3:'CTSA4', CTKA3:'CTKA4',
+};
+const _vistos = new Set();
+function isDuplicado(ticker) {
+  if (TICKER_PRINCIPAL[ticker]) return true; // ticker secundário — ignora
+  if (_vistos.has(ticker)) return true;       // já apareceu antes
+  _vistos.add(ticker);
+  return false;
+}
+
 // ─── FUNÇÃO PRINCIPAL ─────────────────────────────────────────────────────────
 async function loadData() {
   try {
