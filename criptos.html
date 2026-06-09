@@ -143,7 +143,7 @@ function renderTable(arr){
     tr.title = `Ver análise de ${c.name}`;
     tr.onclick = () => { window.location.href = `cripto-detalhe.html?id=${c.id}`; };
     tr.innerHTML = `
-      <td style="color:var(--text3);font-size:12px;font-family:var(--font-mono)">${c.market_cap_rank || '—'}</td>
+      <td style="color:var(--text3);font-size:12px;font-family:var(--font-mono)">${i + 1}</td>
       <td>
         <div style="display:flex;align-items:center;gap:10px">
           <img src="${c.image}" alt="${c.name}"
@@ -262,7 +262,10 @@ async function loadCryptos(){
       progressBar.style.width = ((page-1)/totalPages*100) + '%';
 
       const data = await fetchPage(page, perPage);
-      allCryptos = [...allCryptos, ...data];
+      // Deduplica por id (evita repetir moedas entre páginas)
+      const existingIds = new Set(allCryptos.map(c=>c.id));
+      const newItems = data.filter(c => !existingIds.has(c.id));
+      allCryptos = [...allCryptos, ...newItems];
 
       // Renderiza progressivamente após primeira página
       if(page === 1){
