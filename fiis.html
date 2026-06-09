@@ -25,15 +25,22 @@
         <input class="filter-input" placeholder="🔍 Buscar por ticker ou nome..." style="flex:1;max-width:300px" oninput="filterTable()" id="f-search">
         <select class="filter-select" onchange="filterTable()" id="f-setor">
           <option value="">Todos os tipos e segmentos</option>
-          <option>Papel</option>
-          <option>Logística</option>
-          <option>Shoppings</option>
-          <option>Híbrido</option>
-          <option>FOF</option>
-          <option>Lajes</option>
-          <option>Residencial</option>
-          <option>Hotel</option>
+          <option>Agências</option>
+          <option>Agrícola</option>
+          <option>CRI / Papel</option>
           <option>Educacional</option>
+          <option>FII</option>
+          <option>FOF</option>
+          <option>Hospital</option>
+          <option>Hotel</option>
+          <option>Híbrido</option>
+          <option>Industrial</option>
+          <option>Lajes Corporativas</option>
+          <option>Logística</option>
+          <option>Multiestratégia</option>
+          <option>Residencial</option>
+          <option>Shoppings</option>
+          <option>Varejo</option>
         </select>
       </div>
 
@@ -136,13 +143,13 @@ function renderTable(arr) {
     tr.style.animationDelay = (i * 0.015) + 's';
     tr.className = 'fade-in';
     tr.style.cursor = 'pointer';
-    if (d.stale) tr.setAttribute('data-stale', 'true');: abaixo de 1 = verde, acima de 1.1 = vermelho
+    if (d.stale) tr.setAttribute('data-stale', 'true');
     const pvpClass = d.pvp < 1 ? 'up' : d.pvp > 1.1 ? 'dn' : '';
 
-    // Variação 12m — usa d.v12 se existir, senão d.v (dia)
-    const v12 = d.v12 !== undefined ? d.v12 : d.v;
-    const v12Class = v12 >= 0 ? 'up' : 'dn';
-    const v12Txt = v12 !== undefined ? `${v12 >= 0 ? '+' : ''}${v12.toFixed(2)}%` : '—';
+    // Variação 12m — só mostra se existir, senão '—'
+    const v12 = d.v12 !== undefined ? d.v12 : null;
+    const v12Class = v12 !== null ? (v12 >= 0 ? 'up' : 'dn') : '';
+    const v12Txt = v12 !== null ? `${v12 >= 0 ? '+' : ''}${v12.toFixed(2)}%` : '—';
 
     // Patrimônio líquido — usa d.pl_val (valor numérico) ou d.vm ou d.mcap
     const vpVal = d.pl_val || d.mcap || d.vmNum || null;
@@ -157,7 +164,7 @@ function renderTable(arr) {
           </div>
         </div>
       </td>
-      <td class="r" style="color:var(--text2)">${vpVal ? fmtBi(vpVal) : (d.vm || '—')}</td>
+      <td class="r" style="color:var(--text2)">${vpVal ? fmtBi(vpVal) : '—'}</td>
       <td class="r ${pvpClass}">${d.pvp > 0 ? d.pvp.toFixed(2) : '—'}</td>
       <td class="r gold">${d.dy > 0 ? d.dy.toFixed(1) + '%' : '—'}</td>
       <td class="r ${v12Class}">${v12Txt}</td>
@@ -182,7 +189,10 @@ function applySort(k) {
   if (k === 't')    data.sort((a, b) => a.t.localeCompare(b.t));
   else if (k === 'v')   data.sort((a, b) => b.v - a.v);
   else if (k === 'dy')  data.sort((a, b) => b.dy - a.dy);
-  else if (k === 'pvp') data.sort((a, b) => (a.pvp || 999) - (b.pvp || 999));
+  else if (k === 'pvp') {
+    data = data.filter(d => d.pvp && d.pvp > 0);
+    data.sort((a, b) => a.pvp - b.pvp);
+  }
   else if (k === 'liq') data.sort((a, b) => (b.volNum || 0) - (a.volNum || 0));
   else /* vp / default */ data.sort((a, b) => (b.pl_val || b.mcap || b.vmNum || 0) - (a.pl_val || a.mcap || a.vmNum || 0));
   renderTable(data);

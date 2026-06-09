@@ -25,11 +25,38 @@
         <input class="filter-input" placeholder="🔍 Buscar por ticker ou nome..." style="flex:1;max-width:300px" oninput="filterTable()" id="f-search">
         <select class="filter-select" onchange="filterTable()" id="f-setor">
           <option value="">Todos os setores</option>
-          <option>Bancos</option><option>Petróleo & Gás</option><option>Mineração</option>
-          <option>Varejo</option><option>Indústria</option><option>Bebidas</option>
-          <option>Telecomunicações</option><option>Siderurgia</option><option>Holdings</option>
-          <option>Papel & Celulose</option><option>Locação</option><option>Saúde</option>
-          <option>Energia</option><option>Alimentos</option><option>Construção</option>
+          <option>Agronegócio</option>
+          <option>Alimentos</option>
+          <option>Bancos</option>
+          <option>Bebidas</option>
+          <option>Calçados</option>
+          <option>Combustíveis</option>
+          <option>Construção Civil</option>
+          <option>Cosméticos</option>
+          <option>Educação</option>
+          <option>Energia Elétrica</option>
+          <option>Farmacêutica</option>
+          <option>Financeiro</option>
+          <option>Gás</option>
+          <option>Holdings</option>
+          <option>Indústria</option>
+          <option>Locação de Veículos</option>
+          <option>Mineração</option>
+          <option>Papel & Celulose</option>
+          <option>Petróleo & Gás</option>
+          <option>Saúde</option>
+          <option>Saneamento</option>
+          <option>Seguros</option>
+          <option>Shoppings</option>
+          <option>Siderurgia</option>
+          <option>Tecnologia</option>
+          <option>Telecomunicações</option>
+          <option>Têxtil</option>
+          <option>Transporte</option>
+          <option>Transporte Aéreo</option>
+          <option>Turismo</option>
+          <option>Varejo</option>
+          <option>Outros</option>
         </select>
       </div>
 
@@ -44,6 +71,7 @@
             <button class="rank-btn" data-sort="ml" onclick="setRank(this)">Margem Líquida</button>
             <button class="rank-btn" data-sort="v" onclick="setRank(this)">Variação dia</button>
             <button class="rank-btn" data-sort="liq" onclick="setRank(this)">Liquidez</button>
+            <button class="rank-btn" data-sort="bazin" onclick="setRank(this)">Abaixo do Bazin</button>
           </div>
         </div>
         <table class="data-table">
@@ -53,7 +81,7 @@
             <th class="r">P/L</th>
             <th class="r">P/VP</th>
             <th class="r">Dividend Yield</th>
-            <th class="r">Margem Líquida</th>
+            <th class="r" id="th-ml">Margem Líquida</th>
             <th class="r">Setor</th>
           </tr></thead>
           <tbody id="tbody">
@@ -75,7 +103,7 @@
         <div id="top-dy"></div>
       </div>
       <div class="card">
-        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Mais Negociadas</div></div>
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">Maior Liquidez</div></div>
         <div id="top-vol"></div>
       </div>
     </div>
@@ -108,6 +136,9 @@ function setRank(el) {
   document.querySelectorAll('.rank-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   currentSort = el.dataset.sort;
+  // Atualizar cabeçalho da coluna contextual
+  const thMl = document.getElementById('th-ml');
+  if (thMl) thMl.textContent = currentSort === 'bazin' ? 'Preço Teto Bazin' : 'Margem Líquida';
   filterTable();
 }
 
@@ -135,11 +166,15 @@ function renderTable(arr) {
           </div>
         </div>
       </td>
-      <td class="r" style="color:var(--text2)">${d.mcap ? fmtBi(d.mcap) : d.vol}</td>
+      <td class="r" style="color:var(--text2)">${d.mcap ? fmtBi(d.mcap) : '—'}</td>
       <td class="r" style="color:var(--text2)">${d.pl > 0 ? d.pl.toFixed(2) : '—'}</td>
       <td class="r" style="color:${d.pvp > 0 && d.pvp < 1 ? 'var(--up)' : d.pvp > 3 ? 'var(--dn)' : 'var(--text2)'}">${d.pvp > 0 ? d.pvp.toFixed(2) : '—'}</td>
       <td class="r gold">${d.dy > 0 ? d.dy.toFixed(1) + '%' : '—'}</td>
-      <td class="r" style="color:var(--text2)">${d.ml > 0 ? d.ml.toFixed(2) + '%' : '—'}</td>
+      <td class="r" style="color:var(--text2)">${
+        currentSort === 'bazin'
+          ? (() => { const t = (d.p*(d.dy/100))/0.06; const up = ((t-d.p)/d.p*100); return `<span style="color:var(--up)">Teto R$${t.toFixed(2)}</span> <span style="font-size:10px;color:var(--up)">(+${up.toFixed(1)}%)</span>`; })()
+          : d.ml > 0 ? d.ml.toFixed(2) + '%' : '—'
+      }</td>
       <td class="r" style="color:var(--text3);font-size:11px">${d.setor || '—'}</td>`;
     tr.onclick = () => location.href = `ativo.html?t=${d.t}`;
     tb.appendChild(tr);
@@ -163,7 +198,27 @@ function applySort(k) {
   else if (k === 'dy')     data.sort((a, b) => b.dy - a.dy);
   else if (k === 'liq')    data.sort((a, b) => (b.volNum || 0) - (a.volNum || 0));
   else if (k === 'ml')     data.sort((a, b) => (b.ml || 0) - (a.ml || 0));
-  else if (k === 'graham') data.sort((a, b) => (a.pl || 999) - (b.pl || 999));
+  else if (k === 'graham') {
+    // Fórmula de Graham: P/L × P/VP < 22,5 → ordena pelo produto (menor = mais barato)
+    const grahamScore = d => (d.pl > 0 && d.pvp > 0) ? d.pl * d.pvp : 99999;
+    data = data.filter(d => d.pl > 0 && d.pvp > 0); // remove quem não tem os dois
+    data.sort((a, b) => grahamScore(a) - grahamScore(b));
+  }
+  else if (k === 'bazin') {
+    // Bazin: mostra só ações abaixo do preço teto (div_anual / 0.06)
+    // div_anual estimado via DY × preço
+    data = data.filter(d => {
+      if (d.dy <= 0 || d.p <= 0) return false;
+      const divAnual = d.p * (d.dy / 100);
+      const teto = divAnual / 0.06;
+      return d.p < teto; // apenas abaixo do teto
+    });
+    // Ordena pelo maior upside em relação ao teto
+    data.sort((a, b) => {
+      const upside = d => { const divA = d.p*(d.dy/100); return (divA/0.06 - d.p)/d.p; };
+      return upside(b) - upside(a);
+    });
+  }
   else /* mcap */          data.sort((a, b) => (b.mcap || b.volNum || 0) - (a.mcap || a.volNum || 0));
   renderTable(data);
 }

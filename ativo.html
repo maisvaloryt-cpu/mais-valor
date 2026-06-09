@@ -505,10 +505,15 @@ function renderHero(d) {
   }
   document.getElementById('kpi-var').innerHTML = `<span class="pill ${d.stale?'stale-pill':isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span> hoje`;
 
-  const v12 = d.v12 !== undefined ? d.v12 : d.v;
-  const v12Up = v12 >= 0;
-  document.getElementById('kpi-v12').textContent = (v12Up ? '+' : '') + v12.toFixed(2) + '%';
-  document.getElementById('kpi-v12').className = 'kpi-val ' + (v12Up ? 'up' : 'dn');
+  const v12 = d.v12 !== undefined ? d.v12 : null;
+  if (v12 !== null) {
+    const v12Up = v12 >= 0;
+    document.getElementById('kpi-v12').textContent = (v12Up ? '+' : '') + v12.toFixed(2) + '%';
+    document.getElementById('kpi-v12').className = 'kpi-val ' + (v12Up ? 'up' : 'dn');
+  } else {
+    document.getElementById('kpi-v12').textContent = '—';
+    document.getElementById('kpi-v12').className = 'kpi-val';
+  }
 
   if (TIPO === 'fii') {
     document.getElementById('kpi-pl-wrap').style.display = 'none';
@@ -518,7 +523,7 @@ function renderHero(d) {
   }
 
   document.getElementById('kpi-pvp').textContent = d.pvp ? d.pvp.toFixed(2) : '—';
-  document.getElementById('kpi-pvp').className = 'kpi-val ' + (d.pvp && d.pvp < 1 ? 'up' : '');
+  document.getElementById('kpi-pvp').className = 'kpi-val ' + (d.pvp && d.pvp < 1 ? 'up' : d.pvp && d.pvp > 3 ? 'dn' : '');
   document.getElementById('kpi-dy').textContent = d.dy > 0 ? d.dy.toFixed(2) + '%' : '—';
 
   document.getElementById('comparar-btn').href = `comparador.html?t1=${d.t}&t2=VALE3`;
@@ -563,6 +568,7 @@ function renderIndicadores(d) {
   if (d.pvp&&d.pvp<1)   ops.push({label:`P/VP ${d.pvp.toFixed(2)} (abaixo do VP)`,color:'var(--up)',bg:'var(--up-bg)',icon:'📊'});
   if (d.pl&&d.pl>0&&d.pl<8) ops.push({label:`P/L ${d.pl.toFixed(1)}x (barato)`,color:'var(--up)',bg:'var(--up-bg)',icon:'📈'});
   if (d.roe&&d.roe>20)  ops.push({label:`ROE ${d.roe.toFixed(1)}% (excelente)`,color:'#5E8EE0',bg:'rgba(94,142,224,0.1)',icon:'⭐'});
+  if (d.pl&&d.pvp&&d.pl>0&&d.pvp>0&&d.pl*d.pvp<22.5) ops.push({label:`Graham OK (P/L×P/VP=${(d.pl*d.pvp).toFixed(1)})`,color:'var(--up)',bg:'var(--up-bg)',icon:'✓'});
   const opEl = document.getElementById('oportunidades');
   if (ops.length && opEl) opEl.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.5rem">
     ${ops.map(o=>`<span class="oportunidade-badge" style="background:${o.bg};color:${o.color}">${o.icon} ${o.label}</span>`).join('')}</div>`;
@@ -707,19 +713,41 @@ function renderValuation(d) {
     document.getElementById('graham-upside').textContent = '—';
   }
 
-  // Bazin: div_media_5a / 0.06
-  if (d.dy > 0 && p > 0) {
-    const divAnual = p * (d.dy / 100);
-    const bazin    = divAnual / 0.06;
-    const upside   = ((bazin - p) / p * 100);
-    document.getElementById('bazin-teto').textContent = 'R$ ' + bazin.toFixed(2);
-    document.getElementById('bazin-teto').className = 'v-val ' + (bazin > p ? 'up' : 'dn');
-    document.getElementById('bazin-upside').textContent = (upside >= 0 ? '+' : '') + upside.toFixed(1) + '%';
-    document.getElementById('bazin-upside').className = 'v-val ' + (upside >= 0 ? 'up' : 'dn');
-  } else {
-    document.getElementById('bazin-teto').textContent = '—';
-    document.getElementById('bazin-upside').textContent = '—';
+  // Bazin: soma dividendos reais dos últimos 12 meses / 0.06
+  // Usa divData se disponível (aba dividendos já carregada), senão estima pelo DY
+  function calcBazin() {
+    let divAnual = 0;
+    if (divData && divData.length > 0) {
+      const umAnoAtras = new Date();
+      umAnoAtras.setFullYear(umAnoAtras.getFullYear() - 1);
+      divAnual = divData
+        .filter(pg => new Date(pg.date || pg.pagamento || pg.data_com) >= umAnoAtras)
+        .reduce((sum, pg) => sum + (pg.value || 0), 0);
+    }
+    // Fallback: estimar pelo DY atual se não tiver histórico
+    if (divAnual <= 0 && d.dy > 0 && p > 0) {
+      divAnual = p * (d.dy / 100);
+    }
+    if (divAnual > 0 && p > 0) {
+      const bazin  = divAnual / 0.06;
+      const upside = ((bazin - p) / p * 100);
+      document.getElementById('bazin-teto').textContent = 'R$ ' + bazin.toFixed(2);
+      document.getElementById('bazin-teto').className = 'v-val ' + (bazin > p ? 'up' : 'dn');
+      document.getElementById('bazin-upside').textContent = (upside >= 0 ? '+' : '') + upside.toFixed(1) + '%';
+      document.getElementById('bazin-upside').className = 'v-val ' + (upside >= 0 ? 'up' : 'dn');
+      // Atualizar subtítulo com fonte do cálculo
+      const box = document.getElementById('box-bazin');
+      if (box) {
+        const src = (divData && divData.length > 0) ? 'dividendos reais dos últimos 12 meses' : 'DY estimado';
+        const descEl = box.querySelector('p');
+        if (descEl) descEl.textContent = `Décio Bazin estabelece o preço máximo a pagar com base nos dividendos distribuídos. Base: DY mínimo de 6%. Cálculo usando ${src}.`;
+      }
+    } else {
+      document.getElementById('bazin-teto').textContent = '—';
+      document.getElementById('bazin-upside').textContent = '—';
+    }
   }
+  calcBazin();
 
   // Oculta Graham/Bazin para FII
   if (TIPO === 'fii') {
@@ -907,6 +935,9 @@ async function renderDividendos() {
     <div class="ind-card"><div class="ind-label">Pagamentos</div><div class="ind-val">${divData.length||'—'}</div><div class="ind-desc">registros disponíveis</div></div>
     <div class="ind-card"><div class="ind-label">Último Valor</div><div class="ind-val gold">${divData.length?'R$ '+divData[divData.length-1].value.toFixed(4):'—'}</div><div class="ind-desc">mais recente</div></div>`;
 
+  // Recalcular Bazin com dados reais agora que divData está disponível
+  if (typeof renderValuation === 'function' && ativo) renderValuation(ativo);
+
   if (!divData.length) {
     document.getElementById('div-grafico-anual').innerHTML = '';
     document.getElementById('div-grafico').innerHTML = '<div style="color:var(--text3);font-size:13px;padding:1rem 0">Histórico de dividendos não disponível. Execute o modo "dividendos" no GitHub Actions.</div>';
@@ -931,7 +962,8 @@ async function renderDividendos() {
   const rev = [...divData].reverse().slice(0, 36);
   document.getElementById('div-tbody').innerHTML = rev.map(d => {
     const tipo = d.tipo || (TIPO === 'fii' ? 'Rendimento' : 'Dividendo');
-    const dy   = ativo?.p ? ((d.value * 12 / ativo.p) * 100).toFixed(2) + '%' : '—';
+    // DY estimado por pagamento (valor / preço), sem multiplicar por 12 — evita distorção
+    const dy   = ativo?.p ? ((d.value / ativo.p) * 100).toFixed(3) + '%' : '—';
     return `<tr>
       <td style="font-size:12px;color:var(--text3)">${tipo}</td>
       <td class="r" style="font-family:var(--font-mono);font-size:12px">${d.data_com||d.date||'—'}</td>
@@ -1109,8 +1141,8 @@ function renderAnalise() {
   if (!isFii) {
     if (d.dy>5&&d.dy<=50)      { score+=15; criterios.push({ok:true, txt:`DY ${d.dy.toFixed(1)}% — boa remuneração`}); }
     else criterios.push({ok:false, txt:'DY baixo ou não disponível'});
-    if (d.pl&&d.pl>0&&d.pl<15) { score+=20; criterios.push({ok:true, txt:`P/L ${d.pl.toFixed(1)}x — preço razoável`}); }
-    else if (d.pl&&d.pl>0)       criterios.push({ok:false, txt:`P/L ${d.pl.toFixed(1)}x — pode estar caro`});
+    if (d.pl&&d.pl>0&&d.pl<20) { score+=20; criterios.push({ok:true, txt:`P/L ${d.pl.toFixed(1)}x — preço razoável (abaixo de 20x)`}); }
+    else if (d.pl&&d.pl>0)       criterios.push({ok:false, txt:`P/L ${d.pl.toFixed(1)}x — elevado ou negativo`});
     else                         criterios.push({ok:false, txt:'P/L não disponível'});
     if (d.pvp&&d.pvp<2)        { score+=15; criterios.push({ok:true, txt:`P/VP ${d.pvp.toFixed(2)} — valor patrimonial ok`}); }
     else                         criterios.push({ok:false, txt:'P/VP alto'});
@@ -1157,12 +1189,12 @@ function renderAnalise() {
 
   // Checklist Buy & Hold
   const checks = [
-    {ok: true,            txt:'Empresa com mais de 5 anos de Bolsa'},
-    {ok: d.pl && d.pl > 0,txt:'Empresa nunca deu prejuízo (ano fiscal)'},
-    {ok: d.dy > 5,        txt:'Empresa pagou +5% de dividendos/ano nos últimos 5 anos'},
-    {ok: d.roe && d.roe > 10, txt:'Empresa possui ROE acima de 10%'},
-    {ok: d.cresc5a && d.cresc5a > 0, txt:'Empresa apresentou crescimento de receita nos últimos 5 anos'},
-    {ok: d.cresc_luc5a && d.cresc_luc5a > 0, txt:'Empresa apresentou crescimento de lucros nos últimos 5 anos'},
+    {ok: d.pl && d.pl > 0 && d.pl < 20,  txt: d.pl && d.pl > 0 ? `P/L ${d.pl.toFixed(1)}x — abaixo de 20x (Buy & Hold)` : 'P/L não disponível ou negativo'},
+    {ok: d.pvp && d.pvp > 0 && d.pvp < 3, txt: d.pvp ? `P/VP ${d.pvp.toFixed(2)} — abaixo de 3x` : 'P/VP não disponível'},
+    {ok: d.dy > 5,                         txt: d.dy > 0 ? `DY ${d.dy.toFixed(1)}% — acima de 5%` : 'DY não disponível ou abaixo de 5%'},
+    {ok: d.roe && d.roe > 10,              txt: d.roe ? `ROE ${d.roe.toFixed(1)}% — acima de 10%` : 'ROE não disponível'},
+    {ok: d.cresc5a && d.cresc5a > 0,       txt: d.cresc5a ? `Crescimento de receita ${d.cresc5a.toFixed(1)}% (5 anos)` : 'Crescimento de receita não disponível'},
+    {ok: d.div_ebitda == null || d.div_ebitda < 3, txt: d.div_ebitda ? `Dívida/EBITDA ${d.div_ebitda.toFixed(1)}x — controlada` : 'Endividamento não disponível'},
   ];
   document.getElementById('checklist-content').innerHTML = checks.map(c => `
     <div class="check-item">
@@ -1176,6 +1208,10 @@ function renderAnalise() {
   if (d.pl && d.pl < 0)       alertas.push({type:'warn', txt:'Empresa com lucro negativo (P/L negativo)'});
   if (d.dy > 0 && d.dy > 30)  alertas.push({type:'warn', txt:'DY muito alto pode indicar queda recente do preço'});
   if (d.pvp && d.pvp > 5)     alertas.push({type:'warn', txt:'P/VP muito elevado — preço bem acima do patrimônio'});
+  if (d.pl && d.pvp && d.pl > 0 && d.pvp > 0 && d.pl * d.pvp > 22.5)
+    alertas.push({type:'warn', txt:`P/L × P/VP = ${(d.pl * d.pvp).toFixed(1)} — acima de 22,5 (critério de Graham)`});
+  if (d.div_ebitda && d.div_ebitda > 4)
+    alertas.push({type:'warn', txt:`Dívida/EBITDA ${d.div_ebitda.toFixed(1)}x — nível de endividamento elevado`});
   if (!alertas.length)         alertas.push({type:'ok',   txt:'Nenhum alerta identificado nos indicadores disponíveis'});
   document.getElementById('alertas-content').innerHTML = alertas.map(a => `
     <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:8px;margin-bottom:8px;
