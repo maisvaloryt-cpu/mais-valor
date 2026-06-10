@@ -58,8 +58,21 @@
     <div class="card fade-in-1" style="margin-bottom:1.5rem">
       <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Selecione o ativo e o tipo de análise</div>
       <div style="display:flex;gap:8px;margin-bottom:1.25rem">
-        <input class="filter-input" id="a-ticker" placeholder="Digite o ticker (ex: PETR4, MXRF11)" style="flex:1;font-size:14px" list="ticker-list">
-        <datalist id="ticker-list"></datalist>
+        <div style="flex:1;position:relative">
+          <input class="filter-input" id="a-ticker"
+            placeholder="Digite o ticker ou nome (ex: Petrobras, MXRF11)"
+            style="width:100%;font-size:14px;box-sizing:border-box"
+            autocomplete="off"
+            oninput="acLive(this.value)"
+            onkeydown="acKey(event)"
+            onfocus="acLive(this.value)">
+          <div id="ac-dropdown" style="
+            display:none;position:absolute;top:100%;left:0;right:0;
+            background:var(--bg2);border:1px solid var(--border);
+            border-radius:10px;margin-top:4px;z-index:9999;
+            box-shadow:0 8px 32px rgba(0,0,0,.4);overflow:hidden">
+          </div>
+        </div>
         <button onclick="generateAnalysis()" id="btn-gen"
           style="background:var(--gold);color:#0A0A0A;border:none;border-radius:9px;padding:10px 20px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--font-body);transition:var(--transition);white-space:nowrap;flex-shrink:0"
           onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">
@@ -310,10 +323,83 @@ function copyAnalysis(){
   });
 }
 
+// ── Autocomplete ─────────────────────────────────────────────
+let acIndex = -1;
+
+function acLive(q) {
+  const drop = document.getElementById('ac-dropdown');
+  q = q.trim();
+  if (q.length < 1) { drop.style.display = 'none'; acIndex = -1; return; }
+
+  const all = [...(typeof ACOES !== 'undefined' ? ACOES : []), ...(typeof FIIS !== 'undefined' ? FIIS : [])];
+  const ql  = q.toLowerCase();
+
+  // Busca por ticker OU nome da empresa
+  const results = all.filter(a =>
+    a.t.toLowerCase().startsWith(ql) ||
+    a.n.toLowerCase().includes(ql)
+  ).slice(0, 5);
+
+  if (!results.length) { drop.style.display = 'none'; acIndex = -1; return; }
+
+  const isFii = a => /\d{2}$/.test(a.t);
+  drop.innerHTML = results.map((a, i) => `
+    <div class="ac-item" data-ticker="${a.t}" data-i="${i}"
+      style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;
+             border-bottom:1px solid var(--border);transition:background .1s"
+      onmouseenter="acHover(${i})"
+      onmouseleave="acUnhover(${i})"
+      onmousedown="acSelect('${a.t}')">
+      ${logoHtml(a.t, 26)}
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:13px">${a.t}</div>
+        <div style="font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.n}</div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);flex-shrink:0">${isFii(a) ? 'FII' : 'Ação'}</div>
+    </div>`).join('');
+  drop.lastElementChild && (drop.lastElementChild.style.borderBottom = 'none');
+  drop.style.display = 'block';
+  acIndex = -1;
+}
+
+function acHover(i)   { document.querySelectorAll('.ac-item').forEach((el,j) => el.style.background = j===i?'var(--bg3)':''); }
+function acUnhover()  { document.querySelectorAll('.ac-item').forEach(el => el.style.background = ''); }
+
+function acSelect(ticker) {
+  document.getElementById('a-ticker').value = ticker;
+  document.getElementById('ac-dropdown').style.display = 'none';
+  acIndex = -1;
+}
+
+function acKey(e) {
+  const items = document.querySelectorAll('.ac-item');
+  if (!items.length) return;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    acIndex = Math.min(acIndex + 1, items.length - 1);
+    items.forEach((el, i) => el.style.background = i === acIndex ? 'var(--bg3)' : '');
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    acIndex = Math.max(acIndex - 1, 0);
+    items.forEach((el, i) => el.style.background = i === acIndex ? 'var(--bg3)' : '');
+  } else if (e.key === 'Enter' && acIndex >= 0) {
+    e.preventDefault();
+    acSelect(items[acIndex].dataset.ticker);
+    generateAnalysis();
+  } else if (e.key === 'Escape') {
+    document.getElementById('ac-dropdown').style.display = 'none';
+    acIndex = -1;
+  }
+}
+
 async function init(){
   await loadData();
-  const all=[...(ACOES||[]),...(FIIS||[])];
-  document.getElementById('ticker-list').innerHTML=all.map(a=>`<option value="${a.t}">${a.t} — ${a.n}</option>`).join('');
+  // Fecha dropdown ao clicar fora
+  document.addEventListener('click', e => {
+    if (!e.target.closest('#a-ticker') && !e.target.closest('#ac-dropdown')) {
+      document.getElementById('ac-dropdown').style.display = 'none';
+    }
+  });
 }
 init();
 </script>
