@@ -8,10 +8,10 @@ const NAV_LINKS = [
   {
     label: 'Exterior',
     dropdown: [
-      { href: 'stocks.html',   label: '🇺🇸 Stocks' },
-      { href: 'reits.html',    label: '🏢 REITs' },
-      { href: 'bdrs.html',     label: '🇧🇷 BDRs' },
-      { href: 'etfs.html',     label: '📊 ETFs' },
+      { href: 'stocks.html',   label: 'Stocks' },
+      { href: 'reits.html',    label: 'REITs' },
+      { href: 'bdrs.html',     label: 'BDRs' },
+      { href: 'etfs.html',     label: 'ETFs' },
     ]
   },
   { href: 'dividendos.html',   label: 'Dividendos' },
