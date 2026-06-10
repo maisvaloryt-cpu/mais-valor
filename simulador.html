@@ -33,7 +33,7 @@
 /* ── LAYOUT RAIZ ── */
 .sim-root {
   display: flex;
-  height: calc(100vh - 58px);
+  height: calc(100vh - 44px);
   overflow: hidden;
 }
 
@@ -258,7 +258,7 @@ input[type="range"].pct-slider::-webkit-slider-thumb {
 .ativos-mini { margin-bottom: 6px; }
 .ativo-mini-row {
   display: grid;
-  grid-template-columns: 80px 1fr 20px;
+  grid-template-columns: 80px 1fr 24px;
   gap: 4px; margin-bottom: 4px; align-items: center;
 }
 input[type="text"].mini {
@@ -291,9 +291,9 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
 .pct-val::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .pct-val:focus { border-color: var(--sim-accent); }
 .btn-rm {
-  width: 20px; height: 20px; background: transparent; border: 1px solid var(--sim-border);
+  width: 22px; height: 22px; min-width: 22px; background: transparent; border: 1px solid var(--sim-border);
   border-radius: 4px; color: var(--sim-text3); cursor: pointer; font-size: 10px;
-  display: flex; align-items: center; justify-content: center; transition: all .15s;
+  display: flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0;
 }
 .btn-rm:hover { border-color: var(--sim-danger); color: var(--sim-danger); }
 .btn-add-mini {
@@ -544,7 +544,15 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
 .btn-aplicar-classes:hover { filter: brightness(1.1); }
 .btn-aplicar-classes.show { display: block; }
 </style>
-<div id="nav-placeholder"></div>
+<!-- Logo embutido — link para home -->
+<div style="position:fixed;top:0;left:0;right:0;height:44px;background:var(--bg,#0E0E11);border-bottom:1px solid var(--border,#222);display:flex;align-items:center;padding:0 16px;z-index:200;">
+  <a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+    <img src="favicon.png" alt="Mais Valor" style="height:28px;width:28px;object-fit:contain;">
+    <span style="font-size:15px;font-weight:700;color:#fff;font-family:var(--font-body,sans-serif);">Mais <span style="color:#D4A017;">Valor</span></span>
+  </a>
+  <span style="margin-left:12px;font-size:11px;color:#4E4D4A;font-family:var(--font-body,sans-serif);">— Simulador de Carteiras</span>
+</div>
+<div style="height:44px"></div>
 
 <div class="sim-root">
 
@@ -723,15 +731,19 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
         <!-- Actions bar -->
         <div class="actions-bar">
           <div class="actions-bar-title" id="resultsTitle">Simulações</div>
-          <div class="actions-bar-btns">
-            <button class="btn-sm btn-sm-ghost" onclick="novaSim()">+ Nova carteira</button>
-            <button class="btn-sm btn-sm-ghost" onclick="toggleView()" id="btnView">🔀 Comparar</button>
-            <button class="btn-sm btn-sm-danger" onclick="clearAll()">🗑 Limpar tudo</button>
-          </div>
+
         </div>
 
         <!-- Abas Excel -->
-        <div class="excel-tab-bar" id="excelTabBar"></div>
+        <div style="display:flex;align-items:flex-end;gap:0;margin-bottom:0">
+          <button id="btnView" onclick="toggleView()" style="
+            padding:5px 12px 4px;font-size:11px;cursor:pointer;border-radius:6px 6px 0 0;
+            border:1px solid var(--sim-border);border-bottom:none;margin-bottom:-1px;
+            background:var(--sim-surf);color:var(--sim-text3);font-family:var(--sim-font);
+            transition:all .15s;margin-right:6px;
+          " onmouseover="this.style.color='var(--sim-accent)'" onmouseout="this.style.color='var(--sim-text3)'">🔀 Comparar</button>
+          <div class="excel-tab-bar" id="excelTabBar" style="flex:1;margin-bottom:0"></div>
+        </div>
 
         <!-- Single view -->
         <div id="singleView" style="display:none">
@@ -786,7 +798,6 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
   <div class="loader-text">Calculando simulação...</div>
 </div>
 
-<script src="nav.js"></script>
 <script>
 // ╔══════════════════════════════════════════════════════════════╗
 // ║  LEI PÉTREA — SIMULADOR MAIS VALOR                          ║
@@ -2378,7 +2389,7 @@ function toggleView() {
     renderExcelTabs(); renderSingleView(activeSimIdx);
   }
 }
-function updateViewBtn() { document.getElementById('btnView').textContent = viewMode==='compare' ? '📋 Individual' : '🔀 Comparar'; }
+function updateViewBtn() { const b=document.getElementById('btnView'); if(b) b.textContent = viewMode==='compare' ? '📋 Individual' : '🔀 Comparar'; }
 
 // ══════════════════════════════════════════════════════════════
 // SINGLE VIEW
