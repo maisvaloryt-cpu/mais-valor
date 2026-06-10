@@ -608,7 +608,7 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
             <input type="month" class="param-inp" id="endDate" value="">
           </div>
         </div>
-        <button class="btn-confirmar-etapa" id="btnConfirmarPeriodo" onclick="confirmarPeriodo()" disabled>✓ Confirmar período</button>
+        <button class="btn-confirmar-etapa" id="btnConfirmarPeriodo" onclick="confirmarPeriodo()">✓ Confirmar período</button>
       </div>
 
       <!-- 2. Aportes -->
@@ -1605,10 +1605,6 @@ function verificarCascata() {
   const ed = document.getElementById('endDate').value;
   const periodoOk = !!(sd && ed && sd < ed);
 
-  // Botão confirmar período
-  const btnP = document.getElementById('btnConfirmarPeriodo');
-  if (btnP) btnP.disabled = !periodoOk;
-
   // Aportes: aparecem após período confirmado (_etapaPeriodoOk)
   const etapaA = document.getElementById('etapaAportes');
   if (etapaA) etapaA.style.display = _etapaPeriodoOk ? 'block' : 'none';
@@ -1645,16 +1641,21 @@ function verificarCascata() {
 function confirmarPeriodo() {
   const sd = document.getElementById('startDate').value;
   const ed = document.getElementById('endDate').value;
-  if (!sd || !ed || sd >= ed) { showErr('Datas inválidas.'); return; }
+  if (!sd) { showErr('Informe a data de início.'); return; }
+  if (!ed) { showErr('Informe a data de fim.'); return; }
+  if (sd >= ed) { showErr('A data de início deve ser anterior ao fim.'); return; }
   _etapaPeriodoOk = true;
   salvarEstado();
   verificarCascata();
+  // Scroll suave para aportes
+  setTimeout(() => { const el = document.getElementById('etapaAportes'); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
 }
 
 function confirmarAportes() {
   _etapaAportesOk = true;
   salvarEstado();
   verificarCascata();
+  setTimeout(() => { const el = document.getElementById('etapaClasses'); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
 }
 
 function aplicarClassesPizza() {
@@ -2727,8 +2728,8 @@ function renderCompareBarChart() {
   const maxMonth = `${year}-${month}`;
   const startEl = document.getElementById('startDate');
   const endEl   = document.getElementById('endDate');
-  if (startEl) { startEl.max = maxMonth; startEl.removeAttribute('min'); startEl.addEventListener('change', verificarCascata); startEl.addEventListener('change', () => { const b=document.getElementById('btnConfirmarPeriodo'); if(b){const sd=document.getElementById('startDate').value,ed=document.getElementById('endDate').value;b.disabled=!(sd&&ed&&sd<ed);}}); }
-  if (endEl)   { endEl.max   = maxMonth; endEl.removeAttribute('min');   endEl.addEventListener('change', verificarCascata); endEl.addEventListener('change', () => { const b=document.getElementById('btnConfirmarPeriodo'); if(b){const sd=document.getElementById('startDate').value,ed=document.getElementById('endDate').value;b.disabled=!(sd&&ed&&sd<ed);}}); }
+  if (startEl) { startEl.max = maxMonth; startEl.removeAttribute('min'); startEl.addEventListener('change', verificarCascata); }
+  if (endEl)   { endEl.max   = maxMonth; endEl.removeAttribute('min');   endEl.addEventListener('change', verificarCascata); }
 })();
 
 // ══════════════════════════════════════════════════════════════
