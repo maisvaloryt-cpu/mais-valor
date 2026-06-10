@@ -506,6 +506,22 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
 }
 .ticker-bar, .indices-bar { display: none !important; }
 
+/* ── CASCATA DE ETAPAS ── */
+.etapa { transition: opacity .2s; }
+.etapa.bloqueada { display: none; }
+.etapa-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 8px;
+}
+.etapa-num {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--sim-border2); color: var(--sim-text3);
+  font-size: 9px; font-weight: 700; display: flex;
+  align-items: center; justify-content: center; flex-shrink: 0;
+}
+.etapa-num.ok { background: var(--sim-accent); color: #000; }
+
+
 /* ── PIZZA DE CLASSES ── */
 .classes-resumo {
   display: none; align-items: center; justify-content: space-between;
@@ -542,6 +558,15 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
   border: none; border-radius: 6px; cursor: pointer; transition: all .15s; display: none;
 }
 .btn-aplicar-classes:hover { filter: brightness(1.1); }
+.btn-confirmar-etapa {
+  width: 100%; padding: 7px; margin-top: 8px;
+  background: transparent; color: var(--sim-accent);
+  border: 1px solid var(--sim-accent); border-radius: 6px;
+  font-size: 11px; font-weight: 600; font-family: var(--sim-font);
+  cursor: pointer; transition: all .15s;
+}
+.btn-confirmar-etapa:hover { background: var(--sim-accent-d); }
+.btn-confirmar-etapa:disabled { opacity: .35; cursor: not-allowed; border-color: var(--sim-border2); color: var(--sim-text3); background: transparent; }
 .btn-aplicar-classes.show { display: block; }
 </style>
 <!-- Logo embutido — link para home -->
@@ -571,37 +596,39 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
     <div class="sim-sidebar-body" id="sidebarBody">
 
       <!-- 1. Período -->
-      <div class="param-group">
+      <div class="param-group" id="etapaPeriodo">
         <div class="param-group-label">Período</div>
         <div class="param-row">
           <div class="param-field">
             <label>Início</label>
-            <input type="month" class="param-inp" id="startDate" value="2019-01">
+            <input type="month" class="param-inp" id="startDate" value="">
           </div>
           <div class="param-field">
             <label>Fim</label>
-            <input type="month" class="param-inp" id="endDate" value="2024-12">
+            <input type="month" class="param-inp" id="endDate" value="">
           </div>
         </div>
+        <button class="btn-confirmar-etapa" id="btnConfirmarPeriodo" onclick="confirmarPeriodo()" disabled>✓ Confirmar período</button>
       </div>
 
       <!-- 2. Aportes -->
-      <div class="param-group">
+      <div class="param-group etapa" id="etapaAportes" style="display:none">
         <div class="param-group-label">Aportes</div>
         <div class="param-row">
           <div class="param-field">
             <label>Inicial (R$)</label>
-            <input type="number" class="param-inp" id="initialAmount" value="10000" min="0" step="1000">
+            <input type="number" class="param-inp" id="initialAmount" value="" min="0" step="1000" placeholder="0" oninput="verificarCascata()">
           </div>
           <div class="param-field">
             <label>Mensal (R$)</label>
-            <input type="number" class="param-inp" id="monthlyAmount" value="500" min="0" step="100">
+            <input type="number" class="param-inp" id="monthlyAmount" value="" min="0" step="100" placeholder="0" oninput="verificarCascata()">
           </div>
         </div>
+        <button class="btn-confirmar-etapa" id="btnConfirmarAportes" onclick="confirmarAportes()">✓ Confirmar aportes</button>
       </div>
 
       <!-- 3. Classes -->
-      <div class="param-group">
+      <div class="param-group etapa" id="etapaClasses" style="display:none">
         <div class="param-group-label">Classes de ativos</div>
         <div class="classes-mini-grid" id="classesMiniGrid"></div>
         <div id="allocBarWrap" style="display:none">
@@ -633,7 +660,7 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
       </div>
 
       <!-- 5. Rebalancear -->
-      <div class="param-group">
+      <div class="param-group etapa" id="etapaRebalancear" style="display:none">
         <div class="param-group-label">Rebalancear</div>
         <div class="param-row" style="margin-bottom:6px">
           <div class="param-field">
@@ -676,10 +703,10 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
       </script>
 
       <!-- 6. Dividendos -->
-      <div class="param-group">
+      <div class="param-group etapa" id="etapaDividendos" style="display:none">
         <div class="param-group-label">Dividendos</div>
         <div class="divmode-row">
-          <div class="divmode-btn active" onclick="selectDivMode('none',this)">
+          <div class="divmode-btn" onclick="selectDivMode('none',this)">
             <div class="divmode-btn-title">💰 Caixa</div>
             <div class="divmode-btn-sub">Não reinvestir</div>
           </div>
@@ -699,7 +726,7 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
       </div>
 
       <!-- 7. Nome -->
-      <div class="param-group">
+      <div class="param-group etapa" id="etapaNome" style="display:none">
         <div class="param-group-label">Nome da simulação</div>
         <input type="text" class="param-inp" id="simName"
           placeholder="ex: Carteira Conservadora"
@@ -710,7 +737,7 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
 
     <div class="sim-sidebar-footer">
       <div class="err-inline" id="sidebarError"></div>
-      <button class="btn-simular" id="btnSimular" onclick="simular()">▶ Simular carteira</button>
+      <button class="btn-simular" id="btnSimular" onclick="simular()" disabled>▶ Simular carteira</button>
     </div>
   </aside>
 
@@ -998,10 +1025,12 @@ const SIM_COLORS = ['#1FC96E','#5b8def','#F5A623','#e05c5c','#9b72ef'];
 // ══════════════════════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════════════════════
-let state = { classesSel: [], classesConfig: {}, dividendMode: 'none' };
+let state = { classesSel: [], classesConfig: {}, dividendMode: '' };
 let _queryBuffer = {};
 let _pizzaChart = null;
 let _pizzaMode = false;
+let _etapaPeriodoOk = false;
+let _etapaAportesOk = false;
 let simulations = [];
 let activeSimIdx = 0;
 let viewMode = 'single';
@@ -1567,6 +1596,67 @@ function buildAssetList() {
 // ══════════════════════════════════════════════════════════════
 // SIDEBAR RENDER
 // ══════════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════════
+// CASCATA DE ETAPAS
+// ══════════════════════════════════════════════════════════════
+function verificarCascata() {
+  const sd = document.getElementById('startDate').value;
+  const ed = document.getElementById('endDate').value;
+  const periodoOk = !!(sd && ed && sd < ed);
+
+  // Botão confirmar período
+  const btnP = document.getElementById('btnConfirmarPeriodo');
+  if (btnP) btnP.disabled = !periodoOk;
+
+  // Aportes: aparecem após período confirmado (_etapaPeriodoOk)
+  const etapaA = document.getElementById('etapaAportes');
+  if (etapaA) etapaA.style.display = _etapaPeriodoOk ? 'block' : 'none';
+
+  // Classes: aparecem após aportes confirmados (_etapaAportesOk)
+  const etapaC = document.getElementById('etapaClasses');
+  if (etapaC) etapaC.style.display = _etapaAportesOk ? 'block' : 'none';
+
+  // Composição: após pizza aplicada
+  const compGrp = document.getElementById('composicaoGroup');
+  if (compGrp) compGrp.style.display = (_etapaAportesOk && _pizzaMode) ? 'block' : 'none';
+
+  // Composição válida?
+  const composicaoOk = _pizzaMode && state.classesSel.length > 0 && state.classesSel.every(sel => {
+    const cfg = state.classesConfig[sel.id];
+    if (!cfg) return false;
+    if (cfg.mode === 'indicador') return !!cfg.indicadorTicker;
+    return cfg.ativos.some(a => a.ticker.trim() !== '');
+  });
+
+  // Rebalancear, Dividendos, Nome
+  ['etapaRebalancear','etapaDividendos','etapaNome'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = composicaoOk ? 'block' : 'none';
+  });
+
+  // Simular
+  const dividendoOk = state.dividendMode !== '';
+  const tudo = periodoOk && _etapaPeriodoOk && _etapaAportesOk && _pizzaMode && composicaoOk && dividendoOk;
+  const btn = document.getElementById('btnSimular');
+  if (btn) btn.disabled = !tudo;
+}
+
+function confirmarPeriodo() {
+  const sd = document.getElementById('startDate').value;
+  const ed = document.getElementById('endDate').value;
+  if (!sd || !ed || sd >= ed) { showErr('Datas inválidas.'); return; }
+  _etapaPeriodoOk = true;
+  salvarEstado();
+  verificarCascata();
+}
+
+function confirmarAportes() {
+  _etapaAportesOk = true;
+  salvarEstado();
+  verificarCascata();
+}
+
 function aplicarClassesPizza() {
   _pizzaMode = true;
   // Minimiza a seção de classes
@@ -1583,6 +1673,7 @@ function aplicarClassesPizza() {
   document.getElementById('pizzaSection').classList.add('show');
   renderPizzaClasses();
   renderSlidersPizza();
+  verificarCascata();
 }
 
 function editarClassesPizza() {
@@ -1592,6 +1683,7 @@ function editarClassesPizza() {
   document.getElementById('classesResumo').classList.remove('show');
   document.getElementById('pizzaSection').classList.remove('show');
   if (_pizzaChart) { _pizzaChart.destroy(); _pizzaChart = null; }
+  verificarCascata();
   const btnAp = document.getElementById('btnAplicarClasses');
   if (btnAp) btnAp.classList.toggle('show', state.classesSel.length > 0);
 }
@@ -1681,6 +1773,7 @@ function toggleClasse(id) {
   else state.classesSel.push({ id, pct: 0 });
   const n = state.classesSel.length;
   if (n > 0) { const base = Math.floor(100/n), rem = 100 - base*n; state.classesSel.forEach((c,i) => { c.pct = base + (i===0?rem:0); }); }
+  _etapaPeriodoOk = false; _etapaAportesOk = false;
   if (_pizzaMode) editarClassesPizza(); else renderSidebar();
 }
 
@@ -1747,8 +1840,8 @@ function renderComposicao() {
     if (!state.classesConfig[sel.id]) {
       const hasIndicadores = cls.indicadores && cls.indicadores.length > 0;
       state.classesConfig[sel.id] = {
-        mode: hasIndicadores ? 'indicador' : 'custom',
-        indicadorTicker: cls.indicadores[0]?.ticker || cls.defaultTickers[0] || 'CDI',
+        mode: 'custom',
+        indicadorTicker: '',
         ativos: [{ ticker: '', pct: 100 }],
       };
     }
@@ -1767,13 +1860,13 @@ function renderComposicao() {
       <div class="class-acc-body">
         ${hasIndicadores ? `
         <div class="mode-toggle" id="modeToggle_${sel.id}">
+          <button class="mode-toggle-btn ${cfg.mode==='custom'?'active':''}" onclick="setCfgMode('${sel.id}','custom')">🔧 Ativo</button>
           <button class="mode-toggle-btn ${cfg.mode==='indicador'?'active':''}" onclick="setCfgMode('${sel.id}','indicador')">📊 Indicador</button>
-          <button class="mode-toggle-btn ${cfg.mode==='custom'?'active':''}" onclick="setCfgMode('${sel.id}','custom')">🔧 Personalizado</button>
         </div>
         <div id="indSection_${sel.id}" style="display:${cfg.mode==='indicador'?'block':'none'}">
           <div class="ind-grid" id="indGrid_${sel.id}"></div>
         </div>` : ''}
-        <div id="customSection_${sel.id}" style="display:${!hasIndicadores || cfg.mode==='custom'?'block':'none'}">
+        <div id="customSection_${sel.id}" style="display:${cfg.mode==='custom'?'block':'none'}">
           <div class="ativos-mini" id="ativosRows_${sel.id}"></div>
           <div style="font-size:9px;color:var(--sim-text3);margin-bottom:4px;line-height:1.6;">
             Ex: ${cls.exampleTickers.slice(0,4).join(', ')}
@@ -1816,7 +1909,7 @@ function setCfgMode(id, mode) {
   if (indEl) indEl.style.display = mode==='indicador' ? 'block' : 'none';
   if (custEl) custEl.style.display = mode==='custom' ? 'block' : 'none';
   document.querySelectorAll(`#modeToggle_${id} .mode-toggle-btn`).forEach((b,i) =>
-    b.classList.toggle('active', (i===0&&mode==='indicador')||(i===1&&mode==='custom')));
+    b.classList.toggle('active', (i===0&&mode==='custom')||(i===1&&mode==='indicador')));
 }
 
 function renderIndGrid(id) {
@@ -1835,6 +1928,7 @@ function renderIndGrid(id) {
 function setCfgIndicador(id, ticker) {
   state.classesConfig[id].indicadorTicker = ticker.toUpperCase();
   renderIndGrid(id);
+  verificarCascata();
 }
 
 function redistribuir(id) {
@@ -2001,9 +2095,9 @@ function selecionarAtivo(id, idx, ticker) {
   const cls = CLASSES_DEF.find(c => c.id === id);
   if (!cls.exampleTickers.includes(ticker.toUpperCase())) return;
   state.classesConfig[id].ativos[idx].ticker = ticker.toUpperCase();
-  // Redistribui somente os ativos que já têm ticker válido
   redistribuirValidos(id);
   renderAtivosRows(id);
+  verificarCascata();
 }
 
 function setPct(id, idx, val) {
@@ -2080,6 +2174,7 @@ function selectDivMode(mode, el) {
   state.dividendMode = mode;
   document.querySelectorAll('.divmode-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
+  verificarCascata();
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -2236,6 +2331,7 @@ async function simular() {
     renderExcelTabs();
     if (viewMode === 'compare' && simulations.length > 1) renderCompareView();
     else { viewMode = 'single'; renderSingleView(activeSimIdx); }
+    salvarEstado();
 
   } catch(e) {
     showErr('Erro: ' + e.message);
@@ -2275,6 +2371,7 @@ function duplicarSim() {
 function novaSim() {
   editingSimIdx = null;
   state.classesSel = []; state.classesConfig = {}; state.dividendMode = 'none';
+  _etapaPeriodoOk = false; _etapaAportesOk = false;
   if (_pizzaMode) editarClassesPizza();
   document.getElementById('startDate').value = '2019-01';
   document.getElementById('endDate').value   = '2024-12';
@@ -2288,6 +2385,7 @@ function novaSim() {
   document.getElementById('btnSimular').textContent = '▶ Simular carteira';
   setSidebarLocked(false);
   renderSidebar();
+  verificarCascata();
 }
 
 function deleteSim() {
@@ -2354,6 +2452,7 @@ function removeSim(e, idx) {
     document.getElementById('singleView').style.display  = 'none';
     document.getElementById('compareView').style.display = 'none';
     editingSimIdx = null;
+    salvarEstado();
     novaSim(); return;
   }
   activeSimIdx  = Math.min(activeSimIdx, simulations.length-1);
@@ -2361,10 +2460,12 @@ function removeSim(e, idx) {
   renderExcelTabs();
   if (viewMode === 'compare') renderCompareView();
   else renderSingleView(activeSimIdx);
+  salvarEstado();
 }
 
 function clearAll() {
   simulations = []; activeSimIdx = 0; viewMode = 'single'; editingSimIdx = null;
+  localStorage.removeItem(LS_KEY);
   document.getElementById('emptyState').style.display = 'flex';
   document.getElementById('resultsArea').style.display = 'none';
   document.getElementById('singleView').style.display  = 'none';
@@ -2626,8 +2727,8 @@ function renderCompareBarChart() {
   const maxMonth = `${year}-${month}`;
   const startEl = document.getElementById('startDate');
   const endEl   = document.getElementById('endDate');
-  if (startEl) { startEl.max = maxMonth; startEl.removeAttribute('min'); }
-  if (endEl)   { endEl.max   = maxMonth; endEl.removeAttribute('min');   }
+  if (startEl) { startEl.max = maxMonth; startEl.removeAttribute('min'); startEl.addEventListener('change', verificarCascata); startEl.addEventListener('change', () => { const b=document.getElementById('btnConfirmarPeriodo'); if(b){const sd=document.getElementById('startDate').value,ed=document.getElementById('endDate').value;b.disabled=!(sd&&ed&&sd<ed);}}); }
+  if (endEl)   { endEl.max   = maxMonth; endEl.removeAttribute('min');   endEl.addEventListener('change', verificarCascata); endEl.addEventListener('change', () => { const b=document.getElementById('btnConfirmarPeriodo'); if(b){const sd=document.getElementById('startDate').value,ed=document.getElementById('endDate').value;b.disabled=!(sd&&ed&&sd<ed);}}); }
 })();
 
 // ══════════════════════════════════════════════════════════════
@@ -2744,10 +2845,109 @@ async function initDynamicTickers() {
 }
 
 // Inicializa tickers dinâmicos e só então renderiza a sidebar
+
+// ══════════════════════════════════════════════════════════════
+// PERSISTÊNCIA — localStorage
+// Salva: parâmetros do formulário, state (classes/config/divMode)
+//        e simulações completas (sem dados de preço — só config+result)
+// ══════════════════════════════════════════════════════════════
+const LS_KEY = 'maisvalor_sim_v1';
+
+function salvarEstado() {
+  try {
+    const dados = {
+      form: {
+        startDate:     document.getElementById('startDate').value,
+        endDate:       document.getElementById('endDate').value,
+        initialAmount: document.getElementById('initialAmount').value,
+        monthlyAmount: document.getElementById('monthlyAmount').value,
+        rebalance:     document.getElementById('rebalance').value,
+        rebalMode:     document.getElementById('rebalMode')?.value || 'passive',
+        simName:       document.getElementById('simName').value,
+      },
+      state: {
+        classesSel:    state.classesSel,
+        classesConfig: state.classesConfig,
+        dividendMode:  state.dividendMode,
+      },
+      pizzaMode: _pizzaMode,
+      etapaPeriodoOk: _etapaPeriodoOk,
+      etapaAportesOk: _etapaAportesOk,
+      simulations: simulations.map(s => ({
+        id: s.id, name: s.name, color: s.color,
+        config: s.config, result: s.result,
+        availabilityLog: s.availabilityLog,
+        classesSel: s.classesSel, classesConfig: s.classesConfig,
+      })),
+      activeSimIdx, viewMode, editingSimIdx,
+    };
+    localStorage.setItem(LS_KEY, JSON.stringify(dados));
+  } catch(e) { /* quota ou estrutura circular — ignora */ }
+}
+
+function restaurarEstado() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return false;
+    const dados = JSON.parse(raw);
+
+    // Formulário
+    const f = dados.form || {};
+    if (f.startDate)     document.getElementById('startDate').value     = f.startDate;
+    if (f.endDate)       document.getElementById('endDate').value       = f.endDate;
+    if (f.initialAmount) document.getElementById('initialAmount').value = f.initialAmount;
+    if (f.monthlyAmount) document.getElementById('monthlyAmount').value = f.monthlyAmount;
+    if (f.rebalance)     document.getElementById('rebalance').value     = f.rebalance;
+    if (f.rebalMode && document.getElementById('rebalMode'))
+                         document.getElementById('rebalMode').value     = f.rebalMode;
+    if (f.simName)       document.getElementById('simName').value       = f.simName;
+    document.getElementById('rebalance').dispatchEvent(new Event('change'));
+
+    // State
+    const st = dados.state || {};
+    if (st.classesSel)    state.classesSel    = st.classesSel;
+    if (st.classesConfig) state.classesConfig = st.classesConfig;
+    if (st.dividendMode) {
+      state.dividendMode = st.dividendMode;
+      const modes = ['none','reinvest_same','reinvest_class','reinvest_rebalance'];
+      document.querySelectorAll('.divmode-btn').forEach(b => b.classList.remove('active'));
+      const dBtns = document.querySelectorAll('.divmode-btn');
+      const dIdx  = modes.indexOf(st.dividendMode);
+      if (dBtns[dIdx]) dBtns[dIdx].classList.add('active');
+    }
+
+    // Simulações
+    if (dados.simulations && dados.simulations.length > 0) {
+      simulations    = dados.simulations;
+      activeSimIdx   = dados.activeSimIdx   ?? 0;
+      viewMode       = dados.viewMode       ?? 'single';
+      editingSimIdx  = dados.editingSimIdx  ?? 0;
+    }
+
+    if (dados.etapaPeriodoOk) _etapaPeriodoOk = dados.etapaPeriodoOk;
+    if (dados.etapaAportesOk) _etapaAportesOk = dados.etapaAportesOk;
+    return true;
+  } catch(e) { return false; }
+}
+
 initDynamicTickers().then(() => {
+  const temEstado = restaurarEstado();
   renderSidebar();
-  // Reprocessa botões Add com lista de tickers completa (carregada do servidor)
   state.classesSel.forEach(sel => atualizarBotaoAdd(sel.id));
+
+  verificarCascata();
+  if (temEstado && simulations.length > 0) {
+    // Restaura pizza mode se estava ativo
+    if (_pizzaMode) aplicarClassesPizza();
+    // Mostra resultados
+    document.getElementById('emptyState').style.display = 'none';
+    document.getElementById('resultsArea').style.display = 'block';
+    setSidebarLocked(true);
+    renderExcelTabs();
+    if (viewMode === 'compare' && simulations.length > 1) renderCompareView();
+    else renderSingleView(activeSimIdx);
+    updateViewBtn();
+  }
 });
 </script>
 </body>
