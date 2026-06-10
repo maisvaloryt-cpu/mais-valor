@@ -598,15 +598,14 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
       <!-- 1. Período -->
       <div class="param-group" id="etapaPeriodo">
         <div class="param-group-label">Período</div>
-        <div class="param-row">
-          <div class="param-field">
-            <label>Início</label>
-            <input type="month" class="param-inp" id="startDate" value="">
-          </div>
-          <div class="param-field">
-            <label>Fim</label>
-            <input type="month" class="param-inp" id="endDate" value="">
-          </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <input type="text" class="param-inp" id="startDate" placeholder="MM/AAAA"
+            maxlength="7" style="font-family:var(--sim-mono);text-align:center;flex:1"
+            oninput="maskDateInput(this)" onblur="verificarCascata()">
+          <span style="color:var(--sim-text3);font-size:13px">›</span>
+          <input type="text" class="param-inp" id="endDate" placeholder="MM/AAAA"
+            maxlength="7" style="font-family:var(--sim-mono);text-align:center;flex:1"
+            oninput="maskDateInput(this)" onblur="verificarCascata()">
         </div>
         <button class="btn-confirmar-etapa" id="btnConfirmarPeriodo" onclick="confirmarPeriodo()">✓ Confirmar período</button>
       </div>
@@ -1354,6 +1353,18 @@ function buildAvailabilityLog(normAssets, allPrices, months) {
 }
 
 // ══════════════════════════════════════════════════════════════
+// AVISO DE INÍCIO REAL
+// ══════════════════════════════════════════════════════════════
+function buildInicioLog(primeiroMes, startDate) {
+  if (!primeiroMes) return [];
+  if (primeiroMes === startDate) return [];
+  return [{
+    type: 'inicio_real',
+    msg: 'Primeiro dado disponível em ' + monthLabel(primeiroMes) + '. Os meses anteriores não foram simulados — nenhum ativo tinha preço real nesse período.',
+  }];
+}
+
+// ══════════════════════════════════════════════════════════════
 // BACKTEST ENGINE — dados 100% reais, redistribuição proporcional
 // ══════════════════════════════════════════════════════════════
 function runBacktest(config, allPrices, allDividends) {
@@ -1370,6 +1381,8 @@ function runBacktest(config, allPrices, allDividends) {
   const holdings = {};
   normAssets.forEach(a => holdings[a.ticker] = 0);
   let totalInvested = 0, dividendsCash = 0, totalDividendsEver = 0;
+  // Primeiro mês com pelo menos 1 dado real
+  const primeiroMesComDado = months.find(m => normAssets.some(a => allPrices[a.ticker]?.[m])) || null;
   const dividendsByTicker = {};
   normAssets.forEach(a => dividendsByTicker[a.ticker] = 0);
   const series = [];
@@ -1398,8 +1411,10 @@ function runBacktest(config, allPrices, allDividends) {
     const effW = calcEffectiveWeights(normAssets, allPrices, month);
 
     // Aporte: mês 0 = initial, demais = monthly
+    // Se nenhum ativo tem dado real neste mês, não aporta — dinheiro fica parado
+    const temDadoNoMes = normAssets.some(a => getPrice(a.ticker, month));
     const aporte = i === 0 ? config.initialAmount : config.monthlyAmount;
-    if (aporte > 0) {
+    if (aporte > 0 && temDadoNoMes) {
       let aporteEfetivo = 0;
       normAssets.forEach(a => {
         const w = effW[a.ticker];
@@ -1561,7 +1576,8 @@ function runBacktest(config, allPrices, allDividends) {
       finalValue, totalInvested, profit: finalValue - totalInvested,
       totalReturn: totalInvested > 0 ? (finalValue - totalInvested) / totalInvested : 0,
       cagr, volatility: vol, sharpeRatio: sharpe, maxDrawdown: maxDD,
-      totalDividends: totalDividendsEver, dividendsCash, months: months.length
+      totalDividends: totalDividendsEver, dividendsCash, months: months.length,
+      primeiroMesComDado
     },
     breakdown, dividendMode: mode
   };
@@ -1600,9 +1616,29 @@ function buildAssetList() {
 // ══════════════════════════════════════════════════════════════
 // CASCATA DE ETAPAS
 // ══════════════════════════════════════════════════════════════
+
+function maskDateInput(el) {
+  // Remove tudo que não é dígito
+  let v = el.value.replace(/\D/g, '');
+  if (v.length > 6) v = v.slice(0, 6);
+  // Formata MM/AAAA
+  if (v.length > 2) v = v.slice(0,2) + '/' + v.slice(2);
+  el.value = v;
+  verificarCascata();
+}
+
+// Lê MM/AAAA e retorna YYYY-MM (ou '' se inválido)
+function parseDateInput(val) {
+  const m = val.trim().match(/^(\d{2})\/(\d{4})$/);
+  if (!m) return '';
+  const mm = parseInt(m[1]), yyyy = parseInt(m[2]);
+  if (mm < 1 || mm > 12 || yyyy < 1800 || yyyy > 2100) return '';
+  return yyyy + '-' + String(mm).padStart(2,'0');
+}
+
 function verificarCascata() {
-  const sd = document.getElementById('startDate').value;
-  const ed = document.getElementById('endDate').value;
+  const sd = parseDateInput(document.getElementById('startDate').value);
+  const ed = parseDateInput(document.getElementById('endDate').value);
   const periodoOk = !!(sd && ed && sd < ed);
 
   // Aportes: aparecem após período confirmado (_etapaPeriodoOk)
@@ -1639,11 +1675,11 @@ function verificarCascata() {
 }
 
 function confirmarPeriodo() {
-  const sd = document.getElementById('startDate').value;
-  const ed = document.getElementById('endDate').value;
-  if (!sd) { showErr('Informe a data de início.'); return; }
-  if (!ed) { showErr('Informe a data de fim.'); return; }
-  if (sd >= ed) { showErr('A data de início deve ser anterior ao fim.'); return; }
+  const sd = parseDateInput(document.getElementById('startDate').value);
+  const ed = parseDateInput(document.getElementById('endDate').value);
+  if (!sd) { showErr('Informe o início no formato MM/AAAA.'); return; }
+  if (!ed) { showErr('Informe o fim no formato MM/AAAA.'); return; }
+  if (sd >= ed) { showErr('O início deve ser anterior ao fim.'); return; }
   _etapaPeriodoOk = true;
   salvarEstado();
   verificarCascata();
@@ -2249,8 +2285,8 @@ async function simular() {
   document.getElementById('loaderOverlay').classList.add('show');
   await new Promise(r => setTimeout(r, 50));
   try {
-    const startDate = document.getElementById('startDate').value;
-    const endDate   = document.getElementById('endDate').value;
+    const startDate = parseDateInput(document.getElementById('startDate').value);
+    const endDate   = parseDateInput(document.getElementById('endDate').value);
     const initialAmount = parseFloat(document.getElementById('initialAmount').value) || 0;
     const monthlyAmount = parseFloat(document.getElementById('monthlyAmount').value) || 0;
     const rebalance = document.getElementById('rebalance').value;
@@ -2506,7 +2542,8 @@ function renderAvailabilityLog(logs) {
   const sorted = [...logs].sort((a,b) => (typeOrder[a.type]||9) - (typeOrder[b.type]||9));
   const items = sorted.map(l => {
     let icon, color;
-    if (l.type === 'ok')           { icon = '✓'; color = 'var(--up)'; }
+    if (l.type === 'inicio_real')  { icon = '⏱'; color = '#D4A017'; }
+    else if (l.type === 'ok')        { icon = '✓'; color = 'var(--up)'; }
     else if (l.type === 'no_data') { icon = '✕'; color = 'var(--dn)'; }
     else if (l.type === 'partial') { icon = '⚠'; color = 'var(--gold)'; }
     else                           { icon = '⚠'; color = 'var(--gold)'; }
@@ -2579,7 +2616,8 @@ function renderSingleView(idx) {
 
   // Rodapé de disponibilidade de dados
   const logEl = document.getElementById('availabilityLog');
-  if (logEl) logEl.innerHTML = renderAvailabilityLog(availabilityLog);
+  const inicioLogs = buildInicioLog(result.metrics.primeiroMesComDado, config.startDate);
+  if (logEl) logEl.innerHTML = renderAvailabilityLog([...inicioLogs, ...(availabilityLog||[])]);
 
   showChart('evolution', document.querySelector('.chart-tab'));
 }
@@ -2728,8 +2766,7 @@ function renderCompareBarChart() {
   const maxMonth = `${year}-${month}`;
   const startEl = document.getElementById('startDate');
   const endEl   = document.getElementById('endDate');
-  if (startEl) { startEl.max = maxMonth; startEl.removeAttribute('min'); startEl.addEventListener('change', verificarCascata); }
-  if (endEl)   { endEl.max   = maxMonth; endEl.removeAttribute('min');   endEl.addEventListener('change', verificarCascata); }
+  // inputs de texto — sem max/min (são MM/AAAA)
 })();
 
 // ══════════════════════════════════════════════════════════════
