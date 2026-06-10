@@ -4,6 +4,7 @@ const NAV_LINKS = [
   { href: 'index.html',        label: 'Home' },
   { href: 'acoes.html',        label: 'Ações' },
   { href: 'fiis.html',         label: 'FIIs' },
+  { href: 'exterior.html',     label: 'Exterior' },
   { href: 'criptos.html',      label: 'Criptos' },
   { href: 'dividendos.html',   label: 'Dividendos' },
   { href: 'rankings.html',     label: 'Rankings' },
@@ -11,7 +12,7 @@ const NAV_LINKS = [
   { href: 'ferramentas.html',  label: 'Ferramentas' },
   { href: 'analise.html',      label: '✦ Análise' },
   { href: 'watchlist.html',    label: '★ Watchlist' },
-  { href: 'Calculadora_maisvalor/index.html', label: 'Simulador' },
+  { href: 'simulador.html',    label: 'Simulador' },
   { href: 'status.html',       label: '● Status' },
 ];
 
@@ -293,7 +294,7 @@ function renderNav() {
     </div>
   </div>
 
-  <div class="indices-bar" id="indices-bar">
+  <div class="indices-bar">
     <div class="idx-card">
       <div class="idx-name">Ibovespa</div>
       <div class="idx-val" id="idx-ibov">—</div>
@@ -323,13 +324,6 @@ function renderNav() {
 
   // Aplica tema salvo
   applyTheme(getTheme());
-
-  // Oculta indices-bar em todas as páginas exceto a home
-  const pg = location.pathname.split('/').pop() || 'index.html';
-  if (pg !== 'index.html' && pg !== '') {
-    const bar = document.getElementById('indices-bar');
-    if (bar) bar.style.display = 'none';
-  }
 
   // Fecha busca ao clicar fora
   document.addEventListener('click', (e) => {
