@@ -265,17 +265,35 @@ function renderNav() {
     return `<a href="${l.href}" class="${cls}" style="${style}">${l.label}</a>`;
   }).join('');
 
-  // Só mostra ticker-bar e indices-bar em páginas com data-indices="true"
-  const showIndices = document.documentElement.dataset.indices === 'true';
   document.getElementById('nav-placeholder').innerHTML = `
+  <nav>
+    <a class="nav-logo" href="index.html">
+      <img src="${LOGO}" alt="Mais Valor">
+      <span>Mais <em>Valor</em></span>
+    </a>
+    <div class="nav-links">${links}</div>
+    <div class="nav-right">
+      <div class="nav-search-wrap">
+        <span class="nav-search-icon">⌕</span>
+        <input class="nav-search" type="text" placeholder="Buscar ativo... " id="nav-search-input"
+          oninput="navSearchLive(this.value)" onkeydown="if(event.key==='Enter')navSearchGo(this.value)"
+          onfocus="document.querySelector('.nav-search-shortcut').style.display='none'"
+          onblur="document.querySelector('.nav-search-shortcut').style.display=''">
+        <span class="nav-search-shortcut">/</span>
+        <div id="nav-search-results"></div>
+      </div>
+      <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Alternar tema">☀️</button>
+      <div class="nav-badge">PRO</div>
+    </div>
+  </nav>
+
   <div class="ticker-bar">
     <div class="ticker-track" id="ticker-track">
       <div class="ticker-item"><span class="ticker-name" style="animation:pulse 1s ease-in-out infinite">Carregando...</span></div>
     </div>
-  </div>` : '';
+  </div>
 
-  const indicesHtml = showIndices ? `
-  <div class="indices-bar">
+  <div class="indices-bar" id="indices-bar">
     <div class="idx-card">
       <div class="idx-name">Ibovespa</div>
       <div class="idx-val" id="idx-ibov">—</div>
@@ -301,32 +319,17 @@ function renderNav() {
       <div class="idx-val" id="idx-dolar">—</div>
       <div class="idx-chg" id="idx-dolar-chg">—</div>
     </div>
-  </div>` : '';
-  <nav>
-    <a class="nav-logo" href="index.html">
-      <img src="${LOGO}" alt="Mais Valor">
-      <span>Mais <em>Valor</em></span>
-    </a>
-    <div class="nav-links">${links}</div>
-    <div class="nav-right">
-      <div class="nav-search-wrap">
-        <span class="nav-search-icon">⌕</span>
-        <input class="nav-search" type="text" placeholder="Buscar ativo... " id="nav-search-input"
-          oninput="navSearchLive(this.value)" onkeydown="if(event.key==='Enter')navSearchGo(this.value)"
-          onfocus="document.querySelector('.nav-search-shortcut').style.display='none'"
-          onblur="document.querySelector('.nav-search-shortcut').style.display=''">
-        <span class="nav-search-shortcut">/</span>
-        <div id="nav-search-results"></div>
-      </div>
-      <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Alternar tema">☀️</button>
-      <div class="nav-badge">PRO</div>
-    </div>
-  </nav>
-  ${tickerHtml}
-  ${indicesHtml}`;
+  </div>`;
 
   // Aplica tema salvo
   applyTheme(getTheme());
+
+  // Oculta indices-bar em todas as páginas exceto a home
+  const pg = location.pathname.split('/').pop() || 'index.html';
+  if (pg !== 'index.html' && pg !== '') {
+    const bar = document.getElementById('indices-bar');
+    if (bar) bar.style.display = 'none';
+  }
 
   // Fecha busca ao clicar fora
   document.addEventListener('click', (e) => {
