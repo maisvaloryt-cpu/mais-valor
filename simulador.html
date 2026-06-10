@@ -178,11 +178,26 @@ input[type="range"].pct-slider::-webkit-slider-thumb {
   background: var(--sim-accent); cursor: pointer; box-shadow: 0 0 6px var(--sim-accent-g);
 }
 .inp-pct {
-  width: 42px; background: var(--sim-surf2); border: 1px solid var(--sim-border2);
-  border-radius: 4px; color: var(--sim-accent); font-family: var(--sim-mono);
-  font-size: 10px; padding: 3px 5px; outline: none; text-align: right; transition: border-color .15s;
+  width: 32px; background: transparent; border: none;
+  color: var(--sim-accent); font-family: var(--sim-mono);
+  font-size: 10px; padding: 3px 2px; outline: none; text-align: center;
+  -moz-appearance: textfield;
 }
-.inp-pct:focus { border-color: var(--sim-accent); }
+.inp-pct::-webkit-outer-spin-button,
+.inp-pct::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.inp-pct:focus { color: var(--sim-accent); }
+.slider-pct-ctrl {
+  display: flex; align-items: center; gap: 0;
+  border: 1px solid var(--sim-border2); border-radius: 5px;
+  background: var(--sim-surf2); flex-shrink: 0; overflow: hidden;
+}
+.slider-pct-arrow {
+  width: 16px; height: 22px; background: transparent; border: none;
+  color: var(--sim-text3); font-size: 11px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all .15s; padding: 0; font-family: var(--sim-mono); flex-shrink: 0;
+}
+.slider-pct-arrow:hover { color: var(--sim-accent); background: var(--sim-accent-d); }
 
 /* ── ACCORDION ── */
 .class-acc { border: 1px solid var(--sim-border); border-radius: 6px; margin-bottom: 6px; overflow: hidden; }
@@ -223,14 +238,40 @@ input[type="range"].pct-slider::-webkit-slider-thumb {
 
 /* ── ATIVOS CUSTOM ── */
 .ativos-mini { margin-bottom: 6px; }
-.ativo-mini-row { display: grid; grid-template-columns: 1fr 52px 22px; gap: 4px; margin-bottom: 4px; align-items: center; }
-input[type="text"].mini, input[type="number"].mini {
+.ativo-mini-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 20px;
+  gap: 4px; margin-bottom: 4px; align-items: center;
+}
+input[type="text"].mini {
   width: 100%; background: var(--sim-surf2); border: 1px solid var(--sim-border2);
   border-radius: 4px; color: var(--sim-text); font-family: var(--sim-mono);
   font-size: 10px; padding: 4px 6px; outline: none; transition: border-color .15s;
+  text-transform: uppercase;
 }
-input[type="text"].mini:focus, input[type="number"].mini:focus { border-color: var(--sim-accent); }
-input[type="number"].mini { text-align: right; }
+input[type="text"].mini:focus { border-color: var(--sim-accent); }
+.pct-ctrl {
+  display: flex; align-items: center; gap: 2px;
+}
+.pct-arrow {
+  width: 18px; height: 22px; background: var(--sim-surf2);
+  border: 1px solid var(--sim-border2); border-radius: 4px;
+  color: var(--sim-text2); font-size: 11px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all .15s; line-height: 1; padding: 0;
+  font-family: var(--sim-mono);
+}
+.pct-arrow:hover { border-color: var(--sim-accent); color: var(--sim-accent); }
+.pct-val {
+  flex: 1; text-align: center; font-family: var(--sim-mono); font-size: 10px;
+  color: var(--sim-accent); background: var(--sim-surf2);
+  border: 1px solid var(--sim-border2); border-radius: 4px;
+  padding: 3px 2px; min-width: 28px; outline: none; cursor: text;
+  -moz-appearance: textfield;
+}
+.pct-val::-webkit-outer-spin-button,
+.pct-val::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.pct-val:focus { border-color: var(--sim-accent); }
 .btn-rm {
   width: 20px; height: 20px; background: transparent; border: 1px solid var(--sim-border);
   border-radius: 4px; color: var(--sim-text3); cursor: pointer; font-size: 10px;
@@ -1427,8 +1468,14 @@ function renderSliders() {
       <span class="slider-name" title="${cls.name}">${cls.name}</span>
       <input type="range" class="pct-slider" min="0" max="100" step="1" value="${sel.pct}" id="sl_${sel.id}"
         oninput="onSlider('${sel.id}',+this.value)">
-      <input type="number" class="inp-pct" min="0" max="100" step="1" value="${sel.pct}" id="slv_${sel.id}"
-        oninput="onSlider('${sel.id}',+this.value)">
+      <div class="slider-pct-ctrl">
+        <button class="slider-pct-arrow" onmousedown="event.preventDefault()" onclick="onSlider('${sel.id}', (state.classesSel.find(c=>c.id==='${sel.id}')?.pct||0)-1)">‹</button>
+        <input type="text" class="inp-pct" value="${sel.pct}%" id="slv_${sel.id}"
+          onfocus="this.value=this.value.replace('%','');this.select()"
+          onblur="onSlider('${sel.id}',+this.value.replace('%',''));this.value=(state.classesSel.find(c=>c.id==='${sel.id}')?.pct||0)+'%'"
+          onkeydown="if(event.key==='Enter'){this.blur()}">
+        <button class="slider-pct-arrow" onmousedown="event.preventDefault()" onclick="onSlider('${sel.id}', (state.classesSel.find(c=>c.id==='${sel.id}')?.pct||0)+1)">›</button>
+      </div>
     `;
     wrap.appendChild(div);
   });
@@ -1441,7 +1488,7 @@ function onSlider(id, requested) {
   const sel = state.classesSel.find(c => c.id === id);
   if (sel) sel.pct = capped;
   const slEl = document.getElementById('sl_'+id); if (slEl) slEl.value = capped;
-  const inpEl = document.getElementById('slv_'+id); if (inpEl) inpEl.value = capped;
+  const inpEl = document.getElementById('slv_'+id); if (inpEl && document.activeElement !== inpEl) inpEl.value = capped + '%';
   renderAllocBar();
   renderClassesGrid();
 }
@@ -1528,23 +1575,67 @@ function setCfgIndicador(id, ticker) {
   renderIndGrid(id);
 }
 
+function redistribuir(id) {
+  const ativos = state.classesConfig[id].ativos;
+  const n = ativos.length;
+  if (n === 0) return;
+  const base = Math.floor(100 / n);
+  const resto = 100 - base * n;
+  ativos.forEach((a, i) => { a.pct = base + (i === 0 ? resto : 0); });
+}
+
+function ajustarPct(id, idx, delta) {
+  const ativos = state.classesConfig[id].ativos;
+  const n = ativos.length;
+  if (n <= 1) return;
+  const cur = ativos[idx].pct;
+  const novo = Math.min(100, Math.max(0, cur + delta));
+  const diff = novo - cur;
+  if (diff === 0) return;
+  // Distribui o diff entre os outros proporcionalmente (ou igualmente se pct=0)
+  const outros = ativos.filter((_, i) => i !== idx);
+  const totalOutros = outros.reduce((s, a) => s + a.pct, 0);
+  ativos[idx].pct = novo;
+  if (totalOutros === 0) {
+    outros.forEach(a => { a.pct = Math.max(0, a.pct - diff / outros.length); });
+  } else {
+    outros.forEach(a => { a.pct = Math.max(0, Math.round(a.pct - diff * (a.pct / totalOutros))); });
+  }
+  // Corrige arredondamentos para fechar 100%
+  const soma = ativos.reduce((s, a) => s + a.pct, 0);
+  const gap = 100 - soma;
+  if (gap !== 0) {
+    // Aplica o gap no primeiro ativo diferente do atual que aceite
+    for (let i = 0; i < ativos.length; i++) {
+      if (i === idx) continue;
+      const tentativa = ativos[i].pct + gap;
+      if (tentativa >= 0 && tentativa <= 100) { ativos[i].pct = tentativa; break; }
+    }
+  }
+  renderAtivosRows(id);
+}
+
 function renderAtivosRows(id) {
   const cont = document.getElementById('ativosRows_'+id); if (!cont) return;
   const cfg = state.classesConfig[id];
-  const cls = CLASSES_DEF.find(c => c.id === id);
   cont.innerHTML = cfg.ativos.map((a,i) => `
     <div class="ativo-mini-row" style="position:relative">
-      <div style="position:relative;flex:1">
-        <input type="text" class="mini" placeholder="Buscar ticker..." value="${a.ticker}"
+      <div style="position:relative">
+        <input type="text" class="mini" placeholder="Buscar..." value="${a.ticker}"
           oninput="onAtivoInput('${id}',${i},this)"
           onfocus="showSugestoes('${id}',${i},this)"
           onblur="hideSugestoes('${id}',${i})"
-          autocomplete="off"
-          style="text-transform:uppercase;width:100%">
+          autocomplete="off">
         <div class="sugestoes-drop" id="sug_${id}_${i}" style="display:none"></div>
       </div>
-      <input type="number" class="mini" min="0" max="100" value="${a.pct}" placeholder="%"
-        oninput="updateAtivo('${id}',${i},'pct',+this.value)" style="width:42px">
+      <div class="pct-ctrl">
+        <button class="pct-arrow" onmousedown="event.preventDefault()" onclick="ajustarPct('${id}',${i},-1)">‹</button>
+        <input type="text" class="pct-val" value="${a.pct}%"
+          onfocus="this.value=this.value.replace('%','');this.select()"
+          onblur="setPct('${id}',${i},+this.value.replace('%',''));this.value=state.classesConfig['${id}'].ativos[${i}].pct+'%'"
+          onkeydown="if(event.key==='Enter'){this.blur()}if(event.key==='ArrowUp'){event.preventDefault();ajustarPct('${id}',${i},1)}if(event.key==='ArrowDown'){event.preventDefault();ajustarPct('${id}',${i},-1)}">
+        <button class="pct-arrow" onmousedown="event.preventDefault()" onclick="ajustarPct('${id}',${i},+1)">›</button>
+      </div>
       <button class="btn-rm" onclick="removeAtivo('${id}',${i})">✕</button>
     </div>
   `).join('');
@@ -1562,24 +1653,17 @@ function showSugestoes(id, idx, el) {
   if (!drop) return;
   const q = el.value.toUpperCase().trim();
 
-  // Usa lista dinâmica do servidor se disponível; caso contrário, exampleTickers da classe
-  let pool = cls.exampleTickers;
-  if (window._allServerTickers && window._allServerTickers.length > 0) {
-    // Prioriza tickers da classe, depois os demais
-    const clsSet = new Set(cls.exampleTickers);
-    const clsMatches = cls.exampleTickers.filter(t => !q || t.includes(q));
-    const otherMatches = window._allServerTickers.filter(t => !clsSet.has(t) && (!q || t.includes(q)));
-    pool = [...clsMatches, ...otherMatches];
-  }
-
+  // Somente tickers da própria classe — nunca mistura classes
+  const pool = cls.exampleTickers;
   const lista = q ? pool.filter(t => t.toUpperCase().includes(q)) : pool;
+
   if (!lista.length) { drop.style.display = 'none'; return; }
 
   const MAX = 50;
   const shown = lista.slice(0, MAX);
   drop.innerHTML = shown.map(t => `
     <div class="sug-item" onmousedown="selecionarAtivo('${id}',${idx},'${t}')">${t}</div>
-  `).join('') + (lista.length > MAX ? `<div class="sug-item" style="color:var(--sim-text3);cursor:default;font-style:italic">+${lista.length - MAX} resultados — continue digitando</div>` : '');
+  `).join('') + (lista.length > MAX ? `<div class="sug-item" style="color:var(--sim-text3);cursor:default;font-style:italic">+${lista.length - MAX} — continue digitando</div>` : '');
   drop.style.display = 'block';
 }
 
@@ -1587,17 +1671,63 @@ function hideSugestoes(id, idx) {
   setTimeout(() => {
     const drop = document.getElementById(`sug_${id}_${idx}`);
     if (drop) drop.style.display = 'none';
+    // Reverte o campo para o último ticker confirmado via clique no card
+    const cfg = state.classesConfig[id];
+    if (cfg && cfg.ativos[idx] !== undefined) {
+      const rows = document.querySelectorAll(`#ativosRows_${id} .ativo-mini-row`);
+      const row = rows[idx];
+      if (row) {
+        const inputEl = row.querySelector('input[type="text"]');
+        if (inputEl) inputEl.value = cfg.ativos[idx].ticker;
+      }
+    }
   }, 150);
 }
 
 function selecionarAtivo(id, idx, ticker) {
   state.classesConfig[id].ativos[idx].ticker = ticker;
+  // Se é o primeiro ativo a ser preenchido em slot vazio, redistribui
+  if (state.classesConfig[id].ativos[idx].pct === 0) redistribuir(id);
   renderAtivosRows(id);
 }
 
+function setPct(id, idx, val) {
+  const ativos = state.classesConfig[id].ativos;
+  const clamped = Math.min(100, Math.max(0, Math.round(val) || 0));
+  const diff = clamped - ativos[idx].pct;
+  if (diff === 0) return;
+  const outros = ativos.filter((_, i) => i !== idx);
+  const totalOutros = outros.reduce((s, a) => s + a.pct, 0);
+  ativos[idx].pct = clamped;
+  if (outros.length > 0) {
+    if (totalOutros === 0) {
+      outros.forEach(a => { a.pct = Math.max(0, a.pct - diff / outros.length); });
+    } else {
+      outros.forEach(a => { a.pct = Math.max(0, Math.round(a.pct - diff * (a.pct / totalOutros))); });
+    }
+    const soma = ativos.reduce((s, a) => s + a.pct, 0);
+    const gap = 100 - soma;
+    if (gap !== 0) {
+      for (let i = 0; i < ativos.length; i++) {
+        if (i === idx) continue;
+        const t = ativos[i].pct + gap;
+        if (t >= 0 && t <= 100) { ativos[i].pct = t; break; }
+      }
+    }
+  }
+  renderAtivosRows(id);
+}
 function updateAtivo(id,idx,field,val) { state.classesConfig[id].ativos[idx][field]=val; renderInternoMini(id); }
-function addAtivo(id) { state.classesConfig[id].ativos.push({ticker:'',pct:0}); renderAtivosRows(id); }
-function removeAtivo(id,idx) { state.classesConfig[id].ativos.splice(idx,1); renderAtivosRows(id); }
+function addAtivo(id) {
+  state.classesConfig[id].ativos.push({ticker:'',pct:0});
+  redistribuir(id);
+  renderAtivosRows(id);
+}
+function removeAtivo(id,idx) {
+  state.classesConfig[id].ativos.splice(idx,1);
+  if (state.classesConfig[id].ativos.length > 0) redistribuir(id);
+  renderAtivosRows(id);
+}
 function renderInternoMini(id) {
   const cfg = state.classesConfig[id];
   const total = cfg.ativos.reduce((s,a) => s+(parseFloat(a.pct)||0), 0);
@@ -2185,14 +2315,14 @@ async function initDynamicTickers() {
   if (!tickers || tickers.length === 0) return;
 
   // Distribui os tickers descobertos nas classes corretas
-  // Zera os exampleTickers de todas as classes que têm ativos (não indicadores puros)
+  // Cada ticker vai SOMENTE para a classe inferida — sem misturar
   const classMap = {};
   CLASSES_DEF.forEach(cls => { classMap[cls.id] = new Set(cls.exampleTickers); });
 
   tickers.forEach(ticker => {
     const clsId = inferClassId(ticker);
     if (classMap[clsId]) classMap[clsId].add(ticker);
-    else classMap['acao'].add(ticker);
+    // Se não reconheceu a classe, não adiciona — evita poluir listas erradas
   });
 
   // Aplica de volta, ordenado
@@ -2202,7 +2332,7 @@ async function initDynamicTickers() {
     }
   });
 
-  // Armazena lista completa para busca cross-classe
+  // Guarda lista completa apenas para uso interno (ex: validação futura)
   window._allServerTickers = tickers;
 }
 
