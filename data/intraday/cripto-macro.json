@@ -1,5 +1,5 @@
 {
-  "updated_at": "10/06/2026 14:44",
+  "updated_at": "10/06/2026 15:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,8 +1128,8 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 168747.45,
-      "changePct": -0.0063,
+      "price": 168464.19,
+      "changePct": -0.0079,
       "high": 169812.45,
       "low": 168070.98
     },
@@ -1138,8 +1138,8 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3777.88,
-      "changePct": -0.0089,
+      "price": 3778.33,
+      "changePct": -0.0088,
       "high": 3815.84,
       "low": 3776.39
     },
@@ -1158,8 +1158,8 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 11931.9,
-      "changePct": 0.0001,
+      "price": 11907.46,
+      "changePct": -0.002,
       "high": 11935.63,
       "low": 11833.97
     },
@@ -1188,40 +1188,40 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7294.1,
-      "changePct": -0.0125,
+      "price": 7318.89,
+      "changePct": -0.0092,
       "high": 7396.56,
-      "low": 7292.66
+      "low": 7291.23
     },
     {
       "ticker": "INDEXNASDAQ:.IXIC",
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 25298.98,
-      "changePct": -0.0148,
+      "price": 25381.56,
+      "changePct": -0.0116,
       "high": 25726,
-      "low": 25269.25
+      "low": 25257.87
     },
     {
       "ticker": "INDEXDJX:.DJI",
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 50113.27,
-      "changePct": -0.0149,
+      "price": 50265.85,
+      "changePct": -0.011899999999999999,
       "high": 50769.26,
-      "low": 50095.56
+      "low": 50088.82
     },
     {
       "ticker": "INDEXRUSSELL:RUT",
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2852.54,
-      "changePct": -0.0051,
+      "price": 2860.96,
+      "changePct": -0.0021,
       "high": 2905.28,
-      "low": 2849.65
+      "low": 2848.4
     },
     {
       "ticker": "CBOE:VIX",
