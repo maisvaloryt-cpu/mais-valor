@@ -4,7 +4,12 @@ const NAV_LINKS = [
   { href: 'index.html',        label: 'Home' },
   { href: 'acoes.html',        label: 'Ações' },
   { href: 'fiis.html',         label: 'FIIs' },
-  { href: 'exterior.html',     label: 'Exterior' },
+  { href: '#',                 label: 'Exterior', dropdown: [
+    { href: 'bdrs.html',    label: '🇧🇷 BDRs' },
+    { href: 'etfs.html',    label: '📊 ETFs' },
+    { href: 'reits.html',   label: '🏢 REITs' },
+    { href: 'stocks.html',  label: '🇺🇸 Stocks' },
+  ]},
   { href: 'criptos.html',      label: 'Criptos' },
   { href: 'dividendos.html',   label: 'Dividendos' },
   { href: 'rankings.html',     label: 'Rankings' },
@@ -261,12 +266,31 @@ function renderNav() {
   const page = location.pathname.split('/').pop() || 'index.html';
   const links = NAV_LINKS.map(l => {
     const isStatus = l.href === 'status.html';
-    const cls = page === l.href ? 'active' : '';
     const style = isStatus ? 'color:var(--up);font-size:11px' : '';
+    if (l.dropdown) {
+      const isActive = l.dropdown.some(d => page === d.href);
+      return `<div class="nav-dropdown-wrap">
+        <a href="#" class="${isActive ? 'active' : ''}" style="${style}" onclick="return false">
+          ${l.label} ▾
+        </a>
+        <div class="nav-dropdown">
+          ${l.dropdown.map(d => `<a href="${d.href}" class="${page===d.href?'active':''}">${d.label}</a>`).join('')}
+        </div>
+      </div>`;
+    }
+    const cls = page === l.href ? 'active' : '';
     return `<a href="${l.href}" class="${cls}" style="${style}">${l.label}</a>`;
   }).join('');
 
   document.getElementById('nav-placeholder').innerHTML = `
+  <style>
+  .nav-dropdown-wrap{position:relative;display:inline-flex;align-items:center}
+  .nav-dropdown-wrap > a{cursor:pointer}
+  .nav-dropdown{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--bg2);border:1px solid var(--border3);border-radius:10px;padding:6px;min-width:140px;z-index:300;box-shadow:var(--shadow-lg);animation:slideDown .18s ease both}
+  .nav-dropdown a{display:block;padding:8px 12px;border-radius:7px;font-size:12.5px;font-weight:600;color:var(--text2);white-space:nowrap;transition:var(--transition)}
+  .nav-dropdown a:hover{background:var(--bg3);color:var(--text)}
+  .nav-dropdown-wrap:hover .nav-dropdown{display:block}
+  </style>
   <nav>
     <a class="nav-logo" href="index.html">
       <img src="${LOGO}" alt="Mais Valor">
