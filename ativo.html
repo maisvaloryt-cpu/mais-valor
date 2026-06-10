@@ -7,196 +7,116 @@
 <title id="page-title">Ativo — Mais Valor</title>
 <link rel="stylesheet" href="style.css">
 <style>
-/* ── Hero ── */
-.ativo-hero{padding:1.5rem 2rem 0;background:var(--bg2);border-bottom:1px solid var(--border)}
-.ativo-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1rem}
-.ativo-logo-wrap{display:flex;align-items:center;gap:14px}
-.ativo-logo-av{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#1A3A5C,#2563a8);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;font-family:var(--font-mono);flex-shrink:0;letter-spacing:-1px}
-.ativo-info h1{font-family:var(--font-display);font-size:28px;font-weight:400;letter-spacing:.5px;line-height:1}
+/* ── Ocultar ticker motion nesta página ── */
+.ticker-bar { display: none !important; }
+
+/* ── Hero compacto ── */
+.ativo-hero{padding:1rem 2rem 0;background:var(--bg2);border-bottom:1px solid var(--border)}
+.ativo-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:.85rem}
+.ativo-logo-wrap{display:flex;align-items:center;gap:12px}
+.ativo-logo-av{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#1A3A5C,#2563a8);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;font-family:var(--font-mono);flex-shrink:0;letter-spacing:-1px}
+.ativo-info h1{font-family:var(--font-display);font-size:24px;font-weight:400;letter-spacing:.5px;line-height:1}
 .ativo-info h1 em{color:var(--gold);font-style:italic}
 
-/* ── KPI strip ── */
-.kpi-strip{display:flex;gap:0;border-top:1px solid var(--border);margin:0 -2rem}
-.kpi-item{flex:1;padding:.75rem 1.25rem;border-right:1px solid var(--border);min-width:0}
-.kpi-item:last-child{border-right:none}
-.kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:4px}
-.kpi-val{font-size:20px;font-weight:800;font-family:var(--font-mono)}
-.kpi-sub{font-size:11px;color:var(--text3);margin-top:2px}
+/* ── Preço inline no hero ── */
+.ativo-preco-inline{display:flex;align-items:baseline;gap:10px;margin-top:3px}
+.ativo-preco-inline .preco{font-family:var(--font-mono);font-size:22px;font-weight:700}
 
 /* ── Tabs ── */
-.ativo-tabs{display:flex;gap:0;margin:0 -2rem;overflow-x:auto}
-.ativo-tab{padding:10px 18px;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.ativo-tabs{display:flex;gap:0;margin:0 -2rem;overflow-x:auto;border-top:1px solid var(--border)}
+.ativo-tab{padding:9px 16px;font-size:12.5px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;flex-shrink:0}
 .ativo-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
-.ativo-tab:hover{color:var(--text)}
+.ativo-tab:hover:not(.active){color:var(--text)}
 .tab-content{display:none}
 .tab-content.active{display:block}
 
-/* ── Cards / Sections ── */
-.ind-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem}
-.ind-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:.85rem 1rem;transition:var(--transition)}
-.ind-card:hover{border-color:var(--border3)}
-.ind-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:4px}
-.ind-val{font-size:20px;font-weight:800;font-family:var(--font-mono)}
-.ind-desc{font-size:10px;color:var(--text3);margin-top:2px}
-.section-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1.5rem}
-.section-box h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;color:var(--text2)}
-.section-box h3::before{content:'';width:3px;height:14px;background:var(--gold);border-radius:2px;box-shadow:0 0 8px var(--gold-glow)}
+/* ── Cards de indicadores — compactos ── */
+.ind-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.25rem}
+.ind-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:.65rem .85rem;transition:var(--transition)}
+.ind-card:hover{border-color:var(--border3);background:var(--bg3)}
 
-/* ── Rentabilidade ── */
-.rent-table{width:100%;border-collapse:collapse;font-size:13px}
-.rent-table th{padding:8px 12px;text-align:right;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
-.rent-table th:first-child{text-align:left}
-.rent-table td{padding:10px 12px;text-align:right;border-bottom:1px solid rgba(255,255,255,0.04)}
-.rent-table td:first-child{text-align:left;font-weight:600;color:var(--text2)}
-.rent-table tr:last-child td{border-bottom:none}
+/* Label bem mais legível */
+.ind-label{font-size:10.5px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:3px}
+/* Valor menor — proporcional ao card compacto */
+.ind-val{font-size:17px;font-weight:700;font-family:var(--font-mono);line-height:1.1}
+/* Descrição um pouco mais visível */
+.ind-desc{font-size:10px;color:var(--text3);margin-top:2px;opacity:.85}
 
-/* ── Graham / Bazin box ── */
-.valuation-box{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);border-radius:var(--radius);overflow:hidden;margin-top:.75rem}
-.valuation-cell{background:var(--bg3);padding:1rem;text-align:center}
-.valuation-cell .v-label{font-size:11px;color:var(--text3);margin-bottom:6px;font-weight:600}
-.valuation-cell .v-val{font-size:22px;font-weight:800;font-family:var(--font-mono)}
+/* ── Section boxes ── */
+.section-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem 1.25rem;margin-bottom:1.25rem}
+.section-box h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:.9rem;display:flex;align-items:center;gap:8px;color:var(--text2)}
+.section-box h3::before{content:'';width:3px;height:12px;background:var(--gold);border-radius:2px;box-shadow:0 0 6px var(--gold-glow)}
 
-/* ── Histórico de indicadores ── */
-.hist-ind-table{width:100%;border-collapse:collapse;font-size:12px}
-.hist-ind-table th{padding:8px 10px;text-align:right;font-size:11px;font-weight:700;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap}
-.hist-ind-table th:first-child{text-align:left}
-.hist-ind-table td{padding:8px 10px;text-align:right;border-bottom:1px solid rgba(255,255,255,0.04);font-family:var(--font-mono);color:var(--text2)}
-.hist-ind-table td:first-child{text-align:left;font-family:var(--font-body);font-weight:600;color:var(--text)}
-.hist-ind-table tr:hover td{background:rgba(255,255,255,0.02)}
-
-/* ── Resultados / Balanço ── */
-.result-table{width:100%;border-collapse:collapse;font-size:12px}
-.result-table th{padding:8px 12px;text-align:right;font-size:11px;font-weight:700;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap}
-.result-table th:first-child{text-align:left}
-.result-table td{padding:8px 12px;text-align:right;border-bottom:1px solid rgba(255,255,255,0.04);font-family:var(--font-mono);font-size:12px;color:var(--text2)}
-.result-table td:first-child{text-align:left;font-family:var(--font-body);font-weight:600;color:var(--text);font-size:12px}
-.result-table .sub-row td:first-child{padding-left:24px;font-weight:400;color:var(--text3)}
-.result-table tr:hover td{background:rgba(255,255,255,0.02)}
-
-/* ── Posição acionária ── */
-.acionistas-table{width:100%;border-collapse:collapse;font-size:13px}
-.acionistas-table th{padding:8px 12px;text-align:right;font-size:11px;font-weight:700;color:var(--text3);border-bottom:1px solid var(--border)}
-.acionistas-table th:first-child{text-align:left}
-.acionistas-table td{padding:10px 12px;text-align:right;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text2)}
-.acionistas-table td:first-child{text-align:left;font-weight:600;color:var(--text)}
-
-/* ── Info empresa ── */
-.info-empresa-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem}
-.info-item .info-label{font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:600}
-.info-item .info-val{font-size:15px;font-weight:700;color:var(--text)}
-
-/* ── Checklist ── */
-.checklist-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.check-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);font-size:12px}
-.check-ok{color:var(--up)}
-.check-fail{color:var(--dn)}
-
-/* ── Div bar chart ── */
-.div-bar-chart{display:flex;align-items:flex-end;gap:3px;height:80px;margin-top:.5rem}
+/* ── Misc ── */
+.watchlist-btn{padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-size:12px;font-weight:700;font-family:var(--font-body);transition:all .15s;display:flex;align-items:center;gap:6px}
+.watchlist-btn.saved{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
+.score-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:4px}
+.score-fill{height:100%;border-radius:3px;transition:width .5s}
+.div-bar-chart{display:flex;align-items:flex-end;gap:3px;height:72px;margin-top:.5rem}
 .div-bar{flex:1;background:var(--gold-dim);border-radius:3px 3px 0 0;border:1px solid rgba(245,166,35,0.3);transition:all .2s;cursor:pointer;position:relative}
 .div-bar:hover{background:rgba(245,166,35,0.3)}
 .div-bar-tooltip{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:10px;font-family:var(--font-mono);white-space:nowrap;display:none;margin-bottom:4px;z-index:10}
 .div-bar:hover .div-bar-tooltip{display:block}
-
-/* ── Score / oportunidade ── */
 .oportunidade-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;margin-right:6px;margin-bottom:6px}
-.score-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:4px}
-.score-fill{height:100%;border-radius:3px;transition:width .5s}
-
-/* ── Watchlist btn ── */
-.watchlist-btn{padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-size:12px;font-weight:700;font-family:var(--font-body);transition:all .15s;display:flex;align-items:center;gap:6px}
-.watchlist-btn.saved{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
 
 @media(max-width:768px){
   .ind-grid{grid-template-columns:repeat(2,1fr)}
-  .kpi-strip{flex-wrap:wrap}
-  .kpi-item{flex:1 1 45%;border-bottom:1px solid var(--border)}
-  .info-empresa-grid{grid-template-columns:1fr 1fr}
-  .valuation-box{grid-template-columns:1fr}
-  .checklist-grid{grid-template-columns:1fr}
+  .ativo-header{gap:.5rem}
 }
 @media(max-width:480px){
   .ind-grid{grid-template-columns:repeat(2,1fr)}
-  .kpi-val{font-size:16px}
+  .ativo-preco-inline .preco{font-size:18px}
+  .ativo-hero{padding:.75rem 1rem 0}
 }
 </style>
 </head>
 <body>
 <div id="nav-placeholder"></div>
 
-<!-- ═══════════════════════ HERO ═══════════════════════ -->
 <div class="ativo-hero" id="ativo-hero">
   <div class="ativo-header">
+    <!-- Esquerda: logo + nome -->
     <div class="ativo-logo-wrap">
       <div id="ativo-logo-wrap"></div>
       <div class="ativo-info">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+        <div style="display:flex;align-items:center;gap:8px">
           <h1 id="ativo-titulo">—</h1>
           <div id="ativo-score-badge"></div>
         </div>
-        <div style="font-size:14px;color:var(--text2);margin-bottom:2px" id="ativo-nome">Carregando...</div>
-        <div style="font-size:12px;color:var(--text3)" id="ativo-setor"></div>
+        <div style="font-size:13px;color:var(--text2);margin-top:1px" id="ativo-nome">Carregando...</div>
+        <div style="font-size:11px;color:var(--text3)" id="ativo-setor"></div>
+        <!-- Preço logo abaixo do nome -->
+        <div class="ativo-preco-inline" style="margin-top:6px">
+          <div class="preco" id="ativo-preco">—</div>
+          <div style="font-size:13px;font-family:var(--font-mono)" id="ativo-var">—</div>
+        </div>
       </div>
     </div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+    <!-- Direita: ações -->
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
       <button class="watchlist-btn" id="watchlist-btn" onclick="toggleWatchlist()">☆ Favoritar</button>
-      <a id="comparar-btn" href="comparador.html" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);color:var(--text2);font-size:12px;font-weight:700;text-decoration:none;font-family:var(--font-body)">⇄ Comparar</a>
-      <a id="analise-btn" href="analise.html" style="padding:6px 14px;border-radius:8px;background:var(--gold-dim);border:1px solid var(--border2);color:var(--gold);font-size:12px;font-weight:700;text-decoration:none;font-family:var(--font-body)">✦ Análise IA</a>
+      <a id="comparar-btn" href="comparador.html" style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);color:var(--text2);font-size:12px;font-weight:700;text-decoration:none;font-family:var(--font-body)">⇄ Comparar</a>
+      <a id="analise-btn" href="analise.html" style="padding:5px 12px;border-radius:8px;background:var(--gold-dim);border:1px solid var(--border2);color:var(--gold);font-size:12px;font-weight:700;text-decoration:none;font-family:var(--font-body)">✦ Análise IA</a>
     </div>
   </div>
-
-  <!-- KPI strip -->
-  <div class="kpi-strip" id="kpi-strip">
-    <div class="kpi-item">
-      <div class="kpi-label">Cotação</div>
-      <div class="kpi-val" id="kpi-preco">—</div>
-      <div class="kpi-sub" id="kpi-var">—</div>
-    </div>
-    <div class="kpi-item">
-      <div class="kpi-label">Variação 12m</div>
-      <div class="kpi-val" id="kpi-v12">—</div>
-      <div class="kpi-sub">últimos 12 meses</div>
-    </div>
-    <div class="kpi-item" id="kpi-pl-wrap">
-      <div class="kpi-label">P/L</div>
-      <div class="kpi-val" id="kpi-pl">—</div>
-      <div class="kpi-sub">Preço / Lucro</div>
-    </div>
-    <div class="kpi-item">
-      <div class="kpi-label">P/VP</div>
-      <div class="kpi-val" id="kpi-pvp">—</div>
-      <div class="kpi-sub">Preço / Patrimônio</div>
-    </div>
-    <div class="kpi-item">
-      <div class="kpi-label">DY</div>
-      <div class="kpi-val gold" id="kpi-dy">—</div>
-      <div class="kpi-sub">Dividend Yield 12m</div>
-    </div>
-  </div>
-
-  <!-- Tabs -->
+  <!-- Tabs coladas na borda inferior do hero -->
   <div class="ativo-tabs">
-    <div class="ativo-tab active"  onclick="switchTab('overview',this)">Visão Geral</div>
+    <div class="ativo-tab active" onclick="switchTab('overview',this)">Visão Geral</div>
     <div class="ativo-tab" onclick="switchTab('indicadores',this)">Indicadores</div>
+    <div class="ativo-tab" onclick="switchTab('historico',this)">Histórico</div>
     <div class="ativo-tab" onclick="switchTab('dividendos',this)">Dividendos</div>
-    <div class="ativo-tab" onclick="switchTab('contabil',this)">Contábil</div>
-    <div class="ativo-tab" onclick="switchTab('empresa',this)">Empresa</div>
     <div class="ativo-tab" onclick="switchTab('analise',this)">Análise</div>
   </div>
 </div>
 
 <div class="container" style="max-width:1380px">
 
-  <!-- ═══════════ TAB: VISÃO GERAL ═══════════ -->
+  <!-- OVERVIEW -->
   <div id="tab-overview" class="tab-content active" style="padding-top:1.5rem">
     <div id="oportunidades" style="margin-bottom:1rem"></div>
-
-    <!-- Indicadores rápidos -->
     <div class="ind-grid" id="ind-grid"></div>
-
     <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem">
       <div>
-        <!-- Gráfico histórico -->
         <div class="section-box">
           <h3>Histórico de Preço</h3>
           <div style="display:flex;gap:4px;margin-bottom:1rem">
@@ -218,207 +138,60 @@
             <div class="ind-card"><div class="ind-label">Retorno período</div><div class="ind-val" id="ch-ret">—</div></div>
           </div>
         </div>
-
-        <!-- Rentabilidade -->
-        <div class="section-box">
-          <h3>Rentabilidade</h3>
-          <table class="rent-table">
-            <thead><tr>
-              <th></th>
-              <th>1 mês</th><th>3 meses</th><th>1 ano</th><th>2 anos</th><th>5 anos</th><th>10 anos</th>
-            </tr></thead>
-            <tbody id="rent-tbody"></tbody>
-          </table>
-        </div>
-
-        <!-- Graham -->
-        <div class="section-box" id="box-graham">
-          <h3>Preço Justo — Fórmula de Graham</h3>
-          <p style="font-size:12px;color:var(--text3);margin-bottom:.75rem;line-height:1.6">Fórmula criada por Benjamin Graham para identificar ações negociadas abaixo do valor intrínseco. Considera P/L e P/VP.</p>
-          <div class="valuation-box">
-            <div class="valuation-cell"><div class="v-label">Preço Atual</div><div class="v-val" id="graham-atual">—</div></div>
-            <div class="valuation-cell"><div class="v-label">Preço Justo</div><div class="v-val gold" id="graham-justo">—</div></div>
-            <div class="valuation-cell"><div class="v-label">Upside</div><div class="v-val" id="graham-upside">—</div></div>
-          </div>
-        </div>
-
-        <!-- Bazin -->
-        <div class="section-box" id="box-bazin">
-          <h3>Preço Teto — Método Bazin</h3>
-          <p style="font-size:12px;color:var(--text3);margin-bottom:.75rem;line-height:1.6">Décio Bazin estabelece o preço máximo a pagar por uma ação com base nos dividendos distribuídos. Base: DY mínimo desejado de 6%.</p>
-          <div class="valuation-box">
-            <div class="valuation-cell"><div class="v-label">Preço Atual</div><div class="v-val" id="bazin-atual">—</div></div>
-            <div class="valuation-cell"><div class="v-label">Preço Teto</div><div class="v-val gold" id="bazin-teto">—</div></div>
-            <div class="valuation-cell"><div class="v-label">Upside</div><div class="v-val" id="bazin-upside">—</div></div>
-          </div>
-        </div>
       </div>
-
       <div>
-        <!-- Histórico preços tabela -->
-        <div class="section-box">
-          <h3>Preços Históricos</h3>
-          <div class="table-wrap" style="max-height:220px;overflow-y:auto">
-            <table class="data-table">
-              <thead><tr><th>Data</th><th class="r">Preço</th><th class="r">Var.</th></tr></thead>
-              <tbody id="hist-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Mesmo setor -->
-        <div class="section-box">
-          <h3>Mesmo Setor</h3>
-          <div id="same-sector"></div>
-        </div>
-
-        <!-- Sobre resumo -->
         <div class="section-box">
           <h3>Sobre</h3>
           <div id="about-content" style="font-size:13px;color:var(--text2);line-height:1.7"></div>
+        </div>
+        <div class="section-box">
+          <h3>Mesmo Setor</h3>
+          <div id="same-sector"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ═══════════ TAB: INDICADORES ═══════════ -->
+  <!-- INDICADORES -->
   <div id="tab-indicadores" class="tab-content" style="padding-top:1.5rem">
-    <!-- Grid completo de indicadores -->
-    <div class="section-box">
-      <h3>Indicadores Fundamentalistas</h3>
-      <div class="ind-grid" id="ind-grid-full" style="grid-template-columns:repeat(4,1fr)"></div>
-    </div>
-
-    <!-- Histórico de indicadores por ano -->
-    <div class="section-box">
-      <h3>Histórico de Indicadores</h3>
-      <div style="overflow-x:auto">
-        <table class="hist-ind-table" id="hist-ind-table">
-          <thead id="hist-ind-thead"></thead>
-          <tbody id="hist-ind-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Comparação vs setor -->
     <div class="section-box">
       <h3>Indicadores vs Média do Setor</h3>
       <div id="ind-vs-setor"></div>
     </div>
   </div>
 
-  <!-- ═══════════ TAB: DIVIDENDOS ═══════════ -->
-  <div id="tab-dividendos" class="tab-content" style="padding-top:1.5rem">
-    <!-- Resumo DY -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem" id="div-kpis"></div>
-
-    <!-- Gráfico barras anual -->
+  <!-- HISTÓRICO -->
+  <div id="tab-historico" class="tab-content" style="padding-top:1.5rem">
     <div class="section-box">
-      <h3>DY Anual — Histórico</h3>
-      <div id="div-grafico-anual" style="margin-bottom:.5rem"></div>
+      <h3>Tabela de Preços Históricos</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Data</th><th class="r">Preço</th><th class="r">Variação</th></tr></thead>
+          <tbody id="hist-tbody"></tbody>
+        </table>
+      </div>
     </div>
+  </div>
 
-    <!-- Histórico detalhado -->
+  <!-- DIVIDENDOS -->
+  <div id="tab-dividendos" class="tab-content" style="padding-top:1.5rem">
     <div class="section-box">
-      <h3>Histórico de Pagamentos</h3>
+      <h3>Histórico de Dividendos / Rendimentos</h3>
       <div id="div-grafico" style="margin-bottom:1.5rem"></div>
       <div class="table-wrap">
         <table class="data-table">
-          <thead><tr>
-            <th>Tipo</th><th class="r">Data Com</th><th class="r">Pagamento</th>
-            <th class="r">Valor (R$)</th><th class="r">DY est.</th>
-          </tr></thead>
+          <thead><tr><th>Data</th><th class="r">Valor (R$)</th><th class="r">DY estimado</th></tr></thead>
           <tbody id="div-tbody"></tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- ═══════════ TAB: CONTÁBIL ═══════════ -->
-  <div id="tab-contabil" class="tab-content" style="padding-top:1.5rem">
-    <!-- Receitas e Lucros -->
-    <div class="section-box">
-      <h3>Receitas e Lucros</h3>
-      <div style="position:relative;height:220px;margin-bottom:1rem">
-        <canvas id="receitaChart"></canvas>
-      </div>
-      <div style="overflow-x:auto">
-        <table class="result-table" id="result-table">
-          <thead id="result-thead"></thead>
-          <tbody id="result-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Balanço Patrimonial -->
-    <div class="section-box">
-      <h3>Balanço Patrimonial</h3>
-      <div style="overflow-x:auto">
-        <table class="result-table" id="balanco-table">
-          <thead id="balanco-thead"></thead>
-          <tbody id="balanco-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══════════ TAB: EMPRESA ═══════════ -->
-  <div id="tab-empresa" class="tab-content" style="padding-top:1.5rem">
-
-    <!-- Info FII (só para FIIs) -->
-    <div id="fii-info-box" style="display:none;margin-bottom:1.5rem">
-      <div class="section-box" style="margin-bottom:0">
-        <h3>Informações do FII</h3>
-        <div id="fii-info-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:var(--radius);overflow:hidden;margin-top:.5rem"></div>
-      </div>
-    </div>
-
-    <!-- Sobre -->
-    <div class="section-box">
-      <h3>Sobre a Empresa</h3>
-      <div id="empresa-sobre" style="font-size:13px;color:var(--text2);line-height:1.8;max-width:760px"></div>
-    </div>
-
-    <!-- Dados -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem">
-      <div class="section-box" style="margin-bottom:0">
-        <h3>Dados da Empresa</h3>
-        <div id="empresa-dados"></div>
-      </div>
-      <div class="section-box" style="margin-bottom:0">
-        <h3>Informações Financeiras</h3>
-        <div class="info-empresa-grid" id="empresa-info" style="grid-template-columns:1fr 1fr"></div>
-      </div>
-    </div>
-
-    <!-- Posição acionária -->
-    <div class="section-box">
-      <h3>Posição Acionária</h3>
-      <div class="table-wrap">
-        <table class="acionistas-table" id="acionistas-table">
-          <thead><tr>
-            <th>Acionista</th>
-            <th class="r">% ON</th>
-            <th class="r">% PN</th>
-            <th class="r">% Total</th>
-          </tr></thead>
-          <tbody id="acionistas-tbody">
-            <tr><td colspan="4" style="text-align:center;color:var(--text3);padding:1.5rem;font-size:12px">Dados de composição acionária disponíveis em breve</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══════════ TAB: ANÁLISE ═══════════ -->
+  <!-- ANÁLISE -->
   <div id="tab-analise" class="tab-content" style="padding-top:1.5rem">
     <div class="section-box">
       <h3>Score de Qualidade</h3>
       <div id="score-content"></div>
-    </div>
-    <div class="section-box">
-      <h3>Checklist Buy & Hold</h3>
-      <div class="checklist-grid" id="checklist-content"></div>
     </div>
     <div class="section-box">
       <h3>Pontos de Atenção</h3>
@@ -426,7 +199,7 @@
     </div>
   </div>
 
-</div><!-- /container -->
+</div>
 
 <div id="footer-placeholder"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -434,137 +207,85 @@
 <script src="data.js"></script>
 <script src="nav.js"></script>
 <script>
-const params  = new URLSearchParams(location.search);
-const TICKER  = (params.get('t') || 'PETR4').toUpperCase();
-const TIPO    = params.get('tipo') || 'acao';
-let ativo = null, mainChart = null, receitaChart = null;
-let currentRange = '1A', histData = [], divData = [];
+const params = new URLSearchParams(location.search);
+const TICKER = (params.get('t') || 'PETR4').toUpperCase();
+const TIPO = params.get('tipo') || 'acao';
+let ativo=null, mainChart=null, currentRange='1A', histData=[], divData=[];
 
-// ─────────────────────────────────────────────
-// TABS
-// ─────────────────────────────────────────────
-function switchTab(id, el) {
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.ativo-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + id).classList.add('active');
+function switchTab(id,el){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.ativo-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
   el.classList.add('active');
-  if (id === 'dividendos')  renderDividendos();
-  if (id === 'analise')     renderAnalise();
-  if (id === 'indicadores') renderIndVsSetor();
-  if (id === 'contabil')    renderContabil();
-  if (id === 'empresa')     renderEmpresa();
+  if(id==='dividendos') renderDividendos();
+  if(id==='analise') renderAnalise();
+  if(id==='indicadores') renderIndVsSetor();
 }
 
-// ─────────────────────────────────────────────
-// WATCHLIST
-// ─────────────────────────────────────────────
-function getWatchlist() { try { return JSON.parse(localStorage.getItem('mv_watchlist') || '[]'); } catch { return []; } }
-function saveWatchlist(w) { try { localStorage.setItem('mv_watchlist', JSON.stringify(w)); } catch {} }
-function toggleWatchlist() {
-  let w = getWatchlist();
-  const btn = document.getElementById('watchlist-btn');
-  if (w.includes(TICKER)) { w = w.filter(t => t !== TICKER); btn.textContent = '☆ Favoritar'; btn.classList.remove('saved'); }
-  else { w.push(TICKER); btn.textContent = '★ Favoritado'; btn.classList.add('saved'); }
+// Watchlist
+function getWatchlist(){try{return JSON.parse(localStorage.getItem('mv_watchlist')||'[]');}catch{return[];}}
+function saveWatchlist(w){try{localStorage.setItem('mv_watchlist',JSON.stringify(w));}catch{}}
+function toggleWatchlist(){
+  let w=getWatchlist();
+  const btn=document.getElementById('watchlist-btn');
+  if(w.includes(TICKER)){w=w.filter(t=>t!==TICKER);btn.textContent='☆ Favoritar';btn.classList.remove('saved');}
+  else{w.push(TICKER);btn.textContent='★ Favoritado';btn.classList.add('saved');}
   saveWatchlist(w);
 }
-function initWatchlist() {
-  const w = getWatchlist();
-  const btn = document.getElementById('watchlist-btn');
-  if (w.includes(TICKER)) { btn.textContent = '★ Favoritado'; btn.classList.add('saved'); }
+function initWatchlist(){
+  const w=getWatchlist();
+  const btn=document.getElementById('watchlist-btn');
+  if(w.includes(TICKER)){btn.textContent='★ Favoritado';btn.classList.add('saved');}
 }
 
-// ─────────────────────────────────────────────
-// FORMATTERS
-// ─────────────────────────────────────────────
-function fmtPct(v) { return v != null && v !== 0 ? v.toFixed(1) + '%' : '—'; }
-function fmt(v, s = '') { return v != null ? v.toFixed(2) + s : '—'; }
-function fmtBi(v) {
-  if (!v || isNaN(v)) return '—';
-  if (v >= 1e12) return 'R$ ' + (v/1e12).toFixed(2) + ' T';
-  if (v >= 1e9)  return 'R$ ' + (v/1e9).toFixed(2)  + ' B';
-  if (v >= 1e6)  return 'R$ ' + (v/1e6).toFixed(2)  + ' M';
-  return 'R$ ' + v.toLocaleString('pt-BR');
-}
-function pctClass(v) { return v > 0 ? 'up' : v < 0 ? 'dn' : ''; }
-function pctStr(v) { if (v == null) return '—'; return (v >= 0 ? '+' : '') + v.toFixed(2) + '%'; }
-
-// ─────────────────────────────────────────────
-// HERO
-// ─────────────────────────────────────────────
-function renderHero(d) {
-  document.title = `${d.t} — ${d.n} — Mais Valor`;
-  const initials = d.t.replace(/\d+/g, '').slice(0, 3) || d.t.slice(0, 3);
-  document.getElementById('ativo-logo-wrap').innerHTML = `
+function renderHero(d){
+  document.title=`${d.t} — ${d.n} — Mais Valor`;
+  // Logo com fallback avatar
+  const initials=d.t.replace(/\d+/g,'').slice(0,3)||d.t.slice(0,3);
+  document.getElementById('ativo-logo-wrap').innerHTML=`
     <img src="https://raw.githubusercontent.com/thefintz/icones-b3/main/icones/${d.t}.png"
-      style="width:56px;height:56px;border-radius:14px;object-fit:contain;background:#fff;border:1px solid var(--border);flex-shrink:0"
-      onerror="this.outerHTML='<div class=\\'ativo-logo-av\\'>${initials}</div>'" loading="lazy">`;
-  document.getElementById('ativo-titulo').textContent = d.t;
-  document.getElementById('ativo-score-badge').innerHTML = scoreBadge(d);
-  document.getElementById('ativo-nome').textContent = d.n;
-  document.getElementById('ativo-setor').textContent = (TIPO === 'fii' ? 'Segmento: ' : 'Setor: ') + (d.setor || '—') + ' · B3';
-
-  // KPIs
-  const isUp = d.v >= 0;
-  document.getElementById('kpi-preco').textContent = 'R$ ' + d.p.toFixed(2);
-  document.getElementById('kpi-preco').className = 'kpi-val ' + (isUp ? 'up' : 'dn');
-  if (d.stale) {
-    document.getElementById('kpi-preco').classList.add('stale');
-    document.getElementById('kpi-preco').setAttribute('data-stale','true');
-    document.getElementById('kpi-preco').title = 'Último valor disponível (dado desatualizado)';
-  }
-  document.getElementById('kpi-var').innerHTML = `<span class="pill ${d.stale?'stale-pill':isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span> hoje`;
-
-  const v12 = d.v12 !== undefined ? d.v12 : null;
-  if (v12 !== null) {
-    const v12Up = v12 >= 0;
-    document.getElementById('kpi-v12').textContent = (v12Up ? '+' : '') + v12.toFixed(2) + '%';
-    document.getElementById('kpi-v12').className = 'kpi-val ' + (v12Up ? 'up' : 'dn');
-  } else {
-    document.getElementById('kpi-v12').textContent = '—';
-    document.getElementById('kpi-v12').className = 'kpi-val';
-  }
-
-  if (TIPO === 'fii') {
-    document.getElementById('kpi-pl-wrap').style.display = 'none';
-  } else {
-    document.getElementById('kpi-pl').textContent = d.pl ? (d.pl > 0 ? d.pl.toFixed(2) + 'x' : 'neg.') : '—';
-    document.getElementById('kpi-pl').className = 'kpi-val' + (d.pl && d.pl < 0 ? ' dn' : '');
-  }
-
-  document.getElementById('kpi-pvp').textContent = d.pvp ? d.pvp.toFixed(2) : '—';
-  document.getElementById('kpi-pvp').className = 'kpi-val ' + (d.pvp && d.pvp < 1 ? 'up' : d.pvp && d.pvp > 3 ? 'dn' : '');
-  document.getElementById('kpi-dy').textContent = d.dy > 0 ? d.dy.toFixed(2) + '%' : '—';
-
-  document.getElementById('comparar-btn').href = `comparador.html?t1=${d.t}&t2=VALE3`;
-  document.getElementById('analise-btn').href = `analise.html?t=${d.t}`;
+      style="width:44px;height:44px;border-radius:10px;object-fit:contain;background:#fff;border:1px solid var(--border);flex-shrink:0"
+      onerror="this.outerHTML='<div class=\\'ativo-logo-av\\'>${initials}</div>'"
+      loading="lazy">`;
+  document.getElementById('ativo-titulo').textContent=d.t;
+  // Score badge
+  document.getElementById('ativo-score-badge').innerHTML=scoreBadge(d);
+  document.getElementById('ativo-nome').textContent=d.n;
+  document.getElementById('ativo-setor').textContent=d.setor||'';
+  const isUp=d.v>=0;
+  document.getElementById('ativo-preco').textContent='R$ '+d.p.toFixed(2);
+  document.getElementById('ativo-preco').className='preco '+(isUp?'up':'dn');
+  document.getElementById('ativo-var').innerHTML=`<span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span> hoje`;
+  document.getElementById('comparar-btn').href=`comparador.html?t1=${d.t}&t2=VALE3`;
+  document.getElementById('analise-btn').href=`analise.html?t=${d.t}`;
 }
 
-// ─────────────────────────────────────────────
-// INDICADORES RÁPIDOS (visão geral)
-// ─────────────────────────────────────────────
-function renderIndicadores(d) {
-  const isFii = TIPO === 'fii';
-  const inds = isFii ? [
-    {label:'DY 12m',    val:fmtPct(d.dy),     desc:'Dividend Yield anual',       cls:d.dy>10?'gold':''},
-    {label:'P/VP',      val:fmt(d.pvp),        desc:'Preço/Valor Patrimonial',    cls:d.pvp&&d.pvp<1?'up':d.pvp&&d.pvp>1.1?'dn':''},
-    {label:'Vacância',  val:fmtPct(d.vacancia),desc:'Taxa de vacância física',    cls:d.vacancia!=null&&d.vacancia<5?'up':''},
-    {label:'Cap Rate',  val:fmtPct(d.cap_rate),desc:'Retorno sobre valor'},
+function fmtPct(v){return v!=null&&v!==0?v.toFixed(1)+'%':'—';}
+function fmt(v,s=''){return v!=null?v.toFixed(2)+s:'—';}
+
+function renderIndicadores(d){
+  const isFii=TIPO==='fii';
+  const inds=isFii?[
+    {label:'DY 12m',val:fmtPct(d.dy),desc:'Dividend Yield anual',cls:d.dy>10?'gold':''},
+    {label:'P/VP',val:fmt(d.pvp),desc:'Preço/Valor Patrimonial',cls:d.pvp&&d.pvp<1?'up':d.pvp&&d.pvp>1.1?'dn':''},
+    {label:'Vacância',val:fmtPct(d.vacancia),desc:'Taxa de vacância física',cls:d.vacancia!=null&&d.vacancia<5?'up':''},
+    {label:'Cap Rate',val:fmtPct(d.cap_rate),desc:'Retorno sobre valor'},
     {label:'Qtd. Imóveis',val:d.qtd_imoveis||'—',desc:'Imóveis na carteira'},
-    {label:'Volume',    val:d.vol,             desc:'Volume médio diário'},
-    {label:'Var. 7d',   val:pctStr(d.v7),      desc:'Últimos 7 dias',             cls:pctClass(d.v7)},
-    {label:'Var. 30d',  val:pctStr(d.v30),     desc:'Últimos 30 dias',            cls:pctClass(d.v30)},
-  ] : [
-    {label:'DY 12m',    val:fmtPct(d.dy),     desc:'Dividend Yield anual',       cls:d.dy>8?'gold':''},
-    {label:'P/L',       val:d.pl?(d.pl>0?d.pl.toFixed(1)+'x':'neg.'):'—', desc:'Preço/Lucro'},
-    {label:'P/VP',      val:fmt(d.pvp),        desc:'Preço/Patrimônio',           cls:d.pvp&&d.pvp<1?'up':''},
-    {label:'ROE',       val:fmtPct(d.roe),     desc:'Retorno s/ Patrimônio',      cls:d.roe&&d.roe>15?'up':''},
-    {label:'ROIC',      val:fmtPct(d.roic),    desc:'Retorno s/ Capital',         cls:d.roic&&d.roic>12?'up':''},
-    {label:'Mrg. Líq.', val:fmtPct(d.mrg_liq), desc:'Margem líquida'},
-    {label:'Cresc. 5a', val:fmtPct(d.cresc5a), desc:'Crescimento receita',        cls:d.cresc5a&&d.cresc5a>0?'up':'dn'},
-    {label:'Volume',    val:d.vol,             desc:'Volume médio diário'},
+    {label:'Volume',val:d.vol,desc:'Volume médio diário'},
+    {label:'Variação 7d',val:(d.v7>=0?'+':'')+fmt(d.v7,'%'),desc:'Últimos 7 dias',cls:d.v7>=0?'up':'dn'},
+    {label:'Variação 30d',val:(d.v30>=0?'+':'')+fmt(d.v30,'%'),desc:'Últimos 30 dias',cls:d.v30>=0?'up':'dn'},
+  ]:[
+    {label:'DY 12m',val:fmtPct(d.dy),desc:'Dividend Yield anual',cls:d.dy>8?'gold':''},
+    {label:'P/L',val:d.pl?(d.pl>0?d.pl.toFixed(1)+'x':'neg.'):'—',desc:'Preço/Lucro'},
+    {label:'P/VP',val:fmt(d.pvp),desc:'Preço/Valor Patrimonial',cls:d.pvp&&d.pvp<1?'up':''},
+    {label:'ROE',val:fmtPct(d.roe),desc:'Retorno s/ Patrimônio',cls:d.roe&&d.roe>15?'up':''},
+    {label:'ROIC',val:fmtPct(d.roic),desc:'Retorno s/ Capital',cls:d.roic&&d.roic>12?'up':''},
+    {label:'Mrg. Líquida',val:fmtPct(d.mrg_liq),desc:'Margem líquida'},
+    {label:'Cresc. 5a',val:fmtPct(d.cresc5a),desc:'Crescimento receita 5 anos',cls:d.cresc5a&&d.cresc5a>0?'up':'dn'},
+    {label:'Volume',val:d.vol,desc:'Volume médio diário'},
   ];
-  const grid = document.getElementById('ind-grid');
-  if (grid) grid.innerHTML = inds.map(i => `
+
+  document.getElementById('ind-grid').innerHTML=inds.map(i=>`
     <div class="ind-card">
       <div class="ind-label">${i.label}</div>
       <div class="ind-val ${i.cls||''}">${i.val}</div>
@@ -572,228 +293,79 @@ function renderIndicadores(d) {
     </div>`).join('');
 
   // Oportunidades
-  const ops = [];
-  if (d.dy>8&&d.dy<=50) ops.push({label:`DY ${d.dy.toFixed(1)}%`,color:'var(--gold)',bg:'var(--gold-dim)',icon:'💰'});
-  if (d.pvp&&d.pvp<1)   ops.push({label:`P/VP ${d.pvp.toFixed(2)} (abaixo do VP)`,color:'var(--up)',bg:'var(--up-bg)',icon:'📊'});
-  if (d.pl&&d.pl>0&&d.pl<8) ops.push({label:`P/L ${d.pl.toFixed(1)}x (barato)`,color:'var(--up)',bg:'var(--up-bg)',icon:'📈'});
-  if (d.roe&&d.roe>20)  ops.push({label:`ROE ${d.roe.toFixed(1)}% (excelente)`,color:'#5E8EE0',bg:'rgba(94,142,224,0.1)',icon:'⭐'});
-  if (d.pl&&d.pvp&&d.pl>0&&d.pvp>0&&d.pl*d.pvp<22.5) ops.push({label:`Graham OK (P/L×P/VP=${(d.pl*d.pvp).toFixed(1)})`,color:'var(--up)',bg:'var(--up-bg)',icon:'✓'});
-  const opEl = document.getElementById('oportunidades');
-  if (ops.length && opEl) opEl.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.5rem">
-    ${ops.map(o=>`<span class="oportunidade-badge" style="background:${o.bg};color:${o.color}">${o.icon} ${o.label}</span>`).join('')}</div>`;
-}
-
-// ─────────────────────────────────────────────
-// INDICADORES COMPLETOS (tab indicadores)
-// ─────────────────────────────────────────────
-function renderIndicadoresFull(d) {
-  const isFii = TIPO === 'fii';
-  const all = isFii ? [
-    {label:'DY 12m',    val:fmtPct(d.dy),      desc:'Dividend Yield',             cls:d.dy>10?'gold':''},
-    {label:'P/VP',      val:fmt(d.pvp),         desc:'Preço/Valor Patrimonial',    cls:d.pvp&&d.pvp<1?'up':d.pvp&&d.pvp>1.1?'dn':''},
-    {label:'Vacância',  val:fmtPct(d.vacancia), desc:'Taxa vacância física'},
-    {label:'Cap Rate',  val:fmtPct(d.cap_rate), desc:'Retorno/valor imóvel'},
-    {label:'Qtd. Imóveis',val:d.qtd_imoveis||'—',desc:'Imóveis carteira'},
-    {label:'Volume',    val:d.vol,              desc:'Volume médio diário'},
-    {label:'Var. 7d',   val:pctStr(d.v7),       desc:'7 dias',                    cls:pctClass(d.v7)},
-    {label:'Var. 30d',  val:pctStr(d.v30),      desc:'30 dias',                   cls:pctClass(d.v30)},
-  ] : [
-    {label:'P/L',         val:d.pl?(d.pl>0?d.pl.toFixed(2)+'x':'neg.'):'—', desc:'Preço/Lucro'},
-    {label:'P/Receita',   val:d.psr?d.psr.toFixed(2):'—',   desc:'PSR'},
-    {label:'P/VP',        val:fmt(d.pvp),        desc:'Preço/Patrimônio',          cls:d.pvp&&d.pvp<1?'up':''},
-    {label:'DY 12m',      val:fmtPct(d.dy),      desc:'Dividend Yield',            cls:d.dy>8?'gold':''},
-    {label:'Payout',      val:fmtPct(d.payout),  desc:'% lucro distribuído'},
-    {label:'Mrg. Líq.',   val:fmtPct(d.mrg_liq), desc:'Margem líquida'},
-    {label:'Mrg. Bruta',  val:fmtPct(d.mrg_bruta),desc:'Margem bruta'},
-    {label:'Mrg. EBIT',   val:fmtPct(d.mrg_ebit), desc:'Margem EBIT'},
-    {label:'Mrg. EBITDA', val:fmtPct(d.mrg_ebitda),desc:'Margem EBITDA'},
-    {label:'EV/EBITDA',   val:d.ev_ebitda?d.ev_ebitda.toFixed(2):'—', desc:'Valor firma/EBITDA'},
-    {label:'EV/EBIT',     val:d.ev_ebit?d.ev_ebit.toFixed(2):'—',     desc:'Valor firma/EBIT'},
-    {label:'ROE',         val:fmtPct(d.roe),      desc:'Retorno s/ Patrimônio',    cls:d.roe&&d.roe>15?'up':''},
-    {label:'ROIC',        val:fmtPct(d.roic),     desc:'Retorno s/ Capital',       cls:d.roic&&d.roic>12?'up':''},
-    {label:'ROA',         val:fmtPct(d.roa),      desc:'Retorno s/ Ativos'},
-    {label:'VPA',         val:d.vpa?'R$ '+d.vpa.toFixed(2):'—', desc:'Valor patrim./ação'},
-    {label:'LPA',         val:d.lpa?'R$ '+d.lpa.toFixed(2):'—', desc:'Lucro/ação'},
-    {label:'Liq. Corrente',val:d.liq_corrente?d.liq_corrente.toFixed(2):'—', desc:'Liquidez corrente'},
-    {label:'Dív/EBITDA',  val:d.div_liq_ebitda!=null?d.div_liq_ebitda.toFixed(2):(d.div_ebitda?d.div_ebitda.toFixed(2):'—'), desc:'Dívida liq/EBITDA'},
-    {label:'Dív/EBIT',    val:d.div_liq_ebit!=null?d.div_liq_ebit.toFixed(2):'—',   desc:'Dívida liq/EBIT'},
-    {label:'Dív/Patrim.', val:d.div_liq_patrim!=null?d.div_liq_patrim.toFixed(2):(d.div_patrim?d.div_patrim.toFixed(2):'—'), desc:'Dívida líq/PL'},
-    {label:'Patrim/Ativos',val:d.patrim_ativos!=null?d.patrim_ativos.toFixed(2):'—', desc:'Solidez patrimonial'},
-    {label:'Passiv/Ativos',val:d.passiv_ativos!=null?d.passiv_ativos.toFixed(2):'—', desc:'Alavancagem'},
-    {label:'Giro Ativos', val:d.giro_ativos!=null?d.giro_ativos.toFixed(2):'—',      desc:'Eficiência uso de ativos'},
-    {label:'P/SR',        val:d.psr!=null?d.psr.toFixed(2):'—',                      desc:'Preço/Receita'},
-    {label:'P/EBITDA',    val:d.p_ebitda!=null?d.p_ebitda.toFixed(2):'—',            desc:'Preço/EBITDA'},
-    {label:'P/EBIT',      val:d.p_ebit!=null?d.p_ebit.toFixed(2):'—',               desc:'Preço/EBIT'},
-    {label:'CAGR Rec. 5a',val:fmtPct(d.cagr_rec_5a||d.cresc5a),  desc:'Crescimento receita 5a',  cls:(d.cagr_rec_5a||d.cresc5a)>0?'up':'dn'},
-    {label:'CAGR Luc. 5a',val:fmtPct(d.cagr_luc_5a||d.cresc_luc5a),desc:'Crescimento lucro 5a',  cls:(d.cagr_luc_5a||d.cresc_luc5a)>0?'up':'dn'},
-    {label:'Máx 52s',     val:d.max_52s?'R$ '+d.max_52s.toFixed(2):'—',             desc:'Máxima 52 semanas'},
-    {label:'Mín 52s',     val:d.min_52s?'R$ '+d.min_52s.toFixed(2):'—',             desc:'Mínima 52 semanas'},
-    {label:'Ret. YTD',    val:d.ytd_ret!=null?pctStr(d.ytd_ret):'—',                desc:'Retorno no ano',          cls:d.ytd_ret>0?'up':d.ytd_ret<0?'dn':''},
-    {label:'Free Float',  val:d.free_float?d.free_float.toFixed(1)+'%':'—',         desc:'% ações em circulação'},
-    {label:'Tag Along',   val:d.tag_along?d.tag_along+'%':'—',                       desc:'Proteção minoritários'},
-  ];
-  const el = document.getElementById('ind-grid-full');
-  if (el) el.innerHTML = all.map(i => `
-    <div class="ind-card">
-      <div class="ind-label">${i.label}</div>
-      <div class="ind-val ${i.cls||''}">${i.val}</div>
-      <div class="ind-desc">${i.desc}</div>
-    </div>`).join('');
-}
-
-// ─────────────────────────────────────────────
-// HISTÓRICO DE INDICADORES (tabela por ano)
-// ─────────────────────────────────────────────
-async function renderHistIndicadores() {
-  let hist = [];
-  try {
-    const r = await fetch(`data/indicadores/${TICKER}.json?t=${Date.now()}`);
-    if (r.ok) { const j = await r.json(); hist = j.historico || []; }
-  } catch {}
-
-  // fallback: monta com dados atuais
-  if (!hist.length) {
-    const d = ativo;
-    hist = [{ano:'Atual', pl:d.pl, pvp:d.pvp, dy:d.dy, payout:d.payout, mrg_liq:d.mrg_liq, mrg_bruta:d.mrg_bruta, roe:d.roe, roic:d.roic}];
-  }
-
-  const metrics = [
-    {label:'P/L',          fn: r => r.pl>0?r.pl.toFixed(2):'—'},
-    {label:'P/VP',         fn: r => r.pvp?r.pvp.toFixed(2):'—'},
-    {label:'DY',           fn: r => r.dy?r.dy.toFixed(2)+'%':'—'},
-    {label:'Payout',       fn: r => r.payout?r.payout.toFixed(2)+'%':'—'},
-    {label:'Mrg. Líquida', fn: r => r.mrg_liq?r.mrg_liq.toFixed(2)+'%':'—'},
-    {label:'Mrg. Bruta',   fn: r => r.mrg_bruta?r.mrg_bruta.toFixed(2)+'%':'—'},
-    {label:'ROE',          fn: r => r.roe?r.roe.toFixed(2)+'%':'—'},
-    {label:'ROIC',         fn: r => r.roic?r.roic.toFixed(2)+'%':'—'},
-  ];
-
-  const anos = hist.map(h => h.ano);
-  document.getElementById('hist-ind-thead').innerHTML = `<tr>
-    <th style="text-align:left">Indicador</th>
-    ${anos.map(a => `<th>${a}</th>`).join('')}
-  </tr>`;
-  document.getElementById('hist-ind-tbody').innerHTML = metrics.map(m => `
-    <tr>
-      <td>${m.label}</td>
-      ${hist.map(h => `<td>${m.fn(h)}</td>`).join('')}
-    </tr>`).join('');
-}
-
-// ─────────────────────────────────────────────
-// RENTABILIDADE
-// ─────────────────────────────────────────────
-function renderRentabilidade(d) {
-  const rentData = d.rent || {};
-  const periodos = ['1m','3m','1a','2a','5a','10a'];
-  const labels   = ['1 mês','3 meses','1 ano','2 anos','5 anos','10 anos'];
-
-  // nominal e real (real = nominal - ipca, approx)
-  const rows = [
-    {label:'Rentabilidade',     key:'nom'},
-    {label:'Rentabilidade Real',key:'real', sub:'Rentabilidade menos a inflação'},
-  ];
-
-  document.getElementById('rent-tbody').innerHTML = rows.map(row => `
-    <tr>
-      <td>
-        <div style="font-weight:700">${row.label}</div>
-        ${row.sub ? `<div style="font-size:10px;color:var(--text3)">${row.sub}</div>` : ''}
-      </td>
-      ${periodos.map((p, i) => {
-        const v = rentData[p] !== undefined ? rentData[p] : (p==='1a'?d.v12||d.v:null);
-        const vReal = rentData['real_'+p] !== undefined ? rentData['real_'+p] : null;
-        const val = row.key === 'nom' ? v : vReal;
-        if (val == null) return '<td style="color:var(--text3)">—</td>';
-        const cls = val >= 0 ? 'up' : 'dn';
-        return `<td class="${cls}" style="font-family:var(--font-mono);font-weight:700">${val >= 0 ? '+' : ''}${val.toFixed(2)}%</td>`;
-      }).join('')}
-    </tr>`).join('');
-}
-
-// ─────────────────────────────────────────────
-// GRAHAM & BAZIN
-// ─────────────────────────────────────────────
-function renderValuation(d) {
-  const p = d.p || 0;
-  document.getElementById('graham-atual').textContent = 'R$ ' + p.toFixed(2);
-  document.getElementById('bazin-atual').textContent  = 'R$ ' + p.toFixed(2);
-
-  // Graham: √(22.5 × LPA × VPA)
-  if (d.lpa && d.vpa && d.lpa > 0 && d.vpa > 0) {
-    const graham = Math.sqrt(22.5 * d.lpa * d.vpa);
-    const upside = ((graham - p) / p * 100);
-    document.getElementById('graham-justo').textContent = 'R$ ' + graham.toFixed(2);
-    document.getElementById('graham-justo').className = 'v-val ' + (graham > p ? 'up' : 'dn');
-    document.getElementById('graham-upside').textContent = (upside >= 0 ? '+' : '') + upside.toFixed(1) + '%';
-    document.getElementById('graham-upside').className = 'v-val ' + (upside >= 0 ? 'up' : 'dn');
-  } else {
-    document.getElementById('graham-justo').textContent = '—';
-    document.getElementById('graham-upside').textContent = '—';
-  }
-
-  // Bazin: soma dividendos reais dos últimos 12 meses / 0.06
-  // Usa divData se disponível (aba dividendos já carregada), senão estima pelo DY
-  function calcBazin() {
-    let divAnual = 0;
-    if (divData && divData.length > 0) {
-      const umAnoAtras = new Date();
-      umAnoAtras.setFullYear(umAnoAtras.getFullYear() - 1);
-      divAnual = divData
-        .filter(pg => new Date(pg.date || pg.pagamento || pg.data_com) >= umAnoAtras)
-        .reduce((sum, pg) => sum + (pg.value || 0), 0);
-    }
-    // Fallback: estimar pelo DY atual se não tiver histórico
-    if (divAnual <= 0 && d.dy > 0 && p > 0) {
-      divAnual = p * (d.dy / 100);
-    }
-    if (divAnual > 0 && p > 0) {
-      const bazin  = divAnual / 0.06;
-      const upside = ((bazin - p) / p * 100);
-      document.getElementById('bazin-teto').textContent = 'R$ ' + bazin.toFixed(2);
-      document.getElementById('bazin-teto').className = 'v-val ' + (bazin > p ? 'up' : 'dn');
-      document.getElementById('bazin-upside').textContent = (upside >= 0 ? '+' : '') + upside.toFixed(1) + '%';
-      document.getElementById('bazin-upside').className = 'v-val ' + (upside >= 0 ? 'up' : 'dn');
-      // Atualizar subtítulo com fonte do cálculo
-      const box = document.getElementById('box-bazin');
-      if (box) {
-        const src = (divData && divData.length > 0) ? 'dividendos reais dos últimos 12 meses' : 'DY estimado';
-        const descEl = box.querySelector('p');
-        if (descEl) descEl.textContent = `Décio Bazin estabelece o preço máximo a pagar com base nos dividendos distribuídos. Base: DY mínimo de 6%. Cálculo usando ${src}.`;
-      }
-    } else {
-      document.getElementById('bazin-teto').textContent = '—';
-      document.getElementById('bazin-upside').textContent = '—';
+  const ops=[];
+  if(d.dy>8&&d.dy<=50) ops.push({label:`DY ${d.dy.toFixed(1)}%`,color:'var(--gold)',bg:'var(--gold-dim)',icon:'💰'});
+  if(d.pvp&&d.pvp<1) ops.push({label:`P/VP ${d.pvp.toFixed(2)} (abaixo do VP)`,color:'var(--up)',bg:'var(--up-bg)',icon:'📊'});
+  if(d.pl&&d.pl>0&&d.pl<8) ops.push({label:`P/L ${d.pl.toFixed(1)}x (barato)`,color:'var(--up)',bg:'var(--up-bg)',icon:'📈'});
+  if(d.roe&&d.roe>20) ops.push({label:`ROE ${d.roe.toFixed(1)}% (excelente)`,color:'#5E8EE0',bg:'rgba(94,142,224,0.1)',icon:'⭐'});
+  // Verifica se bate o CDI
+  if(window.BCB_DATA?.cdi?.anual && d.dy > 0) {
+    if(d.dy > window.BCB_DATA.cdi.anual) {
+      ops.push({label:`Bate o CDI (${window.BCB_DATA.cdi.anual.toFixed(1)}% a.a.)`,color:'var(--up)',bg:'var(--up-bg)',icon:'✓'});
     }
   }
-  calcBazin();
-
-  // Oculta Graham/Bazin para FII
-  if (TIPO === 'fii') {
-    const bg = document.getElementById('box-graham');
-    const bb = document.getElementById('box-bazin');
-    if (bg) bg.style.display = 'none';
-    if (bb) bb.style.display = 'none';
-  }
+  if(ops.length) document.getElementById('oportunidades').innerHTML=`
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.5rem">
+      ${ops.map(o=>`<span class="oportunidade-badge" style="background:${o.bg};color:${o.color}">${o.icon} ${o.label}</span>`).join('')}
+    </div>`;
 }
 
-// ─────────────────────────────────────────────
-// CHART HISTÓRICO
-// ─────────────────────────────────────────────
-async function renderChart() {
-  histData = await loadHistoricoCompleto(TICKER);
+function renderIndVsSetor(){
+  const all=TIPO==='fii'?FIIS:ACOES;
+  const peers=all.filter(a=>a.setor===ativo.setor&&a.t!==ativo.t);
+  if(!peers.length){document.getElementById('ind-vs-setor').innerHTML='<div style="color:var(--text3)">Sem outros ativos no mesmo setor para comparar.</div>';return;}
+
+  const avg=(arr,fn)=>{const vs=arr.map(fn).filter(v=>v!=null&&v>0);return vs.length?vs.reduce((a,b)=>a+b)/vs.length:null;};
+  const metrics=[
+    {label:'DY 12m',fn:a=>a.dy,fmt:v=>fmtPct(v),higher:true},
+    {label:'P/L',fn:a=>a.pl&&a.pl>0?a.pl:null,fmt:v=>fmt(v,'x'),higher:false},
+    {label:'P/VP',fn:a=>a.pvp,fmt:v=>fmt(v),higher:false},
+    {label:'ROE',fn:a=>a.roe,fmt:v=>fmtPct(v),higher:true},
+    {label:'Mrg. Líq.',fn:a=>a.mrg_liq,fmt:v=>fmtPct(v),higher:true},
+  ];
+
+  document.getElementById('ind-vs-setor').innerHTML=`
+    <div style="font-size:12px;color:var(--text3);margin-bottom:1rem">Comparando com ${peers.length} ativos do setor ${ativo.setor}</div>
+    ${metrics.map(m=>{
+      const mv=m.fn(ativo); const avgV=avg(peers,m.fn);
+      if(mv==null||avgV==null) return '';
+      const better=m.higher?mv>avgV:mv<avgV;
+      const pct=avgV?Math.abs((mv-avgV)/avgV*100):0;
+      return `<div style="margin-bottom:1rem">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <span style="font-size:13px;font-weight:600">${m.label}</span>
+          <div style="display:flex;gap:16px;font-family:'DM Mono',monospace;font-size:12px">
+            <span style="color:${better?'var(--up)':'var(--dn)'};font-weight:700">${m.fmt(mv)} (este)</span>
+            <span style="color:var(--text3)">Média: ${m.fmt(avgV)}</span>
+          </div>
+        </div>
+        <div style="font-size:11px;color:${better?'var(--up)':'var(--dn)'}">
+          ${better?'▲ Melhor':'▼ Abaixo'} da média do setor em ${pct.toFixed(1)}%
+        </div>
+      </div>`;
+    }).join('')}`;
+}
+
+async function renderChart(){
+  histData=await loadHistoricoCompleto(TICKER);
   await drawChartWithCDI();
 }
 
+
 async function loadBCBData() {
-  try { const r = await fetch('data/bcb.json?t=' + Date.now()); if (!r.ok) return null; return await r.json(); } catch { return null; }
+  try {
+    const r = await fetch('data/bcb.json?t=' + Date.now());
+    if (!r.ok) return null;
+    return await r.json();
+  } catch { return null; }
 }
 
 async function drawChartWithCDI() {
   const filt = filterByRange(histData, currentRange);
   let pts, labels;
   if (filt && filt.length > 2) {
-    pts = filt.map(p => p.close); labels = filt.map(p => p.date);
+    pts = filt.map(p => p.close);
+    labels = filt.map(p => p.date);
     const mn = Math.min(...pts), mx = Math.max(...pts);
     document.getElementById('ch-min').textContent = 'R$ ' + mn.toFixed(2);
     document.getElementById('ch-max').textContent = 'R$ ' + mx.toFixed(2);
@@ -806,424 +378,230 @@ async function drawChartWithCDI() {
     labels = genLabels(pts.length);
     ['ch-min','ch-max','ch-ret'].forEach(id => document.getElementById(id).textContent = '—');
   }
+
   const isUp = (ativo?.v || 0) >= 0;
   const color = isUp ? '#22C87A' : '#E8503A';
+
+  // Tenta carregar CDI para comparação
   const bcb = window.BCB_DATA || await loadBCBData();
   if (bcb) window.BCB_DATA = bcb;
+
+  // Monta datasets
   const datasets = [{
-    label: TICKER, data: pts, borderColor: color, borderWidth: 2,
-    pointRadius: 0, fill: true,
+    label: TICKER,
+    data: pts,
+    borderColor: color,
+    borderWidth: 2,
+    pointRadius: 0,
+    fill: true,
     backgroundColor: isUp ? 'rgba(34,200,122,0.06)' : 'rgba(232,80,58,0.06)',
-    tension: 0.35, yAxisID: 'y'
+    tension: 0.35,
+    yAxisID: 'y'
   }];
+
+  // Adiciona CDI normalizado se houver histórico e período for <= 1A
   if (bcb?.cdi?.acumulado && ['1M','6M','1A'].includes(currentRange) && pts.length > 0) {
-    const cdiAcum = filterByRange(bcb.cdi.acumulado.map(d => ({date:d.date.split('/').reverse().join('-'),close:d.value})), currentRange);
+    const cdiAcum = filterByRange(
+      bcb.cdi.acumulado.map(d => ({date: d.date.split('/').reverse().join('-'), close: d.value})),
+      currentRange
+    );
     if (cdiAcum?.length > 2) {
-      const cdiNorm = cdiAcum.map(d => +(d.close / cdiAcum[0].close * pts[0]).toFixed(2));
-      datasets.push({label:'CDI',data:cdiNorm,borderColor:'rgba(245,166,35,0.6)',borderWidth:1.5,borderDash:[5,5],pointRadius:0,fill:false,tension:0.35,yAxisID:'y'});
+      // Normaliza CDI para começar no mesmo preço do ativo
+      const cdiBase = cdiAcum[0].close;
+      const ativoBase = pts[0];
+      const cdiNorm = cdiAcum.map(d => +(d.close / cdiBase * ativoBase).toFixed(2));
+      datasets.push({
+        label: 'CDI (normalizado)',
+        data: cdiNorm,
+        borderColor: 'rgba(245,166,35,0.6)',
+        borderWidth: 1.5,
+        borderDash: [5, 5],
+        pointRadius: 0,
+        fill: false,
+        tension: 0.35,
+        yAxisID: 'y'
+      });
     }
   }
+
   if (mainChart) mainChart.destroy();
   mainChart = new Chart(document.getElementById('mainChart'), {
-    type: 'line', data: {labels, datasets},
+    type: 'line',
+    data: { labels, datasets },
     options: {
       responsive: true, maintainAspectRatio: false,
-      interaction: {mode:'index',intersect:false},
+      interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: {display: datasets.length > 1, labels:{color:'#9B9896',font:{size:11},boxWidth:20}},
+        legend: {
+          display: datasets.length > 1,
+          labels: { color: '#9B9896', font: { size: 11 }, boxWidth: 20 }
+        },
         tooltip: {
-          backgroundColor:'rgba(17,17,19,0.95)',borderColor:'rgba(245,166,35,0.3)',borderWidth:1,
-          callbacks:{label:ctx=>`  ${ctx.dataset.label}: R$ ${ctx.parsed.y.toFixed(2)}`}
+          backgroundColor: 'rgba(17,17,19,0.95)',
+          borderColor: 'rgba(245,166,35,0.3)',
+          borderWidth: 1,
+          callbacks: { label: ctx => `  ${ctx.dataset.label}: R$ ${ctx.parsed.y.toFixed(2)}` }
         }
       },
       scales: {
-        x: {grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},maxTicksLimit:10}},
-        y: {grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},callback:v=>'R$'+v.toFixed(0)}}
+        x: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#5E5C58', font: { size: 10 }, maxTicksLimit: 10 } },
+        y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#5E5C58', font: { size: 10 }, callback: v => 'R$' + v.toFixed(0) } }
       }
     }
   });
 }
 
-function setRange(r, el) {
-  currentRange = r;
-  document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+function drawChart(){
+  const filt=filterByRange(histData,currentRange);
+  let pts,labels;
+  if(filt&&filt.length>2){
+    pts=filt.map(p=>p.close); labels=filt.map(p=>p.date);
+    const mn=Math.min(...pts),mx=Math.max(...pts);
+    document.getElementById('ch-min').textContent='R$ '+mn.toFixed(2);
+    document.getElementById('ch-max').textContent='R$ '+mx.toFixed(2);
+    const ret=((pts[pts.length-1]-pts[0])/pts[0]*100);
+    const el=document.getElementById('ch-ret');
+    el.textContent=(ret>=0?'+':'')+ret.toFixed(1)+'%';
+    el.className='ind-val '+(ret>=0?'up':'dn');
+  }else{
+    pts=genHistory(ativo?.p||10,ativo?.v||0);
+    labels=genLabels(pts.length);
+    ['ch-min','ch-max','ch-ret'].forEach(id=>document.getElementById(id).textContent='—');
+  }
+  const isUp=(ativo?.v||0)>=0;
+  const color=isUp?'#22C87A':'#E8503A';
+  if(mainChart)mainChart.destroy();
+  mainChart=createChart('mainChart',labels,pts,color,isUp?'rgba(34,200,122,0.06)':'rgba(232,80,58,0.06)');
+}
+
+function setRange(r,el){
+  currentRange=r;
+  document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   drawChartWithCDI();
 }
 
-// ─────────────────────────────────────────────
-// TABELA PREÇOS HISTÓRICOS
-// ─────────────────────────────────────────────
-function renderHistTable() {
-  const tb = document.getElementById('hist-tbody');
-  if (!histData?.length) { tb.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--text3);padding:1rem">Sem histórico</td></tr>'; return; }
-  const rev = [...histData].reverse().slice(0, 60);
-  tb.innerHTML = rev.map((p, i) => {
-    const prev = rev[i+1];
-    const chg  = prev ? ((p.close - prev.close) / prev.close * 100) : 0;
-    return `<tr>
-      <td style="font-family:'DM Mono',monospace;font-size:12px">${p.date}</td>
+async function renderDividendos(){
+  try{
+    const r=await fetch(`data/dividendos/${TICKER}.json?t=${Date.now()}`);
+    if(!r.ok)throw new Error('sem dados');
+    const j=await r.json();
+    divData=j.dividendos||[];
+  }catch{divData=[];}
+
+  if(!divData.length){
+    document.getElementById('div-grafico').innerHTML='<div style="color:var(--text3);font-size:13px;padding:1rem 0">Histórico de dividendos não disponível ainda. Execute o modo "dividendos" no GitHub Actions.</div>';
+    document.getElementById('div-tbody').innerHTML='<tr><td colspan="3" style="text-align:center;color:var(--text3);padding:1rem">Sem dados</td></tr>';
+    return;
+  }
+
+  const recent=divData.slice(-24);
+  const maxV=Math.max(...recent.map(d=>d.value));
+
+  document.getElementById('div-grafico').innerHTML=`
+    <div style="font-size:12px;color:var(--text3);margin-bottom:.5rem">${recent.length} pagamentos · últimos 24 registros</div>
+    <div class="div-bar-chart">
+      ${recent.map(d=>`
+        <div class="div-bar" style="height:${Math.max(10,(d.value/maxV)*100)}%">
+          <div class="div-bar-tooltip">R$ ${d.value.toFixed(4)}<br>${d.date}</div>
+        </div>`).join('')}
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:4px">
+      <span>${recent[0]?.date||''}</span><span>${recent[recent.length-1]?.date||''}</span>
+    </div>`;
+
+  const reversed=[...divData].reverse().slice(0,36);
+  document.getElementById('div-tbody').innerHTML=reversed.map(d=>{
+    const dy=ativo?.p?((d.value*12/ativo.p)*100).toFixed(2)+'%':'—';
+    return `<tr><td style="font-family:'DM Mono',monospace;font-size:12px">${d.date}</td>
+      <td class="r" style="font-family:'DM Mono',monospace;font-weight:700;color:var(--gold)">R$ ${d.value.toFixed(4)}</td>
+      <td class="r" style="font-size:12px;color:var(--text3)">${dy}</td></tr>`;
+  }).join('');
+}
+
+function renderHistTable(){
+  const tb=document.getElementById('hist-tbody');
+  if(!histData?.length){tb.innerHTML='<tr><td colspan="3" style="text-align:center;color:var(--text3);padding:1rem">Sem histórico</td></tr>';return;}
+  const rev=[...histData].reverse().slice(0,60);
+  tb.innerHTML=rev.map((p,i)=>{
+    const prev=rev[i+1];
+    const chg=prev?((p.close-prev.close)/prev.close*100):0;
+    return `<tr><td style="font-family:'DM Mono',monospace;font-size:12px">${p.date}</td>
       <td class="r" style="font-family:'DM Mono',monospace">R$ ${p.close.toFixed(2)}</td>
       <td class="r"><span class="pill ${chg>=0?'up-pill':'dn-pill'}">${prev?(chg>=0?'+':'')+chg.toFixed(2)+'%':'—'}</span></td></tr>`;
   }).join('');
 }
 
-// ─────────────────────────────────────────────
-// MESMO SETOR
-// ─────────────────────────────────────────────
-function renderSameSetor(d) {
-  const all   = TIPO === 'fii' ? FIIS : ACOES;
-  const peers = all.filter(a => a.setor === d.setor && a.t !== d.t).slice(0, 5);
-  document.getElementById('same-sector').innerHTML = peers.map(p => `
+function renderSameSetor(d){
+  const all=TIPO==='fii'?FIIS:ACOES;
+  const peers=all.filter(a=>a.setor===d.setor&&a.t!==d.t).slice(0,5);
+  document.getElementById('same-sector').innerHTML=peers.map(p=>`
     <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${p.t}&tipo=${TIPO}'">
       <div><div class="mover-ticker">${p.t}</div><div class="mover-name">${p.n}</div></div>
       <div style="text-align:right">
         <div class="mover-price">R$ ${p.p.toFixed(2)}</div>
         <div class="mover-chg ${p.v>=0?'up':'dn'}">${p.v>=0?'+':''}${p.v.toFixed(2)}%</div>
       </div>
-    </div>`).join('') || '<div style="color:var(--text3);font-size:12px">Nenhum outro ativo neste setor</div>';
+    </div>`).join('')||'<div style="color:var(--text3);font-size:12px">Nenhum outro ativo neste setor</div>';
 }
 
-// ─────────────────────────────────────────────
-// SOBRE (resumo)
-// ─────────────────────────────────────────────
-function renderAbout(d) {
-  document.getElementById('about-content').innerHTML = `
-    <div style="margin-bottom:.5rem"><span style="color:var(--text3)">Ticker:</span> <strong>${d.t}</strong></div>
-    <div style="margin-bottom:.5rem"><span style="color:var(--text3)">Nome:</span> ${d.n}</div>
-    <div style="margin-bottom:.5rem"><span style="color:var(--text3)">${TIPO==='fii'?'Segmento':'Setor'}:</span> ${d.setor}</div>
-    ${d.vm&&d.vm!=='—'?`<div style="margin-bottom:.5rem"><span style="color:var(--text3)">Valor de Mercado:</span> ${d.vm}</div>`:''}
-    <div style="margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border);font-size:11px;color:var(--text3)">
-      Dados via repositório · Atualizado diariamente · Não constitui recomendação de investimento.
+function renderAbout(d){
+  document.getElementById('about-content').innerHTML=`
+    <div style="margin-bottom:.75rem"><strong style="color:var(--text)">Ticker:</strong> ${d.t}</div>
+    <div style="margin-bottom:.75rem"><strong style="color:var(--text)">Nome:</strong> ${d.n}</div>
+    <div style="margin-bottom:.75rem"><strong style="color:var(--text)">${TIPO==='fii'?'Segmento':'Setor'}:</strong> ${d.setor}</div>
+    ${d.vm&&d.vm!=='—'?`<div style="margin-bottom:.75rem"><strong style="color:var(--text)">Valor de Mercado:</strong> ${d.vm}</div>`:''}
+    ${d.qtd_imoveis?`<div style="margin-bottom:.75rem"><strong style="color:var(--text)">Qtd. Imóveis:</strong> ${d.qtd_imoveis}</div>`:''}
+    <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);font-size:11px;color:var(--text3)">
+      Dados via Fundamentus.com.br e Yahoo Finance · Atualizado diariamente · Não constitui recomendação de investimento.
     </div>`;
 }
 
-// ─────────────────────────────────────────────
-// IND VS SETOR
-// ─────────────────────────────────────────────
-function renderIndVsSetor() {
-  renderIndicadoresFull(ativo);
-  renderHistIndicadores();
-  const all   = TIPO === 'fii' ? FIIS : ACOES;
-  const peers = all.filter(a => a.setor === ativo.setor && a.t !== ativo.t);
-  if (!peers.length) { document.getElementById('ind-vs-setor').innerHTML = '<div style="color:var(--text3)">Sem outros ativos no mesmo setor para comparar.</div>'; return; }
-  const avg = (arr, fn) => { const vs = arr.map(fn).filter(v => v != null && v > 0); return vs.length ? vs.reduce((a,b) => a+b) / vs.length : null; };
-  const metrics = [
-    {label:'DY 12m',   fn:a=>a.dy,             fmt:v=>fmtPct(v),        higher:true},
-    {label:'P/L',      fn:a=>a.pl&&a.pl>0?a.pl:null, fmt:v=>fmt(v,'x'), higher:false},
-    {label:'P/VP',     fn:a=>a.pvp,             fmt:v=>fmt(v),           higher:false},
-    {label:'ROE',      fn:a=>a.roe,             fmt:v=>fmtPct(v),        higher:true},
-    {label:'Mrg. Líq.',fn:a=>a.mrg_liq,         fmt:v=>fmtPct(v),        higher:true},
-  ];
-  document.getElementById('ind-vs-setor').innerHTML = `
-    <div style="font-size:12px;color:var(--text3);margin-bottom:1rem">Comparando com ${peers.length} ativos do setor ${ativo.setor}</div>
-    ${metrics.map(m => {
-      const mv = m.fn(ativo); const avgV = avg(peers, m.fn);
-      if (mv == null || avgV == null) return '';
-      const better = m.higher ? mv > avgV : mv < avgV;
-      const pct = avgV ? Math.abs((mv - avgV) / avgV * 100) : 0;
-      return `<div style="margin-bottom:1rem">
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-          <span style="font-size:13px;font-weight:600">${m.label}</span>
-          <div style="display:flex;gap:16px;font-family:var(--font-mono);font-size:12px">
-            <span style="color:${better?'var(--up)':'var(--dn)'};font-weight:700">${m.fmt(mv)} (este)</span>
-            <span style="color:var(--text3)">Média: ${m.fmt(avgV)}</span>
-          </div>
-        </div>
-        <div style="font-size:11px;color:${better?'var(--up)':'var(--dn)'}">
-          ${better?'▲ Melhor':'▼ Abaixo'} da média do setor em ${pct.toFixed(1)}%
-        </div>
-      </div>`;
-    }).join('')}`;
-}
+function renderAnalise(){
+  const d=ativo;
+  const isFii=TIPO==='fii';
 
-// ─────────────────────────────────────────────
-// DIVIDENDOS
-// ─────────────────────────────────────────────
-async function renderDividendos() {
-  try {
-    const r = await fetch(`data/dividendos/${TICKER}.json?t=${Date.now()}`);
-    if (!r.ok) throw new Error();
-    const j = await r.json(); divData = j.dividendos || [];
-  } catch { divData = []; }
-
-  // KPIs
-  const kpiEl = document.getElementById('div-kpis');
-  if (kpiEl) kpiEl.innerHTML = `
-    <div class="ind-card"><div class="ind-label">DY Atual</div><div class="ind-val gold">${ativo.dy>0?ativo.dy.toFixed(2)+'%':'—'}</div><div class="ind-desc">12 meses</div></div>
-    <div class="ind-card"><div class="ind-label">Pagamentos</div><div class="ind-val">${divData.length||'—'}</div><div class="ind-desc">registros disponíveis</div></div>
-    <div class="ind-card"><div class="ind-label">Último Valor</div><div class="ind-val gold">${divData.length?'R$ '+divData[divData.length-1].value.toFixed(4):'—'}</div><div class="ind-desc">mais recente</div></div>`;
-
-  // Recalcular Bazin com dados reais agora que divData está disponível
-  if (typeof renderValuation === 'function' && ativo) renderValuation(ativo);
-
-  if (!divData.length) {
-    document.getElementById('div-grafico-anual').innerHTML = '';
-    document.getElementById('div-grafico').innerHTML = '<div style="color:var(--text3);font-size:13px;padding:1rem 0">Histórico de dividendos não disponível. Execute o modo "dividendos" no GitHub Actions.</div>';
-    document.getElementById('div-tbody').innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:1rem">Sem dados</td></tr>';
-    return;
-  }
-
-  // Gráfico barras (últimos 24 pagamentos)
-  const recent = divData.slice(-24);
-  const maxV   = Math.max(...recent.map(d => d.value));
-  document.getElementById('div-grafico').innerHTML = `
-    <div style="font-size:12px;color:var(--text3);margin-bottom:.5rem">${recent.length} pagamentos · últimos 24 registros</div>
-    <div class="div-bar-chart">
-      ${recent.map(d => `<div class="div-bar" style="height:${Math.max(10,(d.value/maxV)*100)}%">
-        <div class="div-bar-tooltip">R$ ${d.value.toFixed(4)}<br>${d.date}</div></div>`).join('')}
-    </div>
-    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:4px">
-      <span>${recent[0]?.date||''}</span><span>${recent[recent.length-1]?.date||''}</span>
-    </div>`;
-
-  // Tabela detalhada
-  const rev = [...divData].reverse().slice(0, 36);
-  document.getElementById('div-tbody').innerHTML = rev.map(d => {
-    const tipo = d.tipo || (TIPO === 'fii' ? 'Rendimento' : 'Dividendo');
-    // DY estimado por pagamento (valor / preço), sem multiplicar por 12 — evita distorção
-    const dy   = ativo?.p ? ((d.value / ativo.p) * 100).toFixed(3) + '%' : '—';
-    return `<tr>
-      <td style="font-size:12px;color:var(--text3)">${tipo}</td>
-      <td class="r" style="font-family:var(--font-mono);font-size:12px">${d.data_com||d.date||'—'}</td>
-      <td class="r" style="font-family:var(--font-mono);font-size:12px">${d.pagamento||d.date||'—'}</td>
-      <td class="r" style="font-family:var(--font-mono);font-weight:700;color:var(--gold)">R$ ${d.value.toFixed(4)}</td>
-      <td class="r" style="font-size:12px;color:var(--text3)">${dy}</td></tr>`;
-  }).join('');
-}
-
-// ─────────────────────────────────────────────
-// CONTÁBIL
-// ─────────────────────────────────────────────
-async function renderContabil() {
-  let financeiro = null;
-  try {
-    const r = await fetch(`data/financeiro/${TICKER}.json?t=${Date.now()}`);
-    if (r.ok) financeiro = await r.json();
-  } catch {}
-
-  const anos = financeiro?.anos || ['2025','2024','2023','2022','2021'];
-  const res   = financeiro?.resultados || {};
-  const bal   = financeiro?.balanco || {};
-
-  // Cabeçalhos
-  const headHtml = `<tr><th style="text-align:left">Indicador (R$)</th>${anos.map(a=>`<th>${a}</th>`).join('')}</tr>`;
-
-  // Resultados
-  const resultRows = [
-    {label:'Receita Líquida',  key:'receita',   bold:true},
-    {label:'Custos',           key:'custos'},
-    {label:'Lucro Bruto',      key:'luc_bruto',  bold:true},
-    {label:'Lucro Líquido',    key:'luc_liq',    bold:true},
-    {label:'EBITDA',           key:'ebitda'},
-    {label:'EBIT',             key:'ebit'},
-    {label:'Margem Bruta',     key:'mrg_bruta',  pct:true},
-    {label:'Margem EBITDA',    key:'mrg_ebitda', pct:true},
-    {label:'Margem Líquida',   key:'mrg_liq',    pct:true},
-    {label:'ROE',              key:'roe',         pct:true},
-    {label:'ROIC',             key:'roic',        pct:true},
-    {label:'Dívida Bruta',     key:'div_bruta'},
-    {label:'Dívida Líquida',   key:'div_liq'},
-  ];
-
-  document.getElementById('result-thead').innerHTML = headHtml;
-  document.getElementById('result-tbody').innerHTML = resultRows.map(row => `
-    <tr>
-      <td style="${row.bold?'font-weight:800':''}">${row.label}</td>
-      ${anos.map(a => {
-        const v = res[row.key]?.[a];
-        if (v == null) return '<td style="color:var(--text3)">—</td>';
-        if (row.pct) return `<td class="${v>=0?'up':''}">${v.toFixed(2)}%</td>`;
-        return `<td>${fmtBi(v)}</td>`;
-      }).join('')}
-    </tr>`).join('');
-
-  // Balanço
-  const balRows = [
-    {label:'Ativo Total',     key:'ativo_total',  bold:true},
-    {label:'Ativo Circulante',key:'ativo_circ',   sub:true},
-    {label:'Ativo N.Circulante',key:'ativo_ncirc',sub:true},
-    {label:'Passivo Total',   key:'passivo_total', bold:true},
-    {label:'Passivo Circulante',key:'passivo_circ',sub:true},
-    {label:'Passivo N.Circulante',key:'passivo_ncirc',sub:true},
-    {label:'Patrimônio Líquido',key:'pl',          bold:true},
-  ];
-  document.getElementById('balanco-thead').innerHTML = headHtml;
-  document.getElementById('balanco-tbody').innerHTML = balRows.map(row => `
-    <tr class="${row.sub?'sub-row':''}">
-      <td style="${row.bold?'font-weight:800':''}">${row.label}</td>
-      ${anos.map(a => {
-        const v = bal[row.key]?.[a];
-        return v != null ? `<td>${fmtBi(v)}</td>` : '<td style="color:var(--text3)">—</td>';
-      }).join('')}
-    </tr>`).join('');
-
-  // Gráfico receitas e lucros
-  if (financeiro?.resultados?.receita) {
-    const recVals = anos.map(a => financeiro.resultados.receita[a] || 0).map(v => +(v/1e9).toFixed(2));
-    const lucVals = anos.map(a => (financeiro.resultados.luc_liq||{})[a] || 0).map(v => +(v/1e9).toFixed(2));
-    if (receitaChart) receitaChart.destroy();
-    receitaChart = new Chart(document.getElementById('receitaChart'), {
-      type: 'bar',
-      data: {
-        labels: anos,
-        datasets: [
-          {label:'Receita Líquida (R$ B)',data:recVals,backgroundColor:'rgba(94,142,224,0.7)',borderRadius:4},
-          {label:'Lucro Líquido (R$ B)',  data:lucVals,backgroundColor:'rgba(31,201,110,0.7)',borderRadius:4},
-        ]
-      },
-      options: {
-        responsive:true, maintainAspectRatio:false,
-        plugins:{legend:{labels:{color:'#9B9896',font:{size:11}}}},
-        scales:{
-          x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:11}}},
-          y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5E5C58',font:{size:10},callback:v=>v+'B'}}
-        }
-      }
-    });
-  }
-}
-
-// ─────────────────────────────────────────────
-// EMPRESA
-// ─────────────────────────────────────────────
-async function renderEmpresa() {
-  let empData = null;
-  try {
-    const r = await fetch(`data/empresa/${TICKER}.json?t=${Date.now()}`);
-    if (r.ok) empData = await r.json();
-  } catch {}
-
-  const d = ativo;
-  const emp = empData || {};
-
-  // Sobre
-  document.getElementById('empresa-sobre').innerHTML = emp.sobre || `
-    <p>Informações sobre ${d.n} (${d.t}) disponíveis em breve.</p>
-    <div style="margin-top:.75rem;font-size:11px;color:var(--text3)">
-      Setor: ${d.setor} · B3 · Não constitui recomendação de investimento.
-    </div>`;
-
-  // Dados cadastrais
-  const dados = [
-    {l:'Nome',          v:emp.nome||d.n},
-    {l:'Razão Social',  v:d.razao_social||emp.nome||d.n},
-    {l:'CNPJ',          v:d.cnpj||emp.cnpj||'—'},
-    {l:'Código CVM',    v:d.cvm_code||emp.cvm_code||'—'},
-    {l:'Fundação',      v:emp.fundacao||'—'},
-    {l:'Estreia na B3', v:emp.ipo||'—'},
-    {l:'Estado/Cidade', v:d.estado&&d.cidade?`${d.cidade} / ${d.estado}`:d.estado||d.cidade||emp.cidade||'—'},
-    {l:'Website',       v:d.website||emp.website?`<a href="${d.website||emp.website}" target="_blank" style="color:var(--gold)">${(d.website||emp.website).replace('https://','')}</a>`:'—'},
-    {l:'Funcionários',  v:emp.funcionarios?(+emp.funcionarios).toLocaleString('pt-BR'):'—'},
-    {l:'Segmento Listagem', v:emp.segmento_listagem||'—'},
-  ];
-  document.getElementById('empresa-dados').innerHTML = dados.map(r => `
-    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
-      <span style="color:var(--text3)">${r.l}</span>
-      <span style="font-weight:600">${r.v}</span>
-    </div>`).join('');
-
-  // Informações financeiras
-  const infos = [
-    {l:'Valor de Mercado',   v:emp.vm||d.vm||'—'},
-    {l:'Valor de Firma',     v:emp.vf||'—'},
-    {l:'Patrimônio Líquido', v:emp.pl||'—'},
-    {l:'Nº Total de Papéis', v:emp.total_papeis||'—'},
-    {l:'Ativos',             v:emp.ativos||'—'},
-    {l:'Dívida Bruta',       v:emp.div_bruta||'—'},
-    {l:'Dívida Líquida',     v:emp.div_liq||'—'},
-    {l:'Free Float',         v:emp.free_float?emp.free_float+'%':d.free_float?d.free_float+'%':'—'},
-    {l:'Tag Along',          v:emp.tag_along?emp.tag_along+'%':d.tag_along?d.tag_along+'%':'—'},
-    {l:'Liquidez Diária',    v:emp.liq_diaria||'—'},
-  ];
-  document.getElementById('empresa-info').innerHTML = infos.map(r => `
-    <div class="info-item">
-      <div class="info-label">${r.l}</div>
-      <div class="info-val">${r.v}</div>
-    </div>`).join('');
-
-  // Painel FII
-  if (TIPO === 'fii') {
-    document.getElementById('fii-info-box').style.display = '';
-    const fiiFields = [
-      {l:'Razão Social',        v:d.razao_social||emp.nome||d.n},
-      {l:'CNPJ',                v:d.cnpj||emp.cnpj||'—'},
-      {l:'Mandato',             v:d.mandato||'—'},
-      {l:'Segmento',            v:d.segmento||'—'},
-      {l:'Tipo de Fundo',       v:d.tipo_fundo||'—'},
-      {l:'Tipo de Gestão',      v:d.tipo_gestao||'—'},
-      {l:'Taxa de Adm.',        v:d.taxa_adm!=null?d.taxa_adm+'%':'—'},
-      {l:'Vacância',            v:d.vacancia!=null?d.vacancia.toFixed(2)+'%':'—'},
-      {l:'Nº Cotistas',         v:d.num_cotistas?d.num_cotistas.toLocaleString('pt-BR'):'—'},
-      {l:'Cotas Emitidas',      v:d.cotas_emitidas?d.cotas_emitidas.toLocaleString('pt-BR'):'—'},
-      {l:'VP por Cota',         v:d.patrimonio_cota?'R$ '+d.patrimonio_cota.toFixed(2):'—'},
-      {l:'Patrimônio Total',    v:d.patrimonio_total?fmtBi(d.patrimonio_total):'—'},
-      {l:'Último Rendimento',   v:d.ultimo_rend?'R$ '+d.ultimo_rend.toFixed(4):(d.ult_rend?'R$ '+d.ult_rend.toFixed(4):'—')},
-    ];
-    document.getElementById('fii-info-grid').innerHTML = fiiFields.map(f => `
-      <div style="padding:12px 16px;background:var(--bg2)">
-        <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">${f.l}</div>
-        <div style="font-size:13px;font-weight:600;color:var(--text)">${f.v}</div>
-      </div>`).join('');
-  }
-
-  // Acionistas
-  if (emp.acionistas?.length) {
-    document.getElementById('acionistas-tbody').innerHTML = emp.acionistas.map(a => `
-      <tr>
-        <td>${a.nome}</td>
-        <td class="r" style="font-family:var(--font-mono)">${a.on!=null?a.on.toFixed(2)+'%':'—'}</td>
-        <td class="r" style="font-family:var(--font-mono)">${a.pn!=null?a.pn.toFixed(2)+'%':'—'}</td>
-        <td class="r" style="font-family:var(--font-mono);color:var(--gold);font-weight:700">${a.total!=null?a.total.toFixed(2)+'%':'—'}</td>
-      </tr>`).join('');
-  }
-}
-
-// ─────────────────────────────────────────────
-// ANÁLISE / SCORE
-// ─────────────────────────────────────────────
-function renderAnalise() {
-  const d = ativo;
-  const isFii = TIPO === 'fii';
-  let score = 0; const criterios = [];
-  if (!isFii) {
-    if (d.dy>5&&d.dy<=50)      { score+=15; criterios.push({ok:true, txt:`DY ${d.dy.toFixed(1)}% — boa remuneração`}); }
-    else criterios.push({ok:false, txt:'DY baixo ou não disponível'});
-    if (d.pl&&d.pl>0&&d.pl<20) { score+=20; criterios.push({ok:true, txt:`P/L ${d.pl.toFixed(1)}x — preço razoável (abaixo de 20x)`}); }
-    else if (d.pl&&d.pl>0)       criterios.push({ok:false, txt:`P/L ${d.pl.toFixed(1)}x — elevado ou negativo`});
-    else                         criterios.push({ok:false, txt:'P/L não disponível'});
-    if (d.pvp&&d.pvp<2)        { score+=15; criterios.push({ok:true, txt:`P/VP ${d.pvp.toFixed(2)} — valor patrimonial ok`}); }
-    else                         criterios.push({ok:false, txt:'P/VP alto'});
-    if (d.roe&&d.roe>15)       { score+=20; criterios.push({ok:true, txt:`ROE ${d.roe.toFixed(1)}% — boa rentabilidade`}); }
-    else                         criterios.push({ok:false, txt:'ROE baixo ou não disponível'});
-    if (d.roic&&d.roic>12)     { score+=15; criterios.push({ok:true, txt:`ROIC ${d.roic.toFixed(1)}% — capital bem alocado`}); }
-    else                         criterios.push({ok:false, txt:'ROIC baixo'});
-    if (d.mrg_liq&&d.mrg_liq>10){ score+=15; criterios.push({ok:true, txt:`Margem ${d.mrg_liq.toFixed(1)}% — lucratividade boa`}); }
-    else                         criterios.push({ok:false, txt:'Margem líquida baixa'});
+  // Score simples de qualidade
+  let score=0; const criterios=[];
+  if(!isFii){
+    if(d.dy>5&&d.dy<=50){score+=15;criterios.push({ok:true,txt:`DY ${d.dy.toFixed(1)}% — boa remuneração`});}
+    else criterios.push({ok:false,txt:'DY baixo ou não disponível'});
+    if(d.pl&&d.pl>0&&d.pl<15){score+=20;criterios.push({ok:true,txt:`P/L ${d.pl.toFixed(1)}x — preço razoável`});}
+    else if(d.pl&&d.pl>0) criterios.push({ok:false,txt:`P/L ${d.pl.toFixed(1)}x — pode estar caro`});
+    else criterios.push({ok:false,txt:'P/L não disponível'});
+    if(d.pvp&&d.pvp<2){score+=15;criterios.push({ok:true,txt:`P/VP ${d.pvp.toFixed(2)} — valor patrimonial ok`});}
+    else criterios.push({ok:false,txt:'P/VP alto'});
+    if(d.roe&&d.roe>15){score+=20;criterios.push({ok:true,txt:`ROE ${d.roe.toFixed(1)}% — boa rentabilidade`});}
+    else criterios.push({ok:false,txt:'ROE baixo ou não disponível'});
+    if(d.roic&&d.roic>12){score+=15;criterios.push({ok:true,txt:`ROIC ${d.roic.toFixed(1)}% — capital bem alocado`});}
+    else criterios.push({ok:false,txt:'ROIC baixo ou não disponível'});
+    if(d.mrg_liq&&d.mrg_liq>10){score+=15;criterios.push({ok:true,txt:`Margem ${d.mrg_liq.toFixed(1)}% — lucratividade boa`});}
+    else criterios.push({ok:false,txt:'Margem líquida baixa'});
   } else {
-    if (d.dy>8&&d.dy<=50)      { score+=25; criterios.push({ok:true, txt:`DY ${d.dy.toFixed(1)}% — excelente rendimento`}); }
-    else                         criterios.push({ok:false, txt:'DY baixo'});
-    if (d.pvp&&d.pvp<1)        { score+=30; criterios.push({ok:true, txt:`P/VP ${d.pvp.toFixed(2)} — abaixo do valor patrimonial`}); }
-    else if (d.pvp&&d.pvp<1.05){ score+=15; criterios.push({ok:true, txt:`P/VP ${d.pvp.toFixed(2)} — próximo do VP`}); }
-    else                         criterios.push({ok:false, txt:'P/VP acima do VP'});
-    if (d.vacancia!=null&&d.vacancia<10){ score+=25; criterios.push({ok:true, txt:`Vacância ${d.vacancia.toFixed(1)}% — baixa`}); }
-    else if (d.vacancia!=null)   criterios.push({ok:false, txt:`Vacância ${d.vacancia.toFixed(1)}% — elevada`});
-    else                         criterios.push({ok:false, txt:'Vacância não disponível'});
-    if (d.cap_rate&&d.cap_rate>8){ score+=20; criterios.push({ok:true, txt:`Cap Rate ${d.cap_rate.toFixed(1)}%`}); }
-    else                          criterios.push({ok:false, txt:'Cap Rate baixo'});
+    if(d.dy>8&&d.dy<=50){score+=25;criterios.push({ok:true,txt:`DY ${d.dy.toFixed(1)}% — excelente rendimento`});}
+    else criterios.push({ok:false,txt:'DY baixo'});
+    if(d.pvp&&d.pvp<1){score+=30;criterios.push({ok:true,txt:`P/VP ${d.pvp.toFixed(2)} — abaixo do valor patrimonial`});}
+    else if(d.pvp&&d.pvp<1.05){score+=15;criterios.push({ok:true,txt:`P/VP ${d.pvp.toFixed(2)} — próximo do VP`});}
+    else criterios.push({ok:false,txt:'P/VP acima do VP'});
+    if(d.vacancia!=null&&d.vacancia<10){score+=25;criterios.push({ok:true,txt:`Vacância ${d.vacancia.toFixed(1)}% — baixa`});}
+    else if(d.vacancia!=null) criterios.push({ok:false,txt:`Vacância ${d.vacancia.toFixed(1)}% — elevada`});
+    else criterios.push({ok:false,txt:'Vacância não disponível'});
+    if(d.cap_rate&&d.cap_rate>8){score+=20;criterios.push({ok:true,txt:`Cap Rate ${d.cap_rate.toFixed(1)}% — bom retorno imobiliário`});}
+    else criterios.push({ok:false,txt:'Cap Rate baixo'});
   }
 
-  const scoreColor = score>=70?'var(--up)':score>=40?'var(--gold)':'var(--dn)';
-  const scoreLabel = score>=70?'Bom':score>=40?'Regular':'Fraco';
-  document.getElementById('score-content').innerHTML = `
+  const scoreColor=score>=70?'var(--up)':score>=40?'var(--gold)':'var(--dn)';
+  const scoreLabel=score>=70?'Bom':score>=40?'Regular':'Fraco';
+
+  document.getElementById('score-content').innerHTML=`
     <div style="display:flex;align-items:center;gap:1.5rem;margin-bottom:1.5rem">
       <div style="text-align:center">
-        <div style="font-size:48px;font-weight:800;font-family:var(--font-mono);color:${scoreColor}">${score}</div>
+        <div style="font-size:48px;font-weight:800;font-family:'DM Mono',monospace;color:${scoreColor}">${score}</div>
         <div style="font-size:12px;color:var(--text3)">/100</div>
         <div style="font-size:14px;font-weight:700;color:${scoreColor}">${scoreLabel}</div>
       </div>
       <div style="flex:1">
-        <div style="font-size:12px;color:var(--text3);margin-bottom:6px">Score baseado nos indicadores fundamentalistas disponíveis</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:6px">Score de qualidade baseado nos indicadores fundamentalistas</div>
         <div class="score-bar"><div class="score-fill" style="width:${score}%;background:${scoreColor}"></div></div>
       </div>
     </div>
@@ -1235,139 +613,34 @@ function renderAnalise() {
         </div>`).join('')}
     </div>`;
 
-  // Checklist Buy & Hold
-  const checks = [
-    {ok: d.pl && d.pl > 0 && d.pl < 20,  txt: d.pl && d.pl > 0 ? `P/L ${d.pl.toFixed(1)}x — abaixo de 20x (Buy & Hold)` : 'P/L não disponível ou negativo'},
-    {ok: d.pvp && d.pvp > 0 && d.pvp < 3, txt: d.pvp ? `P/VP ${d.pvp.toFixed(2)} — abaixo de 3x` : 'P/VP não disponível'},
-    {ok: d.dy > 5,                         txt: d.dy > 0 ? `DY ${d.dy.toFixed(1)}% — acima de 5%` : 'DY não disponível ou abaixo de 5%'},
-    {ok: d.roe && d.roe > 10,              txt: d.roe ? `ROE ${d.roe.toFixed(1)}% — acima de 10%` : 'ROE não disponível'},
-    {ok: d.cresc5a && d.cresc5a > 0,       txt: d.cresc5a ? `Crescimento de receita ${d.cresc5a.toFixed(1)}% (5 anos)` : 'Crescimento de receita não disponível'},
-    {ok: d.div_ebitda == null || d.div_ebitda < 3, txt: d.div_ebitda ? `Dívida/EBITDA ${d.div_ebitda.toFixed(1)}x — controlada` : 'Endividamento não disponível'},
-  ];
-  document.getElementById('checklist-content').innerHTML = checks.map(c => `
-    <div class="check-item">
-      <span class="${c.ok?'check-ok':'check-fail'}">${c.ok?'✓':'✗'}</span>
-      <span style="font-size:12px;color:${c.ok?'var(--text)':'var(--text3)'}">${c.txt}</span>
-    </div>`).join('');
-
   // Alertas
-  const alertas = [];
-  if (d.v30 && d.v30 < -15)  alertas.push({type:'warn', txt:`Queda de ${Math.abs(d.v30).toFixed(1)}% nos últimos 30 dias`});
-  if (d.pl && d.pl < 0)       alertas.push({type:'warn', txt:'Empresa com lucro negativo (P/L negativo)'});
-  if (d.dy > 0 && d.dy > 30)  alertas.push({type:'warn', txt:'DY muito alto pode indicar queda recente do preço'});
-  if (d.pvp && d.pvp > 5)     alertas.push({type:'warn', txt:'P/VP muito elevado — preço bem acima do patrimônio'});
-  if (d.pl && d.pvp && d.pl > 0 && d.pvp > 0 && d.pl * d.pvp > 22.5)
-    alertas.push({type:'warn', txt:`P/L × P/VP = ${(d.pl * d.pvp).toFixed(1)} — acima de 22,5 (critério de Graham)`});
-  if (d.div_ebitda && d.div_ebitda > 4)
-    alertas.push({type:'warn', txt:`Dívida/EBITDA ${d.div_ebitda.toFixed(1)}x — nível de endividamento elevado`});
-  if (!alertas.length)         alertas.push({type:'ok',   txt:'Nenhum alerta identificado nos indicadores disponíveis'});
-  document.getElementById('alertas-content').innerHTML = alertas.map(a => `
-    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:8px;margin-bottom:8px;
-      background:${a.type==='ok'?'var(--up-bg)':'var(--dn-bg)'};border:1px solid ${a.type==='ok'?'rgba(34,200,122,0.2)':'rgba(232,80,58,0.2)'}">
+  const alertas=[];
+  if(d.v30&&d.v30<-15) alertas.push({type:'warn',txt:`Queda de ${Math.abs(d.v30).toFixed(1)}% nos últimos 30 dias`});
+  if(d.pl&&d.pl<0) alertas.push({type:'warn',txt:'Empresa com lucro negativo (P/L negativo)'});
+  if(d.dy>0&&d.dy>30) alertas.push({type:'warn',txt:'DY muito alto pode indicar queda recente do preço'});
+  if(d.pvp&&d.pvp>5) alertas.push({type:'warn',txt:'P/VP muito elevado — preço bem acima do patrimônio'});
+  if(!alertas.length) alertas.push({type:'ok',txt:'Nenhum alerta identificado nos indicadores disponíveis'});
+
+  document.getElementById('alertas-content').innerHTML=alertas.map(a=>`
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:8px;margin-bottom:8px;background:${a.type==='ok'?'var(--up-bg)':'var(--dn-bg)'};border:1px solid ${a.type==='ok'?'rgba(34,200,122,0.2)':'rgba(232,80,58,0.2)'}">
       <span style="color:${a.type==='ok'?'var(--up)':'var(--dn)'}">${a.type==='ok'?'✓':'⚠️'}</span>
       <span style="font-size:13px">${a.txt}</span>
     </div>`).join('');
 }
 
-// ─────────────────────────────────────────────
-// INIT
-// ─────────────────────────────────────────────
-// ─────────────────────────────────────────────
-// CARREGA FUNDAMENTALISTAS DO JSON LOCAL
-// ─────────────────────────────────────────────
-async function loadFundamentalistas() {
-  try {
-    const r = await fetch(`data/fundamentalistas/${TICKER}.json?t=${Date.now()}`);
-    if (!r.ok) return null;
-    return await r.json();
-  } catch { return null; }
-}
-
-function mergeFundamentalistas(ativo, fund) {
-  if (!fund) return ativo;
-  // Mescla campos do BolsaI nos dados do ativo — sem sobrescrever se já existir
-  const map = {
-    pl:             fund.pl,
-    pvp:            fund.pvp,
-    dy:             fund.dy,
-    roe:            fund.roe,
-    roic:           fund.roic,
-    roa:            fund.roa,
-    mrg_liq:        fund.mrg_liq,
-    mrg_ebit:       fund.mrg_ebit,
-    mrg_ebitda:     fund.mrg_ebitda,
-    mrg_bruta:      fund.mrg_bruta,
-    ev_ebitda:      fund.ev_ebitda,
-    ev_ebit:        fund.ev_ebit,
-    p_ebitda:       fund.p_ebitda,
-    p_ebit:         fund.p_ebit,
-    psr:            fund.psr,
-    lpa:            fund.lpa,
-    vpa:            fund.vpa,
-    liq_corrente:   fund.liq_corrente,
-    div_liq_ebitda: fund.div_liq_ebitda,
-    div_liq_ebit:   fund.div_liq_ebit,
-    div_liq_patrim: fund.div_liq_patrim,
-    cagr_rec_5a:    fund.cagr_rec_5a,
-    cagr_luc_5a:    fund.cagr_luc_5a,
-    market_cap:     fund.market_cap,
-    giro_ativos:    fund.giro_ativos,
-    patrim_ativos:  fund.patrim_ativos,
-    passiv_ativos:  fund.passiv_ativos,
-    max_52s:        fund.max_52s,
-    min_52s:        fund.min_52s,
-    ytd_ret:        fund.ytd_ret,
-    // Empresa
-    razao_social:   fund.razao_social,
-    cnpj:           fund.cnpj,
-    cvm_code:       fund.cvm_code,
-    website:        fund.website,
-    estado:         fund.estado,
-    cidade:         fund.cidade,
-    // FII extras
-    vacancia:       fund.vacancia,
-    num_cotistas:   fund.num_cotistas,
-    cotas_emitidas: fund.cotas_emitidas,
-    patrimonio_cota:fund.patrimonio_cota,
-    patrimonio_total:fund.patrimonio_total,
-    ultimo_rend:    fund.ultimo_rend,
-    taxa_adm:       fund.taxa_adm,
-    segmento:       fund.segmento,
-    mandato:        fund.mandato,
-    tipo_gestao:    fund.tipo_gestao,
-    tipo_fundo:     fund.tipo_fundo,
-  };
-  // Aplica só onde o ativo não tem dado ou tem 0
-  for (const [k, v] of Object.entries(map)) {
-    if (v != null && (ativo[k] == null || ativo[k] === 0 || ativo[k] === '—')) {
-      ativo[k] = v;
-    }
-  }
-  return ativo;
-}
-
-async function init() {
+async function init(){
   await loadData();
-  const all = TIPO === 'fii' ? FIIS : ACOES;
-  ativo = all.find(a => a.t === TICKER) || all[0];
-  if (!ativo) { document.getElementById('ativo-nome').textContent = 'Ativo não encontrado'; return; }
-
-  // Carrega e mescla fundamentalistas do BolsaI
-  const fund = await loadFundamentalistas();
-  if (fund) ativo = mergeFundamentalistas(ativo, fund);
-
+  const all=TIPO==='fii'?FIIS:ACOES;
+  ativo=all.find(a=>a.t===TICKER)||all[0];
+  if(!ativo){document.getElementById('ativo-nome').textContent='Ativo não encontrado';return;}
   renderHero(ativo);
   renderIndicadores(ativo);
   renderAbout(ativo);
   renderSameSetor(ativo);
-  renderRentabilidade(ativo);
-  renderValuation(ativo);
   initWatchlist();
   await renderChart();
   renderHistTable();
-  renderHistIndicadores();
 }
 init();
 </script>
-</body>
-</html>
+</body></html>
