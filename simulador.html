@@ -1667,6 +1667,18 @@ function redistribuir(id) {
   ativos.forEach((a, i) => { a.pct = base + (i === 0 ? resto : 0); });
 }
 
+function redistribuirValidos(id) {
+  const ativos = state.classesConfig[id].ativos;
+  const validos = ativos.filter(a => a.ticker.trim() !== '');
+  const vazios  = ativos.filter(a => a.ticker.trim() === '');
+  const n = validos.length;
+  if (n === 0) return;
+  const base = Math.floor(100 / n);
+  const resto = 100 - base * n;
+  validos.forEach((a, i) => { a.pct = base + (i === 0 ? resto : 0); });
+  vazios.forEach(a  => { a.pct = 0; });
+}
+
 function ajustarPct(id, idx, delta) {
   const ativos = state.classesConfig[id].ativos;
   const cur = ativos[idx].pct;
@@ -1747,9 +1759,12 @@ function hideSugestoes(id, idx) {
 }
 
 function selecionarAtivo(id, idx, ticker) {
-  state.classesConfig[id].ativos[idx].ticker = ticker;
-  // Se é o primeiro ativo a ser preenchido em slot vazio, redistribui
-  if (state.classesConfig[id].ativos[idx].pct === 0) redistribuir(id);
+  // Só aceita tickers que existem na lista da classe
+  const cls = CLASSES_DEF.find(c => c.id === id);
+  if (!cls.exampleTickers.includes(ticker.toUpperCase())) return;
+  state.classesConfig[id].ativos[idx].ticker = ticker.toUpperCase();
+  // Redistribui somente os ativos que já têm ticker válido
+  redistribuirValidos(id);
   renderAtivosRows(id);
 }
 
@@ -1763,12 +1778,11 @@ function setPct(id, idx, val) {
 function updateAtivo(id,idx,field,val) { state.classesConfig[id].ativos[idx][field]=val; renderInternoMini(id); }
 function addAtivo(id) {
   state.classesConfig[id].ativos.push({ticker:'',pct:0});
-  redistribuir(id);
   renderAtivosRows(id);
 }
 function removeAtivo(id,idx) {
   state.classesConfig[id].ativos.splice(idx,1);
-  if (state.classesConfig[id].ativos.length > 0) redistribuir(id);
+  redistribuirValidos(id);
   renderAtivosRows(id);
 }
 function renderInternoMini(id) {
