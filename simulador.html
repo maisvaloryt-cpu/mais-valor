@@ -1367,6 +1367,37 @@ function buildInicioLog(primeiroMes, startDate) {
 // ══════════════════════════════════════════════════════════════
 // BACKTEST ENGINE — dados 100% reais, redistribuição proporcional
 // ══════════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════════
+// TICKERS ESPECIAIS
+// Índices acumulados: retorno = close[t]/close[t-1] - 1
+// (não compra/vende cotas — aplica retorno sobre saldo)
+// Sem dividendos: rendimento já embutido no índice
+// ══════════════════════════════════════════════════════════════
+const INDICES_ACUMULADOS = new Set([
+  // Renda fixa
+  'CDI','SELIC','IPCA','IMAB','IMAS','IMAB5','IMAB5P','IRFM','IMA',
+  // Índices de ações B3
+  'IBOV','IDIV','SMLL','IBXL','IBXX','IBRA','MLCX','IVBX','ITAG',
+  'IGC','IGCT','IGNM','IFNC','IEE','UTIL','INDX','IMAT','IMOB',
+  'ICON','ISEE','ICO2','BDRX','IFIX',
+  // Exterior / câmbio
+  'SPXBRL','USDBRL','EURBRL',
+]);
+
+const SEM_DIVIDENDOS = new Set([
+  // Renda fixa (rendimento no índice)
+  'CDI','SELIC','IPCA','IMAB','IMAS','IMAB5','IMAB5P','IRFM','IMA',
+  // Índices de ações (total return já no índice)
+  'IBOV','IDIV','SMLL','IBXL','IBXX','IBRA','MLCX','IVBX','ITAG',
+  'IGC','IGCT','IGNM','IFNC','IEE','UTIL','INDX','IMAT','IMOB',
+  'ICON','ISEE','ICO2','BDRX','IFIX',
+  // Câmbio / exterior
+  'SPXBRL','USDBRL','EURBRL',
+  // ETFs de índice (distribuição já no NAV)
+  'BOVA11','SMAL11','IVVB11','SPXI11','FIND11',
+]);
+
 function runBacktest(config, allPrices, allDividends) {
   const months = generateMonthRange(config.startDate, config.endDate);
   const assets = config.assets;
@@ -1378,8 +1409,22 @@ function runBacktest(config, allPrices, allDividends) {
   const totalW = assets.reduce((s,a) => s + a.weight, 0);
   const normAssets = assets.map(a => ({...a, weight: a.weight / totalW}));
 
-  const holdings = {};
+  const holdings = {};     // cotas (ativos normais) ou saldo BRL (índices acumulados)
   normAssets.forEach(a => holdings[a.ticker] = 0);
+
+  // Retorno mensal de índices acumulados: close[t]/close[t-1]-1
+  // Pré-calculado para todo o período
+  const retornoMensal = {};
+  normAssets.forEach(a => {
+    if (!INDICES_ACUMULADOS.has(a.ticker)) return;
+    const pm = allPrices[a.ticker] || {};
+    const meses = Object.keys(pm).sort();
+    retornoMensal[a.ticker] = {};
+    for (let mi = 1; mi < meses.length; mi++) {
+      const prev = pm[meses[mi-1]], curr = pm[meses[mi]];
+      if (prev && curr && prev > 0) retornoMensal[a.ticker][meses[mi]] = (curr / prev) - 1;
+    }
+  });
   let totalInvested = 0, dividendsCash = 0, totalDividendsEver = 0;
   // Primeiro mês com pelo menos 1 dado real
   const primeiroMesComDado = months.find(m => normAssets.some(a => allPrices[a.ticker]?.[m])) || null;
@@ -1388,8 +1433,17 @@ function runBacktest(config, allPrices, allDividends) {
   const series = [];
   let prevVal = null;
 
-  const getPrice = (ticker, month) => allPrices[ticker]?.[month] ?? null;
+  // Para índices acumulados: "preço" = 1 (holdings já é saldo BRL)
+  const getPrice = (ticker, month) => {
+    if (INDICES_ACUMULADOS.has(ticker)) {
+      // Tem dado se há retorno calculado para esse mês OU se é o primeiro mês com dado
+      const pm = allPrices[ticker] || {};
+      return pm[month] != null ? 1 : null;
+    }
+    return allPrices[ticker]?.[month] ?? null;
+  };
   const portValue = (month) => normAssets.reduce((s,a) => {
+    if (INDICES_ACUMULADOS.has(a.ticker)) return s + holdings[a.ticker]; // saldo direto
     const p = getPrice(a.ticker, month);
     return p != null ? s + holdings[a.ticker] * p : s;
   }, 0);
@@ -1421,11 +1475,22 @@ function runBacktest(config, allPrices, allDividends) {
         if (w <= 0) return;
         const verba = aporte * w;
         const p = getPrice(a.ticker, month);
-        if (p && p > 0) { holdings[a.ticker] += verba / p; aporteEfetivo += verba; }
+        if (INDICES_ACUMULADOS.has(a.ticker)) {
+          holdings[a.ticker] += verba; aporteEfetivo += verba;
+        } else if (p && p > 0) {
+          holdings[a.ticker] += verba / p; aporteEfetivo += verba;
+        }
       });
       // Só conta como investido o que foi de fato alocado
       totalInvested += aporteEfetivo;
     }
+
+    // Aplicar retorno mensal dos índices acumulados
+    normAssets.forEach(a => {
+      if (!INDICES_ACUMULADOS.has(a.ticker)) return;
+      const ret = retornoMensal[a.ticker]?.[month];
+      if (ret != null && holdings[a.ticker] > 0) holdings[a.ticker] *= (1 + ret);
+    });
 
     // Snapshot das cotas antes de processar dividendos (corrige bug de dividendsByTicker)
     const qtySnapshot = {};
@@ -1435,8 +1500,8 @@ function runBacktest(config, allPrices, allDividends) {
     let totalDivMes = 0;
     const divByTicker = {};
     normAssets.forEach(a => {
-      const dpCota = allDividends[a.ticker]?.[month] ?? 0;
-      divByTicker[a.ticker] = dpCota * qtySnapshot[a.ticker];
+      const dpCota = SEM_DIVIDENDOS.has(a.ticker) ? 0 : (allDividends[a.ticker]?.[month] ?? 0);
+      divByTicker[a.ticker] = INDICES_ACUMULADOS.has(a.ticker) ? 0 : dpCota * qtySnapshot[a.ticker];
       totalDivMes += divByTicker[a.ticker];
       dividendsByTicker[a.ticker] += divByTicker[a.ticker];
     });
@@ -1449,7 +1514,8 @@ function runBacktest(config, allPrices, allDividends) {
         normAssets.forEach(a => {
           const verba = divByTicker[a.ticker];
           const p = getPrice(a.ticker, month);
-          if (p && p > 0 && verba > 0) holdings[a.ticker] += verba / p;
+          if (INDICES_ACUMULADOS.has(a.ticker)) { holdings[a.ticker] += verba; }
+          else if (p && p > 0 && verba > 0) { holdings[a.ticker] += verba / p; }
         });
       } else if (mode === 'reinvest_class') {
         normAssets.forEach(payer => {
@@ -1492,8 +1558,12 @@ function runBacktest(config, allPrices, allDividends) {
           if (rebalMode === 'active') {
             // ATIVO: vende os acima do peso, compra os abaixo
             normAssets.forEach(a => {
-              const p = getPrice(a.ticker, month);
-              if (p && p > 0) holdings[a.ticker] = (pv * effW[a.ticker]) / p;
+              if (INDICES_ACUMULADOS.has(a.ticker)) {
+                holdings[a.ticker] = pv * effW[a.ticker];
+              } else {
+                const p = getPrice(a.ticker, month);
+                if (p && p > 0) holdings[a.ticker] = (pv * effW[a.ticker]) / p;
+              }
             });
           } else {
             // PASSIVO: só direciona o aporte deste mês para os ativos abaixo do peso
