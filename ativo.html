@@ -64,6 +64,7 @@
 
 <div class="ativo-hero" id="ativo-hero">
   <div class="ativo-header">
+    <!-- Esquerda: logo + nome -->
     <div class="ativo-logo-wrap">
       <div id="ativo-logo-wrap"></div>
       <div class="ativo-info">
@@ -75,13 +76,16 @@
         <div style="font-size:12px;color:var(--text3)" id="ativo-setor"></div>
       </div>
     </div>
-    <div class="ativo-preco">
-      <div class="preco" id="ativo-preco">—</div>
-      <div style="font-size:14px;font-family:var(--font-mono);margin-top:4px" id="ativo-var">—</div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap">
-        <button class="watchlist-btn" id="watchlist-btn" onclick="toggleWatchlist()">☆ Favoritar</button>
-        <a id="comparar-btn" href="comparador.html" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);color:var(--text2);font-size:12px;font-weight:700;text-decoration:none;font-family:var(--font-body)">⇄ Comparar</a>
-        <a id="analise-btn" href="analise.html" style="padding:6px 14px;border-radius:8px;background:var(--gold-dim);border:1px solid var(--border2);color:var(--gold);font-size:12px;font-weight:700;text-decoration:none;font-family:var(--font-body)">✦ Análise IA</a>
+    <!-- Direita: preço + botões ícone -->
+    <div style="display:flex;align-items:center;gap:1.5rem">
+      <div style="text-align:right">
+        <div class="preco" id="ativo-preco">—</div>
+        <div style="font-size:14px;font-family:var(--font-mono);margin-top:2px" id="ativo-var">—</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <button class="watchlist-btn" id="watchlist-btn" onclick="toggleWatchlist()" title="Favoritar">☆</button>
+        <a id="comparar-btn" href="comparador.html" title="Comparar" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);color:var(--text2);font-size:16px;font-weight:700;text-decoration:none;font-family:var(--font-body)">⇄</a>
+        <a id="analise-btn" href="analise.html" title="Análise IA" style="padding:6px 10px;border-radius:8px;background:var(--gold-dim);border:1px solid var(--border2);color:var(--gold);font-size:16px;font-weight:700;text-decoration:none;font-family:var(--font-body)">✦</a>
       </div>
     </div>
   </div>
