@@ -7,11 +7,22 @@
 <title id="page-title">Ativo — Mais Valor</title>
 <link rel="stylesheet" href="style.css">
 <style>
-/* ── Ocultar ticker motion nesta página ── */
-.ticker-bar { display: none !important; }
+/* ── Ticker e indices-bar ocultos (controlado pelo nav.js via data-indices) ── */
 
-/* ── Hero compacto ── */
-.ativo-hero{padding:1rem 2rem 0;background:var(--bg2);border-bottom:1px solid var(--border)}
+/* ── Área de fundo do hero (full-width, apenas bg) ── */
+.ativo-hero-wrap {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding-top: 1.25rem;
+}
+
+/* ── Hero centralizado na mesma largura do container ── */
+.ativo-hero {
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
 .ativo-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:.85rem}
 .ativo-logo-wrap{display:flex;align-items:center;gap:12px}
 .ativo-logo-av{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#1A3A5C,#2563a8);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;font-family:var(--font-mono);flex-shrink:0;letter-spacing:-1px}
@@ -22,8 +33,8 @@
 .ativo-preco-inline{display:flex;align-items:baseline;gap:10px;margin-top:3px}
 .ativo-preco-inline .preco{font-family:var(--font-mono);font-size:22px;font-weight:700}
 
-/* ── Tabs ── */
-.ativo-tabs{display:flex;gap:0;margin:0 -2rem;overflow-x:auto;border-top:1px solid var(--border)}
+/* ── Tabs alinhadas ao container (não full-width) ── */
+.ativo-tabs{display:flex;gap:0;overflow-x:auto;border-top:1px solid var(--border);margin-top:.25rem}
 .ativo-tab{padding:9px 16px;font-size:12.5px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;flex-shrink:0}
 .ativo-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
 .ativo-tab:hover:not(.active){color:var(--text)}
@@ -62,50 +73,53 @@
 @media(max-width:768px){
   .ind-grid{grid-template-columns:repeat(2,1fr)}
   .ativo-header{gap:.5rem}
+  .ativo-hero{padding:0 1rem}
+  .ativo-hero-wrap{padding-top:.85rem}
 }
 @media(max-width:480px){
   .ind-grid{grid-template-columns:repeat(2,1fr)}
   .ativo-preco-inline .preco{font-size:18px}
-  .ativo-hero{padding:.75rem 1rem 0}
 }
 </style>
 </head>
 <body>
 <div id="nav-placeholder"></div>
 
-<div class="ativo-hero" id="ativo-hero">
-  <div class="ativo-header">
-    <!-- Esquerda: logo + nome -->
-    <div class="ativo-logo-wrap">
-      <div id="ativo-logo-wrap"></div>
-      <div class="ativo-info">
-        <div style="display:flex;align-items:center;gap:8px">
-          <h1 id="ativo-titulo">—</h1>
-          <div id="ativo-score-badge"></div>
-        </div>
-        <div style="font-size:13px;color:var(--text2);margin-top:1px" id="ativo-nome">Carregando...</div>
-        <div style="font-size:11px;color:var(--text3)" id="ativo-setor"></div>
-        <!-- Preço logo abaixo do nome -->
-        <div class="ativo-preco-inline" style="margin-top:6px">
-          <div class="preco" id="ativo-preco">—</div>
-          <div style="font-size:13px;font-family:var(--font-mono)" id="ativo-var">—</div>
+<div class="ativo-hero-wrap" id="ativo-hero">
+  <div class="ativo-hero">
+    <div class="ativo-header">
+      <!-- Esquerda: logo + nome -->
+      <div class="ativo-logo-wrap">
+        <div id="ativo-logo-wrap"></div>
+        <div class="ativo-info">
+          <div style="display:flex;align-items:center;gap:8px">
+            <h1 id="ativo-titulo">—</h1>
+            <div id="ativo-score-badge"></div>
+          </div>
+          <div style="font-size:13px;color:var(--text2);margin-top:1px" id="ativo-nome">Carregando...</div>
+          <div style="font-size:11px;color:var(--text3)" id="ativo-setor"></div>
+          <!-- Preço logo abaixo do nome -->
+          <div class="ativo-preco-inline" style="margin-top:6px">
+            <div class="preco" id="ativo-preco">—</div>
+            <div style="font-size:13px;font-family:var(--font-mono)" id="ativo-var">—</div>
+          </div>
         </div>
       </div>
+      <!-- Direita: ações -->
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+        <button class="watchlist-btn" id="watchlist-btn" onclick="toggleWatchlist()">☆ Favoritar</button>
+        <a id="comparar-btn" href="comparador.html" style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);color:var(--text2);font-size:12px;font-weight:700;text-decoration:none;font-family:var(--font-body)">⇄ Comparar</a>
+        <a id="analise-btn" href="analise.html" style="padding:5px 12px;border-radius:8px;background:var(--gold-dim);border:1px solid var(--border2);color:var(--gold);font-size:12px;font-weight:700;text-decoration:none;font-family:var(--font-body)">✦ Análise IA</a>
+      </div>
     </div>
-    <!-- Direita: ações -->
-    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
-      <button class="watchlist-btn" id="watchlist-btn" onclick="toggleWatchlist()">☆ Favoritar</button>
-      <a id="comparar-btn" href="comparador.html" style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);color:var(--text2);font-size:12px;font-weight:700;text-decoration:none;font-family:var(--font-body)">⇄ Comparar</a>
-      <a id="analise-btn" href="analise.html" style="padding:5px 12px;border-radius:8px;background:var(--gold-dim);border:1px solid var(--border2);color:var(--gold);font-size:12px;font-weight:700;text-decoration:none;font-family:var(--font-body)">✦ Análise IA</a>
+    <!-- Tabs alinhadas ao container -->
+    <div class="ativo-tabs">
+      <div class="ativo-tab active" onclick="switchTab('overview',this)">Visão Geral</div>
+      <div class="ativo-tab" onclick="switchTab('indicadores',this)">Indicadores</div>
+      <div class="ativo-tab" onclick="switchTab('historico',this)">Histórico</div>
+      <div class="ativo-tab" onclick="switchTab('dividendos',this)">Dividendos</div>
+      <div class="ativo-tab" onclick="switchTab('analise',this)">Análise</div>
     </div>
-  </div>
-  <!-- Tabs coladas na borda inferior do hero -->
-  <div class="ativo-tabs">
-    <div class="ativo-tab active" onclick="switchTab('overview',this)">Visão Geral</div>
-    <div class="ativo-tab" onclick="switchTab('indicadores',this)">Indicadores</div>
-    <div class="ativo-tab" onclick="switchTab('historico',this)">Histórico</div>
-    <div class="ativo-tab" onclick="switchTab('dividendos',this)">Dividendos</div>
-    <div class="ativo-tab" onclick="switchTab('analise',this)">Análise</div>
   </div>
 </div>
 
