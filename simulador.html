@@ -915,6 +915,7 @@ const SIM_COLORS = ['#1FC96E','#5b8def','#F5A623','#e05c5c','#9b72ef'];
 // STATE
 // ══════════════════════════════════════════════════════════════
 let state = { classesSel: [], classesConfig: {}, dividendMode: 'none' };
+let _queryBuffer = {}; // chave: "classId_idx" → string digitada em memória
 let simulations = [];
 let activeSimIdx = 0;
 let viewMode = 'single';
@@ -1727,18 +1728,27 @@ function isTickerValido(id, ticker) {
 }
 
 function onAtivoInput(id, idx, el) {
-  // O que a pessoa digita NÃO entra no campo — reverte para o ticker confirmado (ou vazio)
-  const cfg = state.classesConfig[id];
-  const query = el.value; // captura o que foi digitado antes de reverter
-  // Reverte o campo imediatamente para o valor do estado (ticker confirmado ou vazio)
-  el.value = cfg.ativos[idx].ticker || '';
-  // Guarda a query no dataset para uso em showSugestoes
-  el.dataset.query = query;
+  // Campo não muda — valor só entra via selecionarAtivo()
+  // Buffer em memória acumula digitação para filtrar sugestões
+  const key = id + '_' + idx;
+  const typed = el.value;
+  const prev = _queryBuffer[key] || '';
+  if (typed === '') {
+    _queryBuffer[key] = '';
+  } else if (typed.length < prev.length || typed.length === 0) {
+    _queryBuffer[key] = prev.slice(0, -1);
+  } else {
+    const newChar = typed.slice(typed.length - 1).toUpperCase();
+    _queryBuffer[key] = prev + newChar;
+  }
+  // Reverte o campo para o ticker confirmado (campo nunca mostra digitação)
+  el.value = state.classesConfig[id].ativos[idx].ticker || '';
   showSugestoes(id, idx, el);
 }
 
 function onAtivoFocus(id, idx, el) {
-  el.dataset.query = '';
+  const key = id + '_' + idx;
+  _queryBuffer[key] = '';
   showSugestoes(id, idx, el);
 }
 
@@ -1759,11 +1769,20 @@ function showSugestoes(id, idx, el) {
   const cls = CLASSES_DEF.find(c => c.id === id);
   const drop = document.getElementById(`sug_${id}_${idx}`);
   if (!drop) return;
-  // Usa a query capturada no dataset, não o value do campo
-  const q = (el.dataset.query || '').trim().toUpperCase();
+  // Usa o buffer de digitação em memória
+  const key = id + '_' + idx;
+  const q = (_queryBuffer[key] || '').trim().toUpperCase();
 
   const pool = cls.exampleTickers;
-  const lista = q ? pool.filter(t => t.toUpperCase().includes(q)) : pool;
+  // startsWith primeiro, depois includes — garante ordem lógica (PET → PETR4 antes de BHPET)
+  let lista;
+  if (!q) {
+    lista = pool;
+  } else {
+    const starts = pool.filter(t => t.toUpperCase().startsWith(q));
+    const contains = pool.filter(t => !t.toUpperCase().startsWith(q) && t.toUpperCase().includes(q));
+    lista = [...starts, ...contains];
+  }
 
   if (!lista.length) { drop.style.display = 'none'; return; }
 
@@ -1779,17 +1798,16 @@ function hideSugestoes(id, idx) {
   setTimeout(() => {
     const drop = document.getElementById(`sug_${id}_${idx}`);
     if (drop) drop.style.display = 'none';
-    // Limpa query e garante que o campo mostra o ticker confirmado
+    // Limpa buffer e garante que o campo mostra o ticker confirmado
+    const key = id + '_' + idx;
+    _queryBuffer[key] = '';
     const cfg = state.classesConfig[id];
     if (cfg && cfg.ativos[idx] !== undefined) {
       const rows = document.querySelectorAll(`#ativosRows_${id} .ativo-mini-row`);
       const row = rows[idx];
       if (row) {
         const inputEl = row.querySelector('input[type="text"].mini');
-        if (inputEl) {
-          inputEl.dataset.query = '';
-          inputEl.value = cfg.ativos[idx].ticker || '';
-        }
+        if (inputEl) inputEl.value = cfg.ativos[idx].ticker || '';
       }
     }
   }, 150);
