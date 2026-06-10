@@ -439,7 +439,7 @@ function renderNav() {
         `<a href="${s.href}" class="nav-dropdown-item${page === s.href ? ' active' : ''}">${s.label}</a>`
       ).join('');
       return `<div class="nav-dropdown-wrap${isActiveParent ? ' active' : ''}">
-        <button class="nav-dropdown-btn${isActiveParent ? ' active' : ''}" onclick="this.parentElement.classList.toggle('open')">${l.label} &#9662;</button>
+        <button class="nav-dropdown-btn${isActiveParent ? ' active' : ''}" onclick="event.stopPropagation();this.parentElement.classList.toggle('open')">${l.label} &#9662;</button>
         <div class="nav-dropdown">${items}</div>
       </div>`;
     }

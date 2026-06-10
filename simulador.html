@@ -700,15 +700,17 @@ const CLASSES_DEF = [
     exampleTickers: ['IVVB11','SPXI11','SPY:BRL','QQQ:BRL','AAPL:BRL','MSFT:BRL','AMZO34','MSFT34'],
   },
   {
-    id: 'cripto', icon: '₿', name: 'Cripto', sub: 'HASH11, QBTC', color: '#f7931a',
+    id: 'cripto', icon: '₿', name: 'Cripto', sub: 'BTC, ETH, SOL, HASH11', color: '#f7931a',
     indicadores: [
       { ticker: 'BTCBRL', desc: 'Bitcoin BRL' },
+      { ticker: 'ETHBRL', desc: 'Ethereum BRL' },
+      { ticker: 'SOLBRL', desc: 'Solana BRL' },
       { ticker: 'HASH11', desc: 'Cripto B3' },
       { ticker: 'IBOV',   desc: 'Ibovespa' },
       { ticker: 'CDI',    desc: 'CDI' },
     ],
-    defaultTickers: ['HASH11','QBTC11'],
-    exampleTickers: ['HASH11','QBTC11'],
+    defaultTickers: ['BTCBRL','ETHBRL'],
+    exampleTickers: ['BTCBRL','ETHBRL','SOLBRL','BNBBRL','XRPBRL','HASH11','QBTC11'],
   },
   {
     id: 'etf', icon: '📦', name: 'ETFs', sub: 'ETFs B3', color: '#e05c5c',
