@@ -439,7 +439,7 @@ function renderNav() {
         `<a href="${s.href}" class="nav-dropdown-item${page === s.href ? ' active' : ''}">${s.label}</a>`
       ).join('');
       return `<div class="nav-dropdown-wrap${isActiveParent ? ' active' : ''}">
-        <button class="nav-dropdown-btn${isActiveParent ? ' active' : ''}" onclick="event.stopPropagation();this.parentElement.classList.toggle('open')">${l.label} &#9662;</button>
+        <button class="nav-dropdown-btn${isActiveParent ? ' active' : ''}" onclick="event.stopPropagation();mvToggleDropdown(this)">${l.label} &#9662;</button>
         <div class="nav-dropdown">${items}</div>
       </div>`;
     }
@@ -456,7 +456,7 @@ function renderNav() {
       .nav-dropdown-wrap{position:relative;display:inline-flex;align-items:center}
       .nav-dropdown-btn{background:transparent;border:none;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;padding:4px 6px;border-radius:6px;transition:color .15s;white-space:nowrap;font-family:inherit}
       .nav-dropdown-btn:hover,.nav-dropdown-btn.active{color:var(--gold)}
-      .nav-dropdown{display:none;position:absolute;top:calc(100% + 8px);left:0;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:6px;min-width:160px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+      .nav-dropdown{display:none;position:fixed;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:6px;min-width:160px;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,.4)}
       .nav-dropdown-wrap.open .nav-dropdown{display:flex !important;flex-direction:column;gap:2px}
       .nav-dropdown-item{display:block;padding:8px 12px;border-radius:7px;font-size:13px;color:var(--text2);text-decoration:none;transition:background .12s,color .12s;white-space:nowrap}
       .nav-dropdown-item:hover,.nav-dropdown-item.active{background:var(--bg3);color:var(--gold)}
@@ -622,3 +622,23 @@ document.addEventListener('DOMContentLoaded', () => {
   renderFooter();
   navUpdateTotal();
 });
+
+// ── Dropdown com position:fixed (evita clipping do overflow-x:auto do nav-links) ──
+function mvToggleDropdown(btn) {
+  const wrap = btn.parentElement;
+  const isOpen = wrap.classList.contains('open');
+
+  // Fecha todos
+  document.querySelectorAll('.nav-dropdown-wrap.open').forEach(el => {
+    el.classList.remove('open');
+  });
+
+  if (!isOpen) {
+    wrap.classList.add('open');
+    // Posiciona o dropdown via getBoundingClientRect
+    const dropdown = wrap.querySelector('.nav-dropdown');
+    const rect = btn.getBoundingClientRect();
+    dropdown.style.top  = (rect.bottom + 6) + 'px';
+    dropdown.style.left = rect.left + 'px';
+  }
+}

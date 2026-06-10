@@ -364,6 +364,15 @@
 
   <!-- ═══════════ TAB: EMPRESA ═══════════ -->
   <div id="tab-empresa" class="tab-content" style="padding-top:1.5rem">
+
+    <!-- Info FII (só para FIIs) -->
+    <div id="fii-info-box" style="display:none;margin-bottom:1.5rem">
+      <div class="section-box" style="margin-bottom:0">
+        <h3>Informações do FII</h3>
+        <div id="fii-info-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:var(--radius);overflow:hidden;margin-top:.5rem"></div>
+      </div>
+    </div>
+
     <!-- Sobre -->
     <div class="section-box">
       <h3>Sobre a Empresa</h3>
@@ -606,12 +615,22 @@ function renderIndicadoresFull(d) {
     {label:'VPA',         val:d.vpa?'R$ '+d.vpa.toFixed(2):'—', desc:'Valor patrim./ação'},
     {label:'LPA',         val:d.lpa?'R$ '+d.lpa.toFixed(2):'—', desc:'Lucro/ação'},
     {label:'Liq. Corrente',val:d.liq_corrente?d.liq_corrente.toFixed(2):'—', desc:'Liquidez corrente'},
-    {label:'Dív/EBITDA',  val:d.div_ebitda?d.div_ebitda.toFixed(2):'—',     desc:'Dívida liq/EBITDA'},
-    {label:'Dív/Patrim.', val:d.div_patrim?d.div_patrim.toFixed(2):'—',     desc:'Dívida bruta/PL'},
-    {label:'CAGR Rec. 5a',val:fmtPct(d.cresc5a),  desc:'Crescimento receita 5a',  cls:d.cresc5a&&d.cresc5a>0?'up':'dn'},
-    {label:'CAGR Luc. 5a',val:fmtPct(d.cresc_luc5a),desc:'Crescimento lucro 5a',  cls:d.cresc_luc5a&&d.cresc_luc5a>0?'up':'dn'},
-    {label:'Free Float',  val:d.free_float?d.free_float.toFixed(1)+'%':'—', desc:'% ações em circulação'},
-    {label:'Tag Along',   val:d.tag_along?d.tag_along+'%':'—',               desc:'Proteção minoritários'},
+    {label:'Dív/EBITDA',  val:d.div_liq_ebitda!=null?d.div_liq_ebitda.toFixed(2):(d.div_ebitda?d.div_ebitda.toFixed(2):'—'), desc:'Dívida liq/EBITDA'},
+    {label:'Dív/EBIT',    val:d.div_liq_ebit!=null?d.div_liq_ebit.toFixed(2):'—',   desc:'Dívida liq/EBIT'},
+    {label:'Dív/Patrim.', val:d.div_liq_patrim!=null?d.div_liq_patrim.toFixed(2):(d.div_patrim?d.div_patrim.toFixed(2):'—'), desc:'Dívida líq/PL'},
+    {label:'Patrim/Ativos',val:d.patrim_ativos!=null?d.patrim_ativos.toFixed(2):'—', desc:'Solidez patrimonial'},
+    {label:'Passiv/Ativos',val:d.passiv_ativos!=null?d.passiv_ativos.toFixed(2):'—', desc:'Alavancagem'},
+    {label:'Giro Ativos', val:d.giro_ativos!=null?d.giro_ativos.toFixed(2):'—',      desc:'Eficiência uso de ativos'},
+    {label:'P/SR',        val:d.psr!=null?d.psr.toFixed(2):'—',                      desc:'Preço/Receita'},
+    {label:'P/EBITDA',    val:d.p_ebitda!=null?d.p_ebitda.toFixed(2):'—',            desc:'Preço/EBITDA'},
+    {label:'P/EBIT',      val:d.p_ebit!=null?d.p_ebit.toFixed(2):'—',               desc:'Preço/EBIT'},
+    {label:'CAGR Rec. 5a',val:fmtPct(d.cagr_rec_5a||d.cresc5a),  desc:'Crescimento receita 5a',  cls:(d.cagr_rec_5a||d.cresc5a)>0?'up':'dn'},
+    {label:'CAGR Luc. 5a',val:fmtPct(d.cagr_luc_5a||d.cresc_luc5a),desc:'Crescimento lucro 5a',  cls:(d.cagr_luc_5a||d.cresc_luc5a)>0?'up':'dn'},
+    {label:'Máx 52s',     val:d.max_52s?'R$ '+d.max_52s.toFixed(2):'—',             desc:'Máxima 52 semanas'},
+    {label:'Mín 52s',     val:d.min_52s?'R$ '+d.min_52s.toFixed(2):'—',             desc:'Mínima 52 semanas'},
+    {label:'Ret. YTD',    val:d.ytd_ret!=null?pctStr(d.ytd_ret):'—',                desc:'Retorno no ano',          cls:d.ytd_ret>0?'up':d.ytd_ret<0?'dn':''},
+    {label:'Free Float',  val:d.free_float?d.free_float.toFixed(1)+'%':'—',         desc:'% ações em circulação'},
+    {label:'Tag Along',   val:d.tag_along?d.tag_along+'%':'—',                       desc:'Proteção minoritários'},
   ];
   const el = document.getElementById('ind-grid-full');
   if (el) el.innerHTML = all.map(i => `
@@ -1088,9 +1107,13 @@ async function renderEmpresa() {
   // Dados cadastrais
   const dados = [
     {l:'Nome',          v:emp.nome||d.n},
-    {l:'CNPJ',          v:emp.cnpj||'—'},
+    {l:'Razão Social',  v:d.razao_social||emp.nome||d.n},
+    {l:'CNPJ',          v:d.cnpj||emp.cnpj||'—'},
+    {l:'Código CVM',    v:d.cvm_code||emp.cvm_code||'—'},
     {l:'Fundação',      v:emp.fundacao||'—'},
     {l:'Estreia na B3', v:emp.ipo||'—'},
+    {l:'Estado/Cidade', v:d.estado&&d.cidade?`${d.cidade} / ${d.estado}`:d.estado||d.cidade||emp.cidade||'—'},
+    {l:'Website',       v:d.website||emp.website?`<a href="${d.website||emp.website}" target="_blank" style="color:var(--gold)">${(d.website||emp.website).replace('https://','')}</a>`:'—'},
     {l:'Funcionários',  v:emp.funcionarios?(+emp.funcionarios).toLocaleString('pt-BR'):'—'},
     {l:'Segmento Listagem', v:emp.segmento_listagem||'—'},
   ];
@@ -1118,6 +1141,31 @@ async function renderEmpresa() {
       <div class="info-label">${r.l}</div>
       <div class="info-val">${r.v}</div>
     </div>`).join('');
+
+  // Painel FII
+  if (TIPO === 'fii') {
+    document.getElementById('fii-info-box').style.display = '';
+    const fiiFields = [
+      {l:'Razão Social',        v:d.razao_social||emp.nome||d.n},
+      {l:'CNPJ',                v:d.cnpj||emp.cnpj||'—'},
+      {l:'Mandato',             v:d.mandato||'—'},
+      {l:'Segmento',            v:d.segmento||'—'},
+      {l:'Tipo de Fundo',       v:d.tipo_fundo||'—'},
+      {l:'Tipo de Gestão',      v:d.tipo_gestao||'—'},
+      {l:'Taxa de Adm.',        v:d.taxa_adm!=null?d.taxa_adm+'%':'—'},
+      {l:'Vacância',            v:d.vacancia!=null?d.vacancia.toFixed(2)+'%':'—'},
+      {l:'Nº Cotistas',         v:d.num_cotistas?d.num_cotistas.toLocaleString('pt-BR'):'—'},
+      {l:'Cotas Emitidas',      v:d.cotas_emitidas?d.cotas_emitidas.toLocaleString('pt-BR'):'—'},
+      {l:'VP por Cota',         v:d.patrimonio_cota?'R$ '+d.patrimonio_cota.toFixed(2):'—'},
+      {l:'Patrimônio Total',    v:d.patrimonio_total?fmtBi(d.patrimonio_total):'—'},
+      {l:'Último Rendimento',   v:d.ultimo_rend?'R$ '+d.ultimo_rend.toFixed(4):(d.ult_rend?'R$ '+d.ult_rend.toFixed(4):'—')},
+    ];
+    document.getElementById('fii-info-grid').innerHTML = fiiFields.map(f => `
+      <div style="padding:12px 16px;background:var(--bg2)">
+        <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">${f.l}</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${f.v}</div>
+      </div>`).join('');
+  }
 
   // Acionistas
   if (emp.acionistas?.length) {
@@ -1224,11 +1272,90 @@ function renderAnalise() {
 // ─────────────────────────────────────────────
 // INIT
 // ─────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// CARREGA FUNDAMENTALISTAS DO JSON LOCAL
+// ─────────────────────────────────────────────
+async function loadFundamentalistas() {
+  try {
+    const r = await fetch(`data/fundamentalistas/${TICKER}.json?t=${Date.now()}`);
+    if (!r.ok) return null;
+    return await r.json();
+  } catch { return null; }
+}
+
+function mergeFundamentalistas(ativo, fund) {
+  if (!fund) return ativo;
+  // Mescla campos do BolsaI nos dados do ativo — sem sobrescrever se já existir
+  const map = {
+    pl:             fund.pl,
+    pvp:            fund.pvp,
+    dy:             fund.dy,
+    roe:            fund.roe,
+    roic:           fund.roic,
+    roa:            fund.roa,
+    mrg_liq:        fund.mrg_liq,
+    mrg_ebit:       fund.mrg_ebit,
+    mrg_ebitda:     fund.mrg_ebitda,
+    mrg_bruta:      fund.mrg_bruta,
+    ev_ebitda:      fund.ev_ebitda,
+    ev_ebit:        fund.ev_ebit,
+    p_ebitda:       fund.p_ebitda,
+    p_ebit:         fund.p_ebit,
+    psr:            fund.psr,
+    lpa:            fund.lpa,
+    vpa:            fund.vpa,
+    liq_corrente:   fund.liq_corrente,
+    div_liq_ebitda: fund.div_liq_ebitda,
+    div_liq_ebit:   fund.div_liq_ebit,
+    div_liq_patrim: fund.div_liq_patrim,
+    cagr_rec_5a:    fund.cagr_rec_5a,
+    cagr_luc_5a:    fund.cagr_luc_5a,
+    market_cap:     fund.market_cap,
+    giro_ativos:    fund.giro_ativos,
+    patrim_ativos:  fund.patrim_ativos,
+    passiv_ativos:  fund.passiv_ativos,
+    max_52s:        fund.max_52s,
+    min_52s:        fund.min_52s,
+    ytd_ret:        fund.ytd_ret,
+    // Empresa
+    razao_social:   fund.razao_social,
+    cnpj:           fund.cnpj,
+    cvm_code:       fund.cvm_code,
+    website:        fund.website,
+    estado:         fund.estado,
+    cidade:         fund.cidade,
+    // FII extras
+    vacancia:       fund.vacancia,
+    num_cotistas:   fund.num_cotistas,
+    cotas_emitidas: fund.cotas_emitidas,
+    patrimonio_cota:fund.patrimonio_cota,
+    patrimonio_total:fund.patrimonio_total,
+    ultimo_rend:    fund.ultimo_rend,
+    taxa_adm:       fund.taxa_adm,
+    segmento:       fund.segmento,
+    mandato:        fund.mandato,
+    tipo_gestao:    fund.tipo_gestao,
+    tipo_fundo:     fund.tipo_fundo,
+  };
+  // Aplica só onde o ativo não tem dado ou tem 0
+  for (const [k, v] of Object.entries(map)) {
+    if (v != null && (ativo[k] == null || ativo[k] === 0 || ativo[k] === '—')) {
+      ativo[k] = v;
+    }
+  }
+  return ativo;
+}
+
 async function init() {
   await loadData();
   const all = TIPO === 'fii' ? FIIS : ACOES;
   ativo = all.find(a => a.t === TICKER) || all[0];
   if (!ativo) { document.getElementById('ativo-nome').textContent = 'Ativo não encontrado'; return; }
+
+  // Carrega e mescla fundamentalistas do BolsaI
+  const fund = await loadFundamentalistas();
+  if (fund) ativo = mergeFundamentalistas(ativo, fund);
+
   renderHero(ativo);
   renderIndicadores(ativo);
   renderAbout(ativo);
@@ -1238,6 +1365,7 @@ async function init() {
   initWatchlist();
   await renderChart();
   renderHistTable();
+  renderHistIndicadores();
 }
 init();
 </script>

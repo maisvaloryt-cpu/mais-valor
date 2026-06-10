@@ -2,178 +2,120 @@
 """
 gerar_historico_cripto.py
 =========================
-Converte cripto_historico/{id}.json (preços em USD) para
-data/historico/{TICKER}BRL.json (preços em BRL) — formato
-compatível com o Simulador de Carteiras.
+Busca histórico das top 30 criptos em BRL direto do Yahoo Finance
+e salva em data/historico/{TICKER}BRL.json — formato compatível
+com o Simulador de Carteiras.
 
-Conversão USD→BRL:
-  Usa a série histórica do USDBRL salva em data/historico/USDBRL.json
-  (gerada pelo fetch_historico_indices.py).
-  Se o arquivo não existir, busca da AwesomeAPI como fallback.
+Vantagem: Yahoo Finance funciona no GitHub Actions sem API key,
+sem rate limit agressivo e sem bloqueio geográfico.
 """
 
-import json, logging
-from datetime import datetime, timezone, timedelta
-from pathlib import Path
+import json, time, datetime, os, sys, requests
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s  %(levelname)s  %(message)s", datefmt="%H:%M:%S")
-log = logging.getLogger(__name__)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from fetch_utils import merge_historico
 
-# Mapa: id CoinGecko → ticker do simulador (top 30 por market cap)
-COIN_MAP = {
-    "bitcoin":           "BTCBRL",
-    "ethereum":          "ETHBRL",
-    "tether":            "USDTBRL",
-    "binancecoin":       "BNBBRL",
-    "solana":            "SOLBRL",
-    "ripple":            "XRPBRL",
-    "usd-coin":          "USDCBRL",
-    "staked-ether":      "STETHBRL",
-    "dogecoin":          "DOGEBRL",
-    "tron":              "TRXBRL",
-    "cardano":           "ADABRL",
-    "wrapped-bitcoin":   "WBTCBRL",
-    "avalanche-2":       "AVAXBRL",
-    "shiba-inu":         "SHIBABRL",
-    "chainlink":         "LINKBRL",
-    "toncoin":           "TONBRL",
-    "polkadot":          "DOTBRL",
-    "bitcoin-cash":      "BCHBRL",
-    "near":              "NEARBRL",
-    "uniswap":           "UNIBRL",
-    "litecoin":          "LTCBRL",
-    "internet-computer": "ICPBRL",
-    "dai":               "DAIBRL",
-    "polygon":           "MATICBRL",
-    "aptos":             "APTBRL",
-    "pepe":              "PEPEBRL",
-    "ethereum-classic":  "ETCBRL",
-    "stellar":           "XLMBRL",
-    "filecoin":          "FILBRL",
-    "cosmos":            "ATOMBRL",
+YAHOO_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Accept": "application/json, text/plain, */*",
 }
 
-DATA_DIR = Path("data")
-HIST_DIR = DATA_DIR / "cripto_historico"
-OUT_DIR  = DATA_DIR / "historico"
-OUT_DIR.mkdir(parents=True, exist_ok=True)
+# Mapa: ticker do simulador → símbolo Yahoo Finance
+# Yahoo usa o formato "BTC-BRL", "ETH-BRL" etc.
+CRIPTO_MAP = {
+    "BTCBRL":   "BTC-BRL",
+    "ETHBRL":   "ETH-BRL",
+    "BNBBRL":   "BNB-BRL",
+    "SOLBRL":   "SOL-BRL",
+    "XRPBRL":   "XRP-BRL",
+    "ADABRL":   "ADA-BRL",
+    "DOGEBRL":  "DOGE-BRL",
+    "AVAXBRL":  "AVAX-BRL",
+    "LINKBRL":  "LINK-BRL",
+    "DOTBRL":   "DOT-BRL",
+    "LTCBRL":   "LTC-BRL",
+    "XLMBRL":   "XLM-BRL",
+    "ATOMBRL":  "ATOM-BRL",
+    "TONBRL":   "TON11419-BRL",
+    "NEARBRL":  "NEAR-BRL",
+    "UNIBRL":   "UNI7083-BRL",
+    "BCHBRL":   "BCH-BRL",
+    "MATICBRL": "MATIC-BRL",
+    "ETCBRL":   "ETC-BRL",
+    "TRXBRL":   "TRX-BRL",
+    "ICPBRL":   "ICP-BRL",
+    "APTBRL":   "APT21794-BRL",
+    "PEPEBRL":  "PEPE24478-BRL",
+    "SHIBABRL": "SHIB-BRL",
+    "FILBRL":   "FIL-BRL",
+    "USDTBRL":  "USDT-BRL",
+    "USDCBRL":  "USDC-BRL",
+    "WBTCBRL":  "WBTC-BRL",
+    "XLMBRL":   "XLM-BRL",
+    "BNBBRL":   "BNB-BRL",
+}
+
+OUT_DIR = "data/historico"
+os.makedirs(OUT_DIR, exist_ok=True)
 
 
-def load_usdbrl() -> dict:
-    """Carrega mapa {YYYY-MM-DD: taxa} do USDBRL local ou busca online."""
-    local = DATA_DIR / "historico" / "USDBRL.json"
-    if local.exists():
-        try:
-            j = json.loads(local.read_text())
-            m = {}
-            for entry in j.get("history", []):
-                if entry.get("date") and entry.get("close"):
-                    m[entry["date"][:10]] = entry["close"]
-            if m:
-                log.info(f"  USDBRL: {len(m)} pontos do arquivo local")
-                return m
-        except Exception as e:
-            log.warning(f"  Erro ao ler USDBRL local: {e}")
-
-    # Fallback: AwesomeAPI
-    log.info("  Buscando USDBRL da AwesomeAPI...")
+def fetch_yahoo_cripto(yahoo_symbol: str, anos: int = 10) -> list:
+    """Busca histórico mensal de uma cripto no Yahoo Finance."""
+    end   = int(datetime.datetime.now().timestamp())
+    start = end - (anos * 365 * 24 * 3600)
+    url   = (f"https://query1.finance.yahoo.com/v8/finance/chart/{yahoo_symbol}"
+             f"?period1={start}&period2={end}&interval=1mo")
     try:
-        import requests
-        r = requests.get("https://economia.awesomeapi.com.br/json/daily/USD-BRL/3650", timeout=30)
-        r.raise_for_status()
-        data = r.json()
-        m = {}
-        for d in data:
-            ts  = int(d.get("timestamp", 0))
-            bid = float(d.get("bid") or d.get("ask") or 0)
-            if not ts or not bid:
-                continue
-            dt  = datetime.fromtimestamp(ts, tz=timezone.utc)
-            key = dt.strftime("%Y-%m-%d")
-            m[key] = round(bid, 4)
-        log.info(f"  USDBRL: {len(m)} pontos da AwesomeAPI")
-        return m
+        r = requests.get(url, headers=YAHOO_HEADERS, timeout=20)
+        if r.status_code != 200:
+            return []
+        data   = r.json()
+        result = data.get("chart", {}).get("result", [])
+        if not result:
+            return []
+        r0     = result[0]
+        ts_list = r0.get("timestamp", [])
+        closes  = (r0.get("indicators", {})
+                     .get("adjclose", [{}])[0]
+                     .get("adjclose", []))
+        if not closes:
+            closes = (r0.get("indicators", {})
+                        .get("quote", [{}])[0]
+                        .get("close", []))
+        pts = []
+        for ts, c in zip(ts_list, closes):
+            if c:
+                d = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d")
+                pts.append({"date": d, "close": round(float(c), 2)})
+        return pts if len(pts) >= 3 else []
     except Exception as e:
-        log.warning(f"  Falha ao buscar USDBRL online: {e}")
-        return {}
-
-
-def closest_rate(usdbrl: dict, date_str: str) -> float:
-    """Retorna taxa mais próxima para uma data (busca +/-7 dias)."""
-    if date_str in usdbrl:
-        return usdbrl[date_str]
-    dt = datetime.strptime(date_str, "%Y-%m-%d")
-    for delta in range(1, 8):
-        for sign in (-1, 1):
-            candidate = (dt + timedelta(days=delta * sign)).strftime("%Y-%m-%d")
-            if candidate in usdbrl:
-                return usdbrl[candidate]
-    return 5.5  # fallback genérico
-
-
-def convert_coin(coin_id: str, ticker: str, usdbrl: dict) -> bool:
-    """Lê cripto_historico/{coin_id}.json e gera historico/{ticker}.json em BRL."""
-    src = HIST_DIR / f"{coin_id}.json"
-    if not src.exists():
-        log.warning(f"  {coin_id}: arquivo nao encontrado em {src} — pulando")
-        return False
-
-    try:
-        j = json.loads(src.read_text())
-    except Exception as e:
-        log.warning(f"  {coin_id}: erro ao ler JSON: {e}")
-        return False
-
-    history_usd = j.get("history", [])
-    if not history_usd:
-        log.warning(f"  {coin_id}: historico vazio")
-        return False
-
-    history_brl = []
-    for entry in history_usd:
-        date      = entry.get("date", "")
-        close_usd = entry.get("close")
-        if not date or close_usd is None:
-            continue
-        rate      = closest_rate(usdbrl, date[:10])
-        close_brl = round(close_usd * rate, 8)
-        row = {"date": date[:10], "close": close_brl}
-        if "volume" in entry:
-            row["volume"] = entry["volume"]
-        history_brl.append(row)
-
-    if not history_brl:
-        log.warning(f"  {coin_id}: nenhum ponto convertido")
-        return False
-
-    out = {
-        "ticker":     ticker,
-        "updated_at": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M UTC"),
-        "history":    history_brl,
-    }
-    dst = OUT_DIR / f"{ticker}.json"
-    dst.write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")))
-    log.info(f"  OK {ticker}: {len(history_brl)} dias -> {dst}  ({dst.stat().st_size // 1024}KB)")
-    return True
+        print(f"    Erro: {e}")
+        return []
 
 
 def main():
-    log.info(f"Iniciando conversao de {len(COIN_MAP)} criptos USD -> BRL para o Simulador...")
+    total = len(CRIPTO_MAP)
+    ok = fail = 0
+    print(f"Buscando historico de {total} criptos via Yahoo Finance...")
 
-    usdbrl = load_usdbrl()
-    if not usdbrl:
-        log.error("Nao foi possivel carregar taxa USDBRL — abortando")
-        return
+    for ticker, yahoo_sym in CRIPTO_MAP.items():
+        print(f"  {ticker} ({yahoo_sym})...", end=" ", flush=True)
+        pts = fetch_yahoo_cripto(yahoo_sym)
 
-    ok, fail = 0, 0
-    for coin_id, ticker in COIN_MAP.items():
-        log.info(f"  {coin_id} -> {ticker}")
-        if convert_coin(coin_id, ticker, usdbrl):
-            ok += 1
-        else:
+        if not pts:
+            print("sem dados")
             fail += 1
+            time.sleep(0.5)
+            continue
 
-    log.info(f"Concluido: {ok} gerados, {fail} nao encontrados (ainda nao baixados pelo atualizar_criptos.py)")
+        path      = f"{OUT_DIR}/{ticker}.json"
+        adicionados = merge_historico(path, ticker, pts)
+        print(f"+{adicionados} pts ({len(pts)} total)")
+        ok += 1
+        time.sleep(0.4)  # respeita rate limit do Yahoo
+
+    print(f"\nConcluido: {ok} ok, {fail} sem dados")
+    print(f"Arquivos em {OUT_DIR}/")
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       modo:
-        description: 'diario | g1-g5 | fii1-fii4 | dividendos | indices | relatorio | setup'
+        description: 'diario | g1-g5 | fii1-fii4 | dividendos | indices | relatorio | fundamentalistas | setup'
         required: false
         default: 'diario'
 
@@ -91,6 +91,20 @@ jobs:
       - name: Relatório
         if: ${{ steps.modo.outputs.modo == 'diario' }}
         run: python gerar_relatorio.py
+
+      # Fundamentalistas rotativos — roda todo dia junto com o diário
+      - name: Fundamentalistas rotativos (BolsaI)
+        if: ${{ steps.modo.outputs.modo == 'diario' }}
+        env:
+          BOLSAI_KEY: ${{ secrets.BOLSAI_KEY }}
+        run: python fetch_fundamentalistas.py
+
+      # MODO MANUAL fundamentalistas
+      - name: Fundamentalistas (modo manual)
+        if: ${{ steps.modo.outputs.modo == 'fundamentalistas' }}
+        env:
+          BOLSAI_KEY: ${{ secrets.BOLSAI_KEY }}
+        run: python fetch_fundamentalistas.py
 
       # ── HISTÓRICO ─────────────────────────────────────────────────────────────
       - name: Histórico Ações G1

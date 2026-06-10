@@ -40,7 +40,7 @@ BASE_URL   = "https://api.coingecko.com/api/v3"
 PER_PAGE   = 100    # máx por request na tier gratuita
 DELAY_PAGE = 6.0    # segundos entre páginas de mercado
 DELAY_HIST = 3.0    # segundos entre requests de histórico
-HIST_MAX   = "max"  # histórico completo na primeira vez
+HIST_MAX   = 365  # 1 ano — tier gratuita CoinGecko (max exige plano pago)
 
 logging.basicConfig(
     level=logging.INFO,

@@ -56,22 +56,6 @@
 
     <!-- Seleção de ticker -->
     <div class="card fade-in-1" style="margin-bottom:1.5rem">
-      <!-- Config API key (colapsável) -->
-      <details id="api-config" style="margin-bottom:1rem;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 14px">
-        <summary style="cursor:pointer;font-size:12px;font-weight:700;color:var(--text3);user-select:none">⚙️ Configuração da API (clique para expandir)</summary>
-        <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
-          <div style="font-size:11px;color:var(--text3)">Cole sua chave da <strong style="color:var(--text)">Groq</strong> (gratuita em <a href="https://console.groq.com" target="_blank" style="color:var(--gold)">console.groq.com</a>) ou <strong style="color:var(--text)">Anthropic</strong>:</div>
-          <div style="display:flex;gap:8px">
-            <input id="api-key-input" type="password" class="filter-input" placeholder="gsk_... ou sk-ant-..." style="flex:1;font-size:12px;font-family:monospace"
-              oninput="saveApiKey(this.value)">
-            <select id="api-provider" class="filter-input" style="font-size:12px;width:130px" onchange="saveProvider(this.value)">
-              <option value="groq">Groq (grátis)</option>
-              <option value="anthropic">Anthropic</option>
-            </select>
-          </div>
-          <div id="api-status" style="font-size:11px;color:var(--text3)">Chave não configurada</div>
-        </div>
-      </details>
       <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Selecione o ativo e o tipo de análise</div>
       <div style="display:flex;gap:8px;margin-bottom:1.25rem">
         <input class="filter-input" id="a-ticker" placeholder="Digite o ticker (ex: PETR4, MXRF11)" style="flex:1;font-size:14px" list="ticker-list">
@@ -139,22 +123,6 @@
 let selectedType = 'fundamental';
 let currentTicker = null;
 
-function saveApiKey(v){ localStorage.setItem('mv_api_key', v); updateApiStatus(); }
-function saveProvider(v){ localStorage.setItem('mv_api_provider', v); updateApiStatus(); }
-function updateApiStatus(){
-  const k = localStorage.getItem('mv_api_key')||'';
-  const p = localStorage.getItem('mv_api_provider')||'groq';
-  const el = document.getElementById('api-status');
-  if(!el) return;
-  if(k.length > 10){
-    el.innerHTML = `<span style="color:var(--up)">✓ Chave ${p} configurada (${k.slice(0,8)}...)</span>`;
-    document.getElementById('api-config').removeAttribute('open');
-  } else {
-    el.innerHTML = `<span style="color:var(--dn)">✗ Chave não configurada — análise não funcionará</span>`;
-    document.getElementById('api-config').setAttribute('open','');
-  }
-}
-
 function setType(type, el){
   selectedType = type;
   document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
@@ -181,107 +149,93 @@ Dados disponíveis do ativo:
 - ROIC: ${ativo.roic?.toFixed(1)||'—'}%
 - Margem líquida: ${ativo.mrg_liq?.toFixed(1)||'—'}%
 - Crescimento 5 anos: ${ativo.cresc5a?.toFixed(1)||'—'}%
+- Volume: ${ativo.vol||'—'}
 - Setor/Segmento: ${ativo.setor||'—'}
-- ${isFii?`P/VP: ${ativo.pvp?.toFixed(2)||'—'}`:''}`:
-    '(dados não disponíveis localmente — use seu conhecimento público sobre a empresa)';
+- ${isFii?`P/VP: ${ativo.pvp?.toFixed(2)||'—'}`:''}`:'(dados não disponíveis localmente — use seu conhecimento público sobre a empresa)';
 
   const prompts = {
-    fundamental:`Você é um analista fundamentalista brasileiro especializado em ações da B3.
-Faça uma análise fundamentalista completa do ativo ${ticker}.
+    fundamental: `Você é um analista fundamentalista brasileiro especializado em ações da B3.
+Faça uma análise fundamentalista completa do ativo ${ticker} com base nos dados abaixo.
 ${dados}
 
+Estruture sua análise em:
 ## ${ticker} — Análise Fundamentalista
+
 ### Avaliação pelos Critérios de Graham
+(avalie P/L, P/VP, DY, solidez financeira)
+
 ### Critérios de Bazin
+(DY mínimo 6%, empresa pagadora consistente)
+
 ### Pontos Positivos
 ### Pontos de Atenção
 ### Conclusão e Nota (0-10)
 ### Disclaimer
 Use markdown simples. Seja objetivo e profissional.`,
 
-    tearsheet:`Você é um analista de equity research brasileiro.
-Crie um tear sheet completo para ${ticker}.
+    tearsheet: `Você é um analista de equity research brasileiro.
+Crie um tear sheet completo e profissional para ${ticker}.
 ${dados}
 
 ## ${ticker} — Tear Sheet
+
 ### Sobre a Empresa
+(descrição do negócio, posição de mercado, diferenciais)
+
 ### Destaques Financeiros
+(principais métricas e o que elas indicam)
+
 ### Riscos Principais
 ### Catalisadores
 ### Posição Competitiva
-### Disclaimer`,
+### Disclaimer
+Seja profissional e conciso.`,
 
-    earnings:`Você é um analista especializado em earnings da B3.
+    earnings: `Você é um analista especializado em earnings da B3.
 Crie um flash de earnings para ${ticker}.
 ${dados}
 
 ## ${ticker} — Earnings Flash
+
 ### Contexto do Setor
 ### Análise dos Indicadores Disponíveis
-### O que Monitorar
-### KPIs
+### O que Monitorar nos Próximos Resultados
+### Métricas-chave (KPIs)
+### Guidance e Perspectivas
 ### Conclusão
 ### Disclaimer`,
 
-    bullbear:`Você é um gestor de fundos especializado em ações brasileiras.
+    bullbear: `Você é um gestor de fundos especializado em ações brasileiras.
 Apresente a tese bull e bear para ${ticker}.
 ${dados}
 
 ## ${ticker} — Tese Bull vs Bear
+
 ### 🐂 BULL CASE (3 razões para comprar)
 ### 🐻 BEAR CASE (3 riscos principais)
 ### ⚖️ Balanço da Tese
-### Nível de Convicção
+### Nível de Convicção (Alto/Médio/Baixo)
 ### Disclaimer`,
 
-    dcf:`Você é um analista de valuation especializado no mercado brasileiro.
+    dcf: `Você é um analista de valuation especializado no mercado brasileiro.
 Faça uma estimativa de valor justo para ${ticker} usando DCF simplificado e múltiplos.
 ${dados}
 
 ## ${ticker} — Valuation
+
 ### Premissas DCF
+(taxa de crescimento, WACC, valor terminal)
+
 ### Cálculo do Preço Justo
+(apresente o range estimado)
+
 ### Comparação com Múltiplos do Setor
 ### Margem de Segurança
 ### Conclusão
 ### ⚠️ Disclaimer importante`
   };
-  return prompts[selectedType]||prompts.fundamental;
-}
 
-async function callGroq(prompt, key){
-  const r = await fetch('https://api.groq.com/openai/v1/chat/completions',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
-    body: JSON.stringify({
-      model:'llama-3.3-70b-versatile',
-      max_tokens:1500,
-      temperature:0.7,
-      messages:[
-        {role:'system',content:'Você é um analista financeiro especializado no mercado brasileiro (B3). Responda sempre em português brasileiro, de forma profissional e objetiva. Use markdown para formatar sua resposta.'},
-        {role:'user',content:prompt}
-      ]
-    })
-  });
-  if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error(e.error?.message||`Groq HTTP ${r.status}`); }
-  const d=await r.json();
-  return d.choices?.[0]?.message?.content||'Sem resposta.';
-}
-
-async function callAnthropic(prompt, key){
-  const r = await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body: JSON.stringify({
-      model:'claude-sonnet-4-20250514',
-      max_tokens:1500,
-      system:'Você é um analista financeiro especializado no mercado brasileiro (B3). Responda sempre em português brasileiro, de forma profissional e objetiva. Use markdown para formatar sua resposta.',
-      messages:[{role:'user',content:prompt}]
-    })
-  });
-  if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error(e.error?.message||`Anthropic HTTP ${r.status}`); }
-  const d=await r.json();
-  return d.content?.[0]?.text||'Sem resposta.';
+  return prompts[selectedType] || prompts.fundamental;
 }
 
 async function generateAnalysis(){
@@ -289,19 +243,10 @@ async function generateAnalysis(){
   if(!tickerRaw){ alert('Digite um ticker válido'); return; }
   currentTicker = tickerRaw;
 
-  const apiKey = localStorage.getItem('mv_api_key')||'';
-  const apiProvider = localStorage.getItem('mv_api_provider')||'groq';
-
-  if(!apiKey || apiKey.length < 10){
-    document.getElementById('api-config').setAttribute('open','');
-    document.getElementById('api-key-input').focus();
-    alert('⚙️ Configure sua chave de API primeiro (seção acima).');
-    return;
-  }
-
   const all = typeof ACOES!=='undefined' ? [...ACOES,...(FIIS||[])] : [];
   const ativo = all.find(a=>a.t===tickerRaw);
 
+  // Mostra painel de resultado
   const card = document.getElementById('result-card');
   card.style.display='';
   const out = document.getElementById('analysis-out');
@@ -319,13 +264,20 @@ async function generateAnalysis(){
 
   try {
     const prompt = buildPrompt(tickerRaw, ativo);
-    let text;
-    if(apiProvider === 'anthropic'){
-      text = await callAnthropic(prompt, apiKey);
-    } else {
-      text = await callGroq(prompt, apiKey);
+
+    const response = await fetch('/api/analise', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+
+    if (!response.ok) {
+      const errBody = await response.json().catch(() => ({}));
+      throw new Error(errBody.error || `HTTP ${response.status}`);
     }
-    out.innerHTML = renderMarkdown(text);
+
+    const data = await response.json();
+    const text = data.text || 'Sem resposta.';
 
     // Renderiza com formatação básica de markdown
     out.innerHTML = renderMarkdown(text);
@@ -359,13 +311,6 @@ function copyAnalysis(){
 }
 
 async function init(){
-  // Restaura chave salva
-  const k = localStorage.getItem('mv_api_key')||'';
-  const p = localStorage.getItem('mv_api_provider')||'groq';
-  if(document.getElementById('api-key-input')) document.getElementById('api-key-input').value = k;
-  if(document.getElementById('api-provider')) document.getElementById('api-provider').value = p;
-  updateApiStatus();
-
   await loadData();
   const all=[...(ACOES||[]),...(FIIS||[])];
   document.getElementById('ticker-list').innerHTML=all.map(a=>`<option value="${a.t}">${a.t} — ${a.n}</option>`).join('');
