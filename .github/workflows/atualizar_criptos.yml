@@ -16,15 +16,15 @@ jobs:
     timeout-minutes: 50
 
     steps:
-      - name: Checkout do repositório
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Configurar Python
+      - name: Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      - name: Instalar dependências
+      - name: Dependências
         run: pip install requests
 
       - name: Decidir modo
@@ -33,57 +33,57 @@ jobs:
           INPUT="${{ github.event.inputs.modo }}"
           echo "modo=${INPUT:-tudo}" >> $GITHUB_OUTPUT
 
-      - name: Atualizar mercado (sem histórico)
+      # ── Mercado (preços atuais para página criptos.html) ─────────────────────
+      - name: Mercado CoinGecko (sem histórico)
         if: ${{ steps.modo.outputs.modo == 'mercado' }}
         run: python atualizar_criptos.py --top 250 --data-dir data --details-top 50 --skip-history
 
-      - name: Atualizar histórico incremental
+      # ── Histórico CoinGecko (cripto_historico/ para página cripto-detalhe) ───
+      - name: Histórico CoinGecko incremental
         if: ${{ steps.modo.outputs.modo == 'historico' }}
         run: python atualizar_criptos.py --top 100 --data-dir data --details-top 0
 
-      - name: Atualizar tudo
+      # ── Tudo (schedule automático) ────────────────────────────────────────────
+      - name: Atualizar mercado + histórico CoinGecko
         if: ${{ steps.modo.outputs.modo == 'tudo' }}
         run: python atualizar_criptos.py --top 100 --data-dir data --details-top 20
 
-      # Sempre converte top 30 para BRL no formato do Simulador
-      - name: Gerar históricos BRL para o Simulador (top 30)
+      # ── SEMPRE: gera historico/TICKER.json em BRL para o Simulador ───────────
+      # Usa Binance API (gratuita, sem chave, sem bloqueio) + fallback Yahoo
+      - name: Gerar históricos BRL para o Simulador (top 30 — Binance)
         run: python gerar_historico_cripto.py
 
-      - name: Commitar JSONs atualizados
+      - name: Commit
         run: |
           git config --local user.email "action@github.com"
-          git config --local user.name  "GitHub Actions"
+          git config --local user.name "GitHub Actions"
           git add data/cripto_market.json data/cripto_historico/ \
                   data/historico/BTCBRL.json \
                   data/historico/ETHBRL.json \
-                  data/historico/USDTBRL.json \
                   data/historico/BNBBRL.json \
                   data/historico/SOLBRL.json \
                   data/historico/XRPBRL.json \
-                  data/historico/USDCBRL.json \
-                  data/historico/STETHBRL.json \
-                  data/historico/DOGEBRL.json \
-                  data/historico/TRXBRL.json \
                   data/historico/ADABRL.json \
-                  data/historico/WBTCBRL.json \
+                  data/historico/DOGEBRL.json \
                   data/historico/AVAXBRL.json \
-                  data/historico/SHIBABRL.json \
                   data/historico/LINKBRL.json \
-                  data/historico/TONBRL.json \
                   data/historico/DOTBRL.json \
-                  data/historico/BCHBRL.json \
+                  data/historico/LTCBRL.json \
+                  data/historico/XLMBRL.json \
+                  data/historico/ATOMBRL.json \
+                  data/historico/TONBRL.json \
                   data/historico/NEARBRL.json \
                   data/historico/UNIBRL.json \
-                  data/historico/LTCBRL.json \
-                  data/historico/ICPBRL.json \
-                  data/historico/DAIBRL.json \
+                  data/historico/BCHBRL.json \
                   data/historico/MATICBRL.json \
+                  data/historico/ETCBRL.json \
+                  data/historico/TRXBRL.json \
+                  data/historico/ICPBRL.json \
                   data/historico/APTBRL.json \
                   data/historico/PEPEBRL.json \
-                  data/historico/ETCBRL.json \
-                  data/historico/XLMBRL.json \
+                  data/historico/SHIBABRL.json \
                   data/historico/FILBRL.json \
-                  data/historico/ATOMBRL.json \
+                  data/historico/USDTBRL.json \
                   2>/dev/null || true
-          git diff --staged --quiet || git commit -m "🤖 Criptos: atualização automática $(date -u '+%d/%m/%Y %H:%M UTC')"
+          git diff --staged --quiet || git commit -m "🤖 Criptos: $(date -u '+%d/%m/%Y %H:%M UTC')"
           git push
