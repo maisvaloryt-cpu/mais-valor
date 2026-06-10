@@ -688,7 +688,25 @@ const CLASSES_DEF = [
       { ticker: 'BDRX',  desc: 'BDRs' },
     ],
     defaultTickers: ['PETR4','VALE3','ITUB4','BBDC4','WEGE3'],
-    exampleTickers: ['PETR4','VALE3','ITUB4','BBDC4','WEGE3','BBAS3','RENT3','EGIE3','RADL3','ABEV3'],
+    exampleTickers: [
+      'ABEV3','AGRO3','ALSO3','ALUP11','AMAR3','AMBP3','AMER3','ARZZ3','ASAI3','AURE3',
+      'AZUL4','B3SA3','BBAS3','BBDC3','BBDC4','BBSE3','BEEF3','BIDI11','BPAC11','BPAN4',
+      'BRAP3','BRAP4','BRFS3','BRKM3','BRKM5','BRML3','BRPR3','BRSR6','BTOW3','CAML3',
+      'CCRO3','CIEL3','CLSA3','CMIG3','CMIG4','COGN3','CPFE3','CPLE3','CPLE6','CRFB3',
+      'CSAN3','CSMG3','CSNA3','CURY3','CVCB3','CXSE3','CYRELA3','DASA3','DIRR3','DXCO3',
+      'ECOR3','EGIE3','ELET3','ELET6','EMBR3','ENEV3','ENGI11','EQTL3','EZTC3','FESA4',
+      'FLRY3','FRAS3','GBIO33','GGBR3','GGBR4','GOAU3','GOAU4','GOLL4','HAPV3','HBSA3',
+      'HYPE3','IGTA3','INTB3','IRBR3','ITSA3','ITSA4','ITUB3','ITUB4','JBSS3','JHSF3',
+      'KLBN11','KLBN3','KLBN4','LAME3','LAME4','LAVV3','LEVE3','LIGT3','LINX3','LJQQ3',
+      'LOGG3','LOGN3','LREN3','LWSA3','MDIA3','MEEI3','MGLU3','MILS3','MRFG3','MRVE3',
+      'MULT3','MYPK3','NATURA3','NEOE3','NFLX34','NTCO3','ODPV3','OIBR3','OIBR4','OMGE3',
+      'PCAR3','PETR3','PETR4','PETZ3','PGMN3','POMO3','POMO4','POSI3','PRIO3','PTBL3',
+      'QUAL3','RADL3','RAIZ4','RAIL3','RDOR3','RECV3','RENT3','ROMI3','ROXO34','SANB11',
+      'SANB3','SANB4','SBSP3','SEER3','SEQL3','SIMH3','SLCE3','SMTO3','SQIA3','STBP3',
+      'SUZB3','TAEE11','TAEE3','TAEE4','TASA3','TASA4','TEND3','TIMS3','TOTS3','TPIS3',
+      'TRPL3','TRPL4','UGPA3','UNIP3','UNIP6','USIM3','USIM5','VALE3','VBBR3','VIVT3',
+      'VLID3','VVAR3','WEGE3','WIZS3','YDUQ3','ZAMP3',
+    ],
   },
   {
     id: 'fii', icon: '🏢', name: 'FIIs', sub: 'Fundos Imob.', color: '#1FC96E',
@@ -699,7 +717,16 @@ const CLASSES_DEF = [
       { ticker: 'KNRI11',desc: 'KNRI11' },
     ],
     defaultTickers: ['MXRF11','HGLG11','KNRI11','XPML11','VISC11'],
-    exampleTickers: ['MXRF11','HGLG11','KNRI11','XPML11','VISC11','BCFF11','RBRF11','BTLG11','HGRU11','IRDM11'],
+    exampleTickers: [
+      'MXRF11','HGLG11','KNRI11','XPML11','VISC11','BCFF11','RBRF11','BTLG11','HGRU11','IRDM11',
+      'BRCO11','BRCR11','BTCI11','CPTS11','CVBI11','DEVA11','FAED11','FIIB11','GGRC11','GTLG11',
+      'HABT11','HCRI11','HFOF11','HGBS11','HGPO11','HGRE11','HTMX11','HSML11','IMGR11','JRDM11',
+      'KNCR11','KNHY11','KNIP11','LVBI11','MALL11','MBRF11','MGFF11','MCCI11','MCRE11','MONO11',
+      'PATC11','PVBI11','RBHY11','RBRD11','RBRL11','RCFA11','RECR11','RECT11','RMAI11','RPRI11',
+      'RZAK11','RZTR11','SDIL11','SPTW11','TGAR11','URPR11','VGIP11','VGIR11','VILG11','VINO11',
+      'VIUR11','VRTA11','VSHO11','VTLT11','VXXV11','WPLZ11','XPCA11','XPIN11','XPLG11','XPPR11',
+      'XPTA11','XPCT11',
+    ],
   },
   {
     id: 'rf', icon: '💵', name: 'Renda Fixa', sub: 'CDI, Tesouro', color: '#F5A623',
@@ -1534,13 +1561,25 @@ function showSugestoes(id, idx, el) {
   const drop = document.getElementById(`sug_${id}_${idx}`);
   if (!drop) return;
   const q = el.value.toUpperCase().trim();
-  const lista = q
-    ? cls.exampleTickers.filter(t => t.toUpperCase().includes(q))
-    : cls.exampleTickers;
+
+  // Usa lista dinâmica do servidor se disponível; caso contrário, exampleTickers da classe
+  let pool = cls.exampleTickers;
+  if (window._allServerTickers && window._allServerTickers.length > 0) {
+    // Prioriza tickers da classe, depois os demais
+    const clsSet = new Set(cls.exampleTickers);
+    const clsMatches = cls.exampleTickers.filter(t => !q || t.includes(q));
+    const otherMatches = window._allServerTickers.filter(t => !clsSet.has(t) && (!q || t.includes(q)));
+    pool = [...clsMatches, ...otherMatches];
+  }
+
+  const lista = q ? pool.filter(t => t.toUpperCase().includes(q)) : pool;
   if (!lista.length) { drop.style.display = 'none'; return; }
-  drop.innerHTML = lista.map(t => `
+
+  const MAX = 50;
+  const shown = lista.slice(0, MAX);
+  drop.innerHTML = shown.map(t => `
     <div class="sug-item" onmousedown="selecionarAtivo('${id}',${idx},'${t}')">${t}</div>
-  `).join('');
+  `).join('') + (lista.length > MAX ? `<div class="sug-item" style="color:var(--sim-text3);cursor:default;font-style:italic">+${lista.length - MAX} resultados — continue digitando</div>` : '');
   drop.style.display = 'block';
 }
 
@@ -2054,7 +2093,123 @@ function renderCompareBarChart() {
   if (endEl)   { endEl.max   = maxMonth; endEl.removeAttribute('min');   }
 })();
 
-renderSidebar();
+// ══════════════════════════════════════════════════════════════
+// DESCOBERTA DINÂMICA DE TICKERS
+// Tenta carregar tickers reais disponíveis no servidor.
+// Fontes tentadas em ordem:
+//   1. data/tickers.json  (manifesto gerado pelo pipeline)
+//   2. GitHub API (repo público)
+//   3. Fallback para as listas hardcoded
+// ══════════════════════════════════════════════════════════════
+
+// Classificadores automáticos para mapear tickers descobertos → classe
+function inferClassId(ticker) {
+  const t = ticker.toUpperCase();
+  // Índices/indicadores de renda fixa
+  if (['CDI','SELIC','IPCA','IMAB','IMAS','IMAB5','IMAB5P','IRFM','IMA'].includes(t)) return 'rf';
+  // Câmbio
+  if (['USDBRL','EURBRL'].includes(t)) return 'ext';
+  // Cripto BRL
+  if (t.endsWith('BRL') && !t.startsWith('I') && t.length >= 6) return 'cripto';
+  // Índices de ações (sem número no fim, sem sufixo 11)
+  const indicesAcao = ['IBOV','IDIV','SMLL','IBXL','IBXX','IBRA','MLCX','IVBX','ITAG','IGC','IGCT','IGNM','IFNC','IEE','UTIL','INDX','IMAT','IMOB','ICON','ISEE','ICO2','BDRX'];
+  if (indicesAcao.includes(t)) return 'acao';
+  const indicesFii = ['IFIX'];
+  if (indicesFii.includes(t)) return 'fii';
+  // Índices exterior
+  if (['SPXBRL','IVVB11','SPXI11'].includes(t)) return 'ext';
+  // BDRs comuns (terminam em 34, 32, 33, 35)
+  if (/\d{2}$/.test(t) && parseInt(t.slice(-2)) >= 30 && parseInt(t.slice(-2)) <= 39) return 'ext';
+  // FIIs terminam em 11
+  if (t.endsWith('11')) {
+    const etfs11 = ['BOVA11','SMAL11','DIVO11','FIND11','IVVB11','SPXI11','HASH11','QBTC11','GOLD11','OGLD11','SLVR11','AGRI11','COAL11'];
+    if (etfs11.includes(t)) {
+      if (['HASH11','QBTC11'].includes(t)) return 'cripto';
+      if (['GOLD11','OGLD11','SLVR11','AGRI11','COAL11'].includes(t)) return 'commodity';
+      if (['IVVB11','SPXI11'].includes(t)) return 'ext';
+      if (['BOVA11','SMAL11','DIVO11','FIND11'].includes(t)) return 'etf';
+    }
+    return 'fii';
+  }
+  // ETFs B3 conhecidos sem sufixo 11
+  const etfsKnown = ['BOVA11','SMAL11','DIVO11','IVVB11','SPXI11','FIND11'];
+  if (etfsKnown.includes(t)) return 'etf';
+  // Commodities conhecidas
+  const comms = ['OURO','GOLD11','OGLD11','SLVR11','AGRI11','COAL11','PETROWTI','PETROBRENT','ALUMINIO','COBRE','PRATA','SOJA','MILHO','CAFE','ACUCAR','TRIGO','BOIGORDO','ACO','ALGODAO','MINERIOFERRO'];
+  if (comms.includes(t)) return 'commodity';
+  // Ações — terminam em 3,4,5,6 com 5-6 chars
+  if (/^[A-Z]{4}\d{1,2}$/.test(t) && !t.endsWith('11')) return 'acao';
+  return 'acao'; // default
+}
+
+async function loadDynamicTickers() {
+  // 1. Tenta manifesto local
+  try {
+    const r = await fetch(`data/tickers.json?t=${Date.now()}`);
+    if (r.ok) {
+      const j = await r.json();
+      if (Array.isArray(j) && j.length > 0) return j.map(t => t.toUpperCase());
+      if (j.tickers && Array.isArray(j.tickers)) return j.tickers.map(t => t.toUpperCase());
+    }
+  } catch {}
+
+  // 2. Tenta GitHub API (funciona para repos públicos)
+  try {
+    // Detecta o base URL do site para montar a URL do repo
+    const origin = window.location.origin;
+    const pathname = window.location.pathname;
+    // Tenta deduzir repo a partir do pathname (GitHub Pages: /repo-name/)
+    const repoMatch = pathname.match(/^\/([^/]+)/);
+    const repoName = repoMatch ? repoMatch[1] : 'mais-valor';
+    // Tenta descobrir o owner a partir do hostname (user.github.io)
+    const hostParts = window.location.hostname.split('.');
+    const owner = hostParts[0] !== 'localhost' && hostParts[0] !== '127' ? hostParts[0] : 'maisvaloryt-cpu';
+
+    const apiUrl = `https://api.github.com/repos/${owner}/${repoName}/contents/data/historico`;
+    const res = await fetch(apiUrl, { headers: { 'Accept': 'application/vnd.github.v3+json' } });
+    if (res.ok) {
+      const files = await res.json();
+      if (Array.isArray(files)) {
+        return files
+          .filter(f => f.name.endsWith('.json'))
+          .map(f => f.name.replace('.json', '').toUpperCase());
+      }
+    }
+  } catch {}
+
+  return null; // fallback para listas hardcoded
+}
+
+async function initDynamicTickers() {
+  const tickers = await loadDynamicTickers();
+  if (!tickers || tickers.length === 0) return;
+
+  // Distribui os tickers descobertos nas classes corretas
+  // Zera os exampleTickers de todas as classes que têm ativos (não indicadores puros)
+  const classMap = {};
+  CLASSES_DEF.forEach(cls => { classMap[cls.id] = new Set(cls.exampleTickers); });
+
+  tickers.forEach(ticker => {
+    const clsId = inferClassId(ticker);
+    if (classMap[clsId]) classMap[clsId].add(ticker);
+    else classMap['acao'].add(ticker);
+  });
+
+  // Aplica de volta, ordenado
+  CLASSES_DEF.forEach(cls => {
+    if (classMap[cls.id]) {
+      cls.exampleTickers = Array.from(classMap[cls.id]).sort();
+    }
+  });
+
+  // Armazena lista completa para busca cross-classe
+  window._allServerTickers = tickers;
+}
+
+// Inicializa tickers dinâmicos e só então renderiza a sidebar
+initDynamicTickers().then(() => {
+  renderSidebar();
+});
 </script>
 </body>
 </html>
