@@ -114,10 +114,9 @@
 .sim-icon-btn {
   width: 34px; height: 34px; border-radius: 7px;
   border: 1px solid var(--sim-border2); background: transparent;
-  color: var(--sim-text2); font-size: 15px;
-  cursor: pointer; transition: all .15s;
-  display: flex; align-items: center; justify-content: center;
-  position: relative;
+  color: var(--sim-text2); font-size: 15px; cursor: pointer;
+  transition: all .15s; display: flex; align-items: center;
+  justify-content: center; position: relative;
 }
 .sim-icon-btn:hover { border-color: var(--sim-accent); color: var(--sim-accent); background: var(--sim-accent-d); }
 .sim-icon-btn.danger:hover { border-color: var(--sim-danger); color: var(--sim-danger); background: rgba(232,80,58,.08); }
@@ -127,7 +126,7 @@
   border: 1px solid var(--sim-border2); color: var(--sim-text);
   font-size: 10px; white-space: nowrap; padding: 3px 8px;
   border-radius: 5px; pointer-events: none; opacity: 0;
-  transition: opacity .15s; font-family: var(--sim-font);
+  transition: opacity .15s; font-family: var(--sim-font); z-index: 10;
 }
 .sim-icon-btn:hover .tip { opacity: 1; }
 .err-inline { font-size: 10px; color: var(--sim-danger); margin-bottom: 6px; display: none; }
@@ -508,29 +507,42 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
 .ticker-bar, .indices-bar { display: none !important; }
 
 /* ── PIZZA DE CLASSES ── */
-.classes-pizza-wrap {
-  display: none; flex-direction: column; gap: 10px;
+.classes-resumo {
+  display: none; align-items: center; justify-content: space-between;
+  background: var(--sim-surf2); border: 1px solid var(--sim-border);
+  border-radius: 6px; padding: 6px 10px; margin-bottom: 8px;
+  font-size: 11px; color: var(--sim-text2);
 }
-.classes-pizza-wrap.show { display: flex; }
-.pizza-canvas-wrap { position: relative; width: 140px; height: 140px; margin: 0 auto; }
-.pizza-legend { display: flex; flex-direction: column; gap: 5px; }
-.pizza-legend-item { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--sim-text2); }
-.pizza-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.classes-resumo.show { display: flex; }
+.classes-resumo-label { font-weight: 600; color: var(--sim-text); }
+.classes-resumo-edit {
+  background: transparent; border: none; color: var(--sim-accent);
+  font-size: 10px; cursor: pointer; font-family: var(--sim-font);
+  padding: 0; text-decoration: underline;
+}
+.pizza-section {
+  display: none; flex-direction: column; gap: 8px;
+  background: var(--sim-surf2); border: 1px solid var(--sim-border);
+  border-radius: var(--sim-r); padding: 12px; margin-bottom: 8px;
+}
+.pizza-section.show { display: flex; }
+.pizza-section-title {
+  font-size: 9px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--sim-text3); margin-bottom: 4px;
+}
+.pizza-canvas-wrap { position: relative; width: 120px; height: 120px; margin: 0 auto; }
+.pizza-legend { display: flex; flex-direction: column; gap: 4px; }
+.pizza-legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--sim-text2); }
+.pizza-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .pizza-legend-pct { margin-left: auto; font-family: var(--sim-mono); font-size: 10px; color: var(--sim-accent); }
-.btn-aplicar {
-  width: 100%; padding: 8px; margin-top: 6px;
+.btn-aplicar-classes {
+  width: 100%; padding: 7px; margin-top: 4px;
   background: var(--sim-accent); color: #000; font-weight: 700;
   font-size: 11px; font-family: var(--sim-font);
-  border: none; border-radius: 6px; cursor: pointer; transition: all .15s;
+  border: none; border-radius: 6px; cursor: pointer; transition: all .15s; display: none;
 }
-.btn-aplicar:hover { filter: brightness(1.1); }
-.btn-editar-pizza {
-  width: 100%; padding: 7px; background: transparent;
-  border: 1px solid var(--sim-border2); border-radius: 6px;
-  color: var(--sim-text2); font-size: 11px; font-family: var(--sim-font);
-  cursor: pointer; transition: all .15s;
-}
-.btn-editar-pizza:hover { border-color: var(--sim-accent); color: var(--sim-accent); }
+.btn-aplicar-classes:hover { filter: brightness(1.1); }
+.btn-aplicar-classes.show { display: block; }
 </style>
 <div id="nav-placeholder"></div>
 
@@ -588,15 +600,22 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
           <div class="alloc-bar-mini" id="allocBarMini"></div>
           <div class="alloc-total-mini" id="allocTotalMini"></div>
           <div id="slidersWrap"></div>
-          <button class="btn-aplicar" id="btnAplicarClasses" onclick="aplicarClasses()" style="display:none">✓ Aplicar</button>
+          <button class="btn-aplicar-classes" id="btnAplicarClasses" onclick="aplicarClassesPizza()">✓ Aplicar</button>
         </div>
-        <!-- Pizza: aparece ao aplicar, esconde cards acima -->
-        <div class="classes-pizza-wrap" id="classesPizzaWrap">
-          <div class="pizza-canvas-wrap"><canvas id="pizzaChart"></canvas></div>
-          <div class="pizza-legend" id="pizzaLegend"></div>
-          <div id="slidersWrapPizza"></div>
-          <button class="btn-editar-pizza" onclick="editarClasses()">✏️ Editar classes</button>
-        </div>
+      </div>
+
+      <!-- Resumo classes (linha minimizada pós-aplicar) -->
+      <div class="classes-resumo" id="classesResumo">
+        <span class="classes-resumo-label" id="classesResumoLabel">Classes</span>
+        <button class="classes-resumo-edit" onclick="editarClassesPizza()">✏️ Editar</button>
+      </div>
+
+      <!-- Gráfico pizza (segmento abaixo, pós-aplicar) -->
+      <div class="pizza-section" id="pizzaSection">
+        <div class="pizza-section-title">Distribuição de classes</div>
+        <div class="pizza-canvas-wrap"><canvas id="pizzaChart"></canvas></div>
+        <div class="pizza-legend" id="pizzaLegend"></div>
+        <div id="slidersWrapPizza"></div>
       </div>
 
       <!-- 4. Composição -->
@@ -970,8 +989,8 @@ const SIM_COLORS = ['#1FC96E','#5b8def','#F5A623','#e05c5c','#9b72ef'];
 // ══════════════════════════════════════════════════════════════
 let state = { classesSel: [], classesConfig: {}, dividendMode: 'none' };
 let _queryBuffer = {};
-let _pizzaMode = false;
 let _pizzaChart = null;
+let _pizzaMode = false;
 let simulations = [];
 let activeSimIdx = 0;
 let viewMode = 'single';
@@ -1537,21 +1556,33 @@ function buildAssetList() {
 // ══════════════════════════════════════════════════════════════
 // SIDEBAR RENDER
 // ══════════════════════════════════════════════════════════════
-function aplicarClasses() {
+function aplicarClassesPizza() {
   _pizzaMode = true;
+  // Minimiza a seção de classes
   document.getElementById('classesMiniGrid').style.display = 'none';
   document.getElementById('allocBarWrap').style.display = 'none';
-  document.getElementById('classesPizzaWrap').classList.add('show');
+  // Mostra resumo em linha
+  const label = state.classesSel.map(s => {
+    const cls = CLASSES_DEF.find(c => c.id === s.id);
+    return cls.icon + ' ' + cls.name + ' ' + s.pct + '%';
+  }).join('  ·  ');
+  document.getElementById('classesResumoLabel').textContent = label;
+  document.getElementById('classesResumo').classList.add('show');
+  // Mostra pizza
+  document.getElementById('pizzaSection').classList.add('show');
   renderPizzaClasses();
   renderSlidersPizza();
 }
 
-function editarClasses() {
+function editarClassesPizza() {
   _pizzaMode = false;
   document.getElementById('classesMiniGrid').style.display = '';
   document.getElementById('allocBarWrap').style.display = state.classesSel.length > 0 ? 'block' : 'none';
-  document.getElementById('classesPizzaWrap').classList.remove('show');
+  document.getElementById('classesResumo').classList.remove('show');
+  document.getElementById('pizzaSection').classList.remove('show');
   if (_pizzaChart) { _pizzaChart.destroy(); _pizzaChart = null; }
+  const btnAp = document.getElementById('btnAplicarClasses');
+  if (btnAp) btnAp.classList.toggle('show', state.classesSel.length > 0);
 }
 
 function renderPizzaClasses() {
@@ -1564,7 +1595,7 @@ function renderPizzaClasses() {
     type: 'doughnut',
     data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: '#0E0E11', borderWidth: 2 }] },
     options: { responsive: true, maintainAspectRatio: false, cutout: '60%',
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.label + ': ' + ctx.raw + '%' } } } }
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' '+ctx.label+': '+ctx.raw+'%' } } } }
   });
   document.getElementById('pizzaLegend').innerHTML = state.classesSel.map(s => {
     const cls = CLASSES_DEF.find(c=>c.id===s.id);
@@ -1577,14 +1608,25 @@ function renderSlidersPizza() {
   state.classesSel.forEach(sel => {
     const cls = CLASSES_DEF.find(c => c.id === sel.id);
     const div = document.createElement('div'); div.className = 'slider-row';
-    div.innerHTML = '<span class="slider-icon">'+cls.icon+'</span>'
-      +'<span class="slider-name" title="'+cls.name+'">'+cls.name+'</span>'
-      +'<input type="range" class="pct-slider" min="0" max="100" step="1" value="'+sel.pct+'" id="slp_'+sel.id+'" oninput="onSliderPizza(''+sel.id+'',+this.value)">'
-      +'<div class="slider-pct-ctrl">'
-      +'<button class="slider-pct-arrow" onmousedown="event.preventDefault()" onclick="onSliderPizza(''+sel.id+'',(state.classesSel.find(c=>c.id===''+sel.id+'')?.pct||0)-1)">‹</button>'
-      +'<input type="text" class="inp-pct" value="'+sel.pct+'%" id="slvp_'+sel.id+'" onfocus="this.value=this.value.replace('%','');this.select()" onblur="onSliderPizza(''+sel.id+'',+this.value.replace('%',''));this.value=(state.classesSel.find(c=>c.id===''+sel.id+'')?.pct||0)+'%'" onkeydown="if(event.key==='Enter'){this.blur()}">'
-      +'<button class="slider-pct-arrow" onmousedown="event.preventDefault()" onclick="onSliderPizza(''+sel.id+'',(state.classesSel.find(c=>c.id===''+sel.id+'')?.pct||0)+1)">›</button>'
-      +'</div>';
+    const icon = document.createElement('span'); icon.className = 'slider-icon'; icon.textContent = cls.icon;
+    const name = document.createElement('span'); name.className = 'slider-name'; name.title = cls.name; name.textContent = cls.name;
+    const range = document.createElement('input'); range.type = 'range'; range.className = 'pct-slider';
+    range.min = 0; range.max = 100; range.step = 1; range.value = sel.pct; range.id = 'slp_' + sel.id;
+    range.oninput = function() { onSliderPizza(sel.id, +this.value); };
+    const ctrl = document.createElement('div'); ctrl.className = 'slider-pct-ctrl';
+    const btnL = document.createElement('button'); btnL.className = 'slider-pct-arrow'; btnL.textContent = '‹';
+    btnL.onmousedown = function(e) { e.preventDefault(); };
+    btnL.onclick = function() { onSliderPizza(sel.id, (state.classesSel.find(c=>c.id===sel.id)?.pct||0)-1); };
+    const inp = document.createElement('input'); inp.type = 'text'; inp.className = 'inp-pct';
+    inp.value = sel.pct + '%'; inp.id = 'slvp_' + sel.id;
+    inp.onfocus = function() { this.value = this.value.replace('%',''); this.select(); };
+    inp.onblur = function() { onSliderPizza(sel.id, parseFloat(this.value)||0); var s=state.classesSel.find(c=>c.id===sel.id); this.value=(s?s.pct:0)+'%'; };
+    inp.onkeydown = function(e) { if(e.key==='Enter') this.blur(); };
+    const btnR = document.createElement('button'); btnR.className = 'slider-pct-arrow'; btnR.textContent = '›';
+    btnR.onmousedown = function(e) { e.preventDefault(); };
+    btnR.onclick = function() { onSliderPizza(sel.id, (state.classesSel.find(c=>c.id===sel.id)?.pct||0)+1); };
+    ctrl.appendChild(btnL); ctrl.appendChild(inp); ctrl.appendChild(btnR);
+    div.appendChild(icon); div.appendChild(name); div.appendChild(range); div.appendChild(ctrl);
     wrap.appendChild(div);
   });
 }
@@ -1595,8 +1637,11 @@ function onSliderPizza(id, requested) {
   const capped = Math.min(Math.max(0, Math.round(requested)), Math.max(0, 100 - othersTotal));
   const sel = state.classesSel.find(c => c.id === id); if (sel) sel.pct = capped;
   const slEl = document.getElementById('slp_'+id); if (slEl) slEl.value = capped;
-  const inpEl = document.getElementById('slvp_'+id); if (inpEl && document.activeElement !== inpEl) inpEl.value = capped + '%';
+  const inpEl = document.getElementById('slvp_'+id); if (inpEl && document.activeElement !== inpEl) inpEl.value = capped+'%';
   renderPizzaClasses();
+  // Atualiza label do resumo
+  const label = state.classesSel.map(s => { const cls=CLASSES_DEF.find(c=>c.id===s.id); return cls.icon+' '+cls.name+' '+s.pct+'%'; }).join('  ·  ');
+  const el = document.getElementById('classesResumoLabel'); if (el) el.textContent = label;
 }
 
 function renderSidebar() {
@@ -1625,7 +1670,7 @@ function toggleClasse(id) {
   else state.classesSel.push({ id, pct: 0 });
   const n = state.classesSel.length;
   if (n > 0) { const base = Math.floor(100/n), rem = 100 - base*n; state.classesSel.forEach((c,i) => { c.pct = base + (i===0?rem:0); }); }
-  if (_pizzaMode) editarClasses(); else renderSidebar();
+  if (_pizzaMode) editarClassesPizza(); else renderSidebar();
 }
 
 function renderAllocBar() {
@@ -1641,8 +1686,7 @@ function renderAllocBar() {
   el.textContent = `${total}% de 100%`;
   el.className = 'alloc-total-mini ' + (total === 100 ? 'ok' : total > 100 ? 'over' : 'under');
   const btnAp = document.getElementById('btnAplicarClasses');
-  if (btnAp) btnAp.style.display = state.classesSel.length > 0 ? 'block' : 'none';
-  if (_pizzaMode) renderPizzaClasses();
+  if (btnAp) btnAp.classList.toggle('show', state.classesSel.length > 0 && !_pizzaMode);
 }
 
 function renderSliders() {
@@ -1847,7 +1891,7 @@ function isTickerValido(id, ticker) {
   return cls && cls.exampleTickers.includes(ticker.toUpperCase());
 }
 
-// ── REGRA: campo nunca mostra digitação — valor só entra via selecionarAtivo()
+// REGRA: campo nunca mostra digitação — valor só entra via selecionarAtivo()
 function onAtivoKeydown(id, idx, event) {
   const key = id + '_' + idx;
   const buf = _queryBuffer[key] || '';
@@ -1867,10 +1911,9 @@ function onAtivoKeydown(id, idx, event) {
   event.preventDefault();
   const tentativa = buf + k.toUpperCase();
   const cls = CLASSES_DEF.find(c => c.id === id);
-  const pool = cls.exampleTickers;
-  const haMatch = pool.some(t => t.toUpperCase().startsWith(tentativa) || t.toUpperCase().includes(tentativa));
+  const haMatch = cls.exampleTickers.some(t => t.toUpperCase().startsWith(tentativa) || t.toUpperCase().includes(tentativa));
   if (!haMatch) {
-    showPopup('❌ Nenhum ativo com "' + tentativa + '"');
+    showPopup('Nenhum ativo com "' + tentativa + '"');
     const drop = document.getElementById('sug_' + id + '_' + idx);
     if (drop) { drop.style.outline = '1px solid var(--sim-danger)'; setTimeout(() => { drop.style.outline = ''; }, 600); }
     return;
@@ -1905,9 +1948,8 @@ function showSugestoes(id, idx, el) {
 
   const pool = cls.exampleTickers;
   let lista;
-  if (!q) {
-    lista = pool;
-  } else {
+  if (!q) { lista = pool; }
+  else {
     const starts   = pool.filter(t => t.toUpperCase().startsWith(q));
     const contains = pool.filter(t => !t.toUpperCase().startsWith(q) && t.toUpperCase().includes(q));
     lista = [...starts, ...contains];
@@ -1927,15 +1969,17 @@ function hideSugestoes(id, idx) {
   setTimeout(() => {
     const drop = document.getElementById(`sug_${id}_${idx}`);
     if (drop) drop.style.display = 'none';
-    // Limpa buffer e garante que o campo mostra o ticker confirmado
     _queryBuffer[id + '_' + idx] = '';
+    // Garante que o campo mostra o ticker confirmado
     const cfg = state.classesConfig[id];
     if (cfg && cfg.ativos[idx] !== undefined) {
       const rows = document.querySelectorAll(`#ativosRows_${id} .ativo-mini-row`);
       const row = rows[idx];
       if (row) {
         const inputEl = row.querySelector('input[type="text"].mini');
-        if (inputEl) inputEl.value = cfg.ativos[idx].ticker || '';
+        if (inputEl) {
+          inputEl.value = cfg.ativos[idx].ticker || '';
+        }
       }
     }
   }, 150);
@@ -2220,7 +2264,7 @@ function duplicarSim() {
 function novaSim() {
   editingSimIdx = null;
   state.classesSel = []; state.classesConfig = {}; state.dividendMode = 'none';
-  if (_pizzaMode) { _pizzaMode = false; document.getElementById('classesMiniGrid').style.display=''; document.getElementById('allocBarWrap').style.display='none'; document.getElementById('classesPizzaWrap').classList.remove('show'); }
+  if (_pizzaMode) editarClassesPizza();
   document.getElementById('startDate').value = '2019-01';
   document.getElementById('endDate').value   = '2024-12';
   document.getElementById('initialAmount').value = '10000';
