@@ -284,6 +284,8 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
   font-family: var(--sim-font); transition: all .15s; margin-bottom: 4px;
 }
 .btn-add-mini:hover { border-color: var(--sim-accent); color: var(--sim-accent); }
+.btn-add-mini:disabled { opacity: .35; cursor: not-allowed; border-color: var(--sim-border2); color: var(--sim-text3); }
+.btn-add-mini:disabled:hover { border-color: var(--sim-border2); color: var(--sim-text3); }
 .interno-mini { font-family: var(--sim-mono); font-size: 9px; margin-top: 2px; }
 .interno-mini.ok  { color: var(--sim-accent); }
 .interno-mini.over { color: var(--sim-danger); }
@@ -1599,7 +1601,7 @@ function renderComposicao() {
           <div style="font-size:9px;color:var(--sim-text3);margin-bottom:4px;line-height:1.6;">
             Ex: ${cls.exampleTickers.slice(0,4).join(', ')}
           </div>
-          <button class="btn-add-mini" onclick="addAtivo('${sel.id}')">+ Ativo</button>
+          <button class="btn-add-mini" id="btnAdd_${sel.id}" onclick="addAtivo('${sel.id}')">+ Ativo</button>
           <div class="interno-mini" id="internoMini_${sel.id}"></div>
         </div>
       </div>
@@ -1695,11 +1697,13 @@ function renderAtivosRows(id) {
   cont.innerHTML = cfg.ativos.map((a,i) => `
     <div class="ativo-mini-row" style="position:relative">
       <div style="position:relative">
-        <input type="text" class="mini" placeholder="Buscar..." value="${a.ticker}"
+        <input type="text" class="mini" placeholder="Buscar..."
+          value="${a.ticker ? a.ticker : ''}"
+          data-query=""
           oninput="onAtivoInput('${id}',${i},this)"
-          onfocus="showSugestoes('${id}',${i},this)"
+          onfocus="onAtivoFocus('${id}',${i},this)"
           onblur="hideSugestoes('${id}',${i})"
-          autocomplete="off">
+          autocomplete="off" spellcheck="false">
         <div class="sugestoes-drop" id="sug_${id}_${i}" style="display:none"></div>
       </div>
       <div class="pct-ctrl">
@@ -1716,18 +1720,48 @@ function renderAtivosRows(id) {
   renderInternoMini(id);
 }
 
+function isTickerValido(id, ticker) {
+  if (!ticker) return false;
+  const cls = CLASSES_DEF.find(c => c.id === id);
+  return cls && cls.exampleTickers.includes(ticker.toUpperCase());
+}
+
 function onAtivoInput(id, idx, el) {
-  updateAtivo(id, idx, 'ticker', el.value.toUpperCase());
+  // O que a pessoa digita NÃO entra no campo — reverte para o ticker confirmado (ou vazio)
+  const cfg = state.classesConfig[id];
+  const query = el.value; // captura o que foi digitado antes de reverter
+  // Reverte o campo imediatamente para o valor do estado (ticker confirmado ou vazio)
+  el.value = cfg.ativos[idx].ticker || '';
+  // Guarda a query no dataset para uso em showSugestoes
+  el.dataset.query = query;
   showSugestoes(id, idx, el);
+}
+
+function onAtivoFocus(id, idx, el) {
+  el.dataset.query = '';
+  showSugestoes(id, idx, el);
+}
+
+function highlightMatch(ticker, query) {
+  if (!query) return ticker;
+  const q = query.toUpperCase();
+  const t = ticker.toUpperCase();
+  const start = t.indexOf(q);
+  if (start === -1) return ticker;
+  return (
+    ticker.slice(0, start) +
+    `<span style="color:#4ade80;font-weight:700">${ticker.slice(start, start + query.length)}</span>` +
+    ticker.slice(start + query.length)
+  );
 }
 
 function showSugestoes(id, idx, el) {
   const cls = CLASSES_DEF.find(c => c.id === id);
   const drop = document.getElementById(`sug_${id}_${idx}`);
   if (!drop) return;
-  const q = el.value.toUpperCase().trim();
+  // Usa a query capturada no dataset, não o value do campo
+  const q = (el.dataset.query || '').trim().toUpperCase();
 
-  // Somente tickers da própria classe — nunca mistura classes
   const pool = cls.exampleTickers;
   const lista = q ? pool.filter(t => t.toUpperCase().includes(q)) : pool;
 
@@ -1736,7 +1770,7 @@ function showSugestoes(id, idx, el) {
   const MAX = 50;
   const shown = lista.slice(0, MAX);
   drop.innerHTML = shown.map(t => `
-    <div class="sug-item" onmousedown="selecionarAtivo('${id}',${idx},'${t}')">${t}</div>
+    <div class="sug-item" onmousedown="selecionarAtivo('${id}',${idx},'${t}')">${highlightMatch(t, q)}</div>
   `).join('') + (lista.length > MAX ? `<div class="sug-item" style="color:var(--sim-text3);cursor:default;font-style:italic">+${lista.length - MAX} — continue digitando</div>` : '');
   drop.style.display = 'block';
 }
@@ -1745,14 +1779,17 @@ function hideSugestoes(id, idx) {
   setTimeout(() => {
     const drop = document.getElementById(`sug_${id}_${idx}`);
     if (drop) drop.style.display = 'none';
-    // Reverte o campo para o último ticker confirmado via clique no card
+    // Limpa query e garante que o campo mostra o ticker confirmado
     const cfg = state.classesConfig[id];
     if (cfg && cfg.ativos[idx] !== undefined) {
       const rows = document.querySelectorAll(`#ativosRows_${id} .ativo-mini-row`);
       const row = rows[idx];
       if (row) {
-        const inputEl = row.querySelector('input[type="text"]');
-        if (inputEl) inputEl.value = cfg.ativos[idx].ticker;
+        const inputEl = row.querySelector('input[type="text"].mini');
+        if (inputEl) {
+          inputEl.dataset.query = '';
+          inputEl.value = cfg.ativos[idx].ticker || '';
+        }
       }
     }
   }, 150);
@@ -1777,14 +1814,43 @@ function setPct(id, idx, val) {
 }
 function updateAtivo(id,idx,field,val) { state.classesConfig[id].ativos[idx][field]=val; renderInternoMini(id); }
 function addAtivo(id) {
-  state.classesConfig[id].ativos.push({ticker:'',pct:0});
+  const cfg = state.classesConfig[id];
+  // Verifica se há campo ainda sem ativo selecionado
+  const temVazio = cfg.ativos.some(a => a.ticker.trim() === '');
+  if (temVazio) {
+    const idx = cfg.ativos.findIndex(a => a.ticker.trim() === '');
+    const num = idx + 1;
+    showPopup(`Selecione um ativo válido no campo ${num} antes de adicionar outro.`);
+    return;
+  }
+  cfg.ativos.push({ticker:'',pct:0});
   renderAtivosRows(id);
 }
 function removeAtivo(id,idx) {
   state.classesConfig[id].ativos.splice(idx,1);
   redistribuirValidos(id);
   renderAtivosRows(id);
+  // Avisa se a soma interna ficou diferente de 100%
+  const soma = somaInterna(id);
+  if (Math.abs(soma - 100) > 0.5) {
+    showPopup('Ativo removido. Ajuste as porcentagens para totalizar 100% antes de continuar.');
+  }
 }
+function todosTickersValidos(id) {
+  const cfg = state.classesConfig[id];
+  const cls = CLASSES_DEF.find(c => c.id === id);
+  const temAlgumAtivo = cfg.ativos.some(a => a.ticker.trim() !== '');
+  if (!temAlgumAtivo) return false;
+  // Todo ativo com % > 0 ou com ticker preenchido deve ser válido
+  return cfg.ativos.every(a =>
+    a.ticker.trim() === '' || cls.exampleTickers.includes(a.ticker.toUpperCase())
+  ) && temAlgumAtivo;
+}
+
+function atualizarBotaoAdd(id) {
+  // Botão + sempre ativo — popup avisa se necessário ao clicar
+}
+
 function renderInternoMini(id) {
   const cfg = state.classesConfig[id];
   const total = cfg.ativos.reduce((s,a) => s+(parseFloat(a.pct)||0), 0);
@@ -1795,6 +1861,8 @@ function renderInternoMini(id) {
   // Atualiza estado de erro visual no accordion header
   const accHead = document.querySelector(`#acc_${id} .class-acc-head`);
   if (accHead) accHead.style.setProperty('--acc-err', ok ? 'transparent' : 'var(--dn, #E8503A)');
+  // Atualiza estado do botão +
+  atualizarBotaoAdd(id);
 }
 
 function checkInternoErro(id) {
@@ -1811,6 +1879,40 @@ function selectDivMode(mode, el) {
   state.dividendMode = mode;
   document.querySelectorAll('.divmode-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════════════
+// POPUP GLOBAL
+// ══════════════════════════════════════════════════════════════
+(function() {
+  const el = document.createElement('div');
+  el.id = 'globalPopup';
+  el.style.cssText = [
+    'position:fixed','top:50%','left:50%',
+    'transform:translate(-50%,-50%) scale(0.85)',
+    'background:#1a1a1b','border:1px solid #D4A017',
+    'color:#fff','padding:14px 22px','border-radius:10px',
+    'font-size:13px','font-family:var(--font-body,sans-serif)',
+    'z-index:9999','text-align:center','max-width:320px',
+    'line-height:1.5','opacity:0',
+    'transition:opacity .18s,transform .18s',
+    'pointer-events:none','box-shadow:0 8px 32px rgba(0,0,0,.55)'
+  ].join(';');
+  document.body.appendChild(el);
+})();
+
+let _popupTimer = null;
+function showPopup(msg) {
+  const el = document.getElementById('globalPopup');
+  if (!el) return;
+  if (_popupTimer) clearTimeout(_popupTimer);
+  el.textContent = msg;
+  el.style.opacity = '1';
+  el.style.transform = 'translate(-50%,-50%) scale(1)';
+  _popupTimer = setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translate(-50%,-50%) scale(0.85)';
+  }, 2000);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1871,6 +1973,17 @@ async function simular() {
     const ativosComDado = assets.filter(a =>
       months.some(m => allPrices[a.ticker]?.[m])
     );
+
+    // Detectar ativos sem nenhum dado — provavelmente inexistentes
+    const ativosSemDado = assets.filter(a =>
+      !months.some(m => allPrices[a.ticker]?.[m])
+    );
+    if (ativosSemDado.length > 0) {
+      const nomes = ativosSemDado.map(a => a.ticker).join(', ');
+      showErr(`Ativo(s) sem dados no período: ${nomes}. Verifique se o ticker existe e se há dados disponíveis.`);
+      return;
+    }
+
     if (ativosComDado.length === 0) {
       showErr('Nenhum ativo possui dados reais no período selecionado. Ajuste as datas ou os ativos.');
       return;
@@ -2416,6 +2529,8 @@ async function initDynamicTickers() {
 // Inicializa tickers dinâmicos e só então renderiza a sidebar
 initDynamicTickers().then(() => {
   renderSidebar();
+  // Reprocessa botões Add com lista de tickers completa (carregada do servidor)
+  state.classesSel.forEach(sel => atualizarBotaoAdd(sel.id));
 });
 </script>
 </body>
