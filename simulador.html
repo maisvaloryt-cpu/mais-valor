@@ -111,7 +111,6 @@
 .btn-simular:hover { filter: brightness(1.1); box-shadow: 0 4px 16px var(--sim-accent-g); }
 .btn-simular:active { transform: translateY(1px); }
 .btn-simular:disabled { opacity: .35; cursor: not-allowed; filter: none; box-shadow: none; }
-/* ── ÍCONES DE CONTROLE DA SIMULAÇÃO ── */
 .sim-icon-btn {
   width: 34px; height: 34px; border-radius: 7px;
   border: 1px solid var(--sim-border2); background: transparent;
@@ -542,10 +541,10 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
     <div class="sim-sidebar-header">
       <div class="sim-sidebar-title">Parâmetros</div>
       <div id="ctrlRow" class="sim-ctrl-row" style="display:none;gap:5px">
-        <button class="sim-icon-btn" onclick="editarSim()" title="">✏️<span class="tip">Editar</span></button>
-        <button class="sim-icon-btn" onclick="duplicarSim()" title="">📋<span class="tip">Duplicar</span></button>
-        <button class="sim-icon-btn" onclick="novaSim()" title="">➕<span class="tip">Nova carteira</span></button>
-        <button class="sim-icon-btn danger" onclick="deleteSim()" title="">🗑<span class="tip">Remover</span></button>
+        <button class="sim-icon-btn" onclick="editarSim()">✏️<span class="tip">Editar</span></button>
+        <button class="sim-icon-btn" onclick="duplicarSim()">📋<span class="tip">Duplicar</span></button>
+        <button class="sim-icon-btn" onclick="novaSim()">➕<span class="tip">Nova carteira</span></button>
+        <button class="sim-icon-btn danger" onclick="deleteSim()">🗑<span class="tip">Remover</span></button>
       </div>
     </div>
 
@@ -584,17 +583,14 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
       <!-- 3. Classes -->
       <div class="param-group">
         <div class="param-group-label">Classes de ativos</div>
-        <!-- Modo cards (edição de classes) -->
-        <div id="classesCardsWrap" style="display:block">
-          <div class="classes-mini-grid" id="classesMiniGrid"></div>
-          <div id="allocBarWrap" style="display:none">
-            <div class="alloc-bar-mini" id="allocBarMini"></div>
-            <div class="alloc-total-mini" id="allocTotalMini"></div>
-            <div id="slidersWrap"></div>
-            <button class="btn-aplicar" id="btnAplicarClasses" onclick="aplicarClasses()" style="display:none">✓ Aplicar</button>
-          </div>
+        <div class="classes-mini-grid" id="classesMiniGrid"></div>
+        <div id="allocBarWrap" style="display:none">
+          <div class="alloc-bar-mini" id="allocBarMini"></div>
+          <div class="alloc-total-mini" id="allocTotalMini"></div>
+          <div id="slidersWrap"></div>
+          <button class="btn-aplicar" id="btnAplicarClasses" onclick="aplicarClasses()" style="display:none">✓ Aplicar</button>
         </div>
-        <!-- Modo pizza (após aplicar) -->
+        <!-- Pizza: aparece ao aplicar, esconde cards acima -->
         <div class="classes-pizza-wrap" id="classesPizzaWrap">
           <div class="pizza-canvas-wrap"><canvas id="pizzaChart"></canvas></div>
           <div class="pizza-legend" id="pizzaLegend"></div>
@@ -974,8 +970,8 @@ const SIM_COLORS = ['#1FC96E','#5b8def','#F5A623','#e05c5c','#9b72ef'];
 // ══════════════════════════════════════════════════════════════
 let state = { classesSel: [], classesConfig: {}, dividendMode: 'none' };
 let _queryBuffer = {};
-let _pizzaMode = false; // true = mostrando pizza de classes
-let _pizzaChart = null; // chave: "id_idx" → string digitada em memória RAM
+let _pizzaMode = false;
+let _pizzaChart = null;
 let simulations = [];
 let activeSimIdx = 0;
 let viewMode = 'single';
@@ -1543,60 +1539,52 @@ function buildAssetList() {
 // ══════════════════════════════════════════════════════════════
 function aplicarClasses() {
   _pizzaMode = true;
-  document.getElementById('classesCardsWrap').style.display = 'none';
+  document.getElementById('classesMiniGrid').style.display = 'none';
+  document.getElementById('allocBarWrap').style.display = 'none';
   document.getElementById('classesPizzaWrap').classList.add('show');
   renderPizzaClasses();
-  // Move sliders para dentro da pizza wrap
   renderSlidersPizza();
 }
 
 function editarClasses() {
   _pizzaMode = false;
-  document.getElementById('classesCardsWrap').style.display = 'block';
+  document.getElementById('classesMiniGrid').style.display = '';
+  document.getElementById('allocBarWrap').style.display = state.classesSel.length > 0 ? 'block' : 'none';
   document.getElementById('classesPizzaWrap').classList.remove('show');
-  renderSidebar();
+  if (_pizzaChart) { _pizzaChart.destroy(); _pizzaChart = null; }
 }
 
 function renderPizzaClasses() {
   if (_pizzaChart) { _pizzaChart.destroy(); _pizzaChart = null; }
   const labels = state.classesSel.map(s => { const cls = CLASSES_DEF.find(c=>c.id===s.id); return cls.icon+' '+cls.name; });
   const data   = state.classesSel.map(s => s.pct);
-  const colors = state.classesSel.map(s => { const cls = CLASSES_DEF.find(c=>c.id===s.id); return cls.color; });
+  const colors = state.classesSel.map(s => CLASSES_DEF.find(c=>c.id===s.id).color);
   const ctx = document.getElementById('pizzaChart').getContext('2d');
   _pizzaChart = new Chart(ctx, {
     type: 'doughnut',
     data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: '#0E0E11', borderWidth: 2 }] },
     options: { responsive: true, maintainAspectRatio: false, cutout: '60%',
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw}%` } } } }
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.label + ': ' + ctx.raw + '%' } } } }
   });
-  // Legenda
-  document.getElementById('pizzaLegend').innerHTML = state.classesSel.map((s,i) => {
+  document.getElementById('pizzaLegend').innerHTML = state.classesSel.map(s => {
     const cls = CLASSES_DEF.find(c=>c.id===s.id);
-    return `<div class="pizza-legend-item"><div class="pizza-legend-dot" style="background:${cls.color}"></div>${cls.icon} ${cls.name}<span class="pizza-legend-pct">${s.pct}%</span></div>`;
+    return '<div class="pizza-legend-item"><div class="pizza-legend-dot" style="background:'+cls.color+'"></div>'+cls.icon+' '+cls.name+'<span class="pizza-legend-pct">'+s.pct+'%</span></div>';
   }).join('');
 }
 
 function renderSlidersPizza() {
-  const wrap = document.getElementById('slidersWrapPizza');
-  wrap.innerHTML = '';
+  const wrap = document.getElementById('slidersWrapPizza'); wrap.innerHTML = '';
   state.classesSel.forEach(sel => {
     const cls = CLASSES_DEF.find(c => c.id === sel.id);
-    const div = document.createElement('div');
-    div.className = 'slider-row';
-    div.innerHTML = \`
-      <span class="slider-icon">\${cls.icon}</span>
-      <span class="slider-name" title="\${cls.name}">\${cls.name}</span>
-      <input type="range" class="pct-slider" min="0" max="100" step="1" value="\${sel.pct}" id="slp_\${sel.id}"
-        oninput="onSliderPizza('\${sel.id}',+this.value)">
-      <div class="slider-pct-ctrl">
-        <button class="slider-pct-arrow" onmousedown="event.preventDefault()" onclick="onSliderPizza('\${sel.id}',(state.classesSel.find(c=>c.id==='\${sel.id}')?.pct||0)-1)">‹</button>
-        <input type="text" class="inp-pct" value="\${sel.pct}%" id="slvp_\${sel.id}"
-          onfocus="this.value=this.value.replace('%','');this.select()"
-          onblur="onSliderPizza('\${sel.id}',+this.value.replace('%',''));this.value=(state.classesSel.find(c=>c.id==='\${sel.id}')?.pct||0)+'%'"
-          onkeydown="if(event.key==='Enter'){this.blur()}">
-        <button class="slider-pct-arrow" onmousedown="event.preventDefault()" onclick="onSliderPizza('\${sel.id}',(state.classesSel.find(c=>c.id==='\${sel.id}')?.pct||0)+1)">›</button>
-      </div>
-    \`;
+    const div = document.createElement('div'); div.className = 'slider-row';
+    div.innerHTML = '<span class="slider-icon">'+cls.icon+'</span>'
+      +'<span class="slider-name" title="'+cls.name+'">'+cls.name+'</span>'
+      +'<input type="range" class="pct-slider" min="0" max="100" step="1" value="'+sel.pct+'" id="slp_'+sel.id+'" oninput="onSliderPizza(''+sel.id+'',+this.value)">'
+      +'<div class="slider-pct-ctrl">'
+      +'<button class="slider-pct-arrow" onmousedown="event.preventDefault()" onclick="onSliderPizza(''+sel.id+'',(state.classesSel.find(c=>c.id===''+sel.id+'')?.pct||0)-1)">‹</button>'
+      +'<input type="text" class="inp-pct" value="'+sel.pct+'%" id="slvp_'+sel.id+'" onfocus="this.value=this.value.replace('%','');this.select()" onblur="onSliderPizza(''+sel.id+'',+this.value.replace('%',''));this.value=(state.classesSel.find(c=>c.id===''+sel.id+'')?.pct||0)+'%'" onkeydown="if(event.key==='Enter'){this.blur()}">'
+      +'<button class="slider-pct-arrow" onmousedown="event.preventDefault()" onclick="onSliderPizza(''+sel.id+'',(state.classesSel.find(c=>c.id===''+sel.id+'')?.pct||0)+1)">›</button>'
+      +'</div>';
     wrap.appendChild(div);
   });
 }
@@ -1605,8 +1593,7 @@ function onSliderPizza(id, requested) {
   const others = state.classesSel.filter(c => c.id !== id);
   const othersTotal = others.reduce((s,c) => s + c.pct, 0);
   const capped = Math.min(Math.max(0, Math.round(requested)), Math.max(0, 100 - othersTotal));
-  const sel = state.classesSel.find(c => c.id === id);
-  if (sel) sel.pct = capped;
+  const sel = state.classesSel.find(c => c.id === id); if (sel) sel.pct = capped;
   const slEl = document.getElementById('slp_'+id); if (slEl) slEl.value = capped;
   const inpEl = document.getElementById('slvp_'+id); if (inpEl && document.activeElement !== inpEl) inpEl.value = capped + '%';
   renderPizzaClasses();
@@ -1638,7 +1625,6 @@ function toggleClasse(id) {
   else state.classesSel.push({ id, pct: 0 });
   const n = state.classesSel.length;
   if (n > 0) { const base = Math.floor(100/n), rem = 100 - base*n; state.classesSel.forEach((c,i) => { c.pct = base + (i===0?rem:0); }); }
-  // Se estava em pizza mode, volta para cards para escolher classes
   if (_pizzaMode) editarClasses(); else renderSidebar();
 }
 
@@ -1654,10 +1640,8 @@ function renderAllocBar() {
   const el = document.getElementById('allocTotalMini');
   el.textContent = `${total}% de 100%`;
   el.className = 'alloc-total-mini ' + (total === 100 ? 'ok' : total > 100 ? 'over' : 'under');
-  // Mostrar botão Aplicar quando há classes selecionadas
   const btnAp = document.getElementById('btnAplicarClasses');
   if (btnAp) btnAp.style.display = state.classesSel.length > 0 ? 'block' : 'none';
-  // Se pizza já está visível, atualiza
   if (_pizzaMode) renderPizzaClasses();
 }
 
@@ -1864,7 +1848,6 @@ function isTickerValido(id, ticker) {
 }
 
 // ── REGRA: campo nunca mostra digitação — valor só entra via selecionarAtivo()
-// Buffer _queryBuffer acumula teclas via onkeydown (determinístico, sem inferências).
 function onAtivoKeydown(id, idx, event) {
   const key = id + '_' + idx;
   const buf = _queryBuffer[key] || '';
@@ -1880,17 +1863,14 @@ function onAtivoKeydown(id, idx, event) {
     event.preventDefault();
     showSugestoes(id, idx, event.target); return;
   }
-  if (k.length !== 1) return; // ignora Enter, Tab, setas, etc.
+  if (k.length !== 1) return;
   event.preventDefault();
   const tentativa = buf + k.toUpperCase();
-  // Verifica se há alguma sugestão com o buffer tentado
   const cls = CLASSES_DEF.find(c => c.id === id);
   const pool = cls.exampleTickers;
   const haMatch = pool.some(t => t.toUpperCase().startsWith(tentativa) || t.toUpperCase().includes(tentativa));
   if (!haMatch) {
-    // Letra inválida: mostra erro, NÃO acumula no buffer
     showPopup('❌ Nenhum ativo com "' + tentativa + '"');
-    // Flash vermelho nas sugestões visíveis
     const drop = document.getElementById('sug_' + id + '_' + idx);
     if (drop) { drop.style.outline = '1px solid var(--sim-danger)'; setTimeout(() => { drop.style.outline = ''; }, 600); }
     return;
@@ -2240,7 +2220,7 @@ function duplicarSim() {
 function novaSim() {
   editingSimIdx = null;
   state.classesSel = []; state.classesConfig = {}; state.dividendMode = 'none';
-  if (_pizzaMode) { _pizzaMode = false; document.getElementById('classesCardsWrap').style.display='block'; document.getElementById('classesPizzaWrap').classList.remove('show'); }
+  if (_pizzaMode) { _pizzaMode = false; document.getElementById('classesMiniGrid').style.display=''; document.getElementById('allocBarWrap').style.display='none'; document.getElementById('classesPizzaWrap').classList.remove('show'); }
   document.getElementById('startDate').value = '2019-01';
   document.getElementById('endDate').value   = '2024-12';
   document.getElementById('initialAmount').value = '10000';
