@@ -10,9 +10,9 @@
 <style>
 /* ── VARIÁVEIS LOCAIS: mapeiam tema do site para o simulador ── */
 :root {
-  --sim-accent:   var(--up);
-  --sim-accent-d: var(--up-bg);
-  --sim-accent-g: var(--up-glow);
+  --sim-accent:   #D4A017;
+  --sim-accent-d: rgba(212,160,23,0.12);
+  --sim-accent-g: rgba(212,160,23,0.35);
   --sim-danger:   var(--dn);
   --sim-warn:     var(--gold);
   --sim-surf:     var(--bg2);
@@ -208,7 +208,9 @@ input[type="range"].pct-slider::-webkit-slider-thumb {
 .mode-toggle-btn.active { border-color: var(--sim-accent); color: var(--sim-accent); background: var(--sim-accent-d); font-weight: 600; }
 
 /* ── INDICADORES GRID ── */
-.ind-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 6px; }
+.ind-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 6px; max-height: 180px; overflow-y: auto; }
+.ind-grid::-webkit-scrollbar { width: 3px; }
+.ind-grid::-webkit-scrollbar-thumb { background: var(--sim-border2); border-radius: 2px; }
 .ind-chip {
   background: var(--sim-surf2); border: 1px solid var(--sim-border); border-radius: 4px;
   padding: 5px 4px; text-align: center; cursor: pointer; transition: all .15s;
@@ -245,7 +247,20 @@ input[type="number"].mini { text-align: right; }
 .interno-mini.ok  { color: var(--sim-accent); }
 .interno-mini.over { color: var(--sim-danger); }
 
-/* ── DIV MODE ── */
+/* ── SUGESTÕES AUTOCOMPLETE ── */
+.sugestoes-drop {
+  position: absolute; top: 100%; left: 0; right: 0; z-index: 100;
+  background: var(--sim-surf2); border: 1px solid var(--sim-accent);
+  border-top: none; border-radius: 0 0 6px 6px;
+  max-height: 160px; overflow-y: auto;
+}
+.sugestoes-drop::-webkit-scrollbar { width: 3px; }
+.sugestoes-drop::-webkit-scrollbar-thumb { background: var(--sim-border2); border-radius: 2px; }
+.sug-item {
+  padding: 5px 8px; font-family: var(--sim-mono); font-size: 10px;
+  color: var(--sim-text); cursor: pointer; transition: background .1s;
+}
+.sug-item:hover { background: var(--sim-accent-d); color: var(--sim-accent); }
 .divmode-row { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
 .divmode-btn {
   background: var(--sim-surf2); border: 1px solid var(--sim-border); border-radius: 6px;
@@ -452,11 +467,11 @@ input[type="number"].mini { text-align: right; }
         <div class="param-row">
           <div class="param-field">
             <label>Início</label>
-            <input type="month" class="param-inp" id="startDate" value="2019-01" min="2010-01" max="2025-01">
+            <input type="month" class="param-inp" id="startDate" value="2019-01">
           </div>
           <div class="param-field">
             <label>Fim</label>
-            <input type="month" class="param-inp" id="endDate" value="2024-12" min="2010-02" max="2025-06">
+            <input type="month" class="param-inp" id="endDate" value="2024-12">
           </div>
         </div>
       </div>
@@ -650,12 +665,27 @@ const CLASSES_DEF = [
     id: 'acao', icon: '📈', name: 'Ações', sub: 'B3', color: '#5b8def',
     indicadores: [
       { ticker: 'IBOV',  desc: 'Ibovespa' },
-      { ticker: 'IBXL',  desc: 'IBrX 50' },
-      { ticker: 'IBRA',  desc: 'Brasil A.' },
-      { ticker: 'SMLL',  desc: 'Small Cap' },
       { ticker: 'IDIV',  desc: 'Dividendos' },
-      { ticker: 'IPCA',  desc: 'Inflação' },
-      { ticker: 'CDI',   desc: 'CDI' },
+      { ticker: 'SMLL',  desc: 'Small Cap' },
+      { ticker: 'IBXL',  desc: 'IBrX 50' },
+      { ticker: 'IBXX',  desc: 'IBrX 100' },
+      { ticker: 'IBRA',  desc: 'Brasil Amplo' },
+      { ticker: 'MLCX',  desc: 'Mid-Large Cap' },
+      { ticker: 'IVBX',  desc: 'Valor BM&F' },
+      { ticker: 'ITAG',  desc: 'Tag Along' },
+      { ticker: 'IGC',   desc: 'Gov. Corp.' },
+      { ticker: 'IGCT',  desc: 'Gov. Trade' },
+      { ticker: 'IGNM',  desc: 'Gov. N. Mercado' },
+      { ticker: 'IFNC',  desc: 'Financeiro' },
+      { ticker: 'IEE',   desc: 'Energia Elétrica' },
+      { ticker: 'UTIL',  desc: 'Utilidade Pública' },
+      { ticker: 'INDX',  desc: 'Setor Industrial' },
+      { ticker: 'IMAT',  desc: 'Mat. Básicos' },
+      { ticker: 'IMOB',  desc: 'Imobiliário' },
+      { ticker: 'ICON',  desc: 'Consumo' },
+      { ticker: 'ISEE',  desc: 'Sustentabilidade' },
+      { ticker: 'ICO2',  desc: 'Carbono Efic.' },
+      { ticker: 'BDRX',  desc: 'BDRs' },
     ],
     defaultTickers: ['PETR4','VALE3','ITUB4','BBDC4','WEGE3'],
     exampleTickers: ['PETR4','VALE3','ITUB4','BBDC4','WEGE3','BBAS3','RENT3','EGIE3','RADL3','ABEV3'],
@@ -664,9 +694,9 @@ const CLASSES_DEF = [
     id: 'fii', icon: '🏢', name: 'FIIs', sub: 'Fundos Imob.', color: '#1FC96E',
     indicadores: [
       { ticker: 'IFIX',  desc: 'Índice FII' },
-      { ticker: 'IPCA',  desc: 'Inflação' },
-      { ticker: 'CDI',   desc: 'CDI' },
-      { ticker: 'IBOV',  desc: 'Ibovespa' },
+      { ticker: 'MXRF11',desc: 'MXRF11' },
+      { ticker: 'HGLG11',desc: 'HGLG11' },
+      { ticker: 'KNRI11',desc: 'KNRI11' },
     ],
     defaultTickers: ['MXRF11','HGLG11','KNRI11','XPML11','VISC11'],
     exampleTickers: ['MXRF11','HGLG11','KNRI11','XPML11','VISC11','BCFF11','RBRF11','BTLG11','HGRU11','IRDM11'],
@@ -675,9 +705,10 @@ const CLASSES_DEF = [
     id: 'rf', icon: '💵', name: 'Renda Fixa', sub: 'CDI, Tesouro', color: '#F5A623',
     indicadores: [
       { ticker: 'CDI',    desc: 'CDI' },
-      { ticker: 'IMAS',   desc: 'IMA-S Selic' },
+      { ticker: 'SELIC',  desc: 'Taxa Selic' },
       { ticker: 'IPCA',   desc: 'IPCA' },
       { ticker: 'IMAB',   desc: 'IMA-B' },
+      { ticker: 'IMAS',   desc: 'IMA-S Selic' },
       { ticker: 'IMAB5',  desc: 'IMA-B5' },
       { ticker: 'IMAB5P', desc: 'IMA-B5+' },
       { ticker: 'IRFM',   desc: 'IRF-M Pré' },
@@ -692,8 +723,7 @@ const CLASSES_DEF = [
       { ticker: 'SPXBRL', desc: 'S&P 500 BRL' },
       { ticker: 'IVVB11', desc: 'S&P 500 ETF' },
       { ticker: 'USDBRL', desc: 'USD/BRL' },
-      { ticker: 'IPCA',   desc: 'IPCA' },
-      { ticker: 'CDI',    desc: 'CDI' },
+      { ticker: 'EURBRL', desc: 'EUR/BRL' },
     ],
     defaultTickers: ['IVVB11','SPXI11'],
     exampleTickers: ['IVVB11','SPXI11','SPY:BRL','QQQ:BRL','AAPL:BRL','MSFT:BRL','AMZO34','MSFT34'],
@@ -705,8 +735,6 @@ const CLASSES_DEF = [
       { ticker: 'ETHBRL', desc: 'Ethereum BRL' },
       { ticker: 'SOLBRL', desc: 'Solana BRL' },
       { ticker: 'HASH11', desc: 'Cripto B3' },
-      { ticker: 'IBOV',   desc: 'Ibovespa' },
-      { ticker: 'CDI',    desc: 'CDI' },
     ],
     defaultTickers: ['BTCBRL','ETHBRL'],
     exampleTickers: ['BTCBRL','ETHBRL','SOLBRL','BNBBRL','XRPBRL','ADABRL','DOGEBRL','AVAXBRL','LINKBRL','DOTBRL','LTCBRL','XLMBRL','ATOMBRL','TONBRL','NEARBRL','UNIBRL','BCHBRL','MATICBRL','ETCBRL','TRXBRL','ICPBRL','APTBRL','PEPEBRL','SHIBABRL','FILBRL','HASH11','QBTC11'],
@@ -714,10 +742,10 @@ const CLASSES_DEF = [
   {
     id: 'etf', icon: '📦', name: 'ETFs', sub: 'ETFs B3', color: '#e05c5c',
     indicadores: [
-      { ticker: 'IBOV',   desc: 'Ibovespa' },
-      { ticker: 'SMLL',   desc: 'Small Cap' },
-      { ticker: 'SPXBRL', desc: 'S&P 500 BRL' },
-      { ticker: 'CDI',    desc: 'CDI' },
+      { ticker: 'BOVA11', desc: 'Ibovespa ETF' },
+      { ticker: 'SMAL11', desc: 'Small Cap ETF' },
+      { ticker: 'IVVB11', desc: 'S&P 500 ETF' },
+      { ticker: 'DIVO11', desc: 'Dividendos ETF' },
     ],
     defaultTickers: ['BOVA11','SMAL11','DIVO11'],
     exampleTickers: ['BOVA11','SMAL11','DIVO11','IVVB11','SPXI11','FIND11'],
@@ -725,15 +753,59 @@ const CLASSES_DEF = [
   {
     id: 'commodity', icon: '🥇', name: 'Commodities', sub: 'Ouro, Prata, Agro', color: '#56c8d8',
     indicadores: [
-      { ticker: 'OURO',  desc: 'Ouro BRL' },
-      { ticker: 'GOLD11',desc: 'Ouro B3' },
-      { ticker: 'IPCA',  desc: 'IPCA' },
-      { ticker: 'CDI',   desc: 'CDI' },
-      { ticker: 'IBOV',  desc: 'Ibovespa' },
+      { ticker: 'OURO',   desc: 'Ouro BRL' },
+      { ticker: 'GOLD11', desc: 'Ouro ETF B3' },
+      { ticker: 'OGLD11', desc: 'Ouro ETF' },
+      { ticker: 'SLVR11', desc: 'Prata ETF' },
+      { ticker: 'AGRI11', desc: 'Agro ETF' },
+      { ticker: 'COAL11', desc: 'Carvão ETF' },
     ],
     defaultTickers: ['GOLD11'],
     exampleTickers: ['GOLD11','OGLD11','SLVR11','AGRI11','VALE3','PETR4'],
   },
+];
+
+// ══════════════════════════════════════════════════════════════
+// ÍNDICES DE REFERÊNCIA — USO FUTURO
+// Índices internacionais listados no Investidor10 que estão
+// fora do escopo atual da ferramenta (dados não em BRL nativo).
+// Para uso quando houver dados históricos em BRL disponíveis.
+// ══════════════════════════════════════════════════════════════
+const INDICES_FUTURO = [
+  { ticker: 'SPX',  desc: 'S&P 500',                mercado: 'EUA' },
+  { ticker: 'NDX',  desc: 'Nasdaq 100',              mercado: 'EUA' },
+  { ticker: 'IXIC', desc: 'Nasdaq Composite',        mercado: 'EUA' },
+  { ticker: 'DJI',  desc: 'Dow Jones Industrial',    mercado: 'EUA' },
+  { ticker: 'DJA',  desc: 'Dow Jones Composite',     mercado: 'EUA' },
+  { ticker: 'DJT',  desc: 'Dow Jones Transportation',mercado: 'EUA' },
+  { ticker: 'DJU',  desc: 'Dow Jones Utility',       mercado: 'EUA' },
+  { ticker: 'OEX',  desc: 'S&P 100',                 mercado: 'EUA' },
+  { ticker: 'RUT',  desc: 'Russell 2000',            mercado: 'EUA' },
+  { ticker: 'NYA',  desc: 'NYSE Composite',          mercado: 'EUA' },
+  { ticker: 'XAX',  desc: 'NYSE American Composite', mercado: 'EUA' },
+];
+
+// ══════════════════════════════════════════════════════════════
+// COMMODITIES — USO FUTURO
+// Commodities listadas no Investidor10 sem ETF/ticker B3 nativo.
+// Cotações em BRL disponíveis no Investidor10, mas sem histórico
+// em formato compatível com a ferramenta ainda.
+// ══════════════════════════════════════════════════════════════
+const COMMODITIES_FUTURO = [
+  { ticker: 'ALUMINIO',    desc: 'Alumínio BRL' },
+  { ticker: 'MINERIOFERRO',desc: 'Minério de Ferro BRL' },
+  { ticker: 'MILHO',       desc: 'Milho BRL' },
+  { ticker: 'CAFE',        desc: 'Café BRL' },
+  { ticker: 'COBRE',       desc: 'Cobre BRL' },
+  { ticker: 'PETROWTI',    desc: 'Petróleo WTI BRL' },
+  { ticker: 'PETROBRENT',  desc: 'Petróleo Brent BRL' },
+  { ticker: 'PRATA',       desc: 'Prata BRL' },
+  { ticker: 'SOJA',        desc: 'Soja BRL' },
+  { ticker: 'ACUCAR',      desc: 'Açúcar BRL' },
+  { ticker: 'TRIGO',       desc: 'Trigo BRL' },
+  { ticker: 'BOIGORDO',    desc: 'Boi Gordo BRL' },
+  { ticker: 'ACO',         desc: 'Aço BRL' },
+  { ticker: 'ALGODAO',     desc: 'Algodão BRL' },
 ];
 
 const SIM_COLORS = ['#1FC96E','#5b8def','#F5A623','#e05c5c','#9b72ef'];
@@ -1355,15 +1427,15 @@ function renderComposicao() {
   state.classesSel.forEach((sel, idx) => {
     const cls = CLASSES_DEF.find(c => c.id === sel.id);
     if (!state.classesConfig[sel.id]) {
+      const hasIndicadores = cls.indicadores && cls.indicadores.length > 0;
       state.classesConfig[sel.id] = {
-        mode: 'indicador',
+        mode: hasIndicadores ? 'indicador' : 'custom',
         indicadorTicker: cls.indicadores[0]?.ticker || cls.defaultTickers[0] || 'CDI',
-        ativos: cls.defaultTickers.slice(0,3).map((t,i,arr) => ({
-          ticker: t, pct: Math.floor(100/arr.length) + (i===0 ? 100%arr.length : 0)
-        })),
+        ativos: [{ ticker: '', pct: 100 }],
       };
     }
     const cfg = state.classesConfig[sel.id];
+    const hasIndicadores = cls.indicadores && cls.indicadores.length > 0;
     const acc = document.createElement('div');
     acc.className = 'class-acc' + (idx === 0 ? ' open' : '');
     acc.id = 'acc_' + sel.id;
@@ -1375,19 +1447,15 @@ function renderComposicao() {
         <span class="class-acc-chev">▼</span>
       </div>
       <div class="class-acc-body">
+        ${hasIndicadores ? `
         <div class="mode-toggle" id="modeToggle_${sel.id}">
           <button class="mode-toggle-btn ${cfg.mode==='indicador'?'active':''}" onclick="setCfgMode('${sel.id}','indicador')">📊 Indicador</button>
           <button class="mode-toggle-btn ${cfg.mode==='custom'?'active':''}" onclick="setCfgMode('${sel.id}','custom')">🔧 Personalizado</button>
         </div>
         <div id="indSection_${sel.id}" style="display:${cfg.mode==='indicador'?'block':'none'}">
           <div class="ind-grid" id="indGrid_${sel.id}"></div>
-          <input type="text" class="mini" style="width:100%;margin-top:2px;" placeholder="Ou ticker..."
-            value="${cfg.indicadorTicker}" oninput="setCfgIndicador('${sel.id}',this.value.toUpperCase())">
-          <div style="font-size:9px;color:var(--sim-text3);margin-top:4px;line-height:1.6;">
-            Ex: ${cls.exampleTickers.slice(0,5).join(', ')}
-          </div>
-        </div>
-        <div id="customSection_${sel.id}" style="display:${cfg.mode==='custom'?'block':'none'}">
+        </div>` : ''}
+        <div id="customSection_${sel.id}" style="display:${!hasIndicadores || cfg.mode==='custom'?'block':'none'}">
           <div class="ativos-mini" id="ativosRows_${sel.id}"></div>
           <div style="font-size:9px;color:var(--sim-text3);margin-bottom:4px;line-height:1.6;">
             Ex: ${cls.exampleTickers.slice(0,4).join(', ')}
@@ -1407,8 +1475,10 @@ function toggleAcc(id) { document.getElementById('acc_'+id).classList.toggle('op
 
 function setCfgMode(id, mode) {
   state.classesConfig[id].mode = mode;
-  document.getElementById('indSection_'+id).style.display = mode==='indicador' ? 'block' : 'none';
-  document.getElementById('customSection_'+id).style.display = mode==='custom' ? 'block' : 'none';
+  const indEl = document.getElementById('indSection_'+id);
+  const custEl = document.getElementById('customSection_'+id);
+  if (indEl) indEl.style.display = mode==='indicador' ? 'block' : 'none';
+  if (custEl) custEl.style.display = mode==='custom' ? 'block' : 'none';
   document.querySelectorAll(`#modeToggle_${id} .mode-toggle-btn`).forEach((b,i) =>
     b.classList.toggle('active', (i===0&&mode==='indicador')||(i===1&&mode==='custom')));
 }
@@ -1434,16 +1504,56 @@ function setCfgIndicador(id, ticker) {
 function renderAtivosRows(id) {
   const cont = document.getElementById('ativosRows_'+id); if (!cont) return;
   const cfg = state.classesConfig[id];
+  const cls = CLASSES_DEF.find(c => c.id === id);
   cont.innerHTML = cfg.ativos.map((a,i) => `
-    <div class="ativo-mini-row">
-      <input type="text" class="mini" placeholder="TICKER" value="${a.ticker}"
-        oninput="updateAtivo('${id}',${i},'ticker',this.value.toUpperCase())" style="text-transform:uppercase">
+    <div class="ativo-mini-row" style="position:relative">
+      <div style="position:relative;flex:1">
+        <input type="text" class="mini" placeholder="Buscar ticker..." value="${a.ticker}"
+          oninput="onAtivoInput('${id}',${i},this)"
+          onfocus="showSugestoes('${id}',${i},this)"
+          onblur="hideSugestoes('${id}',${i})"
+          autocomplete="off"
+          style="text-transform:uppercase;width:100%">
+        <div class="sugestoes-drop" id="sug_${id}_${i}" style="display:none"></div>
+      </div>
       <input type="number" class="mini" min="0" max="100" value="${a.pct}" placeholder="%"
-        oninput="updateAtivo('${id}',${i},'pct',+this.value)">
+        oninput="updateAtivo('${id}',${i},'pct',+this.value)" style="width:42px">
       <button class="btn-rm" onclick="removeAtivo('${id}',${i})">✕</button>
     </div>
   `).join('');
   renderInternoMini(id);
+}
+
+function onAtivoInput(id, idx, el) {
+  updateAtivo(id, idx, 'ticker', el.value.toUpperCase());
+  showSugestoes(id, idx, el);
+}
+
+function showSugestoes(id, idx, el) {
+  const cls = CLASSES_DEF.find(c => c.id === id);
+  const drop = document.getElementById(`sug_${id}_${idx}`);
+  if (!drop) return;
+  const q = el.value.toUpperCase().trim();
+  const lista = q
+    ? cls.exampleTickers.filter(t => t.toUpperCase().includes(q))
+    : cls.exampleTickers;
+  if (!lista.length) { drop.style.display = 'none'; return; }
+  drop.innerHTML = lista.map(t => `
+    <div class="sug-item" onmousedown="selecionarAtivo('${id}',${idx},'${t}')">${t}</div>
+  `).join('');
+  drop.style.display = 'block';
+}
+
+function hideSugestoes(id, idx) {
+  setTimeout(() => {
+    const drop = document.getElementById(`sug_${id}_${idx}`);
+    if (drop) drop.style.display = 'none';
+  }, 150);
+}
+
+function selecionarAtivo(id, idx, ticker) {
+  state.classesConfig[id].ativos[idx].ticker = ticker;
+  renderAtivosRows(id);
 }
 
 function updateAtivo(id,idx,field,val) { state.classesConfig[id].ativos[idx][field]=val; renderInternoMini(id); }
@@ -1932,6 +2042,18 @@ function renderCompareBarChart() {
 // ══════════════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════════════
+// Define max dinâmico baseado na data atual
+(function() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const maxMonth = `${year}-${month}`;
+  const startEl = document.getElementById('startDate');
+  const endEl   = document.getElementById('endDate');
+  if (startEl) { startEl.max = maxMonth; startEl.removeAttribute('min'); }
+  if (endEl)   { endEl.max   = maxMonth; endEl.removeAttribute('min');   }
+})();
+
 renderSidebar();
 </script>
 </body>
