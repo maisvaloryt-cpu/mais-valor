@@ -6,38 +6,56 @@ Converte cripto_historico/{id}.json (preços em USD) para
 data/historico/{TICKER}BRL.json (preços em BRL) — formato
 compatível com o Simulador de Carteiras.
 
-Moedas geradas:
-  bitcoin   → BTCBRL
-  ethereum  → ETHBRL
-  solana    → SOLBRL
-  bnb       → BNBBRL
-  xrp       → XRPBRL
-
 Conversão USD→BRL:
   Usa a série histórica do USDBRL salva em data/historico/USDBRL.json
   (gerada pelo fetch_historico_indices.py).
   Se o arquivo não existir, busca da AwesomeAPI como fallback.
 """
 
-import json, time, logging
-from datetime import datetime, timezone
+import json, logging
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s  %(levelname)s  %(message)s", datefmt="%H:%M:%S")
 log = logging.getLogger(__name__)
 
-# Mapa: id CoinGecko → ticker do simulador
+# Mapa: id CoinGecko → ticker do simulador (top 30 por market cap)
 COIN_MAP = {
-    "bitcoin":  "BTCBRL",
-    "ethereum": "ETHBRL",
-    "solana":   "SOLBRL",
-    "binancecoin": "BNBBRL",
-    "ripple":   "XRPBRL",
+    "bitcoin":           "BTCBRL",
+    "ethereum":          "ETHBRL",
+    "tether":            "USDTBRL",
+    "binancecoin":       "BNBBRL",
+    "solana":            "SOLBRL",
+    "ripple":            "XRPBRL",
+    "usd-coin":          "USDCBRL",
+    "staked-ether":      "STETHBRL",
+    "dogecoin":          "DOGEBRL",
+    "tron":              "TRXBRL",
+    "cardano":           "ADABRL",
+    "wrapped-bitcoin":   "WBTCBRL",
+    "avalanche-2":       "AVAXBRL",
+    "shiba-inu":         "SHIBABRL",
+    "chainlink":         "LINKBRL",
+    "toncoin":           "TONBRL",
+    "polkadot":          "DOTBRL",
+    "bitcoin-cash":      "BCHBRL",
+    "near":              "NEARBRL",
+    "uniswap":           "UNIBRL",
+    "litecoin":          "LTCBRL",
+    "internet-computer": "ICPBRL",
+    "dai":               "DAIBRL",
+    "polygon":           "MATICBRL",
+    "aptos":             "APTBRL",
+    "pepe":              "PEPEBRL",
+    "ethereum-classic":  "ETCBRL",
+    "stellar":           "XLMBRL",
+    "filecoin":          "FILBRL",
+    "cosmos":            "ATOMBRL",
 }
 
-DATA_DIR  = Path("data")
-HIST_DIR  = DATA_DIR / "cripto_historico"
-OUT_DIR   = DATA_DIR / "historico"
+DATA_DIR = Path("data")
+HIST_DIR = DATA_DIR / "cripto_historico"
+OUT_DIR  = DATA_DIR / "historico"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -81,25 +99,23 @@ def load_usdbrl() -> dict:
 
 
 def closest_rate(usdbrl: dict, date_str: str) -> float:
-    """Retorna taxa mais próxima para uma data (busca ±7 dias)."""
+    """Retorna taxa mais próxima para uma data (busca +/-7 dias)."""
     if date_str in usdbrl:
         return usdbrl[date_str]
-    # Busca por proximidade
     dt = datetime.strptime(date_str, "%Y-%m-%d")
     for delta in range(1, 8):
         for sign in (-1, 1):
-            from datetime import timedelta
             candidate = (dt + timedelta(days=delta * sign)).strftime("%Y-%m-%d")
             if candidate in usdbrl:
                 return usdbrl[candidate]
-    return 5.0  # fallback genérico se não achar nada
+    return 5.5  # fallback genérico
 
 
 def convert_coin(coin_id: str, ticker: str, usdbrl: dict) -> bool:
     """Lê cripto_historico/{coin_id}.json e gera historico/{ticker}.json em BRL."""
     src = HIST_DIR / f"{coin_id}.json"
     if not src.exists():
-        log.warning(f"  {coin_id}: arquivo não encontrado em {src}")
+        log.warning(f"  {coin_id}: arquivo nao encontrado em {src} — pulando")
         return False
 
     try:
@@ -110,17 +126,17 @@ def convert_coin(coin_id: str, ticker: str, usdbrl: dict) -> bool:
 
     history_usd = j.get("history", [])
     if not history_usd:
-        log.warning(f"  {coin_id}: histórico vazio")
+        log.warning(f"  {coin_id}: historico vazio")
         return False
 
     history_brl = []
     for entry in history_usd:
-        date  = entry.get("date", "")
+        date      = entry.get("date", "")
         close_usd = entry.get("close")
         if not date or close_usd is None:
             continue
-        rate = closest_rate(usdbrl, date[:10])
-        close_brl = round(close_usd * rate, 2)
+        rate      = closest_rate(usdbrl, date[:10])
+        close_brl = round(close_usd * rate, 8)
         row = {"date": date[:10], "close": close_brl}
         if "volume" in entry:
             row["volume"] = entry["volume"]
@@ -137,28 +153,27 @@ def convert_coin(coin_id: str, ticker: str, usdbrl: dict) -> bool:
     }
     dst = OUT_DIR / f"{ticker}.json"
     dst.write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")))
-    log.info(f"  ✅ {ticker}: {len(history_brl)} dias → {dst}  ({dst.stat().st_size//1024}KB)")
+    log.info(f"  OK {ticker}: {len(history_brl)} dias -> {dst}  ({dst.stat().st_size // 1024}KB)")
     return True
 
 
 def main():
-    log.info("🚀 Gerando históricos de cripto em BRL para o Simulador...")
+    log.info(f"Iniciando conversao de {len(COIN_MAP)} criptos USD -> BRL para o Simulador...")
 
     usdbrl = load_usdbrl()
     if not usdbrl:
-        log.error("❌ Não foi possível carregar taxa USDBRL — abortando")
+        log.error("Nao foi possivel carregar taxa USDBRL — abortando")
         return
 
     ok, fail = 0, 0
     for coin_id, ticker in COIN_MAP.items():
-        log.info(f"🔄 {coin_id} → {ticker}")
+        log.info(f"  {coin_id} -> {ticker}")
         if convert_coin(coin_id, ticker, usdbrl):
             ok += 1
         else:
             fail += 1
 
-    log.info(f"🏁 Concluído: {ok} gerados, {fail} falhas")
-    log.info(f"   Arquivos em: {OUT_DIR}/")
+    log.info(f"Concluido: {ok} gerados, {fail} nao encontrados (ainda nao baixados pelo atualizar_criptos.py)")
 
 
 if __name__ == "__main__":

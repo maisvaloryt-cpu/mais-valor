@@ -2,7 +2,6 @@ name: Atualizar Criptos
 
 on:
   schedule:
-    # Roda às 6h e 18h UTC (3h e 15h horário de Brasília)
     - cron: '0 6,18 * * *'
   workflow_dispatch:
     inputs:
@@ -34,42 +33,57 @@ jobs:
           INPUT="${{ github.event.inputs.modo }}"
           echo "modo=${INPUT:-tudo}" >> $GITHUB_OUTPUT
 
-      # ── MODO: só mercado (rápido ~2min) ─────────────────────────────────────
       - name: Atualizar mercado (sem histórico)
         if: ${{ steps.modo.outputs.modo == 'mercado' }}
-        run: |
-          python atualizar_criptos.py \
-            --top 250 \
-            --data-dir data \
-            --details-top 50 \
-            --skip-history
+        run: python atualizar_criptos.py --top 250 --data-dir data --details-top 50 --skip-history
 
-      # ── MODO: só histórico incremental ───────────────────────────────────────
       - name: Atualizar histórico incremental
         if: ${{ steps.modo.outputs.modo == 'historico' }}
-        run: |
-          python atualizar_criptos.py \
-            --top 100 \
-            --data-dir data \
-            --details-top 0
+        run: python atualizar_criptos.py --top 100 --data-dir data --details-top 0
 
-      # ── MODO: tudo (schedule automático) ─────────────────────────────────────
       - name: Atualizar tudo
         if: ${{ steps.modo.outputs.modo == 'tudo' }}
-        run: |
-          python atualizar_criptos.py \
-            --top 100 \
-            --data-dir data \
-            --details-top 20
+        run: python atualizar_criptos.py --top 100 --data-dir data --details-top 20
 
-      # ── SEMPRE: gera historico/ETHBRL.json, BTCBRL.json etc. para o Simulador ─
-      - name: Gerar históricos BRL para o Simulador
+      # Sempre converte top 30 para BRL no formato do Simulador
+      - name: Gerar históricos BRL para o Simulador (top 30)
         run: python gerar_historico_cripto.py
 
       - name: Commitar JSONs atualizados
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name  "GitHub Actions"
-          git add data/cripto_market.json data/cripto_historico/ data/historico/BTCBRL.json data/historico/ETHBRL.json data/historico/SOLBRL.json data/historico/BNBBRL.json data/historico/XRPBRL.json 2>/dev/null || true
+          git add data/cripto_market.json data/cripto_historico/ \
+                  data/historico/BTCBRL.json \
+                  data/historico/ETHBRL.json \
+                  data/historico/USDTBRL.json \
+                  data/historico/BNBBRL.json \
+                  data/historico/SOLBRL.json \
+                  data/historico/XRPBRL.json \
+                  data/historico/USDCBRL.json \
+                  data/historico/STETHBRL.json \
+                  data/historico/DOGEBRL.json \
+                  data/historico/TRXBRL.json \
+                  data/historico/ADABRL.json \
+                  data/historico/WBTCBRL.json \
+                  data/historico/AVAXBRL.json \
+                  data/historico/SHIBABRL.json \
+                  data/historico/LINKBRL.json \
+                  data/historico/TONBRL.json \
+                  data/historico/DOTBRL.json \
+                  data/historico/BCHBRL.json \
+                  data/historico/NEARBRL.json \
+                  data/historico/UNIBRL.json \
+                  data/historico/LTCBRL.json \
+                  data/historico/ICPBRL.json \
+                  data/historico/DAIBRL.json \
+                  data/historico/MATICBRL.json \
+                  data/historico/APTBRL.json \
+                  data/historico/PEPEBRL.json \
+                  data/historico/ETCBRL.json \
+                  data/historico/XLMBRL.json \
+                  data/historico/FILBRL.json \
+                  data/historico/ATOMBRL.json \
+                  2>/dev/null || true
           git diff --staged --quiet || git commit -m "🤖 Criptos: atualização automática $(date -u '+%d/%m/%Y %H:%M UTC')"
           git push
