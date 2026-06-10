@@ -552,14 +552,45 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
       <!-- 5. Rebalancear -->
       <div class="param-group">
         <div class="param-group-label">Rebalancear</div>
-        <select class="param-inp" id="rebalance" style="width:100%">
-          <option value="none">Não rebalancear</option>
-          <option value="annual">Anualmente</option>
-          <option value="semiannual">Semestralmente</option>
-          <option value="quarterly">Trimestralmente</option>
-          <option value="monthly">Mensalmente</option>
-        </select>
+        <div class="param-row" style="margin-bottom:6px">
+          <div class="param-field">
+            <label>Frequência</label>
+            <select class="param-inp" id="rebalance">
+              <option value="none">Não rebalancear</option>
+              <option value="monthly">Mensalmente</option>
+              <option value="quarterly">Trimestralmente</option>
+              <option value="semiannual">Semestralmente</option>
+              <option value="annual">Anualmente</option>
+            </select>
+          </div>
+          <div class="param-field" id="rebalModeField">
+            <label>Modo</label>
+            <select class="param-inp" id="rebalMode">
+              <option value="passive">Passivo</option>
+              <option value="active">Ativo</option>
+            </select>
+          </div>
+        </div>
+        <div id="rebalModeDesc" style="font-size:9px;color:var(--sim-text3);line-height:1.6;margin-top:2px"></div>
       </div>
+      <script>
+      (function(){
+        function updateRebalDesc(){
+          const freq = document.getElementById('rebalance').value;
+          const mode = document.getElementById('rebalMode').value;
+          const field = document.getElementById('rebalModeField');
+          const desc  = document.getElementById('rebalModeDesc');
+          if(freq==='none'){ field.style.display='none'; desc.textContent=''; return; }
+          field.style.display='';
+          desc.textContent = mode==='passive'
+            ? '📥 Passivo: aportes direcionados aos ativos abaixo do peso. Sem vendas.'
+            : '⚖️ Ativo: vende os ativos acima do peso para comprar os abaixo. Gera eventos de venda.';
+        }
+        document.getElementById('rebalance').addEventListener('change', updateRebalDesc);
+        document.getElementById('rebalMode').addEventListener('change', updateRebalDesc);
+        updateRebalDesc();
+      })();
+      </script>
 
       <!-- 6. Dividendos -->
       <div class="param-group">
@@ -1212,6 +1243,7 @@ function runBacktest(config, allPrices, allDividends) {
   const assets = config.assets;
   const mode = config.dividendMode || 'none';
   const rebalFreq = config.rebalance || 'none';
+  const rebalMode = config.rebalMode || 'passive'; // 'passive' | 'active'
 
   // Normaliza pesos-alvo
   const totalW = assets.reduce((s,a) => s + a.weight, 0);
@@ -1318,16 +1350,49 @@ function runBacktest(config, allPrices, allDividends) {
     if (shouldRebalance(month)) {
       const pv = portValue(month);
       if (pv > 0) {
-        const drift = normAssets.some(a => {
+        const needsRebal = normAssets.some(a => {
           const p = getPrice(a.ticker, month);
           const cw = p ? (holdings[a.ticker]*p)/pv : 0;
-          return Math.abs(cw - effW[a.ticker]) > 0.03;
+          return Math.abs(cw - effW[a.ticker]) > 0.05;
         });
-        if (drift) {
-          normAssets.forEach(a => {
-            const p = getPrice(a.ticker, month);
-            if (p && p > 0) holdings[a.ticker] = (pv * effW[a.ticker]) / p;
-          });
+        if (needsRebal) {
+          if (rebalMode === 'active') {
+            // ATIVO: vende os acima do peso, compra os abaixo
+            normAssets.forEach(a => {
+              const p = getPrice(a.ticker, month);
+              if (p && p > 0) holdings[a.ticker] = (pv * effW[a.ticker]) / p;
+            });
+          } else {
+            // PASSIVO: só direciona o aporte deste mês para os ativos abaixo do peso
+            // (sem vendas — o aporte já foi aplicado acima, aqui só redistribuímos
+            //  o aporte do próximo mês internamente marcando os pesos desejados)
+            // Implementação: redireciona uma "verba virtual" igual ao aporte mensal
+            // para os ativos abaixo do peso, proporcionalmente ao déficit
+            const verba = config.monthlyAmount;
+            if (verba > 0) {
+              const deficits = normAssets
+                .filter(a => {
+                  const p = getPrice(a.ticker, month);
+                  if (!p) return false;
+                  const cw = (holdings[a.ticker]*p)/pv;
+                  return cw < effW[a.ticker] - 0.005;
+                })
+                .map(a => {
+                  const p = getPrice(a.ticker, month);
+                  const cw = (holdings[a.ticker]*p)/pv;
+                  return { a, deficit: effW[a.ticker] - cw, p };
+                });
+              const totalDef = deficits.reduce((s,d) => s + d.deficit, 0);
+              if (totalDef > 0) {
+                // Desconta do aporte já alocado proporcionalmente e redireciona
+                const verbaPorDef = verba * 0.5; // usa até 50% do aporte para corrigir
+                deficits.forEach(d => {
+                  const extra = verbaPorDef * (d.deficit / totalDef);
+                  if (d.p > 0) holdings[d.a.ticker] += extra / d.p;
+                });
+              }
+            }
+          }
         }
       }
     }
@@ -1545,7 +1610,25 @@ function renderComposicao() {
   });
 }
 
-function toggleAcc(id) { document.getElementById('acc_'+id).classList.toggle('open'); }
+function toggleAcc(id) {
+  // Verifica se alguma outra classe está com soma incorreta — impede abrir nova
+  for (const sel of state.classesSel) {
+    if (sel.id === id) continue;
+    const cfg = state.classesConfig[sel.id];
+    if (cfg && cfg.mode === 'custom') {
+      const soma = cfg.ativos.reduce((s,a) => s+(parseFloat(a.pct)||0), 0);
+      if (Math.abs(soma - 100) >= 0.5) {
+        const nomeCls = CLASSES_DEF.find(c => c.id === sel.id)?.name || sel.id;
+        showErr(`Em "${nomeCls}" corrija a porcentagem para dar 100% antes de continuar.`);
+        // Abre o accordion problemático se estiver fechado
+        const accProb = document.getElementById('acc_'+sel.id);
+        if (accProb && !accProb.classList.contains('open')) accProb.classList.add('open');
+        return;
+      }
+    }
+  }
+  document.getElementById('acc_'+id).classList.toggle('open');
+}
 
 function setCfgMode(id, mode) {
   state.classesConfig[id].mode = mode;
@@ -1586,33 +1669,12 @@ function redistribuir(id) {
 
 function ajustarPct(id, idx, delta) {
   const ativos = state.classesConfig[id].ativos;
-  const n = ativos.length;
-  if (n <= 1) return;
   const cur = ativos[idx].pct;
   const novo = Math.min(100, Math.max(0, cur + delta));
-  const diff = novo - cur;
-  if (diff === 0) return;
-  // Distribui o diff entre os outros proporcionalmente (ou igualmente se pct=0)
-  const outros = ativos.filter((_, i) => i !== idx);
-  const totalOutros = outros.reduce((s, a) => s + a.pct, 0);
+  if (novo === cur) return;
   ativos[idx].pct = novo;
-  if (totalOutros === 0) {
-    outros.forEach(a => { a.pct = Math.max(0, a.pct - diff / outros.length); });
-  } else {
-    outros.forEach(a => { a.pct = Math.max(0, Math.round(a.pct - diff * (a.pct / totalOutros))); });
-  }
-  // Corrige arredondamentos para fechar 100%
-  const soma = ativos.reduce((s, a) => s + a.pct, 0);
-  const gap = 100 - soma;
-  if (gap !== 0) {
-    // Aplica o gap no primeiro ativo diferente do atual que aceite
-    for (let i = 0; i < ativos.length; i++) {
-      if (i === idx) continue;
-      const tentativa = ativos[i].pct + gap;
-      if (tentativa >= 0 && tentativa <= 100) { ativos[i].pct = tentativa; break; }
-    }
-  }
   renderAtivosRows(id);
+  checkInternoErro(id);
 }
 
 function renderAtivosRows(id) {
@@ -1694,28 +1756,9 @@ function selecionarAtivo(id, idx, ticker) {
 function setPct(id, idx, val) {
   const ativos = state.classesConfig[id].ativos;
   const clamped = Math.min(100, Math.max(0, Math.round(val) || 0));
-  const diff = clamped - ativos[idx].pct;
-  if (diff === 0) return;
-  const outros = ativos.filter((_, i) => i !== idx);
-  const totalOutros = outros.reduce((s, a) => s + a.pct, 0);
   ativos[idx].pct = clamped;
-  if (outros.length > 0) {
-    if (totalOutros === 0) {
-      outros.forEach(a => { a.pct = Math.max(0, a.pct - diff / outros.length); });
-    } else {
-      outros.forEach(a => { a.pct = Math.max(0, Math.round(a.pct - diff * (a.pct / totalOutros))); });
-    }
-    const soma = ativos.reduce((s, a) => s + a.pct, 0);
-    const gap = 100 - soma;
-    if (gap !== 0) {
-      for (let i = 0; i < ativos.length; i++) {
-        if (i === idx) continue;
-        const t = ativos[i].pct + gap;
-        if (t >= 0 && t <= 100) { ativos[i].pct = t; break; }
-      }
-    }
-  }
   renderAtivosRows(id);
+  checkInternoErro(id);
 }
 function updateAtivo(id,idx,field,val) { state.classesConfig[id].ativos[idx][field]=val; renderInternoMini(id); }
 function addAtivo(id) {
@@ -1732,8 +1775,22 @@ function renderInternoMini(id) {
   const cfg = state.classesConfig[id];
   const total = cfg.ativos.reduce((s,a) => s+(parseFloat(a.pct)||0), 0);
   const el = document.getElementById('internoMini_'+id); if (!el) return;
-  el.textContent = `Soma: ${total.toFixed(0)}%`;
-  el.className = 'interno-mini ' + (Math.abs(total-100)<0.5 ? 'ok' : 'over');
+  const ok = Math.abs(total-100) < 0.5;
+  el.textContent = ok ? `Soma: 100%` : `⚠ Soma: ${total.toFixed(0)}% — corrija para 100%`;
+  el.className = 'interno-mini ' + (ok ? 'ok' : 'over');
+  // Atualiza estado de erro visual no accordion header
+  const accHead = document.querySelector(`#acc_${id} .class-acc-head`);
+  if (accHead) accHead.style.setProperty('--acc-err', ok ? 'transparent' : 'var(--dn, #E8503A)');
+}
+
+function checkInternoErro(id) {
+  renderInternoMini(id);
+}
+
+function somaInterna(id) {
+  const cfg = state.classesConfig[id];
+  if (!cfg || cfg.mode !== 'custom') return 100;
+  return cfg.ativos.reduce((s,a) => s+(parseFloat(a.pct)||0), 0);
 }
 
 function selectDivMode(mode, el) {
@@ -1764,7 +1821,7 @@ function validate() {
       const ativos = cfg.ativos.filter(a => a.ticker.trim());
       if (ativos.length === 0) { showErr(`Adicione ativos em "${CLASSES_DEF.find(c=>c.id===sel.id)?.name}".`); return false; }
       const soma = ativos.reduce((s,a) => s+(parseFloat(a.pct)||0), 0);
-      if (Math.abs(soma-100) > 1) { showErr(`Pesos de "${CLASSES_DEF.find(c=>c.id===sel.id)?.name}" somam ${soma.toFixed(0)}%.`); return false; }
+      if (Math.abs(soma-100) > 1) { const nome = CLASSES_DEF.find(c=>c.id===sel.id)?.name; showErr(`Em "${nome}" corrija a porcentagem para dar 100% (soma atual: ${soma.toFixed(0)}%).`); return false; }
     }
   }
   return true;
@@ -1784,6 +1841,7 @@ async function simular() {
     const initialAmount = parseFloat(document.getElementById('initialAmount').value) || 0;
     const monthlyAmount = parseFloat(document.getElementById('monthlyAmount').value) || 0;
     const rebalance = document.getElementById('rebalance').value;
+    const rebalMode = document.getElementById('rebalMode')?.value || 'passive';
     const assets = buildAssetList();
     const months = generateMonthRange(startDate, endDate);
 
@@ -1820,7 +1878,7 @@ async function simular() {
       weight: a.weight / assets.reduce((s,x) => s+x.weight, 0)
     })), allPrices, months);
 
-    const config = { assets, startDate, endDate, initialAmount, monthlyAmount, rebalance, dividendMode: state.dividendMode };
+    const config = { assets, startDate, endDate, initialAmount, monthlyAmount, rebalance, rebalMode, dividendMode: state.dividendMode };
     const result = runBacktest(config, allPrices, allDividends);
 
     const simName = document.getElementById('simName').value.trim() || `Simulação ${simulations.length + 1}`;
@@ -1879,6 +1937,8 @@ function novaSim() {
   document.getElementById('initialAmount').value = '10000';
   document.getElementById('monthlyAmount').value  = '500';
   document.getElementById('rebalance').value = 'none';
+  if (document.getElementById('rebalMode')) document.getElementById('rebalMode').value = 'passive';
+  document.getElementById('rebalance').dispatchEvent(new Event('change'));
   document.getElementById('simName').value   = '';
   document.querySelectorAll('.divmode-btn').forEach((b,i) => b.classList.toggle('active', i===0));
   document.getElementById('btnSimular').textContent = '▶ Simular carteira';
@@ -1902,6 +1962,9 @@ function loadSimIntoSidebar(idx) {
   document.getElementById('initialAmount').value = sim.config.initialAmount;
   document.getElementById('monthlyAmount').value = sim.config.monthlyAmount;
   document.getElementById('rebalance').value     = sim.config.rebalance || 'none';
+  if (document.getElementById('rebalMode')) document.getElementById('rebalMode').value = sim.config.rebalMode || 'passive';
+  // Trigger desc update
+  document.getElementById('rebalance').dispatchEvent(new Event('change'));
   document.getElementById('simName').value       = sim.name;
   document.querySelectorAll('.divmode-btn').forEach(b => b.classList.remove('active'));
   const modes = ['none','reinvest_same','reinvest_class','reinvest_rebalance'];
