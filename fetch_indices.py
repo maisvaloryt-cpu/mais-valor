@@ -28,7 +28,7 @@ HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0
 # ── Mapeamento yfinance → chave do JSON ──────────────────────────────────────
 YFINANCE_MAP = {
     "^BVSP":  "ibov",
-    "BCFF11.SA": "ifix",
+    "IFIX11.SA": "ifix",
     "SMAL11.SA": "small",
     "DIVO11.SA": "idiv",
     "BOVA11.SA": "ibra",
