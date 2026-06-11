@@ -1296,68 +1296,92 @@ function calcEffectiveWeights(normAssets, allPrices, month) {
 function buildAvailabilityLog(normAssets, allPrices, months) {
   const logs = [];
 
-  normAssets.forEach(a => {
-    const priceMap = allPrices[a.ticker];
-    if (!priceMap || Object.keys(priceMap).length === 0) {
-      logs.push({
-        type: 'no_data',
-        ticker: a.ticker,
-        assetClass: a.assetClass,
-        msg: `${a.ticker} — sem dados disponíveis no período. Não entrou na simulação.`,
-      });
-      return;
-    }
-
-    // Primeiro e último mês com dado
-    const mesesComDado = months.filter(m => priceMap[m]);
-    const mesesSemDado = months.filter(m => !priceMap[m]);
-
-    if (mesesSemDado.length === 0) {
-      logs.push({
-        type: 'ok',
-        ticker: a.ticker,
-        assetClass: a.assetClass,
-        msg: `${a.ticker} — dados completos no período ✓`,
-      });
-    } else if (mesesComDado.length === 0) {
-      logs.push({
-        type: 'no_data',
-        ticker: a.ticker,
-        assetClass: a.assetClass,
-        msg: `${a.ticker} — sem dados disponíveis no período. Não entrou na simulação.`,
-      });
-    } else {
-      const primeiro = mesesComDado[0];
-      const ausentes = mesesSemDado.length;
-      logs.push({
-        type: 'partial',
-        ticker: a.ticker,
-        assetClass: a.assetClass,
-        firstMonth: primeiro,
-        missingMonths: ausentes,
-        msg: `${a.ticker} — dados a partir de ${monthLabel(primeiro)}. Nos ${ausentes} meses anteriores, sua verba foi redistribuída entre os demais ativos disponíveis.`,
-      });
-    }
-  });
-
-  // Avisos de classes ausentes em blocos de tempo
+  // Monta mapa de classes para saber redistribuição
   const byClass = {};
   normAssets.forEach(a => {
     if (!byClass[a.assetClassId]) byClass[a.assetClassId] = { name: a.assetClass, assets: [] };
     byClass[a.assetClassId].assets.push(a);
   });
 
+  // Helper: outros ativos da mesma classe que têm dado em pelo menos 1 mês
+  function outrosDaClasseComDado(ativo) {
+    const cls = byClass[ativo.assetClassId];
+    if (!cls) return [];
+    return cls.assets.filter(a => a.ticker !== ativo.ticker &&
+      months.some(m => allPrices[a.ticker]?.[m]));
+  }
+
+  // Helper: classes com dado (exceto a do ativo em questão)
+  function outrasClassesComDado(assetClassId) {
+    return Object.entries(byClass)
+      .filter(([id, { assets }]) => id !== assetClassId && assets.some(a => months.some(m => allPrices[a.ticker]?.[m])))
+      .map(([, { name }]) => name);
+  }
+
+  normAssets.forEach(a => {
+    const priceMap = allPrices[a.ticker];
+    const mesesComDado = priceMap ? months.filter(m => priceMap[m]) : [];
+    const mesesSemDado = priceMap ? months.filter(m => !priceMap[m]) : months;
+
+    if (mesesComDado.length === 0) {
+      // Ativo sem nenhum dado — determina para onde foi redistribuído
+      const outros = outrosDaClasseComDado(a);
+      let destino;
+      if (outros.length > 0) {
+        destino = `redistribuído entre os outros ativos de ${a.assetClass} (${outros.map(x=>x.ticker).join(', ')})`;
+      } else {
+        const outrasClasses = outrasClassesComDado(a.assetClassId);
+        destino = outrasClasses.length > 0
+          ? `redistribuído proporcionalmente entre as outras classes (${outrasClasses.join(', ')})`
+          : 'sem destino disponível no período';
+      }
+      logs.push({
+        type: 'no_data',
+        ticker: a.ticker,
+        assetClass: a.assetClass,
+        msg: `${a.ticker} (${a.assetClass}) — sem dados no período. Seu aporte foi ${destino}.`,
+      });
+    } else if (mesesSemDado.length === 0) {
+      logs.push({
+        type: 'ok',
+        ticker: a.ticker,
+        assetClass: a.assetClass,
+        msg: `${a.ticker} — dados completos no período ✓`,
+      });
+    } else {
+      const primeiro = mesesComDado[0];
+      const ausentes = mesesSemDado.length;
+      const outros = outrosDaClasseComDado(a);
+      const destinoParcial = outros.length > 0
+        ? `entre os outros ativos de ${a.assetClass}`
+        : `entre as outras classes disponíveis`;
+      logs.push({
+        type: 'partial',
+        ticker: a.ticker,
+        assetClass: a.assetClass,
+        firstMonth: primeiro,
+        missingMonths: ausentes,
+        msg: `${a.ticker} (${a.assetClass}) — dados a partir de ${monthLabel(primeiro)}. Nos ${ausentes} meses anteriores, seu aporte foi redistribuído ${destinoParcial}.`,
+      });
+    }
+  });
+
+  // Avisos de classes inteiras ausentes em parte do período
   Object.values(byClass).forEach(({ name, assets }) => {
-    // Meses em que NENHUM ativo da classe tem dado
     const mesesClasseAusente = months.filter(m =>
       !assets.some(a => allPrices[a.ticker]?.[m])
     );
     if (mesesClasseAusente.length > 0 && mesesClasseAusente.length < months.length) {
-      const primeiro = months.filter(m => assets.some(a => allPrices[a.ticker]?.[m]))[0];
+      const primeiro = months.find(m => assets.some(a => allPrices[a.ticker]?.[m]));
+      // Quais outras classes receberam a redistribuição?
+      const outrasIds = Object.entries(byClass)
+        .filter(([,{assets:oa}]) => oa.some(a => months.some(m => allPrices[a.ticker]?.[m])) && oa[0]?.assetClass !== name)
+        .map(([,{name:n}]) => n);
+      const destClasses = outrasIds.length > 0 ? ` A % foi redistribuída para: ${outrasIds.join(', ')}.` : '';
       logs.push({
         type: 'class_absent',
         assetClass: name,
-        msg: `Classe ${name} — ausente nos primeiros ${mesesClasseAusente.length} meses. A partir de ${monthLabel(primeiro)}, passou a integrar a carteira. Nos meses anteriores, sua % foi redistribuída entre as outras classes.`,
+        msg: `Classe ${name} — ausente nos primeiros ${mesesClasseAusente.length} meses (até ${monthLabel(mesesClasseAusente[mesesClasseAusente.length-1])}).${destClasses} A partir de ${monthLabel(primeiro)}, passou a integrar a carteira normalmente.`,
       });
     }
   });
@@ -1652,6 +1676,8 @@ function runBacktest(config, allPrices, allDividends) {
       finalValue: fv, contribution: finalValue > 0 ? fv/finalValue : 0,
       totalDividends: dividendsByTicker[a.ticker] || 0,
       mesesComDado, totalMeses: months.length,
+      firstMonth: priceMap ? months.find(m => priceMap[m]) || null : null,
+      lastMonth: priceMap ? [...months].reverse().find(m => priceMap[m]) || null : null,
     };
   });
 
@@ -2574,28 +2600,10 @@ async function simular() {
       months.some(m => allPrices[a.ticker]?.[m])
     );
 
-    // Detectar ativos sem nenhum dado — provavelmente inexistentes
-    const ativosSemDado = assets.filter(a =>
-      !months.some(m => allPrices[a.ticker]?.[m])
-    );
-    if (ativosSemDado.length > 0) {
-      const nomes = ativosSemDado.map(a => a.ticker).join(', ');
-      showErr(`Ativo(s) sem dados no período: ${nomes}. Verifique se o ticker existe e se há dados disponíveis.`, document.getElementById('btnSimular'));
-      return;
-    }
-
+    // Ativos sem dado não bloqueiam — são excluídos e o peso redistribuído entre os demais da classe.
+    // Só bloqueia se NENHUM ativo tem dado no período.
     if (ativosComDado.length === 0) {
       showErr('Nenhum ativo possui dados reais no período selecionado. Ajuste as datas ou os ativos.', document.getElementById('btnSimular'));
-      return;
-    }
-
-    // Verificar se há ao menos um ativo disponível em ALGUM mês
-    // (proteção contra carteira completamente sem dado no período)
-    const temAlgumDado = months.some(m =>
-      assets.some(a => allPrices[a.ticker]?.[m])
-    );
-    if (!temAlgumDado) {
-      showErr('Sem dados disponíveis para qualquer ativo no período. Ajuste as datas.', document.getElementById('btnSimular'));
       return;
     }
 
@@ -2811,6 +2819,76 @@ const brl = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
 const pct = v => (v*100).toFixed(2) + '%';
 const divModeLabel = { none:'Caixa', reinvest_same:'Mesmo ativo', reinvest_class:'Na classe', reinvest_rebalance:'Rebalancear' };
 
+function renderAtivosTimeline(breakdown, startDate, endDate) {
+  if (!breakdown || breakdown.length === 0) return '';
+
+  // Converte YYYY-MM para número de meses desde startDate
+  const toMonths = (ym) => {
+    const [y, m] = ym.split('-').map(Number);
+    return y * 12 + m;
+  };
+  const simStart = toMonths(startDate);
+  const simEnd   = toMonths(endDate);
+  const simTotal = simEnd - simStart || 1;
+
+  // Agrupa por classe
+  const byClass = {};
+  breakdown.forEach(b => {
+    if (!byClass[b.assetClass]) byClass[b.assetClass] = [];
+    byClass[b.assetClass].push(b);
+  });
+
+  // Cores por classe (reutiliza paleta existente)
+  const CLASS_COLORS = ['#5b8def','#1FC96E','#D4A017','#9b72ef','#e05c5c','#56c8d8','#f7931a'];
+  const classKeys = Object.keys(byClass);
+
+  const rows = [];
+  classKeys.forEach((cls, ci) => {
+    const color = CLASS_COLORS[ci % CLASS_COLORS.length];
+    byClass[cls].forEach(b => {
+      if (!b.firstMonth) return; // sem dado algum
+      const start = toMonths(b.firstMonth);
+      const end   = b.lastMonth ? toMonths(b.lastMonth) : simEnd;
+      const leftPct  = ((start - simStart) / simTotal * 100).toFixed(2);
+      const widthPct = ((end - start + 1) / simTotal * 100).toFixed(2);
+      const coverPct = b.totalMeses > 0 ? Math.round(b.mesesComDado / b.totalMeses * 100) : 0;
+      const partial  = start > simStart || end < simEnd;
+      const barColor = partial ? color + 'cc' : color;
+      rows.push(`
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+          <div style="width:70px;flex-shrink:0;font-size:10px;font-family:var(--sim-mono);color:var(--sim-text2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${b.ticker} (${cls})">${b.ticker}</div>
+          <div style="flex:1;position:relative;height:18px;background:var(--sim-surf2);border-radius:3px;overflow:hidden">
+            <div style="position:absolute;left:${leftPct}%;width:${widthPct}%;height:100%;background:${barColor};border-radius:3px;min-width:2px"
+              title="${b.ticker}: ${b.firstMonth ? monthLabel(b.firstMonth) : '?'} → ${b.lastMonth ? monthLabel(b.lastMonth) : '?'} (${coverPct}% do período)">
+            </div>
+          </div>
+          <div style="width:34px;flex-shrink:0;font-size:9px;font-family:var(--sim-mono);color:${coverPct===100?'var(--up)':coverPct>50?'var(--gold)':'var(--dn)'};text-align:right">${coverPct}%</div>
+        </div>
+      `);
+    });
+  });
+
+  if (rows.length === 0) return '';
+
+  // Labels de eixo X (início, meio, fim)
+  const midDate = new Date(Math.floor((simStart + simEnd) / 2 / 12), Math.floor((simStart + simEnd) / 2 % 12));
+  const labelStart = monthLabel(startDate);
+  const labelEnd   = monthLabel(endDate);
+  const labelMid   = monthLabel(`${Math.floor((simStart+simEnd)/2/12)}-${String(Math.floor((simStart+simEnd)/2%12)||12).padStart(2,'0')}`);
+
+  return \`
+    <div style="margin-top:20px;background:var(--sim-surf2);border:1px solid var(--sim-border);border-radius:var(--sim-r);padding:14px 16px;">
+      <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sim-text3);margin-bottom:12px;">Cobertura por ativo no período</div>
+      \${rows.join('')}
+      <div style="display:flex;margin-left:78px;margin-top:4px;font-size:9px;font-family:var(--sim-mono);color:var(--sim-text3)">
+        <span>\${labelStart}</span>
+        <span style="margin:0 auto">\${labelMid}</span>
+        <span>\${labelEnd}</span>
+      </div>
+    </div>
+  \`;
+}
+
 function renderAvailabilityLog(logs) {
   if (!logs || logs.length === 0) return '';
   const typeOrder = { no_data: 0, class_absent: 1, partial: 2, ok: 3 };
@@ -2889,10 +2967,12 @@ function renderSingleView(idx) {
     `;
   }).join('');
 
-  // Rodapé de disponibilidade de dados
+  // Linha do tempo por ativo
   const logEl = document.getElementById('availabilityLog');
   const inicioLogs = buildInicioLog(result.metrics.primeiroMesComDado, config.startDate);
-  if (logEl) logEl.innerHTML = renderAvailabilityLog([...inicioLogs, ...(availabilityLog||[])]);
+  const timelineHtml = renderAtivosTimeline(breakdown, config.startDate, config.endDate);
+  const logHtml = renderAvailabilityLog([...inicioLogs, ...(availabilityLog||[])]);
+  if (logEl) logEl.innerHTML = timelineHtml + logHtml;
 
   showChart('evolution', document.querySelector('.chart-tab'));
 }
