@@ -1,5 +1,5 @@
 {
-  "updated_at": "11/06/2026 01:59",
+  "updated_at": "11/06/2026 02:53",
   "acoes": [
     {
       "ticker": "AGRO3",
@@ -4095,15 +4095,17 @@
     },
     {
       "ticker": "ESPA3",
-      "name": "MPM Corporeos SA",
+      "name": "ESPA3",
       "price": 0.72,
-      "change": -5.26,
-      "volume": 1664200,
-      "marketCap": 274681526,
+      "change": 0.0,
+      "volume": 0,
+      "marketCap": 0,
       "pe": null,
       "pb": null,
-      "dividendYield": 0.0,
-      "fallback": false
+      "dividendYield": 0,
+      "fallback": true,
+      "fallback_date": "2026-06-11",
+      "fallback_days": 0
     },
     {
       "ticker": "WHRL3",
