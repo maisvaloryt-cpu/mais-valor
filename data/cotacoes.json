@@ -1,5 +1,5 @@
 {
-  "updated_at": "11/06/2026 01:36",
+  "updated_at": "11/06/2026 01:59",
   "acoes": [
     {
       "ticker": "AGRO3",
@@ -5249,17 +5249,15 @@
     },
     {
       "ticker": "BRCR11",
-      "name": "BRCR11",
-      "price": 43.33,
-      "change": 0.0,
-      "volume": 0,
+      "name": "Fundo de Investimento Imobiliario - FII BTG Pactual Corporate Office Fund Cotas",
+      "price": 43.18,
+      "change": -0.35,
+      "volume": 30137,
       "marketCap": 0,
       "pe": null,
       "pb": null,
-      "dividendYield": 0,
-      "fallback": true,
-      "fallback_date": "2026-06-10",
-      "fallback_days": 1
+      "dividendYield": 0.0,
+      "fallback": false
     },
     {
       "ticker": "BRIM11",
