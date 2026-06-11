@@ -341,7 +341,7 @@ function renderNav() {
     if (l.dropdown) {
       const isActive = l.dropdown.some(d => page === d.href);
       return `<div class="nav-dropdown-wrap">
-        <a href="#" class="${isActive ? 'active' : ''}" style="${style}" onclick="return false">
+        <a href="#" class="${isActive ? 'active' : ''}" style="${style}" onclick="event.preventDefault();this.closest('.nav-dropdown-wrap').classList.toggle('open')">
           ${l.label} ▾
         </a>
         <div class="nav-dropdown">
@@ -370,7 +370,7 @@ function renderNav() {
   .nav-dropdown{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--bg2);border:1px solid var(--border3);border-radius:10px;padding:6px;min-width:140px;z-index:9999;box-shadow:var(--shadow-lg);animation:slideDown .18s ease both;pointer-events:auto}
   .nav-dropdown a{display:block;padding:8px 12px;border-radius:7px;font-size:12.5px;font-weight:600;color:var(--text2);white-space:nowrap;transition:var(--transition)}
   .nav-dropdown a:hover{background:var(--bg3);color:var(--text)}
-  .nav-dropdown-wrap:hover .nav-dropdown{display:block!important}
+  .nav-dropdown-wrap:hover .nav-dropdown,.nav-dropdown-wrap.open .nav-dropdown{display:block!important}
   #nav-hamburger{display:none;background:transparent;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:6px 8px;line-height:1;border-radius:8px;transition:background .15s;flex-shrink:0}
   #nav-hamburger:hover{background:var(--bg3)}
   #nav-mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg,#0E0E11);z-index:500;flex-direction:column;padding:20px 24px;overflow-y:auto;animation:slideDown .2s ease}
@@ -492,6 +492,9 @@ function renderNav() {
     if (!e.target.closest('.nav-search-wrap')) {
       const r = document.getElementById('nav-search-results');
       if (r) r.style.display = 'none';
+    }
+    if (!e.target.closest('.nav-dropdown-wrap')) {
+      document.querySelectorAll('.nav-dropdown-wrap.open').forEach(el => el.classList.remove('open'));
     }
   });
 

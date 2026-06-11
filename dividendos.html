@@ -266,7 +266,7 @@ async function init(){
     divs = todos.map((a,i)=>{
       const com=new Date(hoje); com.setDate(hoje.getDate()+Math.floor(i*3.2));
       const pag=new Date(com); pag.setDate(com.getDate()+3);
-      const fmt=(d)=>`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
+      const fmt=(d)=>`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
       const valMensal=a.p*(a.dy/100)/12;
       return {
         t: a.t, n: a.n,
