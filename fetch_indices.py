@@ -28,7 +28,7 @@ HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0
 # ── Mapeamento yfinance → chave do JSON ──────────────────────────────────────
 YFINANCE_MAP = {
     "^BVSP":  "ibov",
-    "IFIX11.SA": "ifix",
+    "XFIX11.SA": "ifix",
     "SMAL11.SA": "small",
     "DIVO11.SA": "idiv",
     "BOVA11.SA": "ibra",
@@ -42,7 +42,7 @@ YFINANCE_MAP = {
 # ── Mapeamento Brapi → chave do JSON ─────────────────────────────────────────
 BRAPI_BR_MAP = {
     "^BVSP":  "ibov",
-    "BCFF11": "ifix",
+    "XFIX11": "ifix",
     "SMAL11": "small",
     "DIVO11": "idiv",
     "BOVA11": "ibra",
