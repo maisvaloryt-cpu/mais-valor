@@ -335,7 +335,7 @@ function renderNav() {
     if (l.dropdown) {
       const isActive = l.dropdown.some(d => page === d.href);
       return `<div class="nav-dropdown-wrap">
-        <a href="#" class="${isActive ? 'active' : ''}" style="${style}" onclick="return false">
+        <a href="#" class="${isActive ? 'active' : ''}" style="${style}">
           ${l.label} ▾
         </a>
         <div class="nav-dropdown">
