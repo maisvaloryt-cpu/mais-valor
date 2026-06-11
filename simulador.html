@@ -1855,7 +1855,8 @@ function diagnosticarBloqueio() {
     return cfg.ativos.map(a => a.ticker.trim().toUpperCase()).filter(t => t);
   });
   const algumPagaDividendo = carteiraAtivos.some(t => !SEM_DIVIDENDOS.has(t) && !INDICES_ACUMULADOS.has(t));
-  if (algumPagaDividendo && !state.dividendMode) return 'Escolha o que fazer com os dividendos recebidos.';
+  const VALID_DM = ['none','reinvest_same','reinvest_class','reinvest_rebalance'];
+  if (algumPagaDividendo && !VALID_DM.includes(state.dividendMode)) return 'Escolha o que fazer com os dividendos recebidos.';
 
   return null; // tudo ok
 }
@@ -1924,9 +1925,12 @@ function verificarCascata() {
   const etapaD = document.getElementById('etapaDividendos');
   if (etapaD) etapaD.style.display = (composicaoOk && rebalOk && algumPagaDividendo) ? 'block' : 'none';
 
-  // Se nenhum ativo paga dividendo, força dividendMode neutro para não bloquear
-  const dividendoOk = !algumPagaDividendo || (state.dividendMode !== '' && state.dividendMode !== null && state.dividendMode !== undefined);
-  if (!algumPagaDividendo && (!state.dividendMode || state.dividendMode === '')) state.dividendMode = 'none';
+  // dividendoOk: true apenas se não há ativos pagadores (pula etapa) OU usuário escolheu explicitamente
+  // Valores válidos escolhidos pelo usuário: 'none', 'reinvest_same', 'reinvest_class', 'reinvest_rebalance'
+  const VALID_DIV_MODES = ['none','reinvest_same','reinvest_class','reinvest_rebalance'];
+  const dividendoOk = !algumPagaDividendo || VALID_DIV_MODES.includes(state.dividendMode);
+  // Se nenhum ativo paga dividendo, garante que dividendMode tem valor neutro
+  if (!algumPagaDividendo && !VALID_DIV_MODES.includes(state.dividendMode)) state.dividendMode = 'none';
 
   // Nome — após dividendos ok
   const etaN = document.getElementById('etapaNome');
