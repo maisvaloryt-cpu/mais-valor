@@ -33,7 +33,7 @@
 /* ── LAYOUT RAIZ ── */
 .sim-root {
   display: flex;
-  height: calc(100vh - 44px);
+  height: calc(100vh - 72px);
   overflow: hidden;
 }
 
@@ -591,14 +591,30 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
 .btn-aplicar-classes.show { display: block; }
 </style>
 <!-- Logo embutido — link para home -->
-<div style="position:fixed;top:0;left:0;right:0;height:44px;background:var(--bg,#0E0E11);border-bottom:1px solid var(--border,#222);display:flex;align-items:center;padding:0 16px;z-index:200;">
-  <a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none;">
-    <img src="favicon.png" alt="Mais Valor" style="height:28px;width:28px;object-fit:contain;">
-    <span style="font-size:15px;font-weight:700;color:#fff;font-family:var(--font-body,sans-serif);">Mais <span style="color:#D4A017;">Valor</span></span>
+<div style="position:fixed;top:0;left:0;right:0;height:72px;background:var(--bg,#0E0E11);border-bottom:1px solid var(--border,#222);display:flex;align-items:center;padding:0 24px;gap:20px;z-index:200;">
+  <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;">
+    <div style="width:40px;height:40px;border-radius:9px;overflow:hidden;flex-shrink:0;box-shadow:-2px 3px 8px rgba(0,0,0,0.5);">
+      <svg viewBox="0 0 530 530" xmlns="http://www.w3.org/2000/svg" width="40" height="40" style="display:block;">
+        <defs>
+          <linearGradient id="mvGold" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFD76A"/>
+            <stop offset="100%" stop-color="#F3B13B"/>
+          </linearGradient>
+        </defs>
+        <rect width="530" height="530" fill="#C90D08"/>
+        <path fill="url(#mvGold)" d="M459 58 L346 125 L387 142 L365 181 L296 277 L258 315 L212 349 L174 367 L147 374 L110 376 L89 372 L67 362 L49 345 L37 324 L32 302 L31 349 L52 392 L70 409 L94 422 L150 429 L196 420 L230 407 L298 365 L337 329 L377 280 L441 171 L475 192 L480 191 Z"/>
+        <path fill="url(#mvGold)" d="M399 303 L384 326 L358 359 L318 398 L283 424 L258 438 L222 452 L190 459 L161 460 L178 465 L200 468 L237 467 L278 458 L315 441 L340 421 L361 395 L383 353 L397 314 Z"/>
+      </svg>
+    </div>
+    <span style="font-size:22px;font-weight:800;color:#fff;font-family:var(--font-body,sans-serif);letter-spacing:-.01em;">Mais <span style="color:#D4A017;">Valor</span></span>
   </a>
-  <span style="margin-left:12px;font-size:11px;color:#4E4D4A;font-family:var(--font-body,sans-serif);">— Simulador de Carteiras</span>
+  <div style="width:1px;height:36px;background:var(--border,#222);flex-shrink:0;"></div>
+  <div style="display:flex;flex-direction:column;gap:2px;">
+    <span style="font-size:14px;font-weight:700;color:#fff;font-family:var(--font-body,sans-serif);letter-spacing:.01em;">Simulador de Carteiras — Backtest</span>
+    <span style="font-size:11px;color:#4E4D4A;font-family:var(--font-body,sans-serif);">Ferramenta criada pelo canal Mais Valor</span>
+  </div>
 </div>
-<div style="height:44px"></div>
+<div style="height:72px"></div>
 
 <div class="sim-root">
 
