@@ -15,6 +15,19 @@
   document.head.appendChild(s);
 })();
 
+// ── Google Analytics ─────────────────────────────────────────────
+(function() {
+  const s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=G-MXYNF830JM';
+  document.head.appendChild(s);
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  window.gtag = gtag;
+  gtag('js', new Date());
+  gtag('config', 'G-MXYNF830JM');
+})();
+
 const LOGO_SVG_HTML = `<svg viewBox="0 0 530 530" xmlns="http://www.w3.org/2000/svg" width="36" height="36" style="display:block;border-radius:8px;overflow:hidden;flex-shrink:0">
   <defs>
     <linearGradient id="mvGold" x1="0%" y1="0%" x2="100%" y2="100%">
