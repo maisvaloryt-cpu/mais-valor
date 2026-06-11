@@ -110,7 +110,7 @@
 }
 .btn-simular:hover { filter: brightness(1.1); box-shadow: 0 4px 16px var(--sim-accent-g); }
 .btn-simular:active { transform: translateY(1px); }
-.btn-simular:disabled { opacity: .35; cursor: not-allowed; filter: none; box-shadow: none; }
+.btn-simular[data-bloqueado] { opacity: .35; cursor: not-allowed; filter: none; box-shadow: none; }
 .sim-icon-btn {
   width: 34px; height: 34px; border-radius: 7px;
   border: 1px solid var(--sim-border2); background: transparent;
@@ -230,6 +230,16 @@ input[type="range"].pct-slider::-webkit-slider-thumb {
 .class-acc.open .class-acc-chev { transform: rotate(180deg); }
 .class-acc-body { display: none; padding: 10px; background: var(--sim-surf); border-top: 1px solid var(--sim-border); }
 .class-acc.open .class-acc-body { display: block; }
+.class-acc.dimmed { opacity: .3; pointer-events: none; }
+.sim-tooltip { position: relative; }
+.sim-tooltip .sim-tip {
+  position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+  background: #1e1e26; border: 1px solid var(--sim-border2); color: var(--sim-text2);
+  font-size: 10px; line-height: 1.5; padding: 6px 9px; border-radius: 6px;
+  white-space: normal; width: 200px; text-align: center;
+  pointer-events: none; opacity: 0; transition: opacity .15s; z-index: 50;
+}
+.sim-tooltip:hover .sim-tip { opacity: 1; }
 
 /* ── MODE TOGGLE ── */
 .mode-toggle { display: flex; gap: 4px; margin-bottom: 8px; }
@@ -598,14 +608,14 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
       <!-- 1. Período -->
       <div class="param-group" id="etapaPeriodo">
         <div class="param-group-label">Período</div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-          <input type="text" class="param-inp" id="startDate" placeholder="MM/AAAA"
-            maxlength="7" style="font-family:var(--sim-mono);text-align:center;flex:1"
-            oninput="maskDateInput(this)" onblur="verificarCascata()">
-          <span style="color:var(--sim-text3);font-size:13px">›</span>
-          <input type="text" class="param-inp" id="endDate" placeholder="MM/AAAA"
-            maxlength="7" style="font-family:var(--sim-mono);text-align:center;flex:1"
-            oninput="maskDateInput(this)" onblur="verificarCascata()">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;width:100%">
+          <input type="text" class="param-inp" id="startDate" placeholder="__/____"
+            maxlength="7" style="font-family:var(--sim-mono);text-align:center;flex:1;min-width:0"
+            oninput="maskDateInput(this,'startDate')" onkeydown="dateKeydown(event,'startDate')" onblur="verificarCascata()">
+          <span style="color:var(--sim-text3);font-size:11px;white-space:nowrap;flex-shrink:0">até</span>
+          <input type="text" class="param-inp" id="endDate" placeholder="__/____"
+            maxlength="7" style="font-family:var(--sim-mono);text-align:center;flex:1;min-width:0"
+            oninput="maskDateInput(this,'endDate')" onkeydown="dateKeydown(event,'endDate')" onblur="verificarCascata()">
         </div>
         <button class="btn-confirmar-etapa" id="btnConfirmarPeriodo" onclick="confirmarPeriodo()">✓ Confirmar período</button>
       </div>
@@ -660,46 +670,49 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
 
       <!-- 5. Rebalancear -->
       <div class="param-group etapa" id="etapaRebalancear" style="display:none">
-        <div class="param-group-label">Rebalancear</div>
-        <div class="param-row" style="margin-bottom:6px">
-          <div class="param-field">
-            <label>Frequência</label>
-            <select class="param-inp" id="rebalance">
-              <option value="none">Não rebalancear</option>
-              <option value="monthly">Mensalmente</option>
-              <option value="quarterly">Trimestralmente</option>
-              <option value="semiannual">Semestralmente</option>
-              <option value="annual">Anualmente</option>
-            </select>
+        <div class="param-group-label" style="display:flex;align-items:center;gap:4px">
+          Rebalancear carteira
+          <span class="sim-tooltip" style="cursor:help;color:var(--sim-text3);font-size:10px">?
+            <span class="sim-tip">Rebalancear é voltar os ativos às proporções originais da carteira ao longo do tempo, corrigindo o drift causado por variações de preço.</span>
+          </span>
+        </div>
+        <div class="divmode-row" style="margin-bottom:0">
+          <div class="divmode-btn" id="rebalSimBtn" onclick="selectRebalSim(true,this)">
+            <div class="divmode-btn-title">Sim</div>
           </div>
-          <div class="param-field" id="rebalModeField">
-            <label>Modo</label>
-            <select class="param-inp" id="rebalMode">
-              <option value="passive">Passivo</option>
-              <option value="active">Ativo</option>
-            </select>
+          <div class="divmode-btn" id="rebalNaoBtn" onclick="selectRebalSim(false,this)">
+            <div class="divmode-btn-title">Não</div>
           </div>
         </div>
-        <div id="rebalModeDesc" style="font-size:9px;color:var(--sim-text3);line-height:1.6;margin-top:2px"></div>
+
+        <!-- Tipo — só se SIM -->
+        <div id="rebalTipoWrap" style="display:none;margin-top:10px">
+          <div class="param-group-label" style="margin-bottom:6px">Tipo de rebalanceamento</div>
+          <div class="divmode-row" style="margin-bottom:0">
+            <div class="divmode-btn sim-tooltip" id="rebalPassivoBtn" onclick="selectRebalMode('passive',this)">
+              <div class="divmode-btn-title">Passivo</div>
+              <span class="sim-tip">Aportar em ativos que estão abaixo da % definida. Nunca vender ativos.</span>
+            </div>
+            <div class="divmode-btn sim-tooltip" id="rebalAtivoBtn" onclick="selectRebalMode('active',this)">
+              <div class="divmode-btn-title">Ativo</div>
+              <span class="sim-tip">Vender ativos que estão muito acima da % definida e comprar ativos abaixo da carteira.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Frequência — só após tipo escolhido -->
+        <div id="rebalFreqWrap" style="display:none;margin-top:10px">
+          <div class="param-group-label" style="margin-bottom:4px">Frequência</div>
+          <select class="param-inp" id="rebalance" onchange="verificarCascata()" style="width:100%">
+            <option value="">— Escolha —</option>
+            <option value="monthly">Mensalmente</option>
+            <option value="quarterly">Trimestralmente</option>
+            <option value="semiannual">Semestralmente</option>
+            <option value="annual">Anualmente</option>
+          </select>
+        </div>
+        <input type="hidden" id="rebalMode" value="passive">
       </div>
-      <script>
-      (function(){
-        function updateRebalDesc(){
-          const freq = document.getElementById('rebalance').value;
-          const mode = document.getElementById('rebalMode').value;
-          const field = document.getElementById('rebalModeField');
-          const desc  = document.getElementById('rebalModeDesc');
-          if(freq==='none'){ field.style.display='none'; desc.textContent=''; return; }
-          field.style.display='';
-          desc.textContent = mode==='passive'
-            ? '📥 Passivo: aportes direcionados aos ativos abaixo do peso. Sem vendas.'
-            : '⚖️ Ativo: vende os ativos acima do peso para comprar os abaixo. Gera eventos de venda.';
-        }
-        document.getElementById('rebalance').addEventListener('change', updateRebalDesc);
-        document.getElementById('rebalMode').addEventListener('change', updateRebalDesc);
-        updateRebalDesc();
-      })();
-      </script>
 
       <!-- 6. Dividendos -->
       <div class="param-group etapa" id="etapaDividendos" style="display:none">
@@ -719,7 +732,7 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
           </div>
           <div class="divmode-btn" onclick="selectDivMode('reinvest_rebalance',this)">
             <div class="divmode-btn-title">⚖️ Rebalancear</div>
-            <div class="divmode-btn-sub">Reduz drift</div>
+            <div class="divmode-btn-sub">Reduz drift com dividendos</div>
           </div>
         </div>
       </div>
@@ -736,7 +749,7 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
 
     <div class="sim-sidebar-footer">
       <div class="err-inline" id="sidebarError"></div>
-      <button class="btn-simular" id="btnSimular" onclick="simular()" disabled>▶ Simular carteira</button>
+      <button class="btn-simular" id="btnSimular" onclick="tentarSimular()">▶ Simular carteira</button>
     </div>
   </aside>
 
@@ -1024,7 +1037,7 @@ const SIM_COLORS = ['#1FC96E','#5b8def','#F5A623','#e05c5c','#9b72ef'];
 // ══════════════════════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════════════════════
-let state = { classesSel: [], classesConfig: {}, dividendMode: '' };
+let state = { classesSel: [], classesConfig: {}, dividendMode: '', rebalSim: null, rebalModeVal: 'passive' };
 let _queryBuffer = {};
 let _pizzaChart = null;
 let _pizzaMode = false;
@@ -1421,6 +1434,7 @@ function runBacktest(config, allPrices, allDividends) {
     const meses = Object.keys(pm).sort();
     retornoMensal[a.ticker] = {};
     for (let mi = 1; mi < meses.length; mi++) {
+      if (meses[mi] < '1994-07') continue; // pré-Real: moeda incomparável, ignorar
       const prev = pm[meses[mi-1]], curr = pm[meses[mi]];
       if (prev && curr && prev > 0) retornoMensal[a.ticker][meses[mi]] = (curr / prev) - 1;
     }
@@ -1436,7 +1450,7 @@ function runBacktest(config, allPrices, allDividends) {
   // Para índices acumulados: "preço" = 1 (holdings já é saldo BRL)
   const getPrice = (ticker, month) => {
     if (INDICES_ACUMULADOS.has(ticker)) {
-      // Tem dado se há retorno calculado para esse mês OU se é o primeiro mês com dado
+      if (month < '1994-07') return null; // pré-Real: dados incomparáveis
       const pm = allPrices[ticker] || {};
       return pm[month] != null ? 1 : null;
     }
@@ -1687,13 +1701,46 @@ function buildAssetList() {
 // CASCATA DE ETAPAS
 // ══════════════════════════════════════════════════════════════
 
-function maskDateInput(el) {
+function dateKeydown(event, fieldId) {
+  if (event.key !== 'Backspace') return;
+  const el = event.target;
+  const digits = el.value.replace(/\D/g, '');
+
+  if (fieldId === 'endDate' && digits.length === 0) {
+    // Campo fim está vazio — volta para o início e apaga o último dígito
+    event.preventDefault();
+    const start = document.getElementById('startDate');
+    const sd = start.value.replace(/\D/g, '');
+    if (sd.length > 0) {
+      const novoDigits = sd.slice(0, -1);
+      start.value = novoDigits.length > 2 ? novoDigits.slice(0,2) + '/' + novoDigits.slice(2) : novoDigits;
+    }
+    start.focus();
+    // Posiciona cursor no final
+    setTimeout(() => { start.selectionStart = start.selectionEnd = start.value.length; }, 0);
+    verificarCascata();
+    return;
+  }
+
+  // No próprio campo: apaga dígito a dígito ignorando a barra
+  event.preventDefault();
+  if (digits.length === 0) return;
+  const novoDigits = digits.slice(0, -1);
+  el.value = novoDigits.length > 2 ? novoDigits.slice(0,2) + '/' + novoDigits.slice(2) : novoDigits;
+  verificarCascata();
+}
+
+function maskDateInput(el, fieldId) {
   // Remove tudo que não é dígito
   let v = el.value.replace(/\D/g, '');
   if (v.length > 6) v = v.slice(0, 6);
-  // Formata MM/AAAA
+  // Formata MM/____
   if (v.length > 2) v = v.slice(0,2) + '/' + v.slice(2);
   el.value = v;
+  // Auto-avança para endDate ao completar startDate
+  if (fieldId === 'startDate' && v.length === 7) {
+    document.getElementById('endDate').focus();
+  }
   verificarCascata();
 }
 
@@ -1702,8 +1749,63 @@ function parseDateInput(val) {
   const m = val.trim().match(/^(\d{2})\/(\d{4})$/);
   if (!m) return '';
   const mm = parseInt(m[1]), yyyy = parseInt(m[2]);
-  if (mm < 1 || mm > 12 || yyyy < 1800 || yyyy > 2100) return '';
+  if (mm < 1 || mm > 12 || yyyy < 1900 || yyyy > 2100) return '';
   return yyyy + '-' + String(mm).padStart(2,'0');
+}
+
+function diagnosticarBloqueio() {
+  const sd = parseDateInput(document.getElementById('startDate').value);
+  const ed = parseDateInput(document.getElementById('endDate').value);
+  const periodoOk = !!(sd && ed && sd < ed);
+
+  if (!periodoOk || !_etapaPeriodoOk) return 'Confirme o período de simulação.';
+  if (!_etapaAportesOk) return 'Confirme os aportes (clique em "Confirmar aportes").';
+  if (!_pizzaMode) return 'Aplique as classes de ativos (clique em "Aplicar").';
+
+  const composicaoOk = _pizzaMode && state.classesSel.length > 0 && state.classesSel.every(sel => {
+    const cfg = state.classesConfig[sel.id];
+    if (!cfg) return false;
+    if (cfg.mode === 'indicador') return !!cfg.indicadorTicker;
+    return cfg.ativos.some(a => a.ticker.trim() !== '');
+  });
+  if (!composicaoOk) {
+    const faltando = state.classesSel.find(sel => {
+      const cfg = state.classesConfig[sel.id];
+      if (!cfg) return true;
+      if (cfg.mode === 'indicador') return !cfg.indicadorTicker;
+      return !cfg.ativos.some(a => a.ticker.trim() !== '');
+    });
+    const cls = faltando ? CLASSES_DEF.find(c => c.id === faltando.id) : null;
+    return cls ? `Selecione ao menos um ativo em "${cls.name}".` : 'Preencha a composição de todos os ativos.';
+  }
+
+  if (state.rebalSim === null) return 'Responda se deseja rebalancear a carteira (Sim ou Não).';
+  if (state.rebalSim === true) {
+    if (!state.rebalModeVal) return 'Escolha o tipo de rebalanceamento (Passivo ou Ativo).';
+    const freq = document.getElementById('rebalance')?.value || '';
+    if (!freq) return 'Escolha a frequência de rebalanceamento.';
+  }
+
+  const carteiraAtivos = state.classesSel.flatMap(sel => {
+    const cfg = state.classesConfig[sel.id];
+    if (!cfg) return [];
+    if (cfg.mode === 'indicador') return cfg.indicadorTicker ? [cfg.indicadorTicker] : [];
+    return cfg.ativos.map(a => a.ticker.trim().toUpperCase()).filter(t => t);
+  });
+  const algumPagaDividendo = carteiraAtivos.some(t => !SEM_DIVIDENDOS.has(t) && !INDICES_ACUMULADOS.has(t));
+  if (algumPagaDividendo && !state.dividendMode) return 'Escolha o que fazer com os dividendos recebidos.';
+
+  return null; // tudo ok
+}
+
+function tentarSimular() {
+  const btn = document.getElementById('btnSimular');
+  if (btn && btn.hasAttribute('data-bloqueado')) {
+    const motivo = diagnosticarBloqueio();
+    if (motivo) showErr(motivo, btn);
+    return;
+  }
+  simular();
 }
 
 function verificarCascata() {
@@ -1721,7 +1823,7 @@ function verificarCascata() {
 
   // Composição: após pizza aplicada
   const compGrp = document.getElementById('composicaoGroup');
-  if (compGrp) compGrp.style.display = (_etapaAportesOk && _pizzaMode) ? 'block' : 'none';
+  if (compGrp) compGrp.style.display = _pizzaMode ? 'block' : 'none';
 
   // Composição válida?
   const composicaoOk = _pizzaMode && state.classesSel.length > 0 && state.classesSel.every(sel => {
@@ -1731,25 +1833,51 @@ function verificarCascata() {
     return cfg.ativos.some(a => a.ticker.trim() !== '');
   });
 
-  // Rebalancear, Dividendos, Nome
-  ['etapaRebalancear','etapaDividendos','etapaNome'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = composicaoOk ? 'block' : 'none';
+  // Rebalancear — aparece quando composição ok
+  const etapaR = document.getElementById('etapaRebalancear');
+  if (etapaR) etapaR.style.display = composicaoOk ? 'block' : 'none';
+
+  // rebalOk: NÃO escolhido, OU SIM com tipo E frequência preenchidos
+  const rebalFreqVal = document.getElementById('rebalance')?.value || '';
+  const rebalFreqOk = rebalFreqVal !== '' && rebalFreqVal !== 'undefined';
+  const rebalOk = state.rebalSim === false ||
+    (state.rebalSim === true && state.rebalModeVal && rebalFreqOk);
+
+  // Detecta se algum ativo da carteira potencialmente paga dividendos
+  // (excluindo tickers da lista SEM_DIVIDENDOS e índices acumulados)
+  const carteiraAtivos = state.classesSel.flatMap(sel => {
+    const cfg = state.classesConfig[sel.id];
+    if (!cfg) return [];
+    if (cfg.mode === 'indicador') return cfg.indicadorTicker ? [cfg.indicadorTicker] : [];
+    return cfg.ativos.map(a => a.ticker.trim().toUpperCase()).filter(t => t);
   });
+  const algumPagaDividendo = carteiraAtivos.some(t => !SEM_DIVIDENDOS.has(t) && !INDICES_ACUMULADOS.has(t));
+
+  // Dividendos — aparece após rebalOk E se algum ativo paga dividendo
+  const etapaD = document.getElementById('etapaDividendos');
+  if (etapaD) etapaD.style.display = (composicaoOk && rebalOk && algumPagaDividendo) ? 'block' : 'none';
+
+  // Se nenhum ativo paga dividendo, força dividendMode neutro para não bloquear
+  const dividendoOk = !algumPagaDividendo || (state.dividendMode !== '' && state.dividendMode !== null && state.dividendMode !== undefined);
+  if (!algumPagaDividendo && (!state.dividendMode || state.dividendMode === '')) state.dividendMode = 'none';
+
+  // Nome — após dividendos ok
+  const etaN = document.getElementById('etapaNome');
+  if (etaN) etaN.style.display = (composicaoOk && rebalOk && dividendoOk) ? 'block' : 'none';
 
   // Simular
-  const dividendoOk = state.dividendMode !== '';
-  const tudo = periodoOk && _etapaPeriodoOk && _etapaAportesOk && _pizzaMode && composicaoOk && dividendoOk;
+  const tudo = periodoOk && _etapaPeriodoOk && _etapaAportesOk && _pizzaMode && composicaoOk && rebalOk && dividendoOk;
   const btn = document.getElementById('btnSimular');
-  if (btn) btn.disabled = !tudo;
+  if (btn) { if (!tudo) btn.setAttribute('data-bloqueado',''); else btn.removeAttribute('data-bloqueado'); }
 }
 
 function confirmarPeriodo() {
   const sd = parseDateInput(document.getElementById('startDate').value);
   const ed = parseDateInput(document.getElementById('endDate').value);
-  if (!sd) { showErr('Informe o início no formato MM/AAAA.'); return; }
-  if (!ed) { showErr('Informe o fim no formato MM/AAAA.'); return; }
-  if (sd >= ed) { showErr('O início deve ser anterior ao fim.'); return; }
+  if (!sd) { showErr('Informe o início no formato MM/AAAA.', document.getElementById('btnConfirmarPeriodo')); return; }
+  if (!ed) { showErr('Informe o fim no formato MM/AAAA.', document.getElementById('btnConfirmarPeriodo')); return; }
+  if (sd < '1995-01') { showErr('Data mínima: 01/1995 (início do Plano Real estabilizado).', document.getElementById('btnConfirmarPeriodo')); return; }
+  if (sd >= ed) { showErr('O início deve ser anterior ao fim.', document.getElementById('btnConfirmarPeriodo')); return; }
   _etapaPeriodoOk = true;
   salvarEstado();
   verificarCascata();
@@ -1780,6 +1908,7 @@ function aplicarClassesPizza() {
   document.getElementById('pizzaSection').classList.add('show');
   renderPizzaClasses();
   renderSlidersPizza();
+  renderComposicao();
   verificarCascata();
 }
 
@@ -1880,7 +2009,6 @@ function toggleClasse(id) {
   else state.classesSel.push({ id, pct: 0 });
   const n = state.classesSel.length;
   if (n > 0) { const base = Math.floor(100/n), rem = 100 - base*n; state.classesSel.forEach((c,i) => { c.pct = base + (i===0?rem:0); }); }
-  _etapaPeriodoOk = false; _etapaAportesOk = false;
   if (_pizzaMode) editarClassesPizza(); else renderSidebar();
 }
 
@@ -1937,10 +2065,35 @@ function onSlider(id, requested) {
   renderClassesGrid();
 }
 
+function atualizarDimmedAccordions() {
+  // Cada accordion fica dimmed até o anterior estar preenchido
+  // "preenchido" = tem ao menos 1 ticker válido (modo custom) ou indicador selecionado (modo indicador)
+  let anteriorOk = true;
+  state.classesSel.forEach((sel, idx) => {
+    const acc = document.getElementById('acc_' + sel.id);
+    if (!acc) return;
+    if (anteriorOk) {
+      acc.classList.remove('dimmed');
+    } else {
+      acc.classList.add('dimmed');
+      // Fecha se estava aberto
+      acc.classList.remove('open');
+    }
+    // Verifica se este está preenchido para o próximo
+    const cfg = state.classesConfig[sel.id];
+    if (!cfg) { anteriorOk = false; return; }
+    if (cfg.mode === 'indicador') {
+      anteriorOk = !!cfg.indicadorTicker;
+    } else {
+      anteriorOk = cfg.ativos.some(a => a.ticker.trim() !== '');
+    }
+  });
+}
+
 function renderComposicao() {
   const grp = document.getElementById('composicaoGroup');
   const cont = document.getElementById('classesAccContainer');
-  grp.style.display = state.classesSel.length > 0 ? 'block' : 'none';
+  grp.style.display = (_pizzaMode && state.classesSel.length > 0) ? 'block' : 'none';
   cont.innerHTML = '';
   state.classesSel.forEach((sel, idx) => {
     const cls = CLASSES_DEF.find(c => c.id === sel.id);
@@ -1987,6 +2140,7 @@ function renderComposicao() {
     renderIndGrid(sel.id);
     renderAtivosRows(sel.id);
   });
+  atualizarDimmedAccordions();
 }
 
 function toggleAcc(id) {
@@ -1998,7 +2152,7 @@ function toggleAcc(id) {
       const soma = cfg.ativos.reduce((s,a) => s+(parseFloat(a.pct)||0), 0);
       if (Math.abs(soma - 100) >= 0.5) {
         const nomeCls = CLASSES_DEF.find(c => c.id === sel.id)?.name || sel.id;
-        showErr(`Em "${nomeCls}" corrija a porcentagem para dar 100% antes de continuar.`);
+        showErr(`Em "${nomeCls}" corrija a porcentagem para dar 100% antes de continuar.`, document.getElementById("acc_"+sel.id)?.querySelector(".class-acc-head"));
         // Abre o accordion problemático se estiver fechado
         const accProb = document.getElementById('acc_'+sel.id);
         if (accProb && !accProb.classList.contains('open')) accProb.classList.add('open');
@@ -2035,6 +2189,7 @@ function renderIndGrid(id) {
 function setCfgIndicador(id, ticker) {
   state.classesConfig[id].indicadorTicker = ticker.toUpperCase();
   renderIndGrid(id);
+  atualizarDimmedAccordions();
   verificarCascata();
 }
 
@@ -2204,6 +2359,7 @@ function selecionarAtivo(id, idx, ticker) {
   state.classesConfig[id].ativos[idx].ticker = ticker.toUpperCase();
   redistribuirValidos(id);
   renderAtivosRows(id);
+  atualizarDimmedAccordions();
   verificarCascata();
 }
 
@@ -2277,6 +2433,38 @@ function somaInterna(id) {
   return cfg.ativos.reduce((s,a) => s+(parseFloat(a.pct)||0), 0);
 }
 
+function selectRebalSim(sim, el) {
+  state.rebalSim = sim;
+  document.querySelectorAll('#rebalSimBtn,#rebalNaoBtn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const tipoWrap = document.getElementById('rebalTipoWrap');
+  const freqWrap = document.getElementById('rebalFreqWrap');
+  if (sim) {
+    tipoWrap.style.display = 'block';
+    // Frequência só aparece após tipo ser escolhido
+    if (freqWrap) freqWrap.style.display = state.rebalModeVal ? 'block' : 'none';
+  } else {
+    tipoWrap.style.display = 'none';
+    if (freqWrap) freqWrap.style.display = 'none';
+    // Reset tipo e frequência
+    document.querySelectorAll('#rebalPassivoBtn,#rebalAtivoBtn').forEach(b => b.classList.remove('active'));
+    state.rebalModeVal = null;
+    if (document.getElementById('rebalance')) document.getElementById('rebalance').value = '';
+  }
+  verificarCascata();
+}
+
+function selectRebalMode(mode, el) {
+  state.rebalModeVal = mode;
+  document.getElementById('rebalMode').value = mode;
+  document.querySelectorAll('#rebalPassivoBtn,#rebalAtivoBtn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  // Mostra frequência agora que tipo foi escolhido
+  const freqWrap = document.getElementById('rebalFreqWrap');
+  if (freqWrap) freqWrap.style.display = 'block';
+  verificarCascata();
+}
+
 function selectDivMode(mode, el) {
   state.dividendMode = mode;
   document.querySelectorAll('.divmode-btn').forEach(b => b.classList.remove('active'));
@@ -2321,26 +2509,35 @@ function showPopup(msg) {
 // ══════════════════════════════════════════════════════════════
 // VALIDATE
 // ══════════════════════════════════════════════════════════════
-function showErr(msg) {
-  const el = document.getElementById('sidebarError');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 5000);
+function showErr(msg, anchorEl) {
+  document.querySelectorAll('.err-ctx').forEach(e => e.remove());
+  if (anchorEl) {
+    const err = document.createElement('div');
+    err.className = 'err-inline err-ctx show';
+    err.textContent = msg;
+    anchorEl.insertAdjacentElement('afterend', err);
+    setTimeout(() => err.remove(), 5000);
+  } else {
+    const el = document.getElementById('sidebarError');
+    el.textContent = msg; el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 5000);
+  }
 }
 
 function validate() {
-  if (state.classesSel.length === 0) { showErr('Selecione ao menos uma classe.'); return false; }
+  if (state.classesSel.length === 0) { showErr('Selecione ao menos uma classe.', document.getElementById('btnSimular')); return false; }
   const total = state.classesSel.reduce((s,c) => s+c.pct, 0);
-  if (total !== 100) { showErr(`Soma: ${total}%. Deve ser 100%.`); return false; }
+  if (total !== 100) { showErr(`Soma: ${total}%. Deve ser 100%.`, document.getElementById('btnSimular')); return false; }
   const sd = document.getElementById('startDate').value, ed = document.getElementById('endDate').value;
-  if (!sd || !ed) { showErr('Informe o período.'); return false; }
-  if (sd >= ed) { showErr('Início deve ser anterior ao fim.'); return false; }
+  if (!sd || !ed) { showErr('Informe o período.', document.getElementById('btnSimular')); return false; }
+  if (sd >= ed) { showErr('Início deve ser anterior ao fim.', document.getElementById('btnSimular')); return false; }
   for (const sel of state.classesSel) {
     const cfg = state.classesConfig[sel.id];
     if (cfg?.mode === 'custom') {
       const ativos = cfg.ativos.filter(a => a.ticker.trim());
-      if (ativos.length === 0) { showErr(`Adicione ativos em "${CLASSES_DEF.find(c=>c.id===sel.id)?.name}".`); return false; }
+      if (ativos.length === 0) { showErr(`Adicione ativos em "${CLASSES_DEF.find(c=>c.id===sel.id)?.name}".`, document.getElementById('btnSimular')); return false; }
       const soma = ativos.reduce((s,a) => s+(parseFloat(a.pct)||0), 0);
-      if (Math.abs(soma-100) > 1) { const nome = CLASSES_DEF.find(c=>c.id===sel.id)?.name; showErr(`Em "${nome}" corrija a porcentagem para dar 100% (soma atual: ${soma.toFixed(0)}%).`); return false; }
+      if (Math.abs(soma-100) > 1) { const nome = CLASSES_DEF.find(c=>c.id===sel.id)?.name; showErr(`Em "${nome}" corrija a porcentagem para dar 100% (soma atual: ${soma.toFixed(0)}%).`, document.getElementById('btnSimular')); return false; }
     }
   }
   return true;
@@ -2350,7 +2547,7 @@ function validate() {
 // SIMULAR
 // ══════════════════════════════════════════════════════════════
 async function simular() {
-  if (editingSimIdx === null && simulations.length >= 5) { showErr('Máximo de 5 simulações atingido.'); return; }
+  if (editingSimIdx === null && simulations.length >= 5) { showErr('Máximo de 5 simulações atingido.', document.getElementById('btnSimular')); return; }
   if (!validate()) return;
   document.getElementById('loaderOverlay').classList.add('show');
   await new Promise(r => setTimeout(r, 50));
@@ -2359,8 +2556,8 @@ async function simular() {
     const endDate   = parseDateInput(document.getElementById('endDate').value);
     const initialAmount = parseFloat(document.getElementById('initialAmount').value) || 0;
     const monthlyAmount = parseFloat(document.getElementById('monthlyAmount').value) || 0;
-    const rebalance = document.getElementById('rebalance').value;
-    const rebalMode = document.getElementById('rebalMode')?.value || 'passive';
+    const rebalance = state.rebalSim ? (document.getElementById('rebalance')?.value || 'annual') : 'none';
+    const rebalMode = state.rebalModeVal || 'passive';
     const assets = buildAssetList();
     const months = generateMonthRange(startDate, endDate);
 
@@ -2383,12 +2580,12 @@ async function simular() {
     );
     if (ativosSemDado.length > 0) {
       const nomes = ativosSemDado.map(a => a.ticker).join(', ');
-      showErr(`Ativo(s) sem dados no período: ${nomes}. Verifique se o ticker existe e se há dados disponíveis.`);
+      showErr(`Ativo(s) sem dados no período: ${nomes}. Verifique se o ticker existe e se há dados disponíveis.`, document.getElementById('btnSimular'));
       return;
     }
 
     if (ativosComDado.length === 0) {
-      showErr('Nenhum ativo possui dados reais no período selecionado. Ajuste as datas ou os ativos.');
+      showErr('Nenhum ativo possui dados reais no período selecionado. Ajuste as datas ou os ativos.', document.getElementById('btnSimular'));
       return;
     }
 
@@ -2398,7 +2595,7 @@ async function simular() {
       assets.some(a => allPrices[a.ticker]?.[m])
     );
     if (!temAlgumDado) {
-      showErr('Sem dados disponíveis para qualquer ativo no período. Ajuste as datas.');
+      showErr('Sem dados disponíveis para qualquer ativo no período. Ajuste as datas.', document.getElementById('btnSimular'));
       return;
     }
 
@@ -2441,7 +2638,7 @@ async function simular() {
     salvarEstado();
 
   } catch(e) {
-    showErr('Erro: ' + e.message);
+    showErr('Erro: ' + e.message, document.getElementById('btnSimular'));
   } finally {
     document.getElementById('loaderOverlay').classList.remove('show');
   }
@@ -2462,7 +2659,7 @@ function editarSim() { setSidebarLocked(false); document.getElementById('btnSimu
 
 function duplicarSim() {
   if (editingSimIdx === null || !simulations[editingSimIdx]) return;
-  if (simulations.length >= 5) { showErr('Máximo de 5 simulações atingido.'); return; }
+  if (simulations.length >= 5) { showErr('Máximo de 5 simulações atingido.', document.getElementById('btnSimular')); return; }
   const orig = simulations[editingSimIdx];
   const copia = JSON.parse(JSON.stringify(orig));
   copia.id = Date.now();
@@ -2477,18 +2674,17 @@ function duplicarSim() {
 
 function novaSim() {
   editingSimIdx = null;
-  state.classesSel = []; state.classesConfig = {}; state.dividendMode = 'none';
+  state.classesSel = []; state.classesConfig = {}; state.dividendMode = ''; state.rebalSim = null; state.rebalModeVal = 'passive';
   _etapaPeriodoOk = false; _etapaAportesOk = false;
   if (_pizzaMode) editarClassesPizza();
   document.getElementById('startDate').value = '2019-01';
   document.getElementById('endDate').value   = '2024-12';
   document.getElementById('initialAmount').value = '10000';
   document.getElementById('monthlyAmount').value  = '500';
-  document.getElementById('rebalance').value = 'none';
-  if (document.getElementById('rebalMode')) document.getElementById('rebalMode').value = 'passive';
-  document.getElementById('rebalance').dispatchEvent(new Event('change'));
+  if (document.getElementById('rebalance')) document.getElementById('rebalance').value = 'annual';
   document.getElementById('simName').value   = '';
-  document.querySelectorAll('.divmode-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  document.querySelectorAll('#rebalSimBtn,#rebalNaoBtn,#rebalPassivoBtn,#rebalAtivoBtn,.divmode-btn').forEach(b => b.classList.remove('active'));
+  const rWrap = document.getElementById('rebalTipoWrap'); if(rWrap) rWrap.style.display='none';
   document.getElementById('btnSimular').textContent = '▶ Simular carteira';
   setSidebarLocked(false);
   renderSidebar();
@@ -2510,10 +2706,19 @@ function loadSimIntoSidebar(idx) {
   document.getElementById('endDate').value       = sim.config.endDate;
   document.getElementById('initialAmount').value = sim.config.initialAmount;
   document.getElementById('monthlyAmount').value = sim.config.monthlyAmount;
-  document.getElementById('rebalance').value     = sim.config.rebalance || 'none';
-  if (document.getElementById('rebalMode')) document.getElementById('rebalMode').value = sim.config.rebalMode || 'passive';
-  // Trigger desc update
-  document.getElementById('rebalance').dispatchEvent(new Event('change'));
+  // Restore rebal state
+  const wasRebal = sim.config.rebalance && sim.config.rebalance !== 'none';
+  state.rebalSim = wasRebal;
+  state.rebalModeVal = sim.config.rebalMode || 'passive';
+  document.querySelectorAll('#rebalSimBtn,#rebalNaoBtn').forEach(b => b.classList.remove('active'));
+  document.getElementById(wasRebal ? 'rebalSimBtn' : 'rebalNaoBtn')?.classList.add('active');
+  const tipoWrapL = document.getElementById('rebalTipoWrap'); if(tipoWrapL) tipoWrapL.style.display = wasRebal ? 'block' : 'none';
+  const freqWrapL = document.getElementById('rebalFreqWrap'); if(freqWrapL) freqWrapL.style.display = wasRebal ? 'block' : 'none';
+  if (wasRebal) {
+    if (document.getElementById('rebalance')) document.getElementById('rebalance').value = sim.config.rebalance;
+    document.querySelectorAll('#rebalPassivoBtn,#rebalAtivoBtn').forEach(b => b.classList.remove('active'));
+    document.getElementById(state.rebalModeVal === 'active' ? 'rebalAtivoBtn' : 'rebalPassivoBtn')?.classList.add('active');
+  }
   document.getElementById('simName').value       = sim.name;
   document.querySelectorAll('.divmode-btn').forEach(b => b.classList.remove('active'));
   const modes = ['none','reinvest_same','reinvest_class','reinvest_rebalance'];
@@ -2584,7 +2789,7 @@ function clearAll() {
 }
 
 function toggleView() {
-  if (simulations.length < 2) { showErr('Adicione ao menos 2 simulações para comparar.'); return; }
+  if (simulations.length < 2) { showErr('Adicione ao menos 2 simulações para comparar.', document.getElementById('btnSimular')); return; }
   viewMode = viewMode === 'single' ? 'compare' : 'single';
   updateViewBtn();
   if (viewMode === 'compare') {
@@ -2977,6 +3182,8 @@ function salvarEstado() {
         classesSel:    state.classesSel,
         classesConfig: state.classesConfig,
         dividendMode:  state.dividendMode,
+        rebalSim:      state.rebalSim,
+        rebalModeVal:  state.rebalModeVal,
       },
       pizzaMode: _pizzaMode,
       etapaPeriodoOk: _etapaPeriodoOk,
@@ -3009,7 +3216,6 @@ function restaurarEstado() {
     if (f.rebalMode && document.getElementById('rebalMode'))
                          document.getElementById('rebalMode').value     = f.rebalMode;
     if (f.simName)       document.getElementById('simName').value       = f.simName;
-    document.getElementById('rebalance').dispatchEvent(new Event('change'));
 
     // State
     const st = dados.state || {};
@@ -3022,6 +3228,18 @@ function restaurarEstado() {
       const dBtns = document.querySelectorAll('.divmode-btn');
       const dIdx  = modes.indexOf(st.dividendMode);
       if (dBtns[dIdx]) dBtns[dIdx].classList.add('active');
+    }
+    if (st.rebalSim !== undefined && st.rebalSim !== null) {
+      state.rebalSim = st.rebalSim;
+      state.rebalModeVal = st.rebalModeVal || null;
+      document.getElementById(st.rebalSim ? 'rebalSimBtn' : 'rebalNaoBtn')?.classList.add('active');
+      const tipoWrap = document.getElementById('rebalTipoWrap');
+      const freqWrap = document.getElementById('rebalFreqWrap');
+      if (tipoWrap) tipoWrap.style.display = st.rebalSim ? 'block' : 'none';
+      if (st.rebalSim && state.rebalModeVal) {
+        document.getElementById(state.rebalModeVal === 'active' ? 'rebalAtivoBtn' : 'rebalPassivoBtn')?.classList.add('active');
+        if (freqWrap) freqWrap.style.display = 'block';
+      }
     }
 
     // Simulações
