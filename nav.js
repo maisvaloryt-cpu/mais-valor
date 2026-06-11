@@ -38,6 +38,12 @@ const NAV_LINKS = [
   { href: 'index.html',        label: 'Home' },
   { href: 'acoes.html',        label: 'Ações' },
   { href: 'fiis.html',         label: 'FIIs' },
+  { href: '#',                 label: 'Exterior', dropdown: [
+    { href: 'bdrs.html',    label: '🇧🇷 BDRs' },
+    { href: 'etfs.html',    label: '📊 ETFs' },
+    { href: 'reits.html',   label: '🏢 REITs' },
+    { href: 'stocks.html',  label: '🇺🇸 Stocks' },
+  ]},
   { href: 'criptos.html',      label: 'Criptos' },
   { href: 'dividendos.html',   label: 'Dividendos' },
   { href: 'rankings.html',     label: 'Rankings' },
@@ -323,32 +329,42 @@ function toggleMobileMenu() {
 function renderNav() {
   const page = location.pathname.split('/').pop() || 'index.html';
 
-  const extPages = ['bdrs.html','etfs.html','reits.html','stocks.html'];
-  const extActive = extPages.includes(page);
-
   const links = NAV_LINKS.map(l => {
     const isStatus = l.href === 'status.html';
     const style = isStatus ? 'color:var(--up);font-size:11px' : '';
+    if (l.dropdown) {
+      const isActive = l.dropdown.some(d => page === d.href);
+      return `<div class="nav-dropdown-wrap">
+        <a href="#" class="${isActive ? 'active' : ''}" style="${style}" onclick="return false">
+          ${l.label} ▾
+        </a>
+        <div class="nav-dropdown">
+          ${l.dropdown.map(d => `<a href="${d.href}" class="${page===d.href?'active':''}">${d.label}</a>`).join('')}
+        </div>
+      </div>`;
+    }
     const cls = page === l.href ? 'active' : '';
     return `<a href="${l.href}" class="${cls}" style="${style}">${l.label}</a>`;
   }).join('');
 
-  // Exterior trigger — sem dropdown inline, dropdown vai no body via JS
-  const exteriorHtml = `<span id="mv-ext-btn" class="${extActive ? 'active' : ''}" style="cursor:pointer;font-size:13px;font-weight:600;color:var(--text2);padding:4px 2px;transition:color .15s;white-space:nowrap;${extActive?'color:var(--text)':''}">Exterior ▾</span>`;
-
-  const mobileLinks = NAV_LINKS.map(l => {
+  const mobileLinks = NAV_LINKS.flatMap(l => {
+    if (l.dropdown) return l.dropdown;
+    return [l];
+  }).map(l => {
     const isStatus = l.href === 'status.html';
     const cls = page === l.href ? 'active' : '';
     const style = isStatus ? 'color:var(--up)' : '';
     return `<a href="${l.href}" class="${cls}" style="${style}" onclick="toggleMobileMenu()">${l.label}</a>`;
-  }).join('') + `
-    <a href="bdrs.html" class="${page==='bdrs.html'?'active':''}" onclick="toggleMobileMenu()">🇧🇷 BDRs</a>
-    <a href="etfs.html" class="${page==='etfs.html'?'active':''}" onclick="toggleMobileMenu()">📊 ETFs</a>
-    <a href="reits.html" class="${page==='reits.html'?'active':''}" onclick="toggleMobileMenu()">🏢 REITs</a>
-    <a href="stocks.html" class="${page==='stocks.html'?'active':''}" onclick="toggleMobileMenu()">🇺🇸 Stocks</a>`;
+  }).join('');
 
   document.getElementById('nav-placeholder').innerHTML = `
   <style>
+  .nav-dropdown-wrap{position:relative;display:inline-flex;align-items:center}
+  .nav-dropdown-wrap > a{cursor:pointer}
+  .nav-dropdown{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--bg2);border:1px solid var(--border3);border-radius:10px;padding:6px;min-width:140px;z-index:9999;box-shadow:var(--shadow-lg);animation:slideDown .18s ease both;pointer-events:auto}
+  .nav-dropdown a{display:block;padding:8px 12px;border-radius:7px;font-size:12.5px;font-weight:600;color:var(--text2);white-space:nowrap;transition:var(--transition)}
+  .nav-dropdown a:hover{background:var(--bg3);color:var(--text)}
+  .nav-dropdown-wrap:hover .nav-dropdown,.nav-dropdown-wrap.open .nav-dropdown{display:block!important}
   #nav-hamburger{display:none;background:transparent;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:6px 8px;line-height:1;border-radius:8px;transition:background .15s;flex-shrink:0}
   #nav-hamburger:hover{background:var(--bg3)}
   #nav-mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg,#0E0E11);z-index:500;flex-direction:column;padding:20px 24px;overflow-y:auto;animation:slideDown .2s ease}
@@ -358,21 +374,8 @@ function renderNav() {
   #nav-mobile-menu a{display:block;padding:14px 0;font-size:18px;font-weight:700;color:var(--text2);border-bottom:1px solid var(--border);text-decoration:none;transition:color .15s}
   #nav-mobile-menu a:hover,#nav-mobile-menu a.active{color:var(--gold,#D4A017)}
   #nav-mobile-menu a:last-child{border-bottom:none}
-  @media (max-width:900px){.nav-links{display:none!important}#nav-ext-btn-wrap{display:none!important}#nav-hamburger{display:flex!important;align-items:center;justify-content:center}}
+  @media (max-width:900px){.nav-links{display:none!important}#nav-hamburger{display:flex!important;align-items:center;justify-content:center}}
   @media (max-width:600px){.nav-search-wrap{display:none!important}.nav-badge{display:none!important}}
-  #mv-ext-floatdrop{
-    display:none;
-    position:fixed;
-    background:var(--bg2,#1a1a1f);
-    border:1px solid var(--border3,rgba(255,255,255,0.12));
-    border-radius:10px;
-    padding:6px;
-    min-width:150px;
-    z-index:99999;
-    box-shadow:0 8px 32px rgba(0,0,0,0.5);
-  }
-  #mv-ext-floatdrop a{display:block;padding:9px 14px;border-radius:7px;font-size:13px;font-weight:600;color:var(--text2,#aaa);white-space:nowrap;text-decoration:none;transition:background .12s,color .12s}
-  #mv-ext-floatdrop a:hover,#mv-ext-floatdrop a.active{background:var(--bg3,#252529);color:var(--text,#fff)}
   </style>
 
   <div id="nav-mobile-menu">
@@ -391,7 +394,7 @@ function renderNav() {
       ${LOGO_SVG_HTML}
       <span>Mais <em>Valor</em></span>
     </a>
-    <div class="nav-links">${links}${exteriorHtml}</div>
+    <div class="nav-links">${links}</div>
     <div class="nav-right">
       <div class="nav-search-wrap">
         <span class="nav-search-icon">⌕</span>
@@ -479,43 +482,17 @@ function renderNav() {
 
   applyTheme(getTheme());
 
-  // ── Exterior dropdown — appendado no body, escapa de qualquer overflow:hidden ──
-  const drop = document.createElement('div');
-  drop.id = 'mv-ext-floatdrop';
-  drop.innerHTML = `
-    <a href="bdrs.html" class="${page==='bdrs.html'?'active':''}">🇧🇷 BDRs</a>
-    <a href="etfs.html" class="${page==='etfs.html'?'active':''}">📊 ETFs</a>
-    <a href="reits.html" class="${page==='reits.html'?'active':''}">🏢 REITs</a>
-    <a href="stocks.html" class="${page==='stocks.html'?'active':''}">🇺🇸 Stocks</a>`;
-  document.body.appendChild(drop);
-
-  let dropTimer;
-  function showDrop() {
-    clearTimeout(dropTimer);
-    const btn = document.getElementById('mv-ext-btn');
-    if (!btn) return;
-    const r = btn.getBoundingClientRect();
-    drop.style.display = 'block';
-    drop.style.top  = (r.bottom + 6) + 'px';
-    drop.style.left = r.left + 'px';
-  }
-  function hideDrop() {
-    dropTimer = setTimeout(() => { drop.style.display = 'none'; }, 120);
-  }
-
-  document.addEventListener('mouseover', (e) => {
-    if (e.target.closest('#mv-ext-btn')) showDrop();
-    else if (e.target.closest('#mv-ext-floatdrop')) clearTimeout(dropTimer);
-  });
-  document.addEventListener('mouseout', (e) => {
-    const to = e.relatedTarget;
-    if (!to || (!to.closest('#mv-ext-btn') && !to.closest('#mv-ext-floatdrop'))) hideDrop();
-  });
-
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.nav-search-wrap')) {
       const r = document.getElementById('nav-search-results');
       if (r) r.style.display = 'none';
+    }
+    const wrap = e.target.closest('.nav-dropdown-wrap');
+    if (wrap && e.target.closest('.nav-dropdown-wrap > a')) {
+      e.preventDefault();
+      wrap.classList.toggle('open');
+    } else if (!wrap) {
+      document.querySelectorAll('.nav-dropdown-wrap.open').forEach(el => el.classList.remove('open'));
     }
   });
 
