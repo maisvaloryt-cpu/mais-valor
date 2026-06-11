@@ -2822,7 +2822,6 @@ const divModeLabel = { none:'Caixa', reinvest_same:'Mesmo ativo', reinvest_class
 function renderAtivosTimeline(breakdown, startDate, endDate) {
   if (!breakdown || breakdown.length === 0) return '';
 
-  // Converte YYYY-MM para número de meses desde startDate
   const toMonths = (ym) => {
     const [y, m] = ym.split('-').map(Number);
     return y * 12 + m;
@@ -2831,14 +2830,12 @@ function renderAtivosTimeline(breakdown, startDate, endDate) {
   const simEnd   = toMonths(endDate);
   const simTotal = simEnd - simStart || 1;
 
-  // Agrupa por classe
   const byClass = {};
   breakdown.forEach(b => {
     if (!byClass[b.assetClass]) byClass[b.assetClass] = [];
     byClass[b.assetClass].push(b);
   });
 
-  // Cores por classe (reutiliza paleta existente)
   const CLASS_COLORS = ['#5b8def','#1FC96E','#D4A017','#9b72ef','#e05c5c','#56c8d8','#f7931a'];
   const classKeys = Object.keys(byClass);
 
@@ -2846,47 +2843,46 @@ function renderAtivosTimeline(breakdown, startDate, endDate) {
   classKeys.forEach((cls, ci) => {
     const color = CLASS_COLORS[ci % CLASS_COLORS.length];
     byClass[cls].forEach(b => {
-      if (!b.firstMonth) return; // sem dado algum
-      const start = toMonths(b.firstMonth);
-      const end   = b.lastMonth ? toMonths(b.lastMonth) : simEnd;
-      const leftPct  = ((start - simStart) / simTotal * 100).toFixed(2);
-      const widthPct = ((end - start + 1) / simTotal * 100).toFixed(2);
+      if (!b.firstMonth) return;
+      const bStart = toMonths(b.firstMonth);
+      const bEnd   = b.lastMonth ? toMonths(b.lastMonth) : simEnd;
+      const leftPct  = ((bStart - simStart) / simTotal * 100).toFixed(2);
+      const widthPct = ((bEnd - bStart + 1) / simTotal * 100).toFixed(2);
       const coverPct = b.totalMeses > 0 ? Math.round(b.mesesComDado / b.totalMeses * 100) : 0;
-      const partial  = start > simStart || end < simEnd;
-      const barColor = partial ? color + 'cc' : color;
-      rows.push(`
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
-          <div style="width:70px;flex-shrink:0;font-size:10px;font-family:var(--sim-mono);color:var(--sim-text2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${b.ticker} (${cls})">${b.ticker}</div>
-          <div style="flex:1;position:relative;height:18px;background:var(--sim-surf2);border-radius:3px;overflow:hidden">
-            <div style="position:absolute;left:${leftPct}%;width:${widthPct}%;height:100%;background:${barColor};border-radius:3px;min-width:2px"
-              title="${b.ticker}: ${b.firstMonth ? monthLabel(b.firstMonth) : '?'} → ${b.lastMonth ? monthLabel(b.lastMonth) : '?'} (${coverPct}% do período)">
-            </div>
-          </div>
-          <div style="width:34px;flex-shrink:0;font-size:9px;font-family:var(--sim-mono);color:${coverPct===100?'var(--up)':coverPct>50?'var(--gold)':'var(--dn)'};text-align:right">${coverPct}%</div>
-        </div>
-      `);
+      const partial  = bStart > simStart || bEnd < simEnd;
+      const barColor = partial ? color + 'bb' : color;
+      const coverColor = coverPct === 100 ? 'var(--up)' : coverPct > 50 ? 'var(--gold)' : 'var(--dn)';
+      const titleStr = b.ticker + ': ' + (b.firstMonth ? monthLabel(b.firstMonth) : '?') + ' -> ' + (b.lastMonth ? monthLabel(b.lastMonth) : '?') + ' (' + coverPct + '% do periodo)';
+      rows.push(
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">' +
+          '<div style="width:70px;flex-shrink:0;font-size:10px;font-family:var(--sim-mono);color:var(--sim-text2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + b.ticker + ' (' + cls + ')">' + b.ticker + '</div>' +
+          '<div style="flex:1;position:relative;height:18px;background:var(--sim-surf2);border-radius:3px;overflow:hidden">' +
+            '<div style="position:absolute;left:' + leftPct + '%;width:' + widthPct + '%;height:100%;background:' + barColor + ';border-radius:3px;min-width:2px" title="' + titleStr + '"></div>' +
+          '</div>' +
+          '<div style="width:34px;flex-shrink:0;font-size:9px;font-family:var(--sim-mono);color:' + coverColor + ';text-align:right">' + coverPct + '%</div>' +
+        '</div>'
+      );
     });
   });
 
   if (rows.length === 0) return '';
 
-  // Labels de eixo X (início, meio, fim)
-  const midDate = new Date(Math.floor((simStart + simEnd) / 2 / 12), Math.floor((simStart + simEnd) / 2 % 12));
+  const simMid = Math.floor((simStart + simEnd) / 2);
+  const midY = Math.floor(simMid / 12);
+  const midM = String(simMid % 12 || 12).padStart(2, '0');
   const labelStart = monthLabel(startDate);
   const labelEnd   = monthLabel(endDate);
-  const labelMid   = monthLabel(`${Math.floor((simStart+simEnd)/2/12)}-${String(Math.floor((simStart+simEnd)/2%12)||12).padStart(2,'0')}`);
+  const labelMid   = monthLabel(midY + '-' + midM);
 
-  return \`
-    <div style="margin-top:20px;background:var(--sim-surf2);border:1px solid var(--sim-border);border-radius:var(--sim-r);padding:14px 16px;">
-      <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sim-text3);margin-bottom:12px;">Cobertura por ativo no período</div>
-      \${rows.join('')}
-      <div style="display:flex;margin-left:78px;margin-top:4px;font-size:9px;font-family:var(--sim-mono);color:var(--sim-text3)">
-        <span>\${labelStart}</span>
-        <span style="margin:0 auto">\${labelMid}</span>
-        <span>\${labelEnd}</span>
-      </div>
-    </div>
-  \`;
+  return '<div style="margin-top:20px;background:var(--sim-surf2);border:1px solid var(--sim-border);border-radius:var(--sim-r);padding:14px 16px;">' +
+    '<div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sim-text3);margin-bottom:12px;">Cobertura por ativo no período</div>' +
+    rows.join('') +
+    '<div style="display:flex;margin-left:78px;margin-top:6px;font-size:9px;font-family:var(--sim-mono);color:var(--sim-text3)">' +
+      '<span>' + labelStart + '</span>' +
+      '<span style="margin:0 auto">' + labelMid + '</span>' +
+      '<span>' + labelEnd + '</span>' +
+    '</div>' +
+  '</div>';
 }
 
 function renderAvailabilityLog(logs) {
