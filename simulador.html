@@ -2917,7 +2917,19 @@ function renderAtivosTimeline(breakdown, startDate, endDate, series, simName) {
 
       const tooltipHtml =
         '<div style="background:#0E0E11;border:1px solid var(--sim-border2);border-radius:8px;padding:10px 12px;width:210px;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,0.6)">' +
-          '<div style="font-size:10px;font-weight:700;color:var(--sim-text);margin-bottom:8px">' + monthLabel(s.date) + '</div>' +
+          (function(){
+        // Calcula tempo desde o primeiro aporte real
+        const firstReal = series.find(pt => pt.portfolioValue > 0);
+        let durStr = '';
+        if (firstReal && firstReal.date !== s.date) {
+          const [fy,fm] = firstReal.date.split('-').map(Number);
+          const [cy,cm] = s.date.split('-').map(Number);
+          const totalM = (cy*12+cm) - (fy*12+fm);
+          const anos = Math.floor(totalM/12), meses = totalM%12;
+          durStr = ' &nbsp;·&nbsp; ' + (anos>0?anos+' ano'+(anos>1?'s':'')+(meses>0?' e ':' '):'') + (meses>0?meses+' mes'+(meses>1?'es':''):'');
+        }
+        return '<div style="font-size:10px;font-weight:700;color:var(--sim-text);margin-bottom:8px">' + monthLabel(s.date) + '<span style="font-size:9px;color:var(--sim-text3);font-weight:400">' + durStr + '</span></div>';
+      })() +
           '<div style="display:flex;gap:10px;margin-bottom:8px">' +
             svgPie +
             '<div style="display:flex;flex-direction:column;gap:3px;justify-content:center">' + legendHtml + '</div>' +
@@ -3100,11 +3112,20 @@ function showChart(type, el) {
 
   if (type === 'evolution') {
     const datasets = [];
+    // Helper: substitui zeros iniciais (antes do primeiro aporte real) por null
+    // para que o gráfico não desenhe linha antes da carteira ter dados
+    const trimLeadingZeros = (pts) => {
+      let firstReal = pts.findIndex(v => v > 0);
+      if (firstReal <= 0) return pts;
+      return pts.map((v, i) => i < firstReal ? null : v);
+    };
     simulations.forEach((s,i) => {
       const isActive = i === activeSimIdx;
-      datasets.push({ label:s.name, data:s.result.series.map(pt=>pt.portfolioValue), borderColor:s.color, backgroundColor:isActive?s.color+'14':'transparent', borderWidth:isActive?2.5:1.5, fill:isActive, tension:.3, pointRadius:0, order:isActive?0:1 });
+      const data = trimLeadingZeros(s.result.series.map(pt => pt.portfolioValue));
+      datasets.push({ label:s.name, data, borderColor:s.color, backgroundColor:isActive?s.color+'14':'transparent', borderWidth:isActive?2.5:1.5, fill:isActive, tension:.3, pointRadius:0, order:isActive?0:1, spanGaps:false });
     });
-    datasets.push({ label:'Aportado', data:series.map(s=>s.totalInvested), borderColor:'#4E4D4A', borderWidth:1.5, borderDash:[4,4], fill:false, tension:.1, pointRadius:0, order:2 });
+    const aportadoData = trimLeadingZeros(series.map(s=>s.totalInvested));
+    datasets.push({ label:'Aportado', data:aportadoData, borderColor:'#4E4D4A', borderWidth:1.5, borderDash:[4,4], fill:false, tension:.1, pointRadius:0, order:2, spanGaps:false });
     chartInst = new Chart(ctx, { type:'line', data:{labels,datasets}, options:chartOpts('R$') });
   } else if (type === 'monthly') {
     chartInst = new Chart(ctx, { type:'bar', data:{labels,datasets:[{ label:'Retorno %', data:series.map(s=>+(s.monthReturn*100).toFixed(2)), backgroundColor:series.map(s=>s.monthReturn>=0?color+'b3':'#E8503Ab3'), borderRadius:2 }]}, options:chartOpts('%') });
