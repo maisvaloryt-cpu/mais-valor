@@ -335,7 +335,7 @@ function renderNav() {
     if (l.dropdown) {
       const isActive = l.dropdown.some(d => page === d.href);
       return `<div class="nav-dropdown-wrap">
-        <a href="#" class="${isActive ? 'active' : ''}" style="${style}" onclick="event.preventDefault();this.closest('.nav-dropdown-wrap').classList.toggle('open')">
+        <a href="#" class="${isActive ? 'active' : ''}" style="${style}" onclick="return false">
           ${l.label} ▾
         </a>
         <div class="nav-dropdown">
@@ -487,7 +487,11 @@ function renderNav() {
       const r = document.getElementById('nav-search-results');
       if (r) r.style.display = 'none';
     }
-    if (!e.target.closest('.nav-dropdown-wrap')) {
+    const wrap = e.target.closest('.nav-dropdown-wrap');
+    if (wrap && e.target.closest('.nav-dropdown-wrap > a')) {
+      e.preventDefault();
+      wrap.classList.toggle('open');
+    } else if (!wrap) {
       document.querySelectorAll('.nav-dropdown-wrap.open').forEach(el => el.classList.remove('open'));
     }
   });
