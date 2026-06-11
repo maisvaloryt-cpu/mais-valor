@@ -1,3 +1,20 @@
+// ── Sentry — monitoramento de erros ──────────────────────────────
+(function() {
+  const s = document.createElement('script');
+  s.src = 'https://js.sentry-cdn.com/5c73ae0a2da83db6c80acffed3530730.min.js';
+  s.crossOrigin = 'anonymous';
+  s.onload = function() {
+    if (window.Sentry) {
+      Sentry.init({
+        dsn: 'https://5c73ae0a2da83db6c80acffed3530730@o4511545034932224.ingest.de.sentry.io/4511545047187536',
+        environment: location.hostname.includes('localhost') ? 'development' : 'production',
+        tracesSampleRate: 0.1,
+      });
+    }
+  };
+  document.head.appendChild(s);
+})();
+
 const LOGO_SVG_HTML = `<svg viewBox="0 0 530 530" xmlns="http://www.w3.org/2000/svg" width="36" height="36" style="display:block;border-radius:8px;overflow:hidden;flex-shrink:0">
   <defs>
     <linearGradient id="mvGold" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -113,30 +130,32 @@ function isCopomDay() {
   return COPOM_DATES.includes(today);
 }
 
-// ── Live indices ──────────────────────────────────────────────────
-// Índices BR/EUA vêm do indices.json gerado pelo Actions (brapi com token via Secret).
-// AwesomeAPI é gratuita e usada aqui para câmbio e cripto em tempo real.
+// ── Live indices (brapi + awesomeapi) ────────────────────────────
+// CORREÇÃO: tickers corretos na B3
+//   IFIX11 não existe → usar BCFF11 (Fundo de Fundos, proxy do IFIX)
+//   SMLL11 não existe → usar SMAL11 (ETF Small Caps correto)
 async function fetchLiveIndices() {
   const result = {};
   await Promise.allSettled([
-    // Câmbio ao vivo
-    fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,GBP-BRL,JPY-BRL,ARS-BRL')
+    fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,BTC-USD')
       .then(r => r.json())
       .then(d => {
         if (d.USDBRL?.bid) result.dolar = { val: +parseFloat(d.USDBRL.bid).toFixed(4), chg: +parseFloat(d.USDBRL.pctChange).toFixed(2) };
         if (d.EURBRL?.bid) result.euro  = { val: +parseFloat(d.EURBRL.bid).toFixed(4), chg: +parseFloat(d.EURBRL.pctChange).toFixed(2) };
-        if (d.GBPBRL?.bid) result.gbp   = { val: +parseFloat(d.GBPBRL.bid).toFixed(4), chg: +parseFloat(d.GBPBRL.pctChange).toFixed(2) };
-        if (d.JPYBRL?.bid) result.jpy   = { val: +parseFloat(d.JPYBRL.bid).toFixed(4), chg: +parseFloat(d.JPYBRL.pctChange).toFixed(2) };
-        if (d.ARSBRL?.bid) result.ars   = { val: +parseFloat(d.ARSBRL.bid).toFixed(4), chg: +parseFloat(d.ARSBRL.pctChange).toFixed(2) };
+        if (d.BTCUSD?.bid) result.btc   = { val: +parseFloat(d.BTCUSD.bid).toFixed(0),  chg: +parseFloat(d.BTCUSD.pctChange).toFixed(2) };
       }).catch(() => {}),
-    // Cripto ao vivo
-    fetch('https://economia.awesomeapi.com.br/json/last/BTC-USD,ETH-USD,SOL-USD,BNB-USD')
+    fetch('https://brapi.dev/api/quote/%5EBVSP,BCFF11,SMAL11,DIVO11?fundamental=false')
       .then(r => r.json())
       .then(d => {
-        if (d.BTCUSD?.bid) result.btc = { val: +parseFloat(d.BTCUSD.bid).toFixed(0), chg: +parseFloat(d.BTCUSD.pctChange).toFixed(2) };
-        if (d.ETHUSD?.bid) result.eth = { val: +parseFloat(d.ETHUSD.bid).toFixed(0), chg: +parseFloat(d.ETHUSD.pctChange).toFixed(2) };
-        if (d.SOLUSD?.bid) result.sol = { val: +parseFloat(d.SOLUSD.bid).toFixed(2), chg: +parseFloat(d.SOLUSD.pctChange).toFixed(2) };
-        if (d.BNBUSD?.bid) result.bnb = { val: +parseFloat(d.BNBUSD.bid).toFixed(2), chg: +parseFloat(d.BNBUSD.pctChange).toFixed(2) };
+        for (const q of (d.results || [])) {
+          const sym = q.symbol;
+          if (!q.regularMarketPrice) continue;
+          const entry = { val: q.regularMarketPrice, chg: +(q.regularMarketChangePercent||0).toFixed(2), chg_pts: +(q.regularMarketChange||0).toFixed(2) };
+          if (sym === '^BVSP')  result.ibov  = entry;
+          if (sym === 'BCFF11') result.ifix  = entry;
+          if (sym === 'SMAL11') result.small = entry;
+          if (sym === 'DIVO11') result.idiv  = entry;
+        }
       }).catch(() => {}),
   ]);
   return result;
@@ -167,60 +186,26 @@ async function loadIndicesNav() {
   };
 
   const j = {
-    ibov:    pick('ibov'),
-    ifix:    pick('ifix'),
-    small:   pick('small'),
-    idiv:    pick('idiv'),
-    ibra:    pick('ibra'),
-    ifnc:    pick('ifnc'),
-    sp500:   pick('sp500'),
-    nasdaq:  pick('nasdaq'),
-    dow:     pick('dow'),
-    russell: pick('russell'),
-    dolar:   pick('dolar'),
-    euro:    pick('euro'),
-    gbp:     pick('gbp'),
-    jpy:     pick('jpy'),
-    ars:     pick('ars'),
-    btc:     pick('btc'),
-    eth:     pick('eth'),
-    sol:     pick('sol'),
-    bnb:     pick('bnb'),
-    ouro:    pick('ouro'),
-    prata:   pick('prata'),
-    petroleo:pick('petroleo'),
+    ibov:  pick('ibov'),
+    ifix:  pick('ifix'),
+    small: pick('small'),
+    idiv:  pick('idiv'),
+    dolar: pick('dolar'),
+    euro:  pick('euro'),
+    btc:   pick('btc'),
+    ouro:  pick('ouro'),
   };
 
   const buildTickerItems = () => {
     const items = [];
-    // Índices BR
-    if (j.ibov)    items.push(`<div class="ticker-item"><span class="ticker-name">IBOV</span><span class="ticker-val">${fmtNum(j.ibov)}</span>${pillHtml(j.ibov)}</div>`);
-    if (j.ifix)    items.push(`<div class="ticker-item"><span class="ticker-name">IFIX</span><span class="ticker-val">${fmtNum(j.ifix)}</span>${pillHtml(j.ifix)}</div>`);
-    if (j.small)   items.push(`<div class="ticker-item"><span class="ticker-name">SMALL</span><span class="ticker-val">${fmtNum(j.small)}</span>${pillHtml(j.small)}</div>`);
-    if (j.idiv)    items.push(`<div class="ticker-item"><span class="ticker-name">IDIV</span><span class="ticker-val">${fmtNum(j.idiv)}</span>${pillHtml(j.idiv)}</div>`);
-    if (j.ibra)    items.push(`<div class="ticker-item"><span class="ticker-name">IBrA</span><span class="ticker-val">${fmtNum(j.ibra)}</span>${pillHtml(j.ibra)}</div>`);
-    if (j.ifnc)    items.push(`<div class="ticker-item"><span class="ticker-name">IFNC</span><span class="ticker-val">${fmtNum(j.ifnc)}</span>${pillHtml(j.ifnc)}</div>`);
-    // Índices EUA
-    if (j.sp500)   items.push(`<div class="ticker-item"><span class="ticker-name">S&P 500</span><span class="ticker-val">${fmtNum(j.sp500)}</span>${pillHtml(j.sp500)}</div>`);
-    if (j.nasdaq)  items.push(`<div class="ticker-item"><span class="ticker-name">NASDAQ</span><span class="ticker-val">${fmtNum(j.nasdaq)}</span>${pillHtml(j.nasdaq)}</div>`);
-    if (j.dow)     items.push(`<div class="ticker-item"><span class="ticker-name">DOW</span><span class="ticker-val">${fmtNum(j.dow)}</span>${pillHtml(j.dow)}</div>`);
-    if (j.russell) items.push(`<div class="ticker-item"><span class="ticker-name">RUSSELL</span><span class="ticker-val">${fmtNum(j.russell)}</span>${pillHtml(j.russell)}</div>`);
-    // Câmbio
-    if (j.dolar)   items.push(`<div class="ticker-item"><span class="ticker-name">USD/BRL</span><span class="ticker-val">R$${fmtNum(j.dolar,4)}</span>${pillHtml(j.dolar)}</div>`);
-    if (j.euro)    items.push(`<div class="ticker-item"><span class="ticker-name">EUR/BRL</span><span class="ticker-val">R$${fmtNum(j.euro,4)}</span>${pillHtml(j.euro)}</div>`);
-    if (j.gbp)     items.push(`<div class="ticker-item"><span class="ticker-name">GBP/BRL</span><span class="ticker-val">R$${fmtNum(j.gbp,4)}</span>${pillHtml(j.gbp)}</div>`);
-    if (j.jpy)     items.push(`<div class="ticker-item"><span class="ticker-name">JPY/BRL</span><span class="ticker-val">R$${fmtNum(j.jpy,4)}</span>${pillHtml(j.jpy)}</div>`);
-    if (j.ars)     items.push(`<div class="ticker-item"><span class="ticker-name">ARS/BRL</span><span class="ticker-val">R$${fmtNum(j.ars,4)}</span>${pillHtml(j.ars)}</div>`);
-    // Commodities
-    if (j.ouro)    items.push(`<div class="ticker-item"><span class="ticker-name">OURO</span><span class="ticker-val">US$${fmtNum(j.ouro,0)}</span>${pillHtml(j.ouro)}</div>`);
-    if (j.prata)   items.push(`<div class="ticker-item"><span class="ticker-name">PRATA</span><span class="ticker-val">US$${fmtNum(j.prata,2)}</span>${pillHtml(j.prata)}</div>`);
-    if (j.petroleo)items.push(`<div class="ticker-item"><span class="ticker-name">PETRÓLEO</span><span class="ticker-val">US$${fmtNum(j.petroleo,2)}</span>${pillHtml(j.petroleo)}</div>`);
-    // Cripto
-    if (j.btc)     items.push(`<div class="ticker-item"><span class="ticker-name">BTC</span><span class="ticker-val">US$${fmtNum(j.btc,0)}</span>${pillHtml(j.btc)}</div>`);
-    if (j.eth)     items.push(`<div class="ticker-item"><span class="ticker-name">ETH</span><span class="ticker-val">US$${fmtNum(j.eth,0)}</span>${pillHtml(j.eth)}</div>`);
-    if (j.sol)     items.push(`<div class="ticker-item"><span class="ticker-name">SOL</span><span class="ticker-val">US$${fmtNum(j.sol,2)}</span>${pillHtml(j.sol)}</div>`);
-    if (j.bnb)     items.push(`<div class="ticker-item"><span class="ticker-name">BNB</span><span class="ticker-val">US$${fmtNum(j.bnb,2)}</span>${pillHtml(j.bnb)}</div>`);
-    // Renda fixa (BCB)
+    if (j.ibov)  items.push(`<div class="ticker-item"><span class="ticker-name">IBOV</span><span class="ticker-val">${fmtNum(j.ibov)}</span>${pillHtml(j.ibov)}</div>`);
+    if (j.ifix)  items.push(`<div class="ticker-item"><span class="ticker-name">IFIX</span><span class="ticker-val">${fmtNum(j.ifix)}</span>${pillHtml(j.ifix)}</div>`);
+    if (j.small) items.push(`<div class="ticker-item"><span class="ticker-name">SMALL</span><span class="ticker-val">${fmtNum(j.small)}</span>${pillHtml(j.small)}</div>`);
+    if (j.idiv)  items.push(`<div class="ticker-item"><span class="ticker-name">IDIV</span><span class="ticker-val">${fmtNum(j.idiv)}</span>${pillHtml(j.idiv)}</div>`);
+    if (j.dolar) items.push(`<div class="ticker-item"><span class="ticker-name">USD/BRL</span><span class="ticker-val">R$${fmtNum(j.dolar,4)}</span>${pillHtml(j.dolar)}</div>`);
+    if (j.euro)  items.push(`<div class="ticker-item"><span class="ticker-name">EUR/BRL</span><span class="ticker-val">R$${fmtNum(j.euro,4)}</span>${pillHtml(j.euro)}</div>`);
+    if (j.ouro)  items.push(`<div class="ticker-item"><span class="ticker-name">OURO</span><span class="ticker-val">US$${fmtNum(j.ouro,0)}</span>${pillHtml(j.ouro)}</div>`);
+    if (j.btc)   items.push(`<div class="ticker-item"><span class="ticker-name">BTC</span><span class="ticker-val">US$${fmtNum(j.btc,0)}</span>${pillHtml(j.btc)}</div>`);
     items.push(`<div class="ticker-item"><span class="ticker-name">IPCA 12m</span><span class="ticker-val tk-ipca">—</span></div>`);
     if (isCopomDay()) {
       items.push(`<div class="ticker-item" style="border-color:rgba(245,166,35,0.4)"><span class="ticker-name" style="color:var(--gold)">🔔 SELIC</span><span class="ticker-val tk-selic">—</span></div>`);
@@ -276,17 +261,10 @@ async function loadIndicesNav() {
       ec.className = `idx-chg ${j.ibov.chg >= 0 ? 'up' : 'dn'}`;
     }
   }
-  setCard('idx-ifix',    'idx-ifix-chg',    j.ifix);
-  setCard('idx-small',   'idx-small-chg',   j.small);
-  setCard('idx-idiv',    'idx-idiv-chg',    j.idiv);
-  setCard('idx-sp500',   'idx-sp500-chg',   j.sp500);
-  setCard('idx-nasdaq',  'idx-nasdaq-chg',  j.nasdaq);
-  setCard('idx-dolar',   'idx-dolar-chg',   j.dolar, 4, 'R$ ');
-  setCard('idx-euro',    'idx-euro-chg',    j.euro,  4, 'R$ ');
-  setCard('idx-btc',     'idx-btc-chg',     j.btc,   0, 'US$ ');
-  setCard('idx-eth',     'idx-eth-chg',     j.eth,   0, 'US$ ');
-  setCard('idx-ouro',    'idx-ouro-chg',    j.ouro,  0, 'US$ ');
-  setCard('idx-petroleo','idx-petroleo-chg',j.petroleo, 2, 'US$ ');
+  setCard('idx-ifix',  'idx-ifix-chg',  j.ifix);
+  setCard('idx-small', 'idx-small-chg', j.small);
+  setCard('idx-idiv',  'idx-idiv-chg',  j.idiv);
+  setCard('idx-dolar', 'idx-dolar-chg', j.dolar, 4, 'R$ ');
 
   setTimeout(loadBCBNav, 300);
 }
@@ -463,44 +441,9 @@ function renderNav() {
       <div class="idx-chg" id="idx-idiv-chg">—</div>
     </div>
     <div class="idx-card">
-      <div class="idx-name">S&amp;P 500</div>
-      <div class="idx-val" id="idx-sp500">—</div>
-      <div class="idx-chg" id="idx-sp500-chg">—</div>
-    </div>
-    <div class="idx-card">
-      <div class="idx-name">Nasdaq</div>
-      <div class="idx-val" id="idx-nasdaq">—</div>
-      <div class="idx-chg" id="idx-nasdaq-chg">—</div>
-    </div>
-    <div class="idx-card">
       <div class="idx-name">USD / BRL</div>
       <div class="idx-val" id="idx-dolar">—</div>
       <div class="idx-chg" id="idx-dolar-chg">—</div>
-    </div>
-    <div class="idx-card">
-      <div class="idx-name">EUR / BRL</div>
-      <div class="idx-val" id="idx-euro">—</div>
-      <div class="idx-chg" id="idx-euro-chg">—</div>
-    </div>
-    <div class="idx-card">
-      <div class="idx-name">Bitcoin</div>
-      <div class="idx-val" id="idx-btc">—</div>
-      <div class="idx-chg" id="idx-btc-chg">—</div>
-    </div>
-    <div class="idx-card">
-      <div class="idx-name">Ethereum</div>
-      <div class="idx-val" id="idx-eth">—</div>
-      <div class="idx-chg" id="idx-eth-chg">—</div>
-    </div>
-    <div class="idx-card">
-      <div class="idx-name">Ouro</div>
-      <div class="idx-val" id="idx-ouro">—</div>
-      <div class="idx-chg" id="idx-ouro-chg">—</div>
-    </div>
-    <div class="idx-card">
-      <div class="idx-name">Petróleo</div>
-      <div class="idx-val" id="idx-petroleo">—</div>
-      <div class="idx-chg" id="idx-petroleo-chg">—</div>
     </div>
   </div>`;
 

@@ -19,7 +19,17 @@ SI_HEADERS = {
     "Referer": "https://statusinvest.com.br/",
     "x-requested-with": "XMLHttpRequest",
 }
-BRAPI_TOKEN = os.environ.get("BRAPI_TOKEN", "")
+BRAPI_TOKENS = [
+    os.environ.get("BRAPI_TOKEN_2", ""),
+    os.environ.get("BRAPI_TOKEN_3", ""),
+    os.environ.get("BRAPI_TOKEN_4", ""),
+    os.environ.get("BRAPI_TOKEN_5", ""),
+]
+BRAPI_TOKENS = [t for t in BRAPI_TOKENS if t]
+# Fallback para token 1 se nenhum dos outros estiver disponível
+if not BRAPI_TOKENS:
+    BRAPI_TOKENS = [os.environ.get("BRAPI_TOKEN_1", os.environ.get("BRAPI_TOKEN", ""))]
+BRAPI_TOKEN = BRAPI_TOKENS[0] if BRAPI_TOKENS else ""
 
 
 def merge_historico(path: str, ticker: str, novos_pts: list) -> int:

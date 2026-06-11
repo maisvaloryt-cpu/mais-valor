@@ -5,7 +5,25 @@ Salva cotação diária em data/diario/TICKER.json (fallback)
 """
 import json, time, datetime, os, requests
 
-BRAPI_TOKEN = os.environ.get("BRAPI_TOKEN", "")
+# Tokens 2-5 dividem a carga das cotações diárias
+# Token 1 fica reservado para fetch_indices.py (leve)
+BRAPI_TOKENS = [
+    os.environ.get("BRAPI_TOKEN_2", ""),
+    os.environ.get("BRAPI_TOKEN_3", ""),
+    os.environ.get("BRAPI_TOKEN_4", ""),
+    os.environ.get("BRAPI_TOKEN_5", ""),
+]
+BRAPI_TOKENS = [t for t in BRAPI_TOKENS if t]  # remove vazios
+
+# Fallback: se não tiver tokens 2-5, usa token 1
+if not BRAPI_TOKENS:
+    BRAPI_TOKENS = [os.environ.get("BRAPI_TOKEN_1", os.environ.get("BRAPI_TOKEN", ""))]
+
+def get_token_for_index(i: int) -> str:
+    """Distribui ativos entre os tokens disponíveis de forma round-robin."""
+    if not BRAPI_TOKENS:
+        return ""
+    return BRAPI_TOKENS[i % len(BRAPI_TOKENS)]
 
 def get_tickers_acoes():
     """Lê lista de ações do fundamentus.json"""
@@ -39,8 +57,8 @@ def get_tickers_fiis():
             "BCFF11","RBRF11","KNCR11","HGRE11","LVBI11","BRCO11",
         ]
 
-def fetch_one(ticker):
-    url = f"https://brapi.dev/api/quote/{ticker}?token={BRAPI_TOKEN}"
+def fetch_one(ticker, token=""):
+    url = f"https://brapi.dev/api/quote/{ticker}?token={token}"
     try:
         resp = requests.get(url, timeout=15)
         resp.raise_for_status()
@@ -108,8 +126,9 @@ def fetch_all(tickers, label):
     today = datetime.date.today().isoformat()
     ok = fb = sem = 0
     for i, ticker in enumerate(tickers):
+        token = get_token_for_index(i)
         print(f"  {label} {i+1}/{len(tickers)}: {ticker}", end=" ")
-        data = fetch_one(ticker)
+        data = fetch_one(ticker, token)
         if data:
             salvar_diario(ticker, data["price"], today)
             print(f"✓ R${data['price']} ({data['change']:+.2f}%)")

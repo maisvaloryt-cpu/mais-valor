@@ -65,7 +65,7 @@ jobs:
       - name: Índices (Ibovespa, IFIX, Dólar, BTC)
         if: ${{ steps.modo.outputs.modo == 'diario' }}
         env:
-          BRAPI_TOKEN: ${{ secrets.BRAPI_TOKEN }}
+          BRAPI_TOKEN_1: ${{ secrets.BRAPI_TOKEN_1 }}
         run: python fetch_indices.py
 
       - name: BCB (CDI, SELIC, IPCA)
@@ -87,7 +87,10 @@ jobs:
       - name: Cotações diárias
         if: ${{ steps.modo.outputs.modo == 'diario' }}
         env:
-          BRAPI_TOKEN: ${{ secrets.BRAPI_TOKEN }}
+          BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
+          BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
+          BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
+          BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
         run: python fetch_data.py
 
       - name: Relatório
@@ -115,38 +118,83 @@ jobs:
       # ── HISTÓRICO ─────────────────────────────────────────────────────────────
       - name: Histórico Ações G1
         if: ${{ steps.modo.outputs.modo == 'g1' }}
+        env:
+          BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
+          BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
+          BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
+          BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
         run: python fetch_historico_g1.py
 
       - name: Histórico Ações G2
         if: ${{ steps.modo.outputs.modo == 'g2' }}
+        env:
+          BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
+          BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
+          BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
+          BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
         run: python fetch_historico_g2.py
 
       - name: Histórico Ações G3
         if: ${{ steps.modo.outputs.modo == 'g3' }}
+        env:
+          BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
+          BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
+          BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
+          BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
         run: python fetch_historico_g3.py
 
       - name: Histórico Ações G4
         if: ${{ steps.modo.outputs.modo == 'g4' }}
+        env:
+          BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
+          BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
+          BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
+          BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
         run: python fetch_historico_g4.py
 
       - name: Histórico Ações G5
         if: ${{ steps.modo.outputs.modo == 'g5' }}
+        env:
+          BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
+          BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
+          BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
+          BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
         run: python fetch_historico_g5.py
 
       - name: Histórico FIIs G1
         if: ${{ steps.modo.outputs.modo == 'fii1' }}
+        env:
+          BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
+          BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
+          BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
+          BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
         run: python fetch_historico_fii_g1.py
 
       - name: Histórico FIIs G2
         if: ${{ steps.modo.outputs.modo == 'fii2' }}
+        env:
+          BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
+          BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
+          BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
+          BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
         run: python fetch_historico_fii_g2.py
 
       - name: Histórico FIIs G3
         if: ${{ steps.modo.outputs.modo == 'fii3' }}
+        env:
+          BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
+          BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
+          BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
+          BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
         run: python fetch_historico_fii_g3.py
 
       - name: Histórico FIIs G4
         if: ${{ steps.modo.outputs.modo == 'fii4' }}
+        env:
+          BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
+          BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
+          BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
+          BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
         run: python fetch_historico_fii_g4.py
 
       - name: Histórico Dividendos (rode uma vez)

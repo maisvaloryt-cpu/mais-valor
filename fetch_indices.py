@@ -4,7 +4,7 @@ Salva em data/indices.json
 """
 import json, datetime, os, requests
 
-BRAPI_TOKEN = os.environ.get("BRAPI_TOKEN", "")
+BRAPI_TOKEN = os.environ.get("BRAPI_TOKEN_1", os.environ.get("BRAPI_TOKEN", ""))
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0"}
 
 def fetch_brapi(symbols):
