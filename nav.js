@@ -30,14 +30,14 @@
 
 const LOGO_SVG_HTML = `<svg viewBox="0 0 530 530" xmlns="http://www.w3.org/2000/svg" width="36" height="36" style="display:block;border-radius:8px;overflow:hidden;flex-shrink:0">
   <defs>
-    <linearGradient id="mvGold" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="mvGoldNav" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#FFD76A"/>
       <stop offset="100%" stop-color="#F3B13B"/>
     </linearGradient>
   </defs>
   <rect width="530" height="530" fill="#C90D08"/>
-  <path fill="url(#mvGold)" d="M459 58 L346 125 L387 142 L365 181 L296 277 L258 315 L212 349 L174 367 L147 374 L110 376 L89 372 L67 362 L49 345 L37 324 L32 302 L31 349 L52 392 L70 409 L94 422 L150 429 L196 420 L230 407 L298 365 L337 329 L377 280 L441 171 L475 192 L480 191 Z"/>
-  <path fill="url(#mvGold)" d="M399 303 L384 326 L358 359 L318 398 L283 424 L258 438 L222 452 L190 459 L161 460 L178 465 L200 468 L237 467 L278 458 L315 441 L340 421 L361 395 L383 353 L397 314 Z"/>
+  <path fill="url(#mvGoldNav)" d="M459 58 L346 125 L387 142 L365 181 L296 277 L258 315 L212 349 L174 367 L147 374 L110 376 L89 372 L67 362 L49 345 L37 324 L32 302 L31 349 L52 392 L70 409 L94 422 L150 429 L196 420 L230 407 L298 365 L337 329 L377 280 L441 171 L475 192 L480 191 Z"/>
+  <path fill="url(#mvGoldNav)" d="M399 303 L384 326 L358 359 L318 398 L283 424 L258 438 L222 452 L190 459 L161 460 L178 465 L200 468 L237 467 L278 458 L315 441 L340 421 L361 395 L383 353 L397 314 Z"/>
 </svg>`;
 
 const NAV_LINKS = [
@@ -367,10 +367,10 @@ function renderNav() {
   <style>
   .nav-dropdown-wrap{position:relative;display:inline-flex;align-items:center}
   .nav-dropdown-wrap > a{cursor:pointer}
-  .nav-dropdown{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--bg2);border:1px solid var(--border3);border-radius:10px;padding:6px;min-width:140px;z-index:300;box-shadow:var(--shadow-lg);animation:slideDown .18s ease both}
+  .nav-dropdown{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--bg2);border:1px solid var(--border3);border-radius:10px;padding:6px;min-width:140px;z-index:9999;box-shadow:var(--shadow-lg);animation:slideDown .18s ease both;pointer-events:auto}
   .nav-dropdown a{display:block;padding:8px 12px;border-radius:7px;font-size:12.5px;font-weight:600;color:var(--text2);white-space:nowrap;transition:var(--transition)}
   .nav-dropdown a:hover{background:var(--bg3);color:var(--text)}
-  .nav-dropdown-wrap:hover .nav-dropdown{display:block}
+  .nav-dropdown-wrap:hover .nav-dropdown{display:block!important}
   #nav-hamburger{display:none;background:transparent;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:6px 8px;line-height:1;border-radius:8px;transition:background .15s;flex-shrink:0}
   #nav-hamburger:hover{background:var(--bg3)}
   #nav-mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg,#0E0E11);z-index:500;flex-direction:column;padding:20px 24px;overflow-y:auto;animation:slideDown .2s ease}
