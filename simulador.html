@@ -27,7 +27,7 @@
   --sim-font:     var(--font-body);
   --sim-r:        var(--radius);
   --sim-rl:       var(--radius-lg);
-  --sim-sidebar:  320px;
+  --sim-sidebar:  380px;
 }
 
 /* ── LAYOUT RAIZ ── */
@@ -143,6 +143,17 @@
 .param-group-label::after {
   content: ''; flex: 1; height: 1px; background: var(--sim-border);
 }
+/* Collapsible param groups */
+.param-group.collapsible > .param-group-label {
+  cursor: pointer; user-select: none;
+}
+.param-group.collapsible > .param-group-label:hover { color: var(--sim-text2); }
+.param-group-chev {
+  font-size: 8px; color: var(--sim-text3); transition: transform .2s; flex-shrink: 0; margin-left: 2px;
+}
+.param-group.collapsible.collapsed > .param-group-label .param-group-chev { transform: rotate(-90deg); }
+.param-group.collapsible.collapsed > .param-group-body { display: none; }
+.param-group-body { display: block; }
 .param-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
 .param-field { display: flex; flex-direction: column; gap: 4px; }
 .param-field label { font-size: 9px; color: var(--sim-text3); font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
@@ -606,8 +617,9 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
     <div class="sim-sidebar-body" id="sidebarBody">
 
       <!-- 1. Período -->
-      <div class="param-group" id="etapaPeriodo">
-        <div class="param-group-label">Período</div>
+      <div class="param-group collapsible" id="etapaPeriodo">
+        <div class="param-group-label" onclick="toggleParamGroup('etapaPeriodo')">Período<span class="param-group-chev">▼</span></div>
+        <div class="param-group-body">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;width:100%">
           <input type="text" class="param-inp" id="startDate" placeholder="__/____"
             maxlength="7" style="font-family:var(--sim-mono);text-align:center;flex:1;min-width:0"
@@ -618,11 +630,13 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
             oninput="maskDateInput(this,'endDate')" onkeydown="dateKeydown(event,'endDate')" onblur="verificarCascata()">
         </div>
         <button class="btn-confirmar-etapa" id="btnConfirmarPeriodo" onclick="confirmarPeriodo()">✓ Confirmar período</button>
+        </div>
       </div>
 
       <!-- 2. Aportes -->
-      <div class="param-group etapa" id="etapaAportes" style="display:none">
-        <div class="param-group-label">Aportes</div>
+      <div class="param-group etapa collapsible" id="etapaAportes" style="display:none">
+        <div class="param-group-label" onclick="toggleParamGroup('etapaAportes')">Aportes<span class="param-group-chev">▼</span></div>
+        <div class="param-group-body">
         <div class="param-row">
           <div class="param-field">
             <label>Inicial (R$)</label>
@@ -634,6 +648,7 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
           </div>
         </div>
         <button class="btn-confirmar-etapa" id="btnConfirmarAportes" onclick="confirmarAportes()">✓ Confirmar aportes</button>
+        </div>
       </div>
 
       <!-- 3. Classes -->
@@ -663,15 +678,15 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
       </div>
 
       <!-- 4. Composição -->
-      <div class="param-group" id="composicaoGroup" style="display:none">
-        <div class="param-group-label">Composição</div>
-        <div id="classesAccContainer"></div>
+      <div class="param-group collapsible" id="composicaoGroup" style="display:none">
+        <div class="param-group-label" onclick="toggleParamGroup('composicaoGroup')">Composição<span class="param-group-chev">▼</span></div>
+        <div class="param-group-body"><div id="classesAccContainer"></div></div>
       </div>
 
       <!-- 5. Rebalancear -->
-      <div class="param-group etapa" id="etapaRebalancear" style="display:none">
-        <div class="param-group-label" style="display:flex;align-items:center;gap:4px">
-          Rebalancear carteira
+      <div class="param-group etapa collapsible" id="etapaRebalancear" style="display:none">
+        <div class="param-group-label" style="display:flex;align-items:center;gap:4px" onclick="toggleParamGroup('etapaRebalancear')">
+          Rebalancear carteira<span class="param-group-chev">▼</span>
           <span class="sim-tooltip" style="cursor:help;color:var(--sim-text3);font-size:10px">?
             <span class="sim-tip">Rebalancear é voltar os ativos às proporções originais da carteira ao longo do tempo, corrigindo o drift causado por variações de preço.</span>
           </span>
@@ -715,8 +730,9 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
       </div>
 
       <!-- 6. Dividendos -->
-      <div class="param-group etapa" id="etapaDividendos" style="display:none">
-        <div class="param-group-label">Dividendos</div>
+      <div class="param-group etapa collapsible" id="etapaDividendos" style="display:none">
+        <div class="param-group-label" onclick="toggleParamGroup('etapaDividendos')">Dividendos<span class="param-group-chev">▼</span></div>
+        <div class="param-group-body">
         <div class="divmode-row">
           <div class="divmode-btn" onclick="selectDivMode('none',this)">
             <div class="divmode-btn-title">💰 Caixa</div>
@@ -735,6 +751,7 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
             <div class="divmode-btn-sub">Reduz drift com dividendos</div>
           </div>
         </div>
+        </div><!-- /param-group-body dividendos -->
       </div>
 
       <!-- 7. Nome -->
@@ -1825,6 +1842,11 @@ function diagnosticarBloqueio() {
   if (algumPagaDividendo && !state.dividendMode) return 'Escolha o que fazer com os dividendos recebidos.';
 
   return null; // tudo ok
+}
+
+function toggleParamGroup(id) {
+  const grp = document.getElementById(id);
+  if (grp) grp.classList.toggle('collapsed');
 }
 
 function tentarSimular() {
