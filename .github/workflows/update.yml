@@ -63,9 +63,13 @@ jobs:
 
       # ── DIÁRIO ────────────────────────────────────────────────────────────────
       - name: Índices (Ibovespa, IFIX, Dólar, BTC)
-        if: ${{ steps.modo.outputs.modo == 'diario' }}
+        if: ${{ steps.modo.outputs.modo == 'diario' || steps.modo.outputs.modo == 'indices' }}
         env:
           BRAPI_TOKEN_1: ${{ secrets.BRAPI_TOKEN_1 }}
+          BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
+          BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
+          BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
+          BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
         run: python fetch_indices.py
 
       - name: BCB (CDI, SELIC, IPCA)
