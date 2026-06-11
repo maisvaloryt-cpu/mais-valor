@@ -1296,102 +1296,104 @@ function calcEffectiveWeights(normAssets, allPrices, month) {
 function buildAvailabilityLog(normAssets, allPrices, months) {
   const logs = [];
 
-  // Monta mapa de classes para saber redistribuição
+  // Mapa de classes
   const byClass = {};
   normAssets.forEach(a => {
     if (!byClass[a.assetClassId]) byClass[a.assetClassId] = { name: a.assetClass, assets: [] };
     byClass[a.assetClassId].assets.push(a);
   });
 
-  // Helper: outros ativos da mesma classe que têm dado em pelo menos 1 mês
-  function outrosDaClasseComDado(ativo) {
-    const cls = byClass[ativo.assetClassId];
-    if (!cls) return [];
-    return cls.assets.filter(a => a.ticker !== ativo.ticker &&
-      months.some(m => allPrices[a.ticker]?.[m]));
-  }
-
-  // Helper: classes com dado (exceto a do ativo em questão)
-  function outrasClassesComDado(assetClassId) {
-    return Object.entries(byClass)
-      .filter(([id, { assets }]) => id !== assetClassId && assets.some(a => months.some(m => allPrices[a.ticker]?.[m])))
-      .map(([, { name }]) => name);
-  }
-
+  // Para cada ativo, monta fases de redistribuição
   normAssets.forEach(a => {
-    const priceMap = allPrices[a.ticker];
-    const mesesComDado = priceMap ? months.filter(m => priceMap[m]) : [];
-    const mesesSemDado = priceMap ? months.filter(m => !priceMap[m]) : months;
+    const priceMap = allPrices[a.ticker] || {};
+    const mesesComDado = months.filter(m => priceMap[m]);
+    const mesesSemDado = months.filter(m => !priceMap[m]);
+
+    if (mesesComDado.length === months.length) {
+      logs.push({ type: 'ok', ticker: a.ticker, assetClass: a.assetClass,
+        msg: a.ticker + ' — dados completos no período ✓' });
+      return;
+    }
 
     if (mesesComDado.length === 0) {
-      // Ativo sem nenhum dado — determina para onde foi redistribuído
-      const outros = outrosDaClasseComDado(a);
-      let destino;
-      if (outros.length > 0) {
-        destino = `redistribuído entre os outros ativos de ${a.assetClass} (${outros.map(x=>x.ticker).join(', ')})`;
-      } else {
-        const outrasClasses = outrasClassesComDado(a.assetClassId);
-        destino = outrasClasses.length > 0
-          ? `redistribuído proporcionalmente entre as outras classes (${outrasClasses.join(', ')})`
-          : 'sem destino disponível no período';
-      }
-      logs.push({
-        type: 'no_data',
-        ticker: a.ticker,
-        assetClass: a.assetClass,
-        msg: `${a.ticker} (${a.assetClass}) — sem dados no período. Seu aporte foi ${destino}.`,
-      });
-    } else if (mesesSemDado.length === 0) {
-      logs.push({
-        type: 'ok',
-        ticker: a.ticker,
-        assetClass: a.assetClass,
-        msg: `${a.ticker} — dados completos no período ✓`,
-      });
-    } else {
-      const primeiro = mesesComDado[0];
-      const ausentes = mesesSemDado.length;
-      const outros = outrosDaClasseComDado(a);
-      const destinoParcial = outros.length > 0
-        ? `entre os outros ativos de ${a.assetClass}`
-        : `entre as outras classes disponíveis`;
-      logs.push({
-        type: 'partial',
-        ticker: a.ticker,
-        assetClass: a.assetClass,
-        firstMonth: primeiro,
-        missingMonths: ausentes,
-        msg: `${a.ticker} (${a.assetClass}) — dados a partir de ${monthLabel(primeiro)}. Nos ${ausentes} meses anteriores, seu aporte foi redistribuído ${destinoParcial}.`,
-      });
+      // Sem nenhum dado — descreve para onde foi em todo o período
+      const fases = calcFasesRedistribuicao(a, normAssets, allPrices, months, byClass);
+      const descFases = fases.map(f => monthLabel(f.start) + '→' + monthLabel(f.end) + ': ' + f.destino).join(' | ');
+      logs.push({ type: 'no_data', ticker: a.ticker, assetClass: a.assetClass,
+        msg: a.ticker + ' (' + a.assetClass + ') — sem dados em nenhum mês do período. Aporte redistribuído: ' + descFases });
+      return;
     }
+
+    // Dados parciais — descreve fases antes e depois de entrar
+    const firstM = mesesComDado[0];
+    const lastM  = mesesComDado[mesesComDado.length - 1];
+    const faseAntes = months.filter(m => m < firstM);
+    const faseDepois = months.filter(m => m > lastM);
+
+    let msg = a.ticker + ' (' + a.assetClass + ')';
+    if (faseAntes.length > 0) {
+      const dest = calcDestinoFase(a, normAssets, allPrices, faseAntes[0], byClass);
+      msg += ' — antes de ' + monthLabel(firstM) + ': aporte foi para ' + dest;
+    }
+    msg += ' — dados de ' + monthLabel(firstM) + ' a ' + monthLabel(lastM);
+    if (faseDepois.length > 0) {
+      const dest = calcDestinoFase(a, normAssets, allPrices, faseDepois[0], byClass);
+      msg += ' — após ' + monthLabel(lastM) + ': aporte foi para ' + dest;
+    }
+    logs.push({ type: 'partial', ticker: a.ticker, assetClass: a.assetClass, firstMonth: firstM,
+      missingMonths: mesesSemDado.length, msg });
   });
 
-  // Avisos de classes inteiras ausentes em parte do período
+  // Avisos de classes ausentes em blocos de tempo
   Object.values(byClass).forEach(({ name, assets }) => {
-    const mesesClasseAusente = months.filter(m =>
-      !assets.some(a => allPrices[a.ticker]?.[m])
-    );
+    const mesesClasseAusente = months.filter(m => !assets.some(a => allPrices[a.ticker]?.[m]));
     if (mesesClasseAusente.length > 0 && mesesClasseAusente.length < months.length) {
       const primeiro = months.find(m => assets.some(a => allPrices[a.ticker]?.[m]));
-      // Quais outras classes receberam a redistribuição?
-      const outrasIds = Object.entries(byClass)
-        .filter(([,{assets:oa}]) => oa.some(a => months.some(m => allPrices[a.ticker]?.[m])) && oa[0]?.assetClass !== name)
-        .map(([,{name:n}]) => n);
-      const destClasses = outrasIds.length > 0 ? ` A % foi redistribuída para: ${outrasIds.join(', ')}.` : '';
-      logs.push({
-        type: 'class_absent',
-        assetClass: name,
-        msg: `Classe ${name} — ausente nos primeiros ${mesesClasseAusente.length} meses (até ${monthLabel(mesesClasseAusente[mesesClasseAusente.length-1])}).${destClasses} A partir de ${monthLabel(primeiro)}, passou a integrar a carteira normalmente.`,
-      });
+      const outrasClasses = Object.values(byClass)
+        .filter(c => c.name !== name && c.assets.some(a => months.some(m => allPrices[a.ticker]?.[m])))
+        .map(c => c.name);
+      const destStr = outrasClasses.length > 0 ? ' Redistribuído para: ' + outrasClasses.join(', ') + '.' : '';
+      logs.push({ type: 'class_absent', assetClass: name,
+        msg: 'Classe ' + name + ' — ausente nos primeiros ' + mesesClasseAusente.length + ' meses (até ' + monthLabel(mesesClasseAusente[mesesClasseAusente.length-1]) + ').' + destStr + ' Entrou a partir de ' + monthLabel(primeiro) + '.' });
     }
   });
 
   return logs;
 }
 
-// ══════════════════════════════════════════════════════════════
-// AVISO DE INÍCIO REAL
-// ══════════════════════════════════════════════════════════════
+function calcDestinoFase(ativo, normAssets, allPrices, mes, byClass) {
+  // Outros ativos da mesma classe com dado nesse mês
+  const cls = byClass[ativo.assetClassId];
+  if (cls) {
+    const outrosCls = cls.assets.filter(a => a.ticker !== ativo.ticker && allPrices[a.ticker]?.[mes]);
+    if (outrosCls.length > 0) return outrosCls.map(a => a.ticker).join(', ') + ' (mesma classe)';
+  }
+  // Outras classes
+  const outrasClasses = Object.values(byClass)
+    .filter(c => c.assets[0]?.assetClassId !== ativo.assetClassId && c.assets.some(a => allPrices[a.ticker]?.[mes]))
+    .map(c => c.name);
+  if (outrasClasses.length > 0) return outrasClasses.join(', ');
+  return 'nenhum destino disponível';
+}
+
+function calcFasesRedistribuicao(ativo, normAssets, allPrices, months, byClass) {
+  // Agrupa meses consecutivos com mesmo destino em fases
+  const fases = [];
+  let faseAtual = null;
+
+  months.forEach(mes => {
+    const dest = calcDestinoFase(ativo, normAssets, allPrices, mes, byClass);
+    if (!faseAtual || faseAtual.destino !== dest) {
+      if (faseAtual) fases.push(faseAtual);
+      faseAtual = { start: mes, end: mes, destino: dest };
+    } else {
+      faseAtual.end = mes;
+    }
+  });
+  if (faseAtual) fases.push(faseAtual);
+  return fases;
+}
+
 function buildInicioLog(primeiroMes, startDate) {
   if (!primeiroMes) return [];
   if (primeiroMes === startDate) return [];
@@ -2819,70 +2821,158 @@ const brl = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
 const pct = v => (v*100).toFixed(2) + '%';
 const divModeLabel = { none:'Caixa', reinvest_same:'Mesmo ativo', reinvest_class:'Na classe', reinvest_rebalance:'Rebalancear' };
 
-function renderAtivosTimeline(breakdown, startDate, endDate) {
+function renderAtivosTimeline(breakdown, startDate, endDate, series, simName) {
   if (!breakdown || breakdown.length === 0) return '';
 
-  const toMonths = (ym) => {
-    const [y, m] = ym.split('-').map(Number);
-    return y * 12 + m;
-  };
-  const simStart = toMonths(startDate);
-  const simEnd   = toMonths(endDate);
+  const toM = (ym) => { const [y,m] = ym.split('-').map(Number); return y*12+m; };
+  const simStart = toM(startDate), simEnd = toM(endDate);
   const simTotal = simEnd - simStart || 1;
+  const pct = (v) => ((v / simTotal) * 100).toFixed(3);
 
-  const byClass = {};
-  breakdown.forEach(b => {
-    if (!byClass[b.assetClass]) byClass[b.assetClass] = [];
-    byClass[b.assetClass].push(b);
-  });
-
+  // Class color map
   const CLASS_COLORS = ['#5b8def','#1FC96E','#D4A017','#9b72ef','#e05c5c','#56c8d8','#f7931a'];
-  const classKeys = Object.keys(byClass);
+  const classColorMap = {};
+  const allClasses = [...new Set(breakdown.map(b => b.assetClass))];
+  allClasses.forEach((c,i) => { classColorMap[c] = CLASS_COLORS[i % CLASS_COLORS.length]; });
 
-  const rows = [];
-  classKeys.forEach((cls, ci) => {
-    const color = CLASS_COLORS[ci % CLASS_COLORS.length];
-    byClass[cls].forEach(b => {
-      if (!b.firstMonth) return;
-      const bStart = toMonths(b.firstMonth);
-      const bEnd   = b.lastMonth ? toMonths(b.lastMonth) : simEnd;
-      const leftPct  = ((bStart - simStart) / simTotal * 100).toFixed(2);
-      const widthPct = ((bEnd - bStart + 1) / simTotal * 100).toFixed(2);
-      const coverPct = b.totalMeses > 0 ? Math.round(b.mesesComDado / b.totalMeses * 100) : 0;
-      const partial  = bStart > simStart || bEnd < simEnd;
-      const barColor = partial ? color + 'bb' : color;
-      const coverColor = coverPct === 100 ? 'var(--up)' : coverPct > 50 ? 'var(--gold)' : 'var(--dn)';
-      const titleStr = b.ticker + ': ' + (b.firstMonth ? monthLabel(b.firstMonth) : '?') + ' -> ' + (b.lastMonth ? monthLabel(b.lastMonth) : '?') + ' (' + coverPct + '% do periodo)';
-      rows.push(
-        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">' +
-          '<div style="width:70px;flex-shrink:0;font-size:10px;font-family:var(--sim-mono);color:var(--sim-text2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + b.ticker + ' (' + cls + ')">' + b.ticker + '</div>' +
-          '<div style="flex:1;position:relative;height:18px;background:var(--sim-surf2);border-radius:3px;overflow:hidden">' +
-            '<div style="position:absolute;left:' + leftPct + '%;width:' + widthPct + '%;height:100%;background:' + barColor + ';border-radius:3px;min-width:2px" title="' + titleStr + '"></div>' +
-          '</div>' +
-          '<div style="width:34px;flex-shrink:0;font-size:9px;font-family:var(--sim-mono);color:' + coverColor + ';text-align:right">' + coverPct + '%</div>' +
-        '</div>'
-      );
-    });
+  // Build rows — thin line + dot at start
+  const rows = breakdown.filter(b => b.firstMonth).map(b => {
+    const bStart = toM(b.firstMonth);
+    const bEnd   = b.lastMonth ? toM(b.lastMonth) : simEnd;
+    const leftPct  = pct(bStart - simStart);
+    const widthPct = pct(bEnd - bStart + 1);
+    const coverPct = b.totalMeses > 0 ? Math.round(b.mesesComDado / b.totalMeses * 100) : 0;
+    const color = classColorMap[b.assetClass] || '#888';
+    const coverColor = coverPct === 100 ? 'var(--up)' : coverPct > 70 ? 'var(--gold)' : 'var(--dn)';
+    const tipStart = b.firstMonth ? monthLabel(b.firstMonth) : '?';
+    const tipEnd   = b.lastMonth  ? monthLabel(b.lastMonth)  : monthLabel(endDate);
+    return (
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;position:relative">' +
+        '<div style="width:65px;flex-shrink:0;font-size:10px;font-family:var(--sim-mono);color:var(--sim-text2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + b.ticker + '</div>' +
+        '<div style="flex:1;position:relative;height:14px">' +
+          // track background
+          '<div style="position:absolute;top:50%;left:0;right:0;height:2px;background:var(--sim-border2);transform:translateY(-50%);border-radius:1px"></div>' +
+          // active line
+          '<div style="position:absolute;top:50%;left:' + leftPct + '%;width:' + widthPct + '%;height:2px;background:' + color + ';transform:translateY(-50%);border-radius:1px"></div>' +
+          // dot at start of line
+          '<div style="position:absolute;top:50%;left:' + leftPct + '%;width:8px;height:8px;background:' + color + ';border:2px solid var(--sim-surf2);border-radius:50%;transform:translate(-50%,-50%);z-index:2" title="' + b.ticker + ': ' + tipStart + ' → ' + tipEnd + ' (' + coverPct + '% do período)"></div>' +
+        '</div>' +
+        '<div style="width:30px;flex-shrink:0;font-size:9px;font-family:var(--sim-mono);color:' + coverColor + ';text-align:right">' + coverPct + '%</div>' +
+      '</div>'
+    );
   });
 
-  if (rows.length === 0) return '';
+  // Milestone markers — quarterly snapshots on the X axis
+  // Pick ~5 evenly spaced points
+  const milestones = [];
+  if (series && series.length > 0) {
+    const step = Math.max(1, Math.floor(series.length / 5));
+    const picks = [];
+    for (let i = step; i < series.length - step/2; i += step) picks.push(i);
+    // Also add last
+    if (picks[picks.length-1] !== series.length-1) picks.push(series.length-1);
 
-  const simMid = Math.floor((simStart + simEnd) / 2);
-  const midY = Math.floor(simMid / 12);
-  const midM = String(simMid % 12 || 12).padStart(2, '0');
-  const labelStart = monthLabel(startDate);
-  const labelEnd   = monthLabel(endDate);
-  const labelMid   = monthLabel(midY + '-' + midM);
+    picks.forEach(idx => {
+      const s = series[idx];
+      if (!s) return;
+      const mStart = toM(startDate);
+      const mThis  = toM(s.date);
+      const leftP  = pct(mThis - mStart);
 
-  return '<div style="margin-top:20px;background:var(--sim-surf2);border:1px solid var(--sim-border);border-radius:var(--sim-r);padding:14px 16px;">' +
-    '<div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sim-text3);margin-bottom:12px;">Cobertura por ativo no período</div>' +
-    rows.join('') +
-    '<div style="display:flex;margin-left:78px;margin-top:6px;font-size:9px;font-family:var(--sim-mono);color:var(--sim-text3)">' +
-      '<span>' + labelStart + '</span>' +
-      '<span style="margin:0 auto">' + labelMid + '</span>' +
-      '<span>' + labelEnd + '</span>' +
-    '</div>' +
-  '</div>';
+      // Build mini pizza data for tooltip
+      const weights = s.weights || {};
+      const tickers = Object.keys(weights).filter(t => weights[t] > 0.005);
+      const pieSlices = tickers.map(t => {
+        const bd = breakdown.find(b => b.ticker === t);
+        const color = bd ? (classColorMap[bd.assetClass] || '#888') : '#888';
+        return { t, w: weights[t], color };
+      }).sort((a,b) => b.w - a.w);
+
+      const retorno = s.totalInvested > 0 ? ((s.portfolioValue - s.totalInvested) / s.totalInvested * 100).toFixed(1) : '0.0';
+      const lucro = s.portfolioValue - s.totalInvested;
+
+      // SVG mini pizza
+      const R = 28, cx = 32, cy = 32;
+      let angle = -Math.PI / 2;
+      let svgSlices = '';
+      pieSlices.forEach(slice => {
+        const a = slice.w * 2 * Math.PI;
+        const x1 = cx + R * Math.cos(angle);
+        const y1 = cy + R * Math.sin(angle);
+        angle += a;
+        const x2 = cx + R * Math.cos(angle);
+        const y2 = cy + R * Math.sin(angle);
+        const large = a > Math.PI ? 1 : 0;
+        svgSlices += '<path d="M' + cx + ',' + cy + ' L' + x1.toFixed(1) + ',' + y1.toFixed(1) + ' A' + R + ',' + R + ' 0 ' + large + ',1 ' + x2.toFixed(1) + ',' + y2.toFixed(1) + ' Z" fill="' + slice.color + '" opacity="0.9"/>';
+      });
+      const svgPie = '<svg width="64" height="64" style="border-radius:50%;flex-shrink:0"><circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" fill="var(--sim-surf3)"/>' + svgSlices + '</svg>';
+
+      // Legend items
+      const legendHtml = pieSlices.slice(0,6).map(sl =>
+        '<div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--sim-text2)">' +
+          '<div style="width:6px;height:6px;border-radius:50%;background:' + sl.color + ';flex-shrink:0"></div>' +
+          sl.t + ' ' + (sl.w*100).toFixed(0) + '%' +
+        '</div>'
+      ).join('');
+
+      const tooltipHtml =
+        '<div style="background:#0E0E11;border:1px solid var(--sim-border2);border-radius:8px;padding:10px 12px;width:210px;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,0.6)">' +
+          '<div style="font-size:10px;font-weight:700;color:var(--sim-text);margin-bottom:8px">' + monthLabel(s.date) + '</div>' +
+          '<div style="display:flex;gap:10px;margin-bottom:8px">' +
+            svgPie +
+            '<div style="display:flex;flex-direction:column;gap:3px;justify-content:center">' + legendHtml + '</div>' +
+          '</div>' +
+          '<div style="border-top:1px solid var(--sim-border);padding-top:7px;display:flex;flex-direction:column;gap:4px">' +
+            '<div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:var(--sim-text3)">Patrimônio</span><span style="color:var(--sim-text);font-family:var(--sim-mono)">' + brl(s.portfolioValue) + '</span></div>' +
+            '<div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:var(--sim-text3)">Aportado</span><span style="color:var(--sim-text);font-family:var(--sim-mono)">' + brl(s.totalInvested) + '</span></div>' +
+            '<div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:var(--sim-text3)">Lucro</span><span style="color:' + (lucro>=0?'var(--up)':'var(--dn)') + ';font-family:var(--sim-mono)">' + brl(lucro) + '</span></div>' +
+            '<div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:var(--sim-text3)">Retorno</span><span style="color:' + (parseFloat(retorno)>=0?'var(--up)':'var(--dn)') + ';font-family:var(--sim-mono)">' + retorno + '%</span></div>' +
+            '<div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:var(--sim-text3)">Dividendos</span><span style="color:var(--gold);font-family:var(--sim-mono)">' + brl(s.dividendsCash||0) + '</span></div>' +
+          '</div>' +
+        '</div>';
+
+      milestones.push({ leftP, label: monthLabel(s.date), tooltipHtml });
+    });
+  }
+
+  // Milestone dots row
+  const milestoneDots = milestones.map((ms, mi) =>
+    '<div style="position:absolute;left:' + ms.leftP + '%;top:50%;transform:translate(-50%,-50%);z-index:10" ' +
+         'onmouseenter="document.getElementById(\'mstip_' + mi + '\').style.display=\'block\'" ' +
+         'onmouseleave="document.getElementById(\'mstip_' + mi + '\').style.display=\'none\'">' +
+      '<div style="width:9px;height:9px;background:var(--sim-accent);border:2px solid #0E0E11;border-radius:50%;cursor:pointer"></div>' +
+      '<div id="mstip_' + mi + '" style="display:none;position:absolute;bottom:16px;left:50%;transform:translateX(-50%);z-index:100">' +
+        ms.tooltipHtml +
+      '</div>' +
+    '</div>'
+  ).join('');
+
+  // X axis labels
+  const midM = toM(startDate) + Math.floor(simTotal/2);
+  const midY2 = Math.floor(midM/12), midMo = String(midM%12||12).padStart(2,'0');
+
+  return (
+    '<div style="margin-top:20px;background:var(--bg2,#16161a);border:1px solid var(--sim-border);border-radius:8px;padding:16px">' +
+      '<div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sim-text3);margin-bottom:14px">Cobertura por ativo no período</div>' +
+      rows.join('') +
+      // Milestone row
+      (milestones.length > 0 ?
+        '<div style="display:flex;align-items:center;gap:8px;margin-top:4px">' +
+          '<div style="width:65px;flex-shrink:0"></div>' +
+          '<div style="flex:1;position:relative;height:20px">' +
+            '<div style="position:absolute;top:50%;left:0;right:0;height:1px;background:var(--sim-border);transform:translateY(-50%)"></div>' +
+            milestoneDots +
+          '</div>' +
+          '<div style="width:30px"></div>' +
+        '</div>' : '') +
+      // X axis labels
+      '<div style="display:flex;margin-left:73px;margin-top:6px;font-size:9px;font-family:var(--sim-mono);color:var(--sim-text3)">' +
+        '<span>' + monthLabel(startDate) + '</span>' +
+        '<span style="margin:0 auto">' + monthLabel(midY2+'-'+midMo) + '</span>' +
+        '<span>' + monthLabel(endDate) + '</span>' +
+      '</div>' +
+    '</div>'
+  );
 }
 
 function renderAvailabilityLog(logs) {
@@ -2966,7 +3056,7 @@ function renderSingleView(idx) {
   // Linha do tempo por ativo
   const logEl = document.getElementById('availabilityLog');
   const inicioLogs = buildInicioLog(result.metrics.primeiroMesComDado, config.startDate);
-  const timelineHtml = renderAtivosTimeline(breakdown, config.startDate, config.endDate);
+  const timelineHtml = renderAtivosTimeline(breakdown, config.startDate, config.endDate, result.series, sim.name);
   const logHtml = renderAvailabilityLog([...inicioLogs, ...(availabilityLog||[])]);
   if (logEl) logEl.innerHTML = timelineHtml + logHtml;
 
