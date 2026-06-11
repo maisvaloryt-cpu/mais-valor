@@ -1,7 +1,7 @@
 // ── Sentry — monitoramento de erros ──────────────────────────────
 (function() {
   const s = document.createElement('script');
-  s.src = 'https://js.sentry-cdn.com/5c73ae0a2da83db6c80acffed3530730.min.js';
+  s.src = 'https://browser.sentry-cdn.com/7.99.0/bundle.min.js';
   s.crossOrigin = 'anonymous';
   s.onload = function() {
     if (window.Sentry) {
