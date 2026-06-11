@@ -1,0 +1,469 @@
+/* ═══════════════════════════════════════════════════════════════
+   mobile.css — Mais Valor · Otimizações Mobile
+   Aplica-se apenas em telas pequenas (≤768px e ≤480px).
+   Não afeta o layout desktop.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Previne scroll horizontal global ─────────────────────────── */
+html, body {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ══════════════════════════════════════════════════════════════ */
+/*  BREAKPOINT PRINCIPAL: 768px                                   */
+/* ══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ── Container ───────────────────────────────────────────────── */
+  .container {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  /* ── Page Hero ───────────────────────────────────────────────── */
+  .page-hero {
+    padding: 1.25rem 16px 1rem !important;
+  }
+  .page-hero h1 {
+    font-size: clamp(26px, 7vw, 38px) !important;
+    line-height: 1.1 !important;
+  }
+  .page-hero p {
+    font-size: 13px !important;
+  }
+
+  /* ── Main Grid: 1 coluna no mobile ──────────────────────────── */
+  .main-grid {
+    display: block !important;
+    grid-template-columns: unset !important;
+  }
+
+  /* ── Sidebar vira seção abaixo do conteúdo ───────────────────── */
+  .sidebar {
+    margin-top: 1.5rem;
+  }
+  .sidebar .card {
+    margin-bottom: 1rem;
+  }
+
+  /* ── Mini Cards: 2 colunas ──────────────────────────────────── */
+  .mini-cards {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  .mini-card {
+    padding: 12px !important;
+  }
+  .mini-val {
+    font-size: 20px !important;
+  }
+
+  /* ── Filter Bar ─────────────────────────────────────────────── */
+  .filter-bar {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  .filter-input,
+  .filter-select {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  /* ── Ranking Bar ────────────────────────────────────────────── */
+  .ranking-bar {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+  .ranking-btns {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap !important;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .ranking-btns::-webkit-scrollbar { display: none; }
+  .rank-btn {
+    flex-shrink: 0;
+  }
+
+  /* ── Tabs ───────────────────────────────────────────────────── */
+  .tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap !important;
+    display: flex;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* ── Tabela: scroll horizontal ──────────────────────────────── */
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-lg, 12px);
+  }
+  .data-table {
+    min-width: 560px;
+  }
+  /* Colunas menos importantes: ocultar no mobile */
+  .data-table th.r:nth-child(n+5),
+  .data-table td.r:nth-child(n+5) {
+    display: none;
+  }
+  /* Mantém sempre: ativo, preço, variação, DY */
+  .data-table th:nth-child(1),
+  .data-table td:nth-child(1),
+  .data-table th:nth-child(2),
+  .data-table td:nth-child(2),
+  .data-table th:nth-child(3),
+  .data-table td:nth-child(3),
+  .data-table th:nth-child(4),
+  .data-table td:nth-child(4) {
+    display: table-cell;
+  }
+
+  /* ── Chart Panel ────────────────────────────────────────────── */
+  .chart-panel {
+    padding: 14px !important;
+  }
+  .chart-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+  .chart-stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+  .chart-ticker {
+    font-size: 24px !important;
+  }
+  .chart-price {
+    font-size: 18px !important;
+  }
+
+  /* ── Range Buttons ──────────────────────────────────────────── */
+  .range-btn {
+    padding: 4px 10px !important;
+    font-size: 11px !important;
+  }
+
+  /* ── Card ───────────────────────────────────────────────────── */
+  .card {
+    padding: 14px !important;
+  }
+
+  /* ── Section Header ─────────────────────────────────────────── */
+  .section-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* ── Banner ─────────────────────────────────────────────────── */
+  .banner {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    padding: 14px !important;
+  }
+  .banner-btn {
+    align-self: flex-start;
+  }
+
+  /* ── Mover Items ────────────────────────────────────────────── */
+  .mover-item {
+    padding: 8px 0 !important;
+  }
+  .mover-name {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ── Agenda de dividendos ───────────────────────────────────── */
+  .agenda-item {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* ── ═══════════════════════════════════════════════════════════
+     COMPARADOR
+  ═══════════════════════════════════════════════════════════════ */
+  .cmp-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  .cmp-ticker-big {
+    font-size: 24px !important;
+  }
+  .cmp-price-big {
+    font-size: 16px !important;
+  }
+  .cmp-table td {
+    font-size: 12px !important;
+    padding: 8px 8px !important;
+  }
+  .score-bar-wrap {
+    display: none; /* simplifica no mobile */
+  }
+
+  /* ── ═══════════════════════════════════════════════════════════
+     STATUS PAGE
+  ═══════════════════════════════════════════════════════════════ */
+  .status-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  .section-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  /* Timeline da status page */
+  .status-hero {
+    padding: 1rem 12px !important;
+  }
+
+  /* ── ═══════════════════════════════════════════════════════════
+     FERRAMENTAS
+  ═══════════════════════════════════════════════════════════════ */
+  .tool-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  .calc-box {
+    padding: 14px !important;
+  }
+
+  /* ── ═══════════════════════════════════════════════════════════
+     CRIPTO DETALHE
+  ═══════════════════════════════════════════════════════════════ */
+  .detail-layout {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+  .detail-hero-inner {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .detail-price-block {
+    width: 100%;
+  }
+
+  /* ── ═══════════════════════════════════════════════════════════
+     CRIPTOS LIST
+  ═══════════════════════════════════════════════════════════════ */
+  .crypto-grid,
+  .crypto-cards {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+
+  /* ── ═══════════════════════════════════════════════════════════
+     ATIVO PAGE (detalhe do ativo)
+  ═══════════════════════════════════════════════════════════════ */
+  .ativo-logo-wrap {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .ativo-logo,
+  .ativo-logo-av {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 13px !important;
+  }
+
+  /* ── ═══════════════════════════════════════════════════════════
+     WATCHLIST / ALERTAS
+  ═══════════════════════════════════════════════════════════════ */
+  .modal-box {
+    margin: 16px !important;
+    padding: 20px !important;
+    width: calc(100vw - 32px) !important;
+    box-sizing: border-box;
+  }
+
+  /* ── Pill badges ────────────────────────────────────────────── */
+  .pill {
+    font-size: 10px !important;
+    padding: 2px 6px !important;
+  }
+
+  /* ── Asset ticker/name em tabelas ───────────────────────────── */
+  .asset-name {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ── Score badge ────────────────────────────────────────────── */
+  .score-badge {
+    font-size: 10px !important;
+    padding: 2px 5px !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════ */
+/*  BREAKPOINT PEQUENO: 480px                                     */
+/* ══════════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+
+  /* ── Mini Cards: 1 coluna só p/ telas bem pequenas ─────────── */
+  .mini-cards {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* ── Page Hero ainda menor ──────────────────────────────────── */
+  .page-hero h1 {
+    font-size: clamp(22px, 8vw, 30px) !important;
+  }
+
+  /* ── Tabela de status em 1 coluna ───────────────────────────── */
+  .status-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ── Crypto grid 1 coluna ───────────────────────────────────── */
+  .crypto-grid,
+  .crypto-cards {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ── Comparador score ───────────────────────────────────────── */
+  .cmp-select {
+    padding: 12px !important;
+  }
+
+  /* ── Rankings: esconde mais colunas em tela minúscula ────────── */
+  .data-table th:nth-child(n+4),
+  .data-table td:nth-child(n+4) {
+    display: none;
+  }
+  .data-table th:nth-child(1),
+  .data-table td:nth-child(1),
+  .data-table th:nth-child(2),
+  .data-table td:nth-child(2),
+  .data-table th:nth-child(3),
+  .data-table td:nth-child(3) {
+    display: table-cell;
+  }
+
+  /* ── Nav do Simulador ───────────────────────────────────────── */
+  .sim-nav-subtitle {
+    display: none !important;
+  }
+  .sim-nav-divider {
+    display: none !important;
+  }
+
+  /* ── Ranking buttons ainda menores ─────────────────────────── */
+  .rank-btn {
+    padding: 4px 10px !important;
+    font-size: 11px !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════ */
+/*  SIMULADOR: nav inline em mobile (tem classes próprias)        */
+/* ══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* O nav do simulador usa inline style, então targeting wrapper */
+  .sim-root {
+    flex-direction: column !important;
+  }
+  .sim-sidebar {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: 45vh;
+    border-right: none !important;
+    border-bottom: 1px solid var(--sim-border, #2a2a30) !important;
+    overflow-y: auto;
+  }
+  .sim-main {
+    overflow-x: hidden;
+  }
+  .metrics-row {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .metrics-row2 {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .ind-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  /* Nav header do simulador em mobile */
+  .sim-nav-info {
+    display: none !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════ */
+/*  TOUCH TARGETS: mínimo 44px para botões e links interativos    */
+/* ══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .tab,
+  .rank-btn,
+  .range-btn,
+  .banner-btn {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Links de navegação do nav (nav.js) */
+  a[href] {
+    -webkit-tap-highlight-color: rgba(212, 160, 23, 0.15);
+  }
+
+  /* Rows clicáveis da tabela */
+  .data-table tr {
+    min-height: 48px;
+  }
+
+  /* Inputs maiores para dedos */
+  .filter-input,
+  .filter-select,
+  .calc-input {
+    min-height: 42px;
+    font-size: 16px !important; /* previne zoom automático do iOS */
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════ */
+/*  LOGO SVG NO NAV — injetada via nav.js                         */
+/*  Garante que a logo fique visível e responsiva no mobile       */
+/* ══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Nav container gerado pelo nav.js */
+  .navbar,
+  .nav-bar,
+  nav {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  /* Links do menu: ocultar texto, manter ícones se houver */
+  .nav-links,
+  .nav-menu {
+    display: none !important; /* hamburguer deve ser implementado no nav.js */
+  }
+
+  /* Logo sempre visível */
+  .nav-logo,
+  .logo-wrap,
+  .site-logo {
+    flex-shrink: 0 !important;
+  }
+}
