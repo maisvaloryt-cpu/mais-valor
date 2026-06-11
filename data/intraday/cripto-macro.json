@@ -1,5 +1,5 @@
 {
-  "updated_at": "11/06/2026 14:14",
+  "updated_at": "11/06/2026 14:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,18 +1128,18 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 168584.88,
-      "changePct": -0.0002,
+      "price": 169122.3,
+      "changePct": 0.003,
       "high": 169508.55,
-      "low": 168470.28
+      "low": 168280.39
     },
     {
       "ticker": "INDEXBVMF:IFIX",
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3789.79,
-      "changePct": 0.0033,
+      "price": 3789.44,
+      "changePct": 0.0032,
       "high": 3793.67,
       "low": 3777.11
     },
@@ -1158,10 +1158,10 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 11924.61,
-      "changePct": -0.0004,
+      "price": 11949.16,
+      "changePct": 0.0016,
       "high": 12003.52,
-      "low": 11919.05
+      "low": 11908.24
     },
     {
       "ticker": "INDEXBVMF:IMAB",
@@ -1188,9 +1188,9 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7275.86,
-      "changePct": 0.0012,
-      "high": 7327.9,
+      "price": 7375.69,
+      "changePct": 0.015,
+      "high": 7375.69,
       "low": 7257.33
     },
     {
@@ -1198,9 +1198,9 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 25229.73,
-      "changePct": 0.0024,
-      "high": 25465.33,
+      "price": 25662.74,
+      "changePct": 0.0196,
+      "high": 25665.63,
       "low": 25109.4
     },
     {
@@ -1208,9 +1208,9 @@
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 50189.13,
-      "changePct": 0.0054,
-      "high": 50399.98,
+      "price": 50794.18,
+      "changePct": 0.0175,
+      "high": 50794.88,
       "low": 49972.07
     },
     {
@@ -1218,8 +1218,8 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2866.68,
-      "changePct": 0.011000000000000001,
+      "price": 2883.53,
+      "changePct": 0.017,
       "high": 2884.69,
       "low": 2854.23
     },
