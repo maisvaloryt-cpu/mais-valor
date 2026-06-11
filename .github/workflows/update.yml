@@ -24,7 +24,7 @@ jobs:
           python-version: '3.11'
 
       - name: Dependências
-        run: pip install requests
+        run: pip install requests yfinance
 
       - name: Decidir modo
         id: modo
