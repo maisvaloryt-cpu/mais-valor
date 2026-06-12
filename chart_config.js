@@ -162,15 +162,17 @@ function addChartOverlay(chart, canvas, labels, data, color, unit) {
       const chgPct = ((v2 - v1) / v1 * 100);
       const chgSign = chgPct >= 0 ? '+' : '';
       const chgColor = chgPct >= 0 ? '#1FC96E' : '#E8503A';
-      tooltip.innerHTML = `
-        <div style="color:#9B9896;font-size:10px;margin-bottom:4px">${labels[pinIdx]} → ${labels[idx]}</div>
-        <div style="font-size:13px">Pin: <strong>${unit === 'usd' ? 'US$' : unit === 'pts' ? '' : 'R$'}${v1.toFixed(2)}${unit === 'pts' ? ' pts' : ''}</strong></div>
-        <div style="font-size:13px">Agora: <strong>${unit === 'usd' ? 'US$' : unit === 'pts' ? '' : 'R$'}${v2.toFixed(2)}${unit === 'pts' ? ' pts' : ''}</strong></div>
-        <div style="color:${chgColor};font-size:12px;margin-top:3px;font-weight:700">${chgSign}${chgPct.toFixed(2)}%</div>
+      const pfx2 = unit === 'usd' ? 'US$' : unit === 'pts' ? '' : 'R$';
+      const sfx2 = unit === 'pts' ? ' pts' : '';
+      infoBox.innerHTML = `
+        <div style="font-size:15px;font-weight:700;line-height:1">${pfx2}${v1.toFixed(2)} <span style="color:var(--text3);font-weight:400">→</span> ${pfx2}${v2.toFixed(2)}${sfx2}</div>
+        <div style="display:flex;justify-content:space-between;gap:16px;margin-top:3px">
+          <span style="color:#9B9896;font-size:10px">${labels[pinIdx]} → ${labels[idx]}</span>
+          <span style="color:${chgColor};font-size:11px;font-weight:700">${chgSign}${chgPct.toFixed(2)}%</span>
+        </div>
       `;
-      let tx = e.clientX + 16, ty = e.clientY - 40;
-      if (tx + 170 > window.innerWidth) tx = e.clientX - 170;
-      tooltip.style.left = tx + 'px'; tooltip.style.top = ty + 'px'; tooltip.style.display = 'block';
+      infoBox.style.display = 'block';
+      hideTooltip();
     } else { drawCrosshair(idx, false); showTooltip(e, idx); }
   });
 
