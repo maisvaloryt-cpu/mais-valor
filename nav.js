@@ -326,7 +326,14 @@ function renderNav() {
   const extPages = ['bdrs.html','etfs.html','reits.html','stocks.html'];
   const extActive = extPages.includes(page);
 
-  const links = NAV_LINKS.map(l => {
+  const criptosPos = NAV_LINKS.findIndex(l => l.href === 'criptos.html');
+  const beforeExt = NAV_LINKS.slice(0, criptosPos + 1).map(l => {
+    const isStatus = l.href === 'status.html';
+    const style = isStatus ? 'color:var(--up);font-size:11px' : '';
+    const cls = page === l.href ? 'active' : '';
+    return `<a href="${l.href}" class="${cls}" style="${style}">${l.label}</a>`;
+  }).join('');
+  const afterExt = NAV_LINKS.slice(criptosPos + 1).map(l => {
     const isStatus = l.href === 'status.html';
     const style = isStatus ? 'color:var(--up);font-size:11px' : '';
     const cls = page === l.href ? 'active' : '';
@@ -336,16 +343,20 @@ function renderNav() {
   // Exterior trigger — sem dropdown inline, dropdown vai no body via JS
   const exteriorHtml = `<span id="mv-ext-btn" class="${extActive ? 'active' : ''}" style="cursor:pointer;font-size:13px;font-weight:600;color:var(--text2);padding:4px 2px;transition:color .15s;white-space:nowrap;${extActive?'color:var(--text)':''}">Exterior ▾</span>`;
 
-  const mobileLinks = NAV_LINKS.map(l => {
-    const isStatus = l.href === 'status.html';
-    const cls = page === l.href ? 'active' : '';
-    const style = isStatus ? 'color:var(--up)' : '';
-    return `<a href="${l.href}" class="${cls}" style="${style}" onclick="toggleMobileMenu()">${l.label}</a>`;
-  }).join('') + `
+  const extMobileLinks = `
     <a href="bdrs.html" class="${page==='bdrs.html'?'active':''}" onclick="toggleMobileMenu()">🇧🇷 BDRs</a>
     <a href="etfs.html" class="${page==='etfs.html'?'active':''}" onclick="toggleMobileMenu()">📊 ETFs</a>
     <a href="reits.html" class="${page==='reits.html'?'active':''}" onclick="toggleMobileMenu()">🏢 REITs</a>
     <a href="stocks.html" class="${page==='stocks.html'?'active':''}" onclick="toggleMobileMenu()">🇺🇸 Stocks</a>`;
+
+  const mobileLinksHtml = (arr) => arr.map(l => {
+    const isStatus = l.href === 'status.html';
+    const cls = page === l.href ? 'active' : '';
+    const style = isStatus ? 'color:var(--up)' : '';
+    return `<a href="${l.href}" class="${cls}" style="${style}" onclick="toggleMobileMenu()">${l.label}</a>`;
+  }).join('');
+
+  const mobileLinks = mobileLinksHtml(NAV_LINKS.slice(0, criptosPos + 1)) + extMobileLinks + mobileLinksHtml(NAV_LINKS.slice(criptosPos + 1));
 
   document.getElementById('nav-placeholder').innerHTML = `
   <style>
@@ -391,7 +402,7 @@ function renderNav() {
       ${LOGO_SVG_HTML}
       <span>Mais <em>Valor</em></span>
     </a>
-    <div class="nav-links">${links}${exteriorHtml}</div>
+    <div class="nav-links">${beforeExt}${exteriorHtml}${afterExt}</div>
     <div class="nav-right">
       <div class="nav-search-wrap">
         <span class="nav-search-icon">⌕</span>
