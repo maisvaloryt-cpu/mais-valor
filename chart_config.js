@@ -80,11 +80,10 @@ function addChartOverlay(chart, canvas, labels, data, color, unit) {
     const from = Math.min(i1, i2), to = Math.max(i1, i2);
     const x1 = xScale.getPixelForValue(from), x2 = xScale.getPixelForValue(to);
     ctx.save();
-    ctx.fillStyle = 'rgba(245,166,35,0.08)';
-    ctx.fillRect(x1, ca.top, x2 - x1, ca.bottom - ca.top);
-    ctx.strokeStyle = 'rgba(245,166,35,0.5)'; ctx.lineWidth = 1; ctx.setLineDash([]);
+    ctx.strokeStyle = 'rgba(245,166,35,0.4)'; ctx.lineWidth = 1; ctx.setLineDash([4, 3]);
     ctx.beginPath(); ctx.moveTo(x1, ca.top); ctx.lineTo(x1, ca.bottom); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(x2, ca.top); ctx.lineTo(x2, ca.bottom); ctx.stroke();
+    ctx.setLineDash([]);
     [from, to].forEach(idx => {
       const px = xScale.getPixelForValue(idx), py = yScale.getPixelForValue(data[idx]);
       ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI * 2);
@@ -98,12 +97,11 @@ function addChartOverlay(chart, canvas, labels, data, color, unit) {
     const chgColor = chgPct >= 0 ? '#1FC96E' : '#E8503A';
     const pfx = unit === 'usd' ? 'US$' : unit === 'pts' ? '' : 'R$';
     const sfx = unit === 'pts' ? ' pts' : '';
+    const fmtR = l => (l && l.length >= 7) ? l.slice(0, 7) : (l || '');
     infoBox.innerHTML = `
-      <span style="color:#9B9896;font-size:10px">${labels[from]} → ${labels[to]}</span><br>
-      <span>${pfx}${v1.toFixed(2)}${sfx}</span>
-      <span style="color:var(--text3)"> → </span>
-      <span>${pfx}${v2.toFixed(2)}${sfx}</span>
-      &nbsp;<span style="color:${chgColor};font-weight:700">${chgSign}${chgPct.toFixed(2)}%</span>
+      <div style="font-size:20px;font-weight:800;color:${chgColor};line-height:1">${chgSign}${chgPct.toFixed(2)}%</div>
+      <div style="font-size:12px;font-weight:600;margin-top:5px">${pfx}${v1.toFixed(2)} → ${pfx}${v2.toFixed(2)}${sfx}</div>
+      <div style="font-size:10px;color:#9B9896;margin-top:3px">${fmtR(labels[from])} · ${fmtR(labels[to])}</div>
     `;
     infoBox.style.display = 'block';
   }
