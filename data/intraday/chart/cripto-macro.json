@@ -1,0 +1,20 @@
+{
+  "date": "2026-06-12",
+  "points": [
+    {
+      "t": "10:14",
+      "INDEXBVMF:IBOV": 171497.23,
+      "INDEXBVMF:IFIX": 3802.63,
+      "INDEXBVMF:IDIV": 12153.59,
+      "INDEXSP:.INX": 7394.3,
+      "INDEXNASDAQ:.IXIC": 25809.66,
+      "INDEXDJX:.DJI": 50848.75,
+      "INDEXRUSSELL:RUT": 2921.03,
+      "INDEXFTSE:UKX": 10412.6,
+      "INDEXDB:DAX": 24475.45,
+      "INDEXNIKKEI:NI225": 66020.04,
+      "INDEXHANGSENG:HSI": 24718.1
+    }
+  ],
+  "updated_at": "12/06/2026 10:14"
+}
