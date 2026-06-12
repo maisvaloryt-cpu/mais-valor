@@ -2,12 +2,13 @@
 """
 gerar_historico_cripto.py
 =========================
-Busca histórico mensal das top 30 criptos via Binance API (gratuita,
+Busca histórico mensal das top 30 criptos via CoinGecko (gratuita,
 sem chave, sem bloqueio no GitHub Actions) e salva em
 data/historico/{TICKER}BRL.json — formato compatível com o Simulador.
 
-Binance tem pares diretos em BRL (ex: BTCBRL, ETHBRL) então não
-precisa converter USD→BRL. Histórico desde o lançamento de cada par.
+Migrado da Binance para CoinGecko pois a Binance retorna HTTP 451
+(bloqueio geográfico) nos servidores do GitHub Actions para pares BRL.
+CoinGecko retorna preços já em BRL nativamente via ?vs_currency=brl.
 """
 
 import json, time, logging
@@ -19,123 +20,99 @@ try:
 except ImportError:
     raise SystemExit("pip install requests")
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s", datefmt="%H:%M:%S")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s",
+    datefmt="%H:%M:%S",
+)
 log = logging.getLogger(__name__)
 
-# Mapa: ticker do simulador → símbolo Binance
-# Binance usa formato "BTCBRL", "ETHBRL" etc. diretamente
+# Mapa: ticker do simulador → ID do CoinGecko
+# IDs em: https://api.coingecko.com/api/v3/coins/list
 CRIPTO_MAP = {
-    "BTCBRL":   "BTCBRL",
-    "ETHBRL":   "ETHBRL",
-    "BNBBRL":   "BNBBRL",
-    "SOLBRL":   "SOLBRL",
-    "XRPBRL":   "XRPBRL",
-    "ADABRL":   "ADABRL",
-    "DOGEBRL":  "DOGEBRL",
-    "AVAXBRL":  "AVAXBRL",
-    "LINKBRL":  "LINKBRL",
-    "DOTBRL":   "DOTBRL",
-    "LTCBRL":   "LTCBRL",
-    "XLMBRL":   "XLMBRL",
-    "ATOMBRL":  "ATOMBRL",
-    "NEARBRL":  "NEARBRL",
-    "UNIBRL":   "UNIBNB",   # UNI não tem par BRL direto, usa via BNB como proxy
-    "BCHBRL":   "BCHBRL",
-    "MATICBRL": "MATICBRL",
-    "ETCBRL":   "ETCBRL",
-    "TRXBRL":   "TRXBRL",
-    "FILBRL":   "FILBRL",
-    "SHIBABRL": "SHIBABRL",
-    "USDTBRL":  "USDTBRL",
+    "BTCBRL":   "bitcoin",
+    "ETHBRL":   "ethereum",
+    "BNBBRL":   "binancecoin",
+    "SOLBRL":   "solana",
+    "XRPBRL":   "ripple",
+    "ADABRL":   "cardano",
+    "DOGEBRL":  "dogecoin",
+    "AVAXBRL":  "avalanche-2",
+    "LINKBRL":  "chainlink",
+    "DOTBRL":   "polkadot",
+    "LTCBRL":   "litecoin",
+    "XLMBRL":   "stellar",
+    "ATOMBRL":  "cosmos",
+    "NEARBRL":  "near",
+    "UNIBRL":   "uniswap",
+    "BCHBRL":   "bitcoin-cash",
+    "MATICBRL": "matic-network",
+    "ETCBRL":   "ethereum-classic",
+    "TRXBRL":   "tron",
+    "FILBRL":   "filecoin",
+    "SHIBABRL": "shiba-inu",
+    "USDTBRL":  "tether",
+    "TONBRL":   "the-open-network",
+    "ICPBRL":   "internet-computer",
+    "APTBRL":   "aptos",
+    "PEPEBRL":  "pepe",
 }
 
-# Pares que não existem na Binance em BRL — fallback Yahoo Finance
-YAHOO_FALLBACK = {
-    "TONBRL":   "TON11419-BRL",
-    "ICPBRL":   "ICP-BRL",
-    "APTBRL":   "APT21794-BRL",
-    "PEPEBRL":  "PEPE24478-BRL",
-    "XLMBRL":   "XLM-BRL",
-    "UNIBRL":   "UNI7083-BRL",
-    "BNBBRL":   "BNB-BRL",     # fallback se Binance falhar
-}
-
-BINANCE_BASE = "https://api.binance.com/api/v3"
-YAHOO_BASE   = "https://query1.finance.yahoo.com/v8/finance/chart"
-OUT_DIR      = Path("data/historico")
+COINGECKO_BASE = "https://api.coingecko.com/api/v3"
+OUT_DIR        = Path("data/historico")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-HEADERS_YAHOO = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0",
-    "Accept": "application/json",
-}
+# CoinGecko free tier: ~10-30 req/min — 1.5s entre chamadas é seguro
+DELAY_ENTRE_REQUESTS = 1.5
 
 
-def fetch_binance(symbol: str) -> list:
+def fetch_coingecko(coin_id: str, dias: int = 3650) -> list:
     """
-    Busca klines mensais da Binance.
-    Retorna lista de {date, close} ou [] se falhar.
-    Binance retorna até 1000 candles por request — mensal cobre ~83 anos.
+    Busca histórico de preços diários do CoinGecko em BRL.
+    Retorna lista de {date, close} agrupada por mês (último dia do mês)
+    ou [] se falhar.
+
+    CoinGecko /market_chart retorna dados diários para janelas > 90 dias.
+    Agrupamos por mês pegando o último ponto de cada mês — compatível
+    com o formato que o Simulador espera.
     """
     try:
         r = requests.get(
-            f"{BINANCE_BASE}/klines",
-            params={"symbol": symbol, "interval": "1M", "limit": 1000},
-            timeout=20
+            f"{COINGECKO_BASE}/coins/{coin_id}/market_chart",
+            params={
+                "vs_currency": "brl",
+                "days": dias,
+                "interval": "daily",
+            },
+            timeout=30,
         )
-        if r.status_code == 400:
-            # Par não existe na Binance
+        if r.status_code == 429:
+            log.warning(f"    CoinGecko rate limit — aguardando 60s...")
+            time.sleep(60)
+            return fetch_coingecko(coin_id, dias)  # retry uma vez
+        if r.status_code == 404:
+            log.warning(f"    CoinGecko: coin_id '{coin_id}' não encontrado")
             return []
         r.raise_for_status()
         data = r.json()
-        pts = []
-        for candle in data:
-            # candle: [open_time, open, high, low, close, volume, ...]
-            ts    = candle[0] / 1000
-            close = float(candle[4])
-            date  = datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%d")
-            if close > 0:
-                pts.append({"date": date, "close": round(close, 8)})
+
+        prices = data.get("prices", [])
+        if not prices:
+            return []
+
+        # Agrupa por mês — mantém o último ponto de cada mês
+        por_mes: dict[str, float] = {}
+        for ts_ms, preco in prices:
+            dt   = datetime.fromtimestamp(ts_ms / 1000, tz=timezone.utc)
+            chave = dt.strftime("%Y-%m")  # "2024-03"
+            # sobrescreve sempre → fica com o último dia do mês
+            por_mes[chave] = (dt.strftime("%Y-%m-%d"), round(float(preco), 8))
+
+        pts = [{"date": v[0], "close": v[1]} for v in sorted(por_mes.values())]
         return pts
-    except Exception as e:
-        log.warning(f"    Binance {symbol}: {e}")
-        return []
 
-
-def fetch_yahoo(yahoo_symbol: str, anos: int = 10) -> list:
-    """Fallback: busca histórico mensal do Yahoo Finance."""
-    import datetime as dt
-    end   = int(dt.datetime.now().timestamp())
-    start = end - (anos * 365 * 24 * 3600)
-    try:
-        r = requests.get(
-            f"{YAHOO_BASE}/{yahoo_symbol}",
-            params={"period1": start, "period2": end, "interval": "1mo"},
-            headers=HEADERS_YAHOO, timeout=20
-        )
-        if not r.ok:
-            return []
-        data   = r.json()
-        result = data.get("chart", {}).get("result", [])
-        if not result:
-            return []
-        r0      = result[0]
-        ts_list = r0.get("timestamp", [])
-        closes  = (r0.get("indicators", {})
-                     .get("adjclose", [{}])[0]
-                     .get("adjclose", []))
-        if not closes:
-            closes = (r0.get("indicators", {})
-                        .get("quote", [{}])[0]
-                        .get("close", []))
-        pts = []
-        for ts, c in zip(ts_list, closes):
-            if c:
-                d = datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%d")
-                pts.append({"date": d, "close": round(float(c), 8)})
-        return pts if len(pts) >= 3 else []
     except Exception as e:
-        log.warning(f"    Yahoo {yahoo_symbol}: {e}")
+        log.warning(f"    CoinGecko {coin_id}: {e}")
         return []
 
 
@@ -153,54 +130,42 @@ def merge_historico(path: Path, ticker: str, novos: list) -> int:
     to_add = [p for p in novos if p["date"] not in datas_existentes]
 
     merged = sorted(existente + to_add, key=lambda x: x["date"])
-    path.write_text(json.dumps({
-        "ticker":     ticker,
-        "updated_at": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M UTC"),
-        "history":    merged,
-    }, ensure_ascii=False, separators=(",", ":")))
+    path.write_text(
+        json.dumps(
+            {
+                "ticker":     ticker,
+                "updated_at": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M UTC"),
+                "history":    merged,
+            },
+            ensure_ascii=False,
+            separators=(",", ":"),
+        )
+    )
     return len(to_add)
 
 
 def main():
-    # Todos os tickers para processar
-    todos = dict(CRIPTO_MAP)
-    todos.update({k: None for k in YAHOO_FALLBACK if k not in todos})
-
-    log.info(f"Iniciando: {len(todos)} criptos")
+    log.info(f"Iniciando: {len(CRIPTO_MAP)} criptos via CoinGecko (BRL)")
     ok = fail = 0
 
-    for ticker in todos:
-        binance_sym = CRIPTO_MAP.get(ticker)
-        yahoo_sym   = YAHOO_FALLBACK.get(ticker)
-        path        = OUT_DIR / f"{ticker}.json"
+    for ticker, coin_id in CRIPTO_MAP.items():
+        path = OUT_DIR / f"{ticker}.json"
+        log.info(f"  {ticker} ({coin_id})...")
 
-        log.info(f"  {ticker}...")
-        pts = []
-
-        # 1. Tenta Binance
-        if binance_sym:
-            pts = fetch_binance(binance_sym)
-            if pts:
-                log.info(f"    Binance: {len(pts)} candles")
-
-        # 2. Fallback Yahoo se Binance não tiver
-        if not pts and yahoo_sym:
-            pts = fetch_yahoo(yahoo_sym)
-            if pts:
-                log.info(f"    Yahoo fallback: {len(pts)} pontos")
+        pts = fetch_coingecko(coin_id)
 
         if not pts:
-            log.warning(f"    sem dados em nenhuma fonte")
+            log.warning(f"    sem dados — pulando {ticker}")
             fail += 1
-            time.sleep(0.3)
+            time.sleep(DELAY_ENTRE_REQUESTS)
             continue
 
         adicionados = merge_historico(path, ticker, pts)
-        log.info(f"    +{adicionados} novos pontos salvos")
+        log.info(f"    {len(pts)} pontos totais, +{adicionados} novos salvos")
         ok += 1
-        time.sleep(0.3)  # gentil com a API
+        time.sleep(DELAY_ENTRE_REQUESTS)
 
-    log.info(f"\nConcluido: {ok} ok, {fail} sem dados")
+    log.info(f"\nConcluído: {ok} ok, {fail} sem dados")
     log.info(f"Arquivos em {OUT_DIR}/")
 
 
