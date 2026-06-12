@@ -94,10 +94,10 @@ nav {
   display: flex; align-items: center; gap: 9px;
   flex-shrink: 0; margin-right: .5rem;
 }
-.nav-logo img { width: 45px; height: 45px; object-fit: contain; border-radius: 9px; }
+.nav-logo img { width: 54px; height: 54px; object-fit: contain; border-radius: 10px; }
 .nav-logo span {
   font-family: var(--font-display);
-  font-size: 30px; font-weight: 400;
+  font-size: 38px; font-weight: 400;
   letter-spacing: 0.5px;
   color: var(--text);
   line-height: 1;

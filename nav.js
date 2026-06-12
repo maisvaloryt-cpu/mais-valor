@@ -28,7 +28,7 @@
   gtag('config', 'G-MXYNF830JM');
 })();
 
-const LOGO_SVG_HTML = `<svg viewBox="0 0 530 530" xmlns="http://www.w3.org/2000/svg" width="36" height="36" style="display:block;border-radius:8px;overflow:hidden;flex-shrink:0">
+const LOGO_SVG_HTML = `<svg viewBox="0 0 530 530" xmlns="http://www.w3.org/2000/svg" width="54" height="54" style="display:block;border-radius:10px;overflow:hidden;flex-shrink:0">
   <rect width="530" height="530" fill="#C90D08"/>
   <path fill="#FFD76A" d="M459 58 L346 125 L387 142 L365 181 L296 277 L258 315 L212 349 L174 367 L147 374 L110 376 L89 372 L67 362 L49 345 L37 324 L32 302 L31 349 L52 392 L70 409 L94 422 L150 429 L196 420 L230 407 L298 365 L337 329 L377 280 L441 171 L475 192 L480 191 Z"/>
   <path fill="#FFD76A" d="M399 303 L384 326 L358 359 L318 398 L283 424 L258 438 L222 452 L190 459 L161 460 L178 465 L200 468 L237 467 L278 458 L315 441 L340 421 L361 395 L383 353 L397 314 Z"/>
