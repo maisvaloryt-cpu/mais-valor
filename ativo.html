@@ -374,7 +374,7 @@ async function drawChartWithCDI() {
   }
 
   const isUp = (ativo?.v || 0) >= 0;
-  const color = isUp ? '#22C87A' : '#E8503A';
+  const color = isUp ? '#F5A623' : '#E8503A';
 
   // Tenta carregar CDI para comparação
   const bcb = window.BCB_DATA || await loadBCBData();
@@ -388,7 +388,7 @@ async function drawChartWithCDI() {
     borderWidth: 2,
     pointRadius: 0,
     fill: true,
-    backgroundColor: isUp ? 'rgba(34,200,122,0.06)' : 'rgba(232,80,58,0.06)',
+    backgroundColor: isUp ? 'rgba(245,166,35,0.06)' : 'rgba(232,80,58,0.06)',
     tension: 0.35,
     yAxisID: 'y'
   }];
@@ -419,30 +419,28 @@ async function drawChartWithCDI() {
   }
 
   if (mainChart) mainChart.destroy();
-  mainChart = new Chart(document.getElementById('mainChart'), {
+  const canvasEl = document.getElementById('mainChart');
+  mainChart = new Chart(canvasEl, {
     type: 'line',
     data: { labels, datasets },
     options: {
       responsive: true, maintainAspectRatio: false,
+      animation: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: {
           display: datasets.length > 1,
           labels: { color: '#9B9896', font: { size: 11 }, boxWidth: 20 }
         },
-        tooltip: {
-          backgroundColor: 'rgba(17,17,19,0.95)',
-          borderColor: 'rgba(245,166,35,0.3)',
-          borderWidth: 1,
-          callbacks: { label: ctx => `  ${ctx.dataset.label}: R$ ${ctx.parsed.y.toFixed(2)}` }
-        }
+        tooltip: { enabled: false }
       },
       scales: {
         x: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#5E5C58', font: { size: 10 }, maxTicksLimit: 10 } },
-        y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#5E5C58', font: { size: 10 }, callback: v => 'R$' + v.toFixed(0) } }
+        y: { grace: '5%', grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#5E5C58', font: { size: 10 }, callback: v => 'R$' + v.toFixed(0) } }
       }
     }
   });
+  addChartOverlay(mainChart, canvasEl, labels, pts, color, 'brl');
 }
 
 function setRange(r,el){
