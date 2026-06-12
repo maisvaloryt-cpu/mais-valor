@@ -19,9 +19,9 @@ function addChartOverlay(chart, canvas, labels, data, color, unit) {
   infoBox.style.cssText = `
     display:none;position:absolute;top:8px;left:50%;transform:translateX(-50%);
     background:rgba(17,17,19,0.96);border:1px solid rgba(245,166,35,0.5);
-    border-radius:10px;padding:8px 16px;font-family:'JetBrains Mono',monospace;
+    border-radius:12px;padding:10px 14px;font-family:'JetBrains Mono',monospace;
     font-size:12px;color:#F0EDE8;z-index:10;pointer-events:none;text-align:center;
-    box-shadow:0 4px 20px rgba(0,0,0,0.5);white-space:nowrap;
+    box-shadow:0 4px 20px rgba(0,0,0,0.5);min-width:140px;
   `;
   wrapper.appendChild(infoBox);
 
@@ -164,12 +164,11 @@ function addChartOverlay(chart, canvas, labels, data, color, unit) {
       const chgColor = chgPct >= 0 ? '#1FC96E' : '#E8503A';
       const pfx2 = unit === 'usd' ? 'US$' : unit === 'pts' ? '' : 'R$';
       const sfx2 = unit === 'pts' ? ' pts' : '';
+      const fmt = l => (l && l.length >= 7) ? l.slice(0, 7) : (l || '');
       infoBox.innerHTML = `
-        <div style="font-size:15px;font-weight:700;line-height:1">${pfx2}${v1.toFixed(2)} <span style="color:var(--text3);font-weight:400">→</span> ${pfx2}${v2.toFixed(2)}${sfx2}</div>
-        <div style="display:flex;justify-content:space-between;gap:16px;margin-top:3px">
-          <span style="color:#9B9896;font-size:10px">${labels[pinIdx]} → ${labels[idx]}</span>
-          <span style="color:${chgColor};font-size:11px;font-weight:700">${chgSign}${chgPct.toFixed(2)}%</span>
-        </div>
+        <div style="font-size:20px;font-weight:800;color:${chgColor};line-height:1">${chgSign}${chgPct.toFixed(2)}%</div>
+        <div style="font-size:12px;font-weight:600;margin-top:5px">${pfx2}${v1.toFixed(2)} → ${pfx2}${v2.toFixed(2)}${sfx2}</div>
+        <div style="font-size:10px;color:#9B9896;margin-top:3px">${fmt(labels[pinIdx])} · ${fmt(labels[idx])}</div>
       `;
       infoBox.style.display = 'block';
       hideTooltip();
@@ -200,6 +199,7 @@ function addChartOverlay(chart, canvas, labels, data, color, unit) {
             <div style="color:#F5A623;font-size:10px;margin-top:3px">${labels[idx]}</div>
           `;
           infoBox.style.display = 'block';
+          hideTooltip();
           drawCrosshair(idx, true);
         }
       }
