@@ -80,7 +80,9 @@ function addChartOverlay(chart, canvas, labels, data, color, unit) {
     const from = Math.min(i1, i2), to = Math.max(i1, i2);
     const x1 = xScale.getPixelForValue(from), x2 = xScale.getPixelForValue(to);
     ctx.save();
-    ctx.strokeStyle = 'rgba(245,166,35,0.4)'; ctx.lineWidth = 1; ctx.setLineDash([4, 3]);
+    ctx.fillStyle = 'rgba(245,166,35,0.07)';
+    ctx.fillRect(x1, ca.top, x2 - x1, ca.bottom - ca.top);
+    ctx.strokeStyle = 'rgba(245,166,35,0.35)'; ctx.lineWidth = 1; ctx.setLineDash([4, 3]);
     ctx.beginPath(); ctx.moveTo(x1, ca.top); ctx.lineTo(x1, ca.bottom); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(x2, ca.top); ctx.lineTo(x2, ca.bottom); ctx.stroke();
     ctx.setLineDash([]);
@@ -142,7 +144,7 @@ function addChartOverlay(chart, canvas, labels, data, color, unit) {
   });
 
   canvas.addEventListener('mousemove', (e) => {
-    if (lockedRange) return;
+    if (lockedRange) { hideTooltip(); return; }
     const rect = canvas.getBoundingClientRect();
     const mouseX = e.clientX - rect.left, mouseY = e.clientY - rect.top;
     const ca = chart.chartArea;
@@ -180,14 +182,14 @@ function addChartOverlay(chart, canvas, labels, data, color, unit) {
     const ca = chart.chartArea;
     isDragging = false;
     if (dragEnd !== null && Math.abs(dragEnd - dragStart) > 1) {
-      drawRangeSelection(dragStart, dragEnd); pinIdx = null; lockedRange = { from: dragStart, to: dragEnd };
+      drawRangeSelection(dragStart, dragEnd); pinIdx = null; lockedRange = { from: dragStart, to: dragEnd }; hideTooltip();
     } else {
       if (ca && mouseX >= ca.left && mouseX <= ca.right) {
         const idx = getIdx(mouseX);
         if (pinIdx === idx) { pinIdx = null; infoBox.style.display = 'none'; clearAll(); }
         else if (pinIdx !== null) {
           const from = Math.min(pinIdx, idx), to = Math.max(pinIdx, idx);
-          drawRangeSelection(from, to); pinIdx = null; lockedRange = { from, to };
+          drawRangeSelection(from, to); pinIdx = null; lockedRange = { from, to }; hideTooltip();
         } else {
           pinIdx = idx;
           const pfxPin = unit === 'usd' ? 'US$' : unit === 'pts' ? '' : 'R$';
