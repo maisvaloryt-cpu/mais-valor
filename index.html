@@ -226,14 +226,22 @@ function renderTable(arr){
 async function loadChart(d) {
   sel = d;
   const logoEl = document.getElementById('c-logo');
-  if(logoEl) logoEl.innerHTML = logoHtml(d.t, 36);
-  document.getElementById('c-ticker').textContent = d.t;
   const isUp = d.v >= 0;
   if (d.isIndex) {
-    const ptsFmt = (d.p || 0).toLocaleString('pt-BR', { maximumFractionDigits: 0 });
-    document.getElementById('c-price').innerHTML = `${ptsFmt}&nbsp;pts&nbsp;<span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span>`;
-    document.getElementById('c-meta').textContent = `${d.n} · principal índice da B3`;
+    if (logoEl) logoEl.innerHTML = `<div style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--bg3);flex-shrink:0">${INDEX_ICONS[d.t] || '📊'}</div>`;
+    document.getElementById('c-ticker').textContent = d.n;
+    let priceStr;
+    if (d.unit === 'usd') {
+      const dec = d.p < 100 ? 2 : 0;
+      priceStr = `US$&nbsp;${d.p.toLocaleString('pt-BR', { minimumFractionDigits: dec, maximumFractionDigits: dec })}`;
+    } else {
+      priceStr = `${d.p.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}&nbsp;pts`;
+    }
+    document.getElementById('c-price').innerHTML = `${priceStr}&nbsp;<span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span>`;
+    document.getElementById('c-meta').textContent = `${d.n} · ${d.unit === 'usd' ? 'cotação ao vivo' : 'principal índice'}`;
   } else {
+    if (logoEl) logoEl.innerHTML = logoHtml(d.t, 36);
+    document.getElementById('c-ticker').textContent = d.t;
     document.getElementById('c-price').innerHTML = `R$&nbsp;${d.p.toFixed(2)}&nbsp;<span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span>`;
     document.getElementById('c-meta').textContent = `${d.n} · ${d.setor} · B3`;
   }
@@ -249,7 +257,7 @@ async function loadChart(d) {
     verMais.href = `ativo.html?t=${d.t}${currentTab==='fiis'?'&tipo=fii':''}`;
   }
 
-  const histTicker = d.isIndex ? 'IBOV' : d.t;
+  const histTicker = d.isIndex ? d.t : d.t;
   const hist = await loadHistoricoCompleto(histTicker);
   let pts, labels;
   if (hist?.length) { const filt = filterByRange(hist, currentRange); pts = filt.map(p => p.close); labels = filt.map(p => p.date); }
@@ -362,26 +370,55 @@ let carouselIdx = 0;
 let carouselTimer = null;
 const CAROUSEL_INTERVAL = 8000; // 8s entre trocas automáticas
 
-function buildCarouselItems() {
+const INDEX_ICONS = {
+  IBOV: '🇧🇷', SP500: '🇺🇸', NASDAQ: '💻', BTC: '₿', ETH: 'Ξ',
+  IFIX: '🏢', DOLAR: '💵',
+};
+
+async function buildCarouselItems() {
   carouselItems = [];
 
-  // 1) Ibovespa sempre primeiro, se houver dado válido
-  if (typeof IBOV !== 'undefined' && typeof IBOV.val === 'number' && IBOV.val > 0) {
+  let fromJson = {}, fromLive = {};
+  try {
+    const [jsonRes, liveRes] = await Promise.allSettled([
+      fetch('data/indices.json?t=' + Date.now()).then(r => r.ok ? r.json() : {}),
+      (typeof fetchLiveIndices === 'function' ? fetchLiveIndices() : Promise.resolve({})),
+    ]);
+    fromJson = jsonRes.status === 'fulfilled' ? (jsonRes.value || {}) : {};
+    fromLive = liveRes.status === 'fulfilled' ? (liveRes.value || {}) : {};
+  } catch(e) {}
+
+  const pick = (key) => {
+    const live = fromLive[key], json = fromJson[key];
+    if (live?.val > 0) return live;
+    if (json?.val > 0) return json;
+    return null;
+  };
+
+  const addIndex = (key, code, name, unit) => {
+    const d = pick(key);
+    if (!d) return;
     carouselItems.push({
-      t: 'IBOV', n: 'Ibovespa',
-      p: IBOV.val, v: IBOV.chg || 0,
+      t: code, n: name, p: d.val, v: d.chg || 0,
       dy: 0, pl: null, pvp: null, vol: '—',
-      setor: 'Índice', isIndex: true,
+      setor: 'Índice', isIndex: true, unit: unit || 'pts',
     });
+  };
+
+  // Os 5 indicadores mais relevantes para o público geral
+  addIndex('ibov',   'IBOV',   'Ibovespa');
+  addIndex('sp500',  'SP500',  'S&P 500');
+  addIndex('nasdaq', 'NASDAQ', 'Nasdaq');
+  addIndex('btc',    'BTC',    'Bitcoin',  'usd');
+  addIndex('eth',    'ETH',    'Ethereum', 'usd');
+
+  // Fallback: se nada dos índices carregou, usa maiores altas como antes
+  if (!carouselItems.length) {
+    carouselItems = [...ACOES, ...FIIS]
+      .filter(d => d.p > 0)
+      .sort((a, b) => b.v - a.v)
+      .slice(0, 5);
   }
-
-  // 2) 5 destaques entre as maiores altas do dia (ações + FIIs)
-  const destaques = [...ACOES, ...FIIS]
-    .filter(d => d.p > 0)
-    .sort((a, b) => b.v - a.v)
-    .slice(0, 5);
-
-  carouselItems.push(...destaques);
 }
 
 function renderCarouselDots() {
@@ -420,7 +457,7 @@ function resumeCarousel() {
 }
 
 async function startCarousel() {
-  buildCarouselItems();
+  await buildCarouselItems();
   if (!carouselItems.length) return;
   await showCarousel(0, false);
   resetCarouselTimer();
