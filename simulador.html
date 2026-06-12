@@ -1068,6 +1068,9 @@ const COMMODITIES_FUTURO = [
 ];
 
 const SIM_COLORS = ['#1FC96E','#5b8def','#F5A623','#e05c5c','#9b72ef'];
+// Tolerância única para verificação de "soma = 100%" em todo o app (pesos de
+// classes e de ativos). Evita mensagens conflitantes entre validação e UI.
+const TOLERANCIA_SOMA = 0.5;
 
 // ══════════════════════════════════════════════════════════════
 // STATE
@@ -1085,6 +1088,7 @@ let editingSimIdx = null;
 let chartInst = null, compareChartInst = null, compareBarChartInst = null;
 let _priceCache = {};   // ticker → {'YYYY-MM': price} | null (sem dados)
 let _divCache   = {};   // ticker → {'YYYY-MM': valor}
+let _divComCache = {};  // ticker → {'YYYY-MM': 'YYYY-MM-DD' data-com}, quando disponível
 
 // ══════════════════════════════════════════════════════════════
 // DADOS REAIS — única fonte de verdade
@@ -1105,25 +1109,35 @@ function histToMap(history) {
   return Object.keys(map).length > 0 ? map : null;
 }
 
-// Busca client-side para cripto (CoinGecko) como último recurso
+// Busca client-side para cripto (CoinGecko) como último recurso.
+// Observação: o parâmetro interval=monthly foi descontinuado no plano gratuito
+// da CoinGecko. Aqui pedimos a série diária (days=max) e agregamos para o último
+// preço de cada mês no próprio cliente — funciona no tier público.
 async function fetchClientSideCripto(ticker) {
   const cgMap = { 'BTCBRL': 'bitcoin', 'ETHBRL': 'ethereum', 'HASH11': null, 'QBTC11': null };
   const cgId = cgMap[ticker];
   if (!cgId) return null;
   try {
-    const url = `https://api.coingecko.com/api/v3/coins/${cgId}/market_chart?vs_currency=brl&days=1825&interval=monthly`;
+    const url = `https://api.coingecko.com/api/v3/coins/${cgId}/market_chart?vs_currency=brl&days=max`;
     const r = await fetch(url);
     if (!r.ok) return null;
     const data = await r.json();
     const prices = data.prices || [];
+    // Cada item é [timestamp_ms, preco]. Como vêm em ordem cronológica, sobrescrever
+    // a chave do mês deixa, ao final, o ÚLTIMO preço observado de cada mês.
     const por_mes = {};
-    prices.forEach(([ts, price]) => {
+    prices.forEach(pt => {
+      if (!Array.isArray(pt) || pt.length < 2) return;
+      const ts = pt[0], price = pt[1];
+      if (ts == null || price == null) return;
       const d = new Date(ts);
       const chave = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
       por_mes[chave] = price;
     });
     const map = {};
-    Object.entries(por_mes).forEach(([k, v]) => { map[k] = round(v, 2); });
+    Object.entries(por_mes).forEach(([k, v]) => {
+      if (v != null) map[k] = round(v, 2);
+    });
     return Object.keys(map).length > 0 ? map : null;
   } catch { return null; }
 }
@@ -1152,7 +1166,7 @@ async function fetchClientSideCambio(ticker) {
   } catch { return null; }
 }
 
-const round = (v, d) => parseFloat(v.toFixed(d));
+const round = (v, d) => parseFloat((v ?? 0).toFixed(d));
 
 // Tickers que têm fallback client-side disponível
 const CLIENT_SIDE_TICKERS = new Set(['BTCBRL','ETHBRL','USDBRL','EURBRL']);
@@ -1211,6 +1225,11 @@ async function loadRealPrices(ticker) {
   return null;
 }
 
+// A data-com (ex-date) de cada provento é captada em _divComCache (declarado junto
+// aos demais caches acima) quando presente no JSON. Hoje a regra de cálculo de
+// proventos é a conservadora (cotas compradas no mês não recebem o dividendo do
+// mês); a data-com fica captada para uso futuro (ex.: ferramenta de compra antes
+// da data-com e venda depois). Não altera nenhum cálculo atual.
 async function loadRealDividends(ticker) {
   if (ticker in _divCache) return _divCache[ticker];
   try {
@@ -1218,16 +1237,23 @@ async function loadRealDividends(ticker) {
     if (!r.ok) throw new Error('not found');
     const j = await r.json();
     const map = {};
+    const comMap = {};
     (j.dividendos || []).forEach(d => {
       if (d.date && d.value) {
         const m = d.date.slice(0,7);
         map[m] = (map[m] || 0) + d.value;
+        // Data-com (ex-date): aceita várias chaves possíveis no JSON. Se ausente,
+        // simplesmente não é registrada — o cálculo cai na regra conservadora.
+        const dataCom = d.data_com || d.dataCom || d.date_com || d.ex_date || d.exDate || d.com || null;
+        if (dataCom) comMap[m] = dataCom;
       }
     });
     _divCache[ticker] = map;
+    _divComCache[ticker] = comMap;
     return map;
   } catch {
     _divCache[ticker] = {};
+    _divComCache[ticker] = {};
     return {};
   }
 }
@@ -1448,6 +1474,11 @@ function buildInicioLog(primeiroMes, startDate) {
 // (não compra/vende cotas — aplica retorno sobre saldo)
 // Sem dividendos: rendimento já embutido no índice
 // ══════════════════════════════════════════════════════════════
+// Data mínima única para todo o app: início do Plano Real estabilizado.
+// Usada tanto na validação de input quanto no motor de cálculo, evitando faixas
+// de meses inalcançáveis (input bloqueava 1995-01 mas o motor cortava em 1994-07).
+const DATA_MINIMA = '1995-01';
+
 const INDICES_ACUMULADOS = new Set([
   // Renda fixa
   'CDI','SELIC','IPCA','IMAB','IMAS','IMAB5','IMAB5P','IRFM','IMA',
@@ -1472,12 +1503,19 @@ const SEM_DIVIDENDOS = new Set([
   'BOVA11','SMAL11','IVVB11','SPXI11','FIND11',
 ]);
 
+// Índices de renda fixa usados como taxa livre de risco (risk-free) no Sharpe.
+// Preferência: CDI > SELIC. Os demais servem de fallback se forem os únicos na carteira.
+const RF_INDEX_FOR_RF = new Set(['CDI','SELIC','IRFM','IMA','IMAB','IMAB5','IMAB5P','IMAS','IPCA']);
+
 function runBacktest(config, allPrices, allDividends) {
   const months = generateMonthRange(config.startDate, config.endDate);
   const assets = config.assets;
   const mode = config.dividendMode || 'none';
   const rebalFreq = config.rebalance || 'none';
   const rebalMode = config.rebalMode || 'passive'; // 'passive' | 'active'
+  // Banda de tolerância do rebalanceamento ativo: só rebalanceia quando um ativo
+  // desvia mais que isto da meta (5%). Evita girar a carteira por ruído mínimo.
+  const REBAL_BAND = 0.05;
 
   // Normaliza pesos-alvo
   const totalW = assets.reduce((s,a) => s + a.weight, 0);
@@ -1495,12 +1533,33 @@ function runBacktest(config, allPrices, allDividends) {
     const meses = Object.keys(pm).sort();
     retornoMensal[a.ticker] = {};
     for (let mi = 1; mi < meses.length; mi++) {
-      if (meses[mi] < '1994-07') continue; // pré-Real: moeda incomparável, ignorar
+      if (meses[mi] < DATA_MINIMA) continue; // pré-Real: moeda incomparável, ignorar
       const prev = pm[meses[mi-1]], curr = pm[meses[mi]];
       if (prev && curr && prev > 0) retornoMensal[a.ticker][meses[mi]] = (curr / prev) - 1;
     }
   });
   let totalInvested = 0, dividendsCash = 0, totalDividendsEver = 0;
+
+  // ── RESERVA-CDI ──
+  // Dividendos recebidos em caixa (modo 'none') não ficam parados: vão para uma
+  // reserva que rende 100% do CDI todo mês, como um RDB/Tesouro Selic. A reserva
+  // é SEPARADA dos ativos — não rebalanceia e não distorce os pesos. O patrimônio
+  // total passa a ser: reservaCDI + valor dos ativos.
+  let reservaCDI = 0;
+  // Retornos mensais do CDI de referência (close[t]/close[t-1]-1), para remunerar
+  // a reserva. Independente de o CDI estar ou não entre os ativos da carteira.
+  const cdiRetMensal = {};
+  {
+    const pmCdi = config.cdiRef || allPrices['CDI'] || null;
+    if (pmCdi) {
+      const mesesCdi = Object.keys(pmCdi).sort();
+      for (let mi = 1; mi < mesesCdi.length; mi++) {
+        if (mesesCdi[mi] < DATA_MINIMA) continue;
+        const prev = pmCdi[mesesCdi[mi-1]], curr = pmCdi[mesesCdi[mi]];
+        if (prev && curr && prev > 0) cdiRetMensal[mesesCdi[mi]] = (curr / prev) - 1;
+      }
+    }
+  }
   // Primeiro mês com pelo menos 1 dado real
   const primeiroMesComDado = months.find(m => normAssets.some(a => allPrices[a.ticker]?.[m])) || null;
   const dividendsByTicker = {};
@@ -1511,7 +1570,7 @@ function runBacktest(config, allPrices, allDividends) {
   // Para índices acumulados: "preço" = 1 (holdings já é saldo BRL)
   const getPrice = (ticker, month) => {
     if (INDICES_ACUMULADOS.has(ticker)) {
-      if (month < '1994-07') return null; // pré-Real: dados incomparáveis
+      if (month < DATA_MINIMA) return null; // pré-Real: dados incomparáveis
       const pm = allPrices[ticker] || {};
       return pm[month] != null ? 1 : null;
     }
@@ -1523,7 +1582,8 @@ function runBacktest(config, allPrices, allDividends) {
     return p != null ? s + holdings[a.ticker] * p : s;
   }, 0);
 
-  const shouldRebalance = (month) => {
+  const shouldRebalance = (month, i) => {
+    if (i === 0) return false; // mês 0: aporte inicial recém-feito na meta, nada a rebalancear
     if (rebalFreq === 'none') return false;
     if (rebalFreq === 'monthly') return true;
     const mo = parseInt(month.split('-')[1]);
@@ -1539,39 +1599,126 @@ function runBacktest(config, allPrices, allDividends) {
     // Pesos efetivos neste mês (redistribuição proporcional)
     const effW = calcEffectiveWeights(normAssets, allPrices, month);
 
-    // Aporte: mês 0 = initial, demais = monthly
-    // Se nenhum ativo tem dado real neste mês, não aporta — dinheiro fica parado
-    const temDadoNoMes = normAssets.some(a => getPrice(a.ticker, month));
-    const aporte = i === 0 ? config.initialAmount : config.monthlyAmount;
-    if (aporte > 0 && temDadoNoMes) {
-      let aporteEfetivo = 0;
-      normAssets.forEach(a => {
-        const w = effW[a.ticker];
-        if (w <= 0) return;
-        const verba = aporte * w;
-        const p = getPrice(a.ticker, month);
-        if (INDICES_ACUMULADOS.has(a.ticker)) {
-          holdings[a.ticker] += verba; aporteEfetivo += verba;
-        } else if (p && p > 0) {
-          holdings[a.ticker] += verba / p; aporteEfetivo += verba;
-        }
-      });
-      // Só conta como investido o que foi de fato alocado
-      totalInvested += aporteEfetivo;
-    }
-
-    // Aplicar retorno mensal dos índices acumulados
+    // ── ORDEM CORRETA (como um investidor real) ──
+    // 1º) Aplicar o retorno do mês nos ativos que já existem na carteira
+    //     (a carteira sobe/desce com o mercado ANTES de qualquer novo aporte).
     normAssets.forEach(a => {
       if (!INDICES_ACUMULADOS.has(a.ticker)) return;
       const ret = retornoMensal[a.ticker]?.[month];
       if (ret != null && holdings[a.ticker] > 0) holdings[a.ticker] *= (1 + ret);
     });
 
-    // Snapshot das cotas antes de processar dividendos (corrige bug de dividendsByTicker)
+    // Remunerar a reserva-CDI com o rendimento do CDI no mês (100% do CDI).
+    if (reservaCDI > 0) {
+      const rCdi = cdiRetMensal[month];
+      if (rCdi != null) reservaCDI *= (1 + rCdi);
+    }
+
+    // Snapshot das cotas ANTES do aporte deste mês. Os dividendos do mês são pagos
+    // apenas sobre as cotas que o investidor já possuía (abordagem conservadora:
+    // cotas compradas neste mês não recebem o dividendo do próprio mês, evitando
+    // superestimar o retorno em meses de compra coincidentes com o pagamento).
     const qtySnapshot = {};
     normAssets.forEach(a => qtySnapshot[a.ticker] = holdings[a.ticker]);
 
-    // Dividendos
+    // Aporte: mês 0 = initial, demais = monthly
+    // Se nenhum ativo tem dado real neste mês, não aporta — dinheiro fica parado
+    const temDadoNoMes = normAssets.some(a => getPrice(a.ticker, month));
+    const aporte = i === 0 ? config.initialAmount : config.monthlyAmount;
+    let aporteEsteMes = 0; // usado depois para descontar do cálculo de retorno mensal
+    if (aporte > 0 && temDadoNoMes) {
+      // 2º) Analisar a carteira ANTES de aportar e decidir como dividir a verba.
+      //     Em meses de rebalanceamento PASSIVO, o aporte é direcionado para os
+      //     ativos abaixo da meta (lógica "déficit primeiro"), sem vender nada e
+      //     sem criar dinheiro: o que entra é exatamente o valor do aporte.
+      //     Fora desses meses (ou em modo ativo), o aporte segue os pesos-meta.
+      const pvAntes = portValue(month);
+      const usarDeficit = rebalMode === 'passive' && shouldRebalance(month, i) && pvAntes > 0;
+
+      // Define a verba (em R$) destinada a cada ativo disponível neste mês.
+      const verbaPorAtivo = {};
+      let somaDef = 0;
+      if (usarDeficit) {
+        // Quanto falta, em R$, para cada ativo bater a meta considerando o
+        // tamanho que a carteira terá DEPOIS do aporte.
+        const alvoTotal = pvAntes + aporte;
+        normAssets.forEach(a => {
+          const w = effW[a.ticker];
+          if (w <= 0) return;
+          const p = getPrice(a.ticker, month);
+          if (!INDICES_ACUMULADOS.has(a.ticker) && !(p && p > 0)) return;
+          const valorAtual = INDICES_ACUMULADOS.has(a.ticker)
+            ? holdings[a.ticker]
+            : holdings[a.ticker] * p;
+          const valorAlvo = alvoTotal * w;
+          const deficit = valorAlvo - valorAtual; // só conta quem está ABAIXO
+          if (deficit > 0) { verbaPorAtivo[a.ticker] = deficit; somaDef += deficit; }
+        });
+      }
+
+      if (usarDeficit && somaDef > 0) {
+        // Distribui o aporte proporcionalmente ao déficit de cada ativo atrasado.
+        // Se a soma dos déficits for maior que o aporte, cada um recebe sua fração
+        // proporcional (os mais atrasados primeiro); o resto se equilibra no próximo
+        // mês. Se for menor, todos chegam à meta e a sobra segue os pesos-meta.
+        const aRedistribuir = Math.min(aporte, somaDef);
+        const sobra = aporte - aRedistribuir;
+        normAssets.forEach(a => {
+          const def = verbaPorAtivo[a.ticker];
+          if (def == null) return;
+          let verba = aRedistribuir * (def / somaDef);
+          // Sobra (quando o aporte cobre todos os déficits) segue o peso-meta
+          if (sobra > 0) verba += sobra * effW[a.ticker];
+          const p = getPrice(a.ticker, month);
+          if (INDICES_ACUMULADOS.has(a.ticker)) {
+            holdings[a.ticker] += verba; aporteEsteMes += verba;
+          } else if (p && p > 0) {
+            holdings[a.ticker] += verba / p; aporteEsteMes += verba;
+          }
+        });
+        // Se sobrou verba mas nenhum déficit aparente (carteira já no alvo),
+        // ela é tratada pelo caminho dos pesos-meta abaixo via aporteRestante.
+        const aporteRestante = aporte - aporteEsteMes;
+        if (aporteRestante > 0.01) {
+          normAssets.forEach(a => {
+            const w = effW[a.ticker];
+            if (w <= 0) return;
+            const verba = aporteRestante * w;
+            const p = getPrice(a.ticker, month);
+            if (INDICES_ACUMULADOS.has(a.ticker)) {
+              holdings[a.ticker] += verba; aporteEsteMes += verba;
+            } else if (p && p > 0) {
+              holdings[a.ticker] += verba / p; aporteEsteMes += verba;
+            }
+          });
+        }
+      } else {
+        // Caminho padrão: distribui o aporte pelos pesos-meta efetivos do mês.
+        // (carteira equilibrada, mês fora da frequência de rebal, ou modo ativo)
+        normAssets.forEach(a => {
+          const w = effW[a.ticker];
+          if (w <= 0) return;
+          const verba = aporte * w;
+          const p = getPrice(a.ticker, month);
+          if (INDICES_ACUMULADOS.has(a.ticker)) {
+            holdings[a.ticker] += verba; aporteEsteMes += verba;
+          } else if (p && p > 0) {
+            holdings[a.ticker] += verba / p; aporteEsteMes += verba;
+          }
+        });
+      }
+      // Só conta como investido o que foi de fato alocado
+      totalInvested += aporteEsteMes;
+    }
+
+    // Dividendos (calculados sobre qtySnapshot, capturado antes do aporte — ver acima).
+    // REGRA ATUAL (conservadora): cotas compradas neste mês NÃO recebem o dividendo
+    //   do mês, pois qtySnapshot reflete as cotas detidas antes do aporte.
+    // INFRAESTRUTURA FUTURA: a data-com (ex-date) de cada provento já é captada em
+    //   _divComCache[ticker][month] quando presente no JSON. Uma futura ferramenta de
+    //   "comprar antes da data-com / vender depois" pode consumir esse dado sem
+    //   precisar mexer aqui. Enquanto a data-com não for usada no cálculo, o
+    //   comportamento permanece o conservador acima.
     let totalDivMes = 0;
     const divByTicker = {};
     normAssets.forEach(a => {
@@ -1584,7 +1731,11 @@ function runBacktest(config, allPrices, allDividends) {
 
     if (totalDivMes > 0) {
       if (mode === 'none') {
+        // Modo caixa: o dividendo vai para a reserva-CDI (rende 100% do CDI).
+        // dividendsCash mantém o total nominal recebido (para exibição); reservaCDI
+        // é o saldo que efetivamente rende e compõe o patrimônio.
         dividendsCash += totalDivMes;
+        reservaCDI += totalDivMes;
       } else if (mode === 'reinvest_same') {
         normAssets.forEach(a => {
           const verba = divByTicker[a.ticker];
@@ -1595,10 +1746,25 @@ function runBacktest(config, allPrices, allDividends) {
       } else if (mode === 'reinvest_class') {
         normAssets.forEach(payer => {
           const verba = divByTicker[payer.ticker]; if (verba <= 0) return;
+          // Ativos da MESMA classe com dado neste mês
           const sc = normAssets.filter(a => a.assetClass === payer.assetClass && getPrice(a.ticker, month));
-          const tw = sc.reduce((s,a) => s + a.weight, 0);
-          sc.forEach(target => {
-            const part = verba * (target.weight / tw);
+          // Usa o peso efetivo do mês (effW), não o peso-meta original, para não
+          // distribuir com base em alvos distorcidos quando há ativos ausentes.
+          let tw = sc.reduce((s,a) => s + (effW[a.ticker] || 0), 0);
+          let alvos = sc;
+          if (sc.length === 0 || tw <= 0) {
+            // Classe sem ativo disponível neste mês: em vez de perder a verba,
+            // empurra para QUALQUER ativo com dado no mês (pode distorcer o peso
+            // temporariamente, mas não some). Pondera pelo peso efetivo; se todos
+            // tiverem peso 0, distribui igualmente.
+            alvos = normAssets.filter(a => getPrice(a.ticker, month) && !INDICES_ACUMULADOS.has(a.ticker));
+            if (alvos.length === 0) return; // não há nenhum ativo investível neste mês
+            tw = alvos.reduce((s,a) => s + (effW[a.ticker] || 0), 0);
+          }
+          const usarIgual = !(tw > 0);
+          alvos.forEach(target => {
+            const peso = usarIgual ? (1 / alvos.length) : ((effW[target.ticker] || 0) / tw);
+            const part = verba * peso;
             const p = getPrice(target.ticker, month);
             if (p && p > 0) holdings[target.ticker] += part / p;
           });
@@ -1607,83 +1773,80 @@ function runBacktest(config, allPrices, allDividends) {
         const pv = portValue(month);
         const drifts = normAssets
           .filter(a => getPrice(a.ticker, month))
-          .map(a => { const p = getPrice(a.ticker,month); const cur = p ? holdings[a.ticker]*p : 0; return {a, drift:(pv>0?cur/pv:0)-a.weight}; });
+          // Drift medido contra o peso EFETIVO do mês (effW), não o peso-meta fixo.
+          .map(a => { const p = getPrice(a.ticker,month); const cur = p ? holdings[a.ticker]*p : 0; return {a, drift:(pv>0?cur/pv:0)-(effW[a.ticker]||0)}; });
         drifts.sort((x,y) => x.drift - y.drift);
         const sub = drifts.filter(d => d.drift < 0);
         const targets = sub.length > 0 ? sub : drifts;
         const totalDef = targets.reduce((s,d) => s + Math.abs(d.drift), 0);
-        targets.forEach(d => {
-          const verba = totalDivMes * (totalDef > 0 ? Math.abs(d.drift)/totalDef : 1/targets.length);
-          const p = getPrice(d.a.ticker, month);
-          if (p && p > 0) holdings[d.a.ticker] += verba / p;
-        });
+        if (targets.length === 0) {
+          // Nenhum destino pelo critério de drift: empurra para qualquer ativo com
+          // dado no mês (não some, pode distorcer peso temporariamente).
+          const alvos = normAssets.filter(a => getPrice(a.ticker, month) && !INDICES_ACUMULADOS.has(a.ticker));
+          if (alvos.length > 0) {
+            alvos.forEach(a => {
+              const p = getPrice(a.ticker, month);
+              if (p && p > 0) holdings[a.ticker] += (totalDivMes / alvos.length) / p;
+            });
+          }
+        } else {
+          targets.forEach(d => {
+            const verba = totalDivMes * (totalDef > 0 ? Math.abs(d.drift)/totalDef : 1/targets.length);
+            const p = getPrice(d.a.ticker, month);
+            if (p && p > 0) holdings[d.a.ticker] += verba / p;
+          });
+        }
       }
     }
 
-    // Rebalanceamento periódico — só entre ativos com dado neste mês
-    if (shouldRebalance(month)) {
+    // Rebalanceamento periódico — só entre ativos com dado neste mês.
+    // MODO ATIVO: vende quem está acima do peso e compra quem está abaixo, até a meta.
+    // MODO PASSIVO: NÃO age aqui — já foi tratado no momento do aporte (acima),
+    //   direcionando a verba do mês para os ativos abaixo da meta, sem vender nada
+    //   e sem criar dinheiro do nada.
+    if (rebalMode === 'active' && shouldRebalance(month, i)) {
       const pv = portValue(month);
       if (pv > 0) {
+        // Só rebalanceia se algum ativo desviou mais que o limite da meta.
+        // (banda de tolerância — evita rebalancear por ruído mínimo)
         const needsRebal = normAssets.some(a => {
           const p = getPrice(a.ticker, month);
           const cw = p ? (holdings[a.ticker]*p)/pv : 0;
-          return Math.abs(cw - effW[a.ticker]) > 0.05;
+          return Math.abs(cw - effW[a.ticker]) > REBAL_BAND;
         });
         if (needsRebal) {
-          if (rebalMode === 'active') {
-            // ATIVO: vende os acima do peso, compra os abaixo
-            normAssets.forEach(a => {
-              if (INDICES_ACUMULADOS.has(a.ticker)) {
-                holdings[a.ticker] = pv * effW[a.ticker];
-              } else {
-                const p = getPrice(a.ticker, month);
-                if (p && p > 0) holdings[a.ticker] = (pv * effW[a.ticker]) / p;
-              }
-            });
-          } else {
-            // PASSIVO: só direciona o aporte deste mês para os ativos abaixo do peso
-            // (sem vendas — o aporte já foi aplicado acima, aqui só redistribuímos
-            //  o aporte do próximo mês internamente marcando os pesos desejados)
-            // Implementação: redireciona uma "verba virtual" igual ao aporte mensal
-            // para os ativos abaixo do peso, proporcionalmente ao déficit
-            const verba = config.monthlyAmount;
-            if (verba > 0) {
-              const deficits = normAssets
-                .filter(a => {
-                  const p = getPrice(a.ticker, month);
-                  if (!p) return false;
-                  const cw = (holdings[a.ticker]*p)/pv;
-                  return cw < effW[a.ticker] - 0.005;
-                })
-                .map(a => {
-                  const p = getPrice(a.ticker, month);
-                  const cw = (holdings[a.ticker]*p)/pv;
-                  return { a, deficit: effW[a.ticker] - cw, p };
-                });
-              const totalDef = deficits.reduce((s,d) => s + d.deficit, 0);
-              if (totalDef > 0) {
-                // Desconta do aporte já alocado proporcionalmente e redireciona
-                const verbaPorDef = verba * 0.5; // usa até 50% do aporte para corrigir
-                deficits.forEach(d => {
-                  const extra = verbaPorDef * (d.deficit / totalDef);
-                  if (d.p > 0) holdings[d.a.ticker] += extra / d.p;
-                });
-              }
+          normAssets.forEach(a => {
+            if (INDICES_ACUMULADOS.has(a.ticker)) {
+              holdings[a.ticker] = pv * effW[a.ticker];
+            } else {
+              const p = getPrice(a.ticker, month);
+              if (p && p > 0) holdings[a.ticker] = (pv * effW[a.ticker]) / p;
             }
-          }
+          });
         }
       }
     }
 
     const pv = portValue(month);
-    const monthRet = prevVal != null && prevVal > 0 ? (pv - prevVal) / prevVal : 0;
+    // Patrimônio total = valor dos ativos + reserva-CDI. A reserva entra aqui (no
+    // retorno e no valor final), mas NÃO no portValue usado para pesos/rebalanceamento,
+    // para não distorcer a alocação-alvo dos ativos.
+    const patrimonio = pv + reservaCDI;
+    // Retorno do mês: desconta o aporte aplicado neste mês para não contar
+    // entrada de caixa como rendimento (senão volatilidade/Sharpe ficam inflados).
+    // Baseado no patrimônio total (inclui o rendimento da reserva-CDI).
+    const monthRet = prevVal != null && prevVal > 0
+      ? (patrimonio - prevVal - aporteEsteMes) / prevVal
+      : 0;
     const weights = {};
     normAssets.forEach(a => {
       const p = getPrice(a.ticker, month);
+      // Pesos calculados sobre os ATIVOS (pv), não sobre o patrimônio total —
+      // assim "ação = 50%" continua sendo dentro da parte investida nos ativos.
       weights[a.ticker] = p && pv > 0 ? (holdings[a.ticker]*p)/pv : 0;
     });
-    series.push({ date: month, portfolioValue: pv, totalInvested, monthReturn: monthRet, dividendsCash, dividendsMonth: totalDivMes, weights });
-    prevVal = pv;
+    series.push({ date: month, portfolioValue: patrimonio, ativosValue: pv, reservaCDI, totalInvested, monthReturn: monthRet, dividendsCash, dividendsMonth: totalDivMes, weights });
+    prevVal = patrimonio;
   }
 
   const finalValue = series[series.length-1]?.portfolioValue || 0;
@@ -1693,13 +1856,76 @@ function runBacktest(config, allPrices, allDividends) {
   const variance = n > 1 ? monthlyReturns.reduce((s,r) => s+(r-avg)**2, 0) / (n-1) : 0;
   const vol = Math.sqrt(variance * 12);
   const years = months.length / 12;
-  const cagr = years > 0 && totalInvested > 0 ? (finalValue/totalInvested)**(1/years) - 1 : 0;
-  const rfMonthly = 0.005;
-  const sharpe = vol > 0 ? ((avg - rfMonthly) / Math.sqrt(variance)) * Math.sqrt(12) : 0;
-  let peak = 0, maxDD = 0;
-  series.forEach(s => {
-    if (s.portfolioValue > peak) peak = s.portfolioValue;
-    const dd = peak > 0 ? (s.portfolioValue - peak) / peak : 0;
+
+  // ── CAGR via TIR (IRR) ──
+  // A fórmula antiga (finalValue/totalInvested)^(1/anos)-1 só vale para aporte
+  // ÚNICO. Com aportes recorrentes ela subestima o retorno, pois trata o último
+  // aporte (que mal rendeu) igual ao primeiro (que rendeu o período todo).
+  // Aqui montamos o fluxo de caixa mensal real e calculamos a taxa interna de
+  // retorno (TIR) mensal, depois anualizamos.
+  let cagr = 0;
+  {
+    // Fluxos: aporte de cada mês = saída (negativo); valor final = entrada (positivo).
+    // Reconstruímos o aporte de cada mês a partir do crescimento de totalInvested.
+    const flows = [];
+    let prevInv = 0;
+    series.forEach((s, idx) => {
+      const aporteMes = (s.totalInvested ?? 0) - prevInv;
+      prevInv = s.totalInvested ?? 0;
+      flows.push(-aporteMes); // saída de caixa do investidor
+      if (idx === series.length - 1) flows[flows.length - 1] += finalValue; // resgate final
+    });
+    // Newton/bisseção para achar a taxa mensal i tal que VPL(i) = 0.
+    const npv = (rate) => flows.reduce((s, cf, t) => s + cf / Math.pow(1 + rate, t), 0);
+    const temFluxo = flows.some(f => f < 0) && finalValue > 0;
+    if (temFluxo) {
+      let lo = -0.9, hi = 1.0; // taxa mensal entre -90% e +100%
+      let fLo = npv(lo), fHi = npv(hi);
+      if (fLo * fHi < 0) {
+        for (let k = 0; k < 200; k++) {
+          const mid = (lo + hi) / 2;
+          const fMid = npv(mid);
+          if (Math.abs(fMid) < 1e-7) { lo = hi = mid; break; }
+          if (fLo * fMid < 0) { hi = mid; fHi = fMid; } else { lo = mid; fLo = fMid; }
+        }
+        const iMensal = (lo + hi) / 2;
+        cagr = Math.pow(1 + iMensal, 12) - 1; // anualiza
+      } else {
+        // fora do intervalo de bisseção — fallback para a fórmula de múltiplo
+        cagr = years > 0 && totalInvested > 0 ? (finalValue/totalInvested)**(1/years) - 1 : 0;
+      }
+    } else {
+      cagr = years > 0 && totalInvested > 0 ? (finalValue/totalInvested)**(1/years) - 1 : 0;
+    }
+  }
+
+  // ── Risk-free dinâmico para o Sharpe ──
+  // Antes era fixo em 0,5%/mês (~6,17% a.a.) para qualquer período, o que distorce
+  // o Sharpe em épocas de Selic muito alta ou muito baixa. Se houver um índice de
+  // renda fixa na carteira (CDI/SELIC/IPCA/IMAB...), usamos o retorno mensal médio
+  // dele como taxa livre de risco do período. Caso contrário, mantemos o fallback.
+  let rfMonthly = 0.005;
+  {
+    // Preferência: CDI/SELIC; senão, qualquer índice de RF disponível na carteira.
+    const rfPref = normAssets.find(a => a.ticker === 'CDI' || a.ticker === 'SELIC')
+                 || normAssets.find(a => RF_INDEX_FOR_RF.has(a.ticker));
+    if (rfPref && retornoMensal[rfPref.ticker]) {
+      const rs = months.map(m => retornoMensal[rfPref.ticker]?.[m]).filter(r => r != null);
+      if (rs.length > 0) rfMonthly = rs.reduce((s,r) => s+r, 0) / rs.length;
+    }
+  }
+  const sharpe = (variance > 0) ? ((avg - rfMonthly) / Math.sqrt(variance)) * Math.sqrt(12) : 0;
+
+  // ── Máximo Drawdown sobre a curva de RETORNO (cota teórica) ──
+  // Antes o DD era medido sobre portfolioValue, que salta a cada aporte e mascara
+  // as quedas reais. Aqui reconstruímos uma "cota" que cresce só pelos retornos
+  // mensais (sem entradas de caixa), refletindo a perda real de quem já estava
+  // investido no topo.
+  let peak = 1, maxDD = 0, cota = 1;
+  series.forEach((s, idx) => {
+    if (idx > 0) cota *= (1 + (s.monthReturn || 0));
+    if (cota > peak) peak = cota;
+    const dd = peak > 0 ? (cota - peak) / peak : 0;
     if (dd < maxDD) maxDD = dd;
   });
 
@@ -1714,9 +1940,17 @@ function runBacktest(config, allPrices, allDividends) {
       totalDividends: dividendsByTicker[a.ticker] || 0,
       mesesComDado, totalMeses: months.length,
       firstMonth: priceMap ? months.find(m => priceMap[m]) || null : null,
-      lastMonth: priceMap ? [...months].reverse().find(m => priceMap[m]) || null : null,
+      // Último mês com dado: varre de trás pra frente sem copiar/reverter o array
+      // (evita alocação O(n) por ativo).
+      lastMonth: priceMap ? (() => {
+        for (let k = months.length - 1; k >= 0; k--) if (priceMap[months[k]]) return months[k];
+        return null;
+      })() : null,
     };
   });
+
+  const reservaFinal = series.length > 0 ? (series[series.length-1].reservaCDI || 0) : 0;
+  const ativosFinal = finalValue - reservaFinal;
 
   return {
     series, metrics: {
@@ -1724,6 +1958,7 @@ function runBacktest(config, allPrices, allDividends) {
       totalReturn: totalInvested > 0 ? (finalValue - totalInvested) / totalInvested : 0,
       cagr, volatility: vol, sharpeRatio: sharpe, maxDrawdown: maxDD,
       totalDividends: totalDividendsEver, dividendsCash, months: months.length,
+      reservaCDI: reservaFinal, ativosValue: ativosFinal,
       primeiroMesComDado
     },
     breakdown, dividendMode: mode
@@ -1948,8 +2183,13 @@ function confirmarPeriodo() {
   const ed = parseDateInput(document.getElementById('endDate').value);
   if (!sd) { showErr('Informe o início no formato MM/AAAA.', document.getElementById('btnConfirmarPeriodo')); return; }
   if (!ed) { showErr('Informe o fim no formato MM/AAAA.', document.getElementById('btnConfirmarPeriodo')); return; }
-  if (sd < '1995-01') { showErr('Data mínima: 01/1995 (início do Plano Real estabilizado).', document.getElementById('btnConfirmarPeriodo')); return; }
+  if (sd < DATA_MINIMA) { showErr('Data mínima: 01/1995 (início do Plano Real estabilizado).', document.getElementById('btnConfirmarPeriodo')); return; }
   if (sd >= ed) { showErr('O início deve ser anterior ao fim.', document.getElementById('btnConfirmarPeriodo')); return; }
+  // Não permite data fim no futuro: não há dados além do mês atual, e os aportes
+  // desses meses seriam silenciosamente perdidos.
+  const _now = new Date();
+  const mesAtual = `${_now.getFullYear()}-${String(_now.getMonth()+1).padStart(2,'0')}`;
+  if (ed > mesAtual) { showErr(`A data fim não pode ser no futuro (máximo: ${monthLabel(mesAtual)}).`, document.getElementById('btnConfirmarPeriodo')); return; }
   _etapaPeriodoOk = true;
   salvarEstado();
   verificarCascata();
@@ -2095,7 +2335,7 @@ function renderAllocBar() {
   }).join('');
   const el = document.getElementById('allocTotalMini');
   el.textContent = `${total}% de 100%`;
-  el.className = 'alloc-total-mini ' + (total === 100 ? 'ok' : total > 100 ? 'over' : 'under');
+  el.className = 'alloc-total-mini ' + (Math.abs(total-100) < TOLERANCIA_SOMA ? 'ok' : total > 100 ? 'over' : 'under');
   const btnAp = document.getElementById('btnAplicarClasses');
   if (btnAp) btnAp.classList.toggle('show', state.classesSel.length > 0 && !_pizzaMode);
 }
@@ -2222,7 +2462,7 @@ function toggleAcc(id) {
     const cfg = state.classesConfig[sel.id];
     if (cfg && cfg.mode === 'custom') {
       const soma = cfg.ativos.reduce((s,a) => s+(parseFloat(a.pct)||0), 0);
-      if (Math.abs(soma - 100) >= 0.5) {
+      if (Math.abs(soma - 100) >= TOLERANCIA_SOMA) {
         const nomeCls = CLASSES_DEF.find(c => c.id === sel.id)?.name || sel.id;
         showErr(`Em "${nomeCls}" corrija a porcentagem para dar 100% antes de continuar.`, document.getElementById("acc_"+sel.id)?.querySelector(".class-acc-head"));
         // Abre o accordion problemático se estiver fechado
@@ -2462,7 +2702,7 @@ function removeAtivo(id,idx) {
   renderAtivosRows(id);
   // Avisa se a soma interna ficou diferente de 100%
   const soma = somaInterna(id);
-  if (Math.abs(soma - 100) > 0.5) {
+  if (Math.abs(soma - 100) > TOLERANCIA_SOMA) {
     showPopup('Ativo removido. Ajuste as porcentagens para totalizar 100% antes de continuar.');
   }
 }
@@ -2485,7 +2725,7 @@ function renderInternoMini(id) {
   const cfg = state.classesConfig[id];
   const total = cfg.ativos.reduce((s,a) => s+(parseFloat(a.pct)||0), 0);
   const el = document.getElementById('internoMini_'+id); if (!el) return;
-  const ok = Math.abs(total-100) < 0.5;
+  const ok = Math.abs(total-100) < TOLERANCIA_SOMA;
   el.textContent = ok ? `Soma: 100%` : `⚠ Soma: ${total.toFixed(0)}% — corrija para 100%`;
   el.className = 'interno-mini ' + (ok ? 'ok' : 'over');
   // Atualiza estado de erro visual no accordion header
@@ -2599,17 +2839,22 @@ function showErr(msg, anchorEl) {
 function validate() {
   if (state.classesSel.length === 0) { showErr('Selecione ao menos uma classe.', document.getElementById('btnSimular')); return false; }
   const total = state.classesSel.reduce((s,c) => s+c.pct, 0);
-  if (total !== 100) { showErr(`Soma: ${total}%. Deve ser 100%.`, document.getElementById('btnSimular')); return false; }
+  if (Math.abs(total - 100) > TOLERANCIA_SOMA) { showErr(`Soma: ${total}%. Deve ser 100%.`, document.getElementById('btnSimular')); return false; }
   const sd = document.getElementById('startDate').value, ed = document.getElementById('endDate').value;
   if (!sd || !ed) { showErr('Informe o período.', document.getElementById('btnSimular')); return false; }
   if (sd >= ed) { showErr('Início deve ser anterior ao fim.', document.getElementById('btnSimular')); return false; }
+  {
+    const _now = new Date();
+    const mesAtual = `${_now.getFullYear()}-${String(_now.getMonth()+1).padStart(2,'0')}`;
+    if (ed > mesAtual) { showErr(`A data fim não pode ser no futuro (máximo: ${monthLabel(mesAtual)}).`, document.getElementById('btnSimular')); return false; }
+  }
   for (const sel of state.classesSel) {
     const cfg = state.classesConfig[sel.id];
     if (cfg?.mode === 'custom') {
       const ativos = cfg.ativos.filter(a => a.ticker.trim());
       if (ativos.length === 0) { showErr(`Adicione ativos em "${CLASSES_DEF.find(c=>c.id===sel.id)?.name}".`, document.getElementById('btnSimular')); return false; }
       const soma = ativos.reduce((s,a) => s+(parseFloat(a.pct)||0), 0);
-      if (Math.abs(soma-100) > 1) { const nome = CLASSES_DEF.find(c=>c.id===sel.id)?.name; showErr(`Em "${nome}" corrija a porcentagem para dar 100% (soma atual: ${soma.toFixed(0)}%).`, document.getElementById('btnSimular')); return false; }
+      if (Math.abs(soma-100) > TOLERANCIA_SOMA) { const nome = CLASSES_DEF.find(c=>c.id===sel.id)?.name; showErr(`Em "${nome}" corrija a porcentagem para dar 100% (soma atual: ${soma.toFixed(0)}%).`, document.getElementById('btnSimular')); return false; }
     }
   }
   return true;
@@ -2640,6 +2885,16 @@ async function simular() {
       allDividends[a.ticker] = await loadRealDividends(a.ticker);
     }));
 
+    // Série do CDI de referência para a RESERVA (dividendos em caixa rendem 100%
+    // do CDI). Carregada sempre, mesmo que o CDI não esteja entre os ativos
+    // escolhidos. Se não houver dados de CDI, a reserva fica sem render (fallback).
+    let cdiRef = null;
+    if (allPrices['CDI'] && Object.keys(allPrices['CDI']).length > 0) {
+      cdiRef = allPrices['CDI'];
+    } else {
+      cdiRef = await loadRealPrices('CDI') || null;
+    }
+
     // Verificar se algum ativo tem dado no período
     // (cada ativo deve ter pelo menos 1 mês com preço no intervalo escolhido)
     const ativosComDado = assets.filter(a =>
@@ -2659,7 +2914,7 @@ async function simular() {
       weight: a.weight / assets.reduce((s,x) => s+x.weight, 0)
     })), allPrices, months);
 
-    const config = { assets, startDate, endDate, initialAmount, monthlyAmount, rebalance, rebalMode, dividendMode: state.dividendMode };
+    const config = { assets, startDate, endDate, initialAmount, monthlyAmount, rebalance, rebalMode, dividendMode: state.dividendMode, cdiRef };
     const result = runBacktest(config, allPrices, allDividends);
 
     const simName = document.getElementById('simName').value.trim() || `Simulação ${simulations.length + 1}`;
@@ -3077,11 +3332,12 @@ function renderSingleView(idx) {
 
   // Métricas row 1
   const pos = metrics.totalReturn >= 0;
+  const temReserva = (metrics.reservaCDI || 0) > 0.005;
   document.getElementById('metricsRow1').innerHTML = `
-    <div class="metric-card"><div class="metric-label">Valor Final</div><div class="metric-value ${pos?'green':'red'}">${brl(metrics.finalValue)}</div><div class="metric-sub">Aportado: ${brl(metrics.totalInvested)}</div></div>
+    <div class="metric-card"><div class="metric-label">Valor Final</div><div class="metric-value ${pos?'green':'red'}">${brl(metrics.finalValue)}</div><div class="metric-sub">${temReserva ? 'Ativos: '+brl(metrics.ativosValue)+' + Reserva: '+brl(metrics.reservaCDI) : 'Aportado: '+brl(metrics.totalInvested)}</div></div>
     <div class="metric-card"><div class="metric-label">Retorno Total</div><div class="metric-value ${pos?'green':'red'}">${pct(metrics.totalReturn)}</div><div class="metric-sub">Lucro: ${brl(metrics.profit)}</div></div>
     <div class="metric-card"><div class="metric-label">CAGR (a.a.)</div><div class="metric-value ${metrics.cagr>=0?'green':'red'}">${pct(metrics.cagr)}</div><div class="metric-sub">Retorno anualizado</div></div>
-    <div class="metric-card"><div class="metric-label">Dividendos</div><div class="metric-value gold">${brl(metrics.totalDividends)}</div><div class="metric-sub">${dividendMode==='none'?'Em caixa: '+brl(metrics.dividendsCash):'Reinvestidos'}</div></div>
+    <div class="metric-card"><div class="metric-label">Dividendos</div><div class="metric-value gold">${brl(metrics.totalDividends)}</div><div class="metric-sub">${dividendMode==='none'?'Reserva CDI: '+brl(metrics.reservaCDI||0):'Reinvestidos'}</div></div>
   `;
 
   // Métricas row 2
@@ -3090,7 +3346,7 @@ function renderSingleView(idx) {
     <div class="metric-card"><div class="metric-label">Sharpe Ratio</div><div class="metric-value ${metrics.sharpeRatio>=1?'green':''}">${metrics.sharpeRatio.toFixed(2)}</div></div>
     <div class="metric-card"><div class="metric-label">Máx. Drawdown</div><div class="metric-value red">${pct(metrics.maxDrawdown)}</div></div>
     <div class="metric-card"><div class="metric-label">Meses</div><div class="metric-value">${metrics.months}</div></div>
-    <div class="metric-card"><div class="metric-label">Dividendos</div><div class="metric-value" style="font-size:11px;color:var(--sim-text2);font-family:var(--sim-font)">${divModeLabel[dividendMode]}</div></div>
+    <div class="metric-card"><div class="metric-label">Estratégia Div.</div><div class="metric-value" style="font-size:11px;color:var(--sim-text2);font-family:var(--sim-font)">${divModeLabel[dividendMode]}</div></div>
   `;
 
   // Breakdown por ativo
@@ -3163,10 +3419,17 @@ function showChart(type, el) {
       if (firstReal <= 0) return pts;
       return pts.map((v, i) => i < firstReal ? null : v);
     };
-    // Hex color darkened for Aportado
-    const darken = (hex, amt) => {
-      let c = parseInt(hex.slice(1),16);
-      let r = Math.max(0,((c>>16)&255)-amt), g = Math.max(0,((c>>8)&255)-amt), b = Math.max(0,(c&255)-amt);
+    // Escurece uma cor hex por um FATOR multiplicativo (0–1). Mais robusto que
+    // subtrair um valor fixo de cada canal: preserva o matiz e nunca colapsa em
+    // preto-sobre-preto para cores já escuras.
+    const darken = (hex, factor) => {
+      const h = hex.replace('#','');
+      const full = h.length === 3 ? h.split('').map(c => c+c).join('') : h;
+      const c = parseInt(full,16);
+      const f = Math.max(0, Math.min(1, factor));
+      const r = Math.round(((c>>16)&255) * f);
+      const g = Math.round(((c>>8)&255) * f);
+      const b = Math.round((c&255) * f);
       return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
     };
     simulations.forEach((s,i) => {
@@ -3176,7 +3439,7 @@ function showChart(type, el) {
         borderShadowColor: isActive ? s.color : undefined, shadowBlur: isActive ? 8 : 0 });
       // Per-sim Aportado — same color darkened, dashed, no neon
       const aporData = trimLeadingZeros(s.result.series.map(pt => pt.totalInvested));
-      const darkColor = darken(s.color, 60);
+      const darkColor = darken(s.color, 0.7); // 30% mais escuro, preservando o matiz
       datasets.push({ label:'Aportado ' + s.name, data:aporData, borderColor:darkColor, borderWidth:1.2, borderDash:[4,4], fill:false, tension:.1, pointRadius:0, order:10+i, spanGaps:false, pointStyle:'circle' });
     });
     chartInst = new Chart(ctx, { type:'line', data:{labels,datasets}, options:chartOpts('R$') });
@@ -3187,7 +3450,19 @@ function showChart(type, el) {
   } else if (type === 'allocation') {
     const assets = sim.result.breakdown;
     const COLORS = ['#1FC96E','#5b8def','#9b72ef','#F5A623','#e05c5c','#56c8d8','#f7931a','#a8e6cf'];
-    chartInst = new Chart(ctx, { type:'doughnut', data:{ labels:assets.map(a=>a.ticker), datasets:[{ data:assets.map(a=>+(a.contribution*100).toFixed(2)), backgroundColor:COLORS.slice(0,assets.length), borderColor:'#0E0E11', borderWidth:2 }]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'right',labels:{color:'#8A8884',font:{size:11},padding:14}}, tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.raw}%`}} }}});
+    const labels = assets.map(a => a.ticker);
+    const data   = assets.map(a => +(a.contribution*100).toFixed(2));
+    const cores  = COLORS.slice(0, assets.length);
+    // Reserva-CDI (dividendos em caixa rendendo CDI) entra como fatia SEPARADA,
+    // fora dos ativos. A soma fecha 100% do patrimônio total.
+    const reserva = sim.result.metrics.reservaCDI || 0;
+    const finalTot = sim.result.metrics.finalValue || 0;
+    if (reserva > 0 && finalTot > 0) {
+      labels.push('Reserva (CDI)');
+      data.push(+((reserva / finalTot) * 100).toFixed(2));
+      cores.push('#6b7280'); // cinza neutro para distinguir dos ativos
+    }
+    chartInst = new Chart(ctx, { type:'doughnut', data:{ labels, datasets:[{ data, backgroundColor:cores, borderColor:'#0E0E11', borderWidth:2 }]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'right',labels:{color:'#8A8884',font:{size:11},padding:14}}, tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.raw}%`}} }}});
   }
 }
 
@@ -3379,16 +3654,6 @@ function renderCompareBarChart() {
 // ══════════════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════════════
-// Define max dinâmico baseado na data atual
-(function() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const maxMonth = `${year}-${month}`;
-  const startEl = document.getElementById('startDate');
-  const endEl   = document.getElementById('endDate');
-  // inputs de texto — sem max/min (são MM/AAAA)
-})();
 
 // ══════════════════════════════════════════════════════════════
 // DESCOBERTA DINÂMICA DE TICKERS
@@ -3399,14 +3664,19 @@ function renderCompareBarChart() {
 //   3. Fallback para as listas hardcoded
 // ══════════════════════════════════════════════════════════════
 
-// Classificadores automáticos para mapear tickers descobertos → classe
+// Classificadores automáticos para mapear tickers descobertos → classe.
+// As regras são avaliadas EM ORDEM: a primeira que casar vence. Por isso câmbio
+// (USDBRL/EURBRL) e RF são checados antes da regra genérica de cripto.
 function inferClassId(ticker) {
   const t = ticker.toUpperCase();
   // Índices/indicadores de renda fixa
   if (['CDI','SELIC','IPCA','IMAB','IMAS','IMAB5','IMAB5P','IRFM','IMA'].includes(t)) return 'rf';
-  // Câmbio
+  // Câmbio (precisa vir ANTES da regra de cripto, pois também termina em BRL)
   if (['USDBRL','EURBRL'].includes(t)) return 'ext';
-  // Cripto BRL
+  // Cripto BRL: termina em BRL, tem ao menos 6 chars (ex.: BTCBRL, ETHBRL).
+  // O !startsWith('I') é uma guarda defensiva: evita classificar como cripto um
+  // eventual índice hipotético terminado em BRL (ex.: "IBOVBRL"). Pares de câmbio
+  // reais (USDBRL/EURBRL) já foram capturados na regra anterior.
   if (t.endsWith('BRL') && !t.startsWith('I') && t.length >= 6) return 'cripto';
   // Índices de ações (sem número no fim, sem sufixo 11)
   const indicesAcao = ['IBOV','IDIV','SMLL','IBXL','IBXX','IBRA','MLCX','IVBX','ITAG','IGC','IGCT','IGNM','IFNC','IEE','UTIL','INDX','IMAT','IMOB','ICON','ISEE','ICO2','BDRX'];
@@ -3499,7 +3769,9 @@ async function initDynamicTickers() {
     }
   });
 
-  // Guarda lista completa apenas para uso interno (ex: validação futura)
+  // TODO(futuro): lista completa de tickers do servidor, reservada para validação
+  // futura (ex.: avisar quando o usuário digita um ticker inexistente). Hoje é
+  // apenas escrita; nenhuma leitura depende dela ainda.
   window._allServerTickers = tickers;
 }
 
@@ -3511,6 +3783,11 @@ async function initDynamicTickers() {
 //        e simulações completas (sem dados de preço — só config+result)
 // ══════════════════════════════════════════════════════════════
 const LS_KEY = 'maisvalor_sim_v1';
+// Cache temporário: serve só como rede de segurança contra F5 / queda rápida de
+// internet. Expira 30 min após a ÚLTIMA interação (cada salvarEstado renova o
+// relógio, criando uma janela deslizante). Ao expirar, o cache é descartado na
+// próxima abertura da página — nada é apagado da tela enquanto a aba está aberta.
+const LS_TTL_MS = 30 * 60 * 1000; // 30 minutos
 
 function salvarEstado() {
   try {
@@ -3541,9 +3818,15 @@ function salvarEstado() {
         classesSel: s.classesSel, classesConfig: s.classesConfig,
       })),
       activeSimIdx, viewMode, editingSimIdx,
+      savedAt: Date.now(), // renova a janela de 30 min a cada interação
     };
     localStorage.setItem(LS_KEY, JSON.stringify(dados));
-  } catch(e) { /* quota ou estrutura circular — ignora */ }
+  } catch(e) {
+    // Falha ao salvar (ex.: quota do navegador cheia). Não quebra a aplicação —
+    // a simulação na tela continua intacta; apenas a rede de segurança de F5
+    // não estará disponível desta vez.
+    console.warn('Cache temporário não pôde ser salvo:', e && e.message);
+  }
 }
 
 function restaurarEstado() {
@@ -3551,6 +3834,14 @@ function restaurarEstado() {
     const raw = localStorage.getItem(LS_KEY);
     if (!raw) return false;
     const dados = JSON.parse(raw);
+
+    // Cache expirado? (passou mais de 30 min desde a última interação)
+    // Se sim, descarta e começa do zero — a rede de segurança só vale para
+    // recargas rápidas (F5 acidental, queda breve de internet).
+    if (!dados.savedAt || (Date.now() - dados.savedAt) > LS_TTL_MS) {
+      localStorage.removeItem(LS_KEY);
+      return false;
+    }
 
     // Formulário
     const f = dados.form || {};
@@ -3602,6 +3893,23 @@ function restaurarEstado() {
   } catch(e) { return false; }
 }
 
+// Limpa APENAS o cache do storage após 30 min de inatividade — sem mexer no que
+// está na tela. A simulação que a pessoa está vendo permanece intacta enquanto a
+// aba estiver aberta; só não sobreviverá a um F5 depois que o tempo esgotar.
+let _idleTimer = null;
+function agendarExpiracaoCache() {
+  if (_idleTimer) clearTimeout(_idleTimer);
+  _idleTimer = setTimeout(() => {
+    try { localStorage.removeItem(LS_KEY); } catch(e) {}
+  }, LS_TTL_MS);
+}
+// Cada salvamento de estado é uma interação → reinicia o relógio de inatividade.
+const _salvarEstadoOriginal = salvarEstado;
+salvarEstado = function() {
+  _salvarEstadoOriginal.apply(this, arguments);
+  agendarExpiracaoCache();
+};
+
 initDynamicTickers().then(() => {
   const temEstado = restaurarEstado();
   renderSidebar();
@@ -3620,6 +3928,8 @@ initDynamicTickers().then(() => {
     else renderSingleView(activeSimIdx);
     updateViewBtn();
   }
+  // Inicia o relógio de expiração ao abrir (caso haja cache restaurado).
+  agendarExpiracaoCache();
 });
 </script>
 </body>
