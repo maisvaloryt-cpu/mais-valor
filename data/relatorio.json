@@ -1,8 +1,8 @@
 {
-  "gerado_em": "12/06/2026 03:23",
+  "gerado_em": "12/06/2026 03:46",
   "historico_mensal": {
-    "total": 815,
-    "ok": 796,
+    "total": 817,
+    "ok": 798,
     "poucos_dados": 19,
     "lista_poucos": [
       {
@@ -119,8 +119,8 @@
   },
   "criptos": {
     "atualizado_em": "12/06/2026 04:27 UTC",
-    "total_moedas": 0,
-    "com_dados": 0,
+    "total_moedas": 100,
+    "com_dados": 100,
     "sem_dados": 0,
     "tickers_sem_dados": [],
     "historico_ok": 100,
@@ -128,11 +128,11 @@
     "historico_falhou_lista": []
   },
   "resumo": {
-    "acoes_com_historico": 796,
+    "acoes_com_historico": 798,
     "fiis_com_historico": 364,
     "cotacoes_atuais": 768,
     "indicadores_fundamentus": 783,
-    "criptos_atuais": 0,
+    "criptos_atuais": 100,
     "status_geral": "✅ OK"
   }
 }
