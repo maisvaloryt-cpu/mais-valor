@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="mobile.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="chart_config.js"></script>
 <style>
 /* ── VARIÁVEIS LOCAIS: mapeiam tema do site para o simulador ── */
 :root {
@@ -3442,7 +3443,13 @@ function showChart(type, el) {
       const darkColor = darken(s.color, 0.7); // 30% mais escuro, preservando o matiz
       datasets.push({ label:'Aportado ' + s.name, data:aporData, borderColor:darkColor, borderWidth:1.2, borderDash:[4,4], fill:false, tension:.1, pointRadius:0, order:10+i, spanGaps:false, pointStyle:'circle' });
     });
-    chartInst = new Chart(ctx, { type:'line', data:{labels,datasets}, options:chartOpts('R$') });
+    const evolutionOpts = chartOpts('R$');
+    evolutionOpts.plugins.tooltip = { enabled: false };
+    evolutionOpts.animation = false;
+    chartInst = new Chart(ctx, { type:'line', data:{labels,datasets}, options:evolutionOpts });
+    const canvasEl = document.getElementById('mainChart');
+    const activeData = simulations[activeSimIdx].result.series.map(pt => pt.portfolioValue);
+    addChartOverlay(chartInst, canvasEl, labels, activeData, color, 'brl');
   } else if (type === 'monthly') {
     chartInst = new Chart(ctx, { type:'bar', data:{labels,datasets:[{ label:'Retorno %', data:series.map(s=>+(s.monthReturn*100).toFixed(2)), backgroundColor:series.map(s=>s.monthReturn>=0?color+'b3':'#E8503Ab3'), borderRadius:2 }]}, options:chartOpts('%') });
   } else if (type === 'dividends') {
