@@ -457,6 +457,12 @@ async function loadData() {
     const el = document.getElementById('data-timestamp');
     if (el) el.textContent = label;
 
+    // ── Dividendos ────────────────────────────────────────────────────────────
+    try {
+      const dr = await fetch('data/dividendos.json?t=' + Date.now());
+      if (dr.ok) { const dj = await dr.json(); DIVIDENDOS = dj.dividendos || []; }
+    } catch(e) {}
+
     console.log(`✅ ${ACOES.length} ações + ${FIIS.length} FIIs | Intraday: ${intradayCount} ativos ao vivo`);
     return true;
   } catch(e) {
@@ -494,8 +500,43 @@ async function loadHistoricoCompleto(ticker) {
   return resultado;
 }
 
+// ─── Intraday chart acumulado ─────────────────────────────────────────────────
+// Retorna o grupo do arquivo chart para um ticker
+function _getIntradayGroup(ticker) {
+  if (ACOES.some(a => a.t === ticker)) return 'acoes-br';
+  if (FIIS.some(f => f.t === ticker)) return 'fiis';
+  return null; // índices, stocks, ETFs — sem suporte intraday chart ainda
+}
+
+// Carrega data/intraday/chart/{grupo}.json e retorna [{date:"HH:mm", close: X}, ...]
+// para o ticker e dia de hoje. Retorna [] se não houver dados.
+async function loadIntradayChart(ticker) {
+  const group = _getIntradayGroup(ticker);
+  if (!group) return [];
+  try {
+    const r = await fetch(`data/intraday/chart/${group}.json?t=${Date.now()}`);
+    if (!r.ok) return [];
+    const j = await r.json();
+    // Verifica se é de hoje (formato yyyy-MM-dd)
+    const hoje = new Date().toISOString().slice(0, 10);
+    if (j.date !== hoje) return [];
+    // Extrai pontos do ticker
+    return (j.points || [])
+      .filter(p => p[ticker] != null)
+      .map(p => ({ date: p.t, close: p[ticker] }));
+  } catch(e) { return []; }
+}
+
 function filterByRange(history, range) {
   if(!history?.length) return history;
+  if(range === '1D') {
+    // Fallback: últimos 2 dias do diário (quando não há intraday acumulado)
+    return history.slice(-2);
+  }
+  if(range === '1S') {
+    const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-7);
+    return history.filter(p=>new Date(p.date)>=cutoff);
+  }
   const meses=range==='1M'?1:range==='6M'?6:range==='1A'?12:range==='5A'?60:120;
   const cutoff=new Date(); cutoff.setMonth(cutoff.getMonth()-meses);
   return history.filter(p=>new Date(p.date)>=cutoff);

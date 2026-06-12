@@ -93,6 +93,8 @@
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
             <div style="display:flex;gap:4px">
+              <button class="range-btn" onclick="setRange('1D',this)">1D</button>
+              <button class="range-btn" onclick="setRange('1S',this)">1S</button>
               <button class="range-btn" onclick="setRange('1M',this)">1M</button>
               <button class="range-btn" onclick="setRange('6M',this)">6M</button>
               <button class="range-btn active" onclick="setRange('1A',this)">1A</button>
@@ -257,14 +259,49 @@ async function loadChart(d) {
     verMais.href = `ativo.html?t=${d.t}${currentTab==='fiis'?'&tipo=fii':''}`;
   }
 
-  const histTicker = d.isIndex ? d.t : d.t;
-  const hist = await loadHistoricoCompleto(histTicker);
+  const histTicker = d.hist || d.t;
   let pts, labels;
-  if (hist?.length) { const filt = filterByRange(hist, currentRange); pts = filt.map(p => p.close); labels = filt.map(p => p.date); }
-  else { pts = genHistory(d.p || 100, d.v); labels = genLabels(pts.length); }
-  const color = isUp ? '#F5A623' : '#E8503A';
+
+  // Para 1D, tenta primeiro os dados intraday acumulados (série temporal do dia)
+  if (currentRange === '1D' && !d.isIndex) {
+    const intradayPts = await loadIntradayChart(d.t);
+    if (intradayPts.length >= 2) {
+      pts   = intradayPts.map(p => p.close);
+      labels = intradayPts.map(p => p.date);
+    }
+  }
+
+  // Se não teve intraday suficiente, carrega histórico normal (diário/mensal)
+  if (!pts) {
+    const hist = await loadHistoricoCompleto(histTicker);
+    if (hist?.length) {
+      const filt = filterByRange(hist, currentRange);
+      pts   = filt.map(p => p.close);
+      labels = filt.map(p => p.date);
+    } else {
+      pts   = genHistory(d.p || 100, d.v);
+      labels = genLabels(pts.length);
+    }
+  }
+
+  // Atualiza badge com variação do período selecionado
+  if (pts.length >= 2) {
+    const periodVar = (pts[pts.length-1] - pts[0]) / pts[0] * 100;
+    const periodUp = periodVar >= 0;
+    const priceEl = document.getElementById('c-price');
+    if (priceEl) {
+      const pill = priceEl.querySelector('span.pill');
+      if (pill) {
+        pill.className = `pill ${periodUp?'up-pill':'dn-pill'}`;
+        pill.textContent = `${periodUp?'+':''}${periodVar.toFixed(2)}%`;
+      }
+    }
+  }
+
+  const periodUp = pts.length >= 2 ? pts[pts.length-1] >= pts[0] : isUp;
+  const color = periodUp ? '#F5A623' : '#E8503A';
   if (mainChart) mainChart.destroy();
-  mainChart = createChart('mainChart', labels, pts, color, isUp?'rgba(245,166,35,0.06)':'rgba(232,80,58,0.06)');
+  mainChart = createChart('mainChart', labels, pts, color, periodUp?'rgba(245,166,35,0.06)':'rgba(232,80,58,0.06)', d.unit);
 }
 
 async function setRange(r, el) {
@@ -395,22 +432,23 @@ async function buildCarouselItems() {
     return null;
   };
 
-  const addIndex = (key, code, name, unit) => {
+  const addIndex = (key, code, name, unit, hist) => {
     const d = pick(key);
     if (!d) return;
     carouselItems.push({
       t: code, n: name, p: d.val, v: d.chg || 0,
       dy: 0, pl: null, pvp: null, vol: '—',
       setor: 'Índice', isIndex: true, unit: unit || 'pts',
+      hist: hist || code,
     });
   };
 
   // Os 5 indicadores mais relevantes para o público geral
-  addIndex('ibov',   'IBOV',   'Ibovespa');
-  addIndex('sp500',  'SP500',  'S&P 500');
-  addIndex('nasdaq', 'NASDAQ', 'Nasdaq');
-  addIndex('btc',    'BTC',    'Bitcoin',  'usd');
-  addIndex('eth',    'ETH',    'Ethereum', 'usd');
+  addIndex('ibov',   'IBOV',   'Ibovespa',  'pts', 'IBOV');
+  addIndex('sp500',  'SP500',  'S&P 500',   'pts', 'SPX_USD');
+  addIndex('nasdaq', 'NASDAQ', 'Nasdaq',    'pts', 'NASDAQ');
+  addIndex('btc',    'BTC',    'Bitcoin',   'usd', 'BTCBRL');
+  addIndex('eth',    'ETH',    'Ethereum',  'usd', 'ETH');
 
   // Fallback: se nada dos índices carregou, usa maiores altas como antes
   if (!carouselItems.length) {

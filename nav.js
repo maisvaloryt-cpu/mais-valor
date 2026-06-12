@@ -587,7 +587,7 @@ function navSearchLive(q) {
       </div>
       <div style="text-align:right">
         <div style="font-family:var(--font-mono);font-size:13px">R$ ${d.p.toFixed(2)}</div>
-        <div style="font-size:11px;color:${d.v >= 0 ? 'var(--up)' : 'var(--dn)'}'">${d.v >= 0 ? '+' : ''}${d.v.toFixed(2)}%</div>
+        <div style="font-size:11px;color:${d.v >= 0 ? 'var(--up)' : 'var(--dn)'}">${d.v >= 0 ? '+' : ''}${d.v.toFixed(2)}%</div>
       </div>
     </div>`;
   }).join('');

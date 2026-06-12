@@ -157,6 +157,13 @@ function parseDateBR(str){
   return null;
 }
 
+function fmtDiaMes(str){
+  // Formata YYYY-MM-DD ou DD/MM/YYYY como "DD/MM"
+  const dt = parseDateBR(str);
+  if(!dt) return '—';
+  return String(dt.getDate()).padStart(2,'0') + '/' + String(dt.getMonth()+1).padStart(2,'0');
+}
+
 function renderTable(arr){
   const tb=document.getElementById('tbody'); tb.innerHTML='';
   document.getElementById('div-count').textContent = arr.length ? `${arr.length} pagamento(s) encontrado(s)` : '';
@@ -180,8 +187,8 @@ function renderTable(arr){
         </div>
       </td>
       <td><span class="pill ${tipoColor}">${d.tipo}</span></td>
-      <td class="r" style="font-size:12px">${d.com?.slice(0,5)||'—'}</td>
-      <td class="r" style="font-size:12px;color:var(--gold)">${d.pag?.slice(0,5)||'—'}</td>
+      <td class="r" style="font-size:12px">${d.com?fmtDiaMes(d.com):'—'}</td>
+      <td class="r" style="font-size:12px;color:var(--gold)">${d.pag?fmtDiaMes(d.pag):'—'}</td>
       <td class="r" style="font-size:14px;font-weight:700;color:var(--gold)">R$&nbsp;${(d.val||0).toFixed(4)}</td>
       <td class="r up">${d.dy||'—'}</td>`;
     tb.appendChild(tr);

@@ -114,13 +114,13 @@ def main():
     try:
         with open('data/cripto_market.json') as f:
             cripto = json.load(f)
-        moedas = cripto.get('moedas', [])
+        moedas = cripto.get('coins', [])
         relatorio['criptos'] = {
             'atualizado_em': cripto.get('updated_at'),
             'total_moedas': len(moedas),
-            'com_dados': len([m for m in moedas if m.get('price_usd')]),
-            'sem_dados': len([m for m in moedas if not m.get('price_usd')]),
-            'tickers_sem_dados': [m['symbol'] for m in moedas if not m.get('price_usd')]
+            'com_dados': len([m for m in moedas if m.get('price')]),
+            'sem_dados': len([m for m in moedas if not m.get('price')]),
+            'tickers_sem_dados': [m['symbol'] for m in moedas if not m.get('price')]
         }
     except:
         relatorio['criptos'] = {'erro': 'cripto_market.json não encontrado'}

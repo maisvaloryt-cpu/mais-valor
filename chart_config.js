@@ -1,6 +1,6 @@
 // chart_config.js — crosshair, pin-on-click, seleção de período por drag
 
-function createChart(canvasId, labels, data, color, bgColor) {
+function createChart(canvasId, labels, data, color, bgColor, unit) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return null;
 
@@ -39,7 +39,7 @@ function createChart(canvasId, labels, data, color, bgColor) {
         pointHoverRadius: 0,
         fill: true,
         backgroundColor: bgColor,
-        tension: 0.35
+        tension: 0.1
       }]
     },
     options: {
@@ -53,8 +53,13 @@ function createChart(canvasId, labels, data, color, bgColor) {
           ticks: { color: '#5E5C58', font: { size: 10, family: 'JetBrains Mono' }, maxTicksLimit: 10, maxRotation: 0 }
         },
         y: {
+          grace: '5%',
           grid: { color: 'rgba(255,255,255,.04)' },
-          ticks: { color: '#5E5C58', font: { size: 10, family: 'JetBrains Mono' }, callback: v => 'R$' + (v >= 1000 ? (v/1000).toFixed(1)+'k' : v.toFixed(0)) }
+          ticks: { color: '#5E5C58', font: { size: 10, family: 'JetBrains Mono' }, callback: v => {
+            const prefix = unit === 'usd' ? 'US$' : unit === 'pts' ? '' : 'R$';
+            const suffix = unit === 'pts' ? ' pts' : '';
+            return prefix + (v >= 1000 ? (v/1000).toFixed(1)+'k' : v.toFixed(0)) + suffix;
+          } }
         }
       }
     }
@@ -169,11 +174,13 @@ function createChart(canvasId, labels, data, color, bgColor) {
     const chgPct = ((v2 - v1) / v1 * 100);
     const chgSign = chgPct >= 0 ? '+' : '';
     const chgColor = chgPct >= 0 ? '#1FC96E' : '#E8503A';
+    const pfx = unit === 'usd' ? 'US$' : unit === 'pts' ? '' : 'R$';
+    const sfx = unit === 'pts' ? ' pts' : '';
     infoBox.innerHTML = `
       <span style="color:#9B9896;font-size:10px">${labels[from]} → ${labels[to]}</span><br>
-      <span>R$ ${v1.toFixed(2)}</span>
+      <span>${pfx}${v1.toFixed(2)}${sfx}</span>
       <span style="color:var(--text3)"> → </span>
-      <span>R$ ${v2.toFixed(2)}</span>
+      <span>${pfx}${v2.toFixed(2)}${sfx}</span>
       &nbsp;<span style="color:${chgColor};font-weight:700">${chgSign}${chgPct.toFixed(2)}%</span>
     `;
     infoBox.style.display = 'block';
@@ -188,7 +195,7 @@ function createChart(canvasId, labels, data, color, bgColor) {
     const chgColor = chg >= 0 ? '#22C87A' : '#E8503A';
     tooltip.innerHTML = `
       <div style="color:#9B9896;font-size:10px;margin-bottom:4px">${lbl}</div>
-      <div style="font-size:15px;font-weight:700">R$ ${val.toFixed(2)}</div>
+      <div style="font-size:15px;font-weight:700">${unit === 'usd' ? 'US$' : unit === 'pts' ? '' : 'R$'}${val.toFixed(2)}${unit === 'pts' ? ' pts' : ''}</div>
       ${chgStr ? `<div style="color:${chgColor};font-size:11px;margin-top:2px">${chgStr}</div>` : ''}
     `;
     let tx = e.clientX + 16, ty = e.clientY - 40;
@@ -260,8 +267,8 @@ function createChart(canvasId, labels, data, color, bgColor) {
       const chgColor = chgPct >= 0 ? '#1FC96E' : '#E8503A';
       tooltip.innerHTML = `
         <div style="color:#9B9896;font-size:10px;margin-bottom:4px">${labels[pinIdx]} → ${labels[idx]}</div>
-        <div style="font-size:13px">Pin: <strong>R$ ${v1.toFixed(2)}</strong></div>
-        <div style="font-size:13px">Agora: <strong>R$ ${v2.toFixed(2)}</strong></div>
+        <div style="font-size:13px">Pin: <strong>${unit === 'usd' ? 'US$' : unit === 'pts' ? '' : 'R$'}${v1.toFixed(2)}${unit === 'pts' ? ' pts' : ''}</strong></div>
+        <div style="font-size:13px">Agora: <strong>${unit === 'usd' ? 'US$' : unit === 'pts' ? '' : 'R$'}${v2.toFixed(2)}${unit === 'pts' ? ' pts' : ''}</strong></div>
         <div style="color:${chgColor};font-size:12px;margin-top:3px;font-weight:700">${chgSign}${chgPct.toFixed(2)}%</div>
       `;
       let tx = e.clientX + 16, ty = e.clientY - 40;
@@ -307,7 +314,7 @@ function createChart(canvasId, labels, data, color, bgColor) {
           pinIdx = idx;
           infoBox.innerHTML = `
             <span style="color:#F5A623;font-weight:700">📌 ${labels[idx]}</span>
-            &nbsp;R$ ${data[idx].toFixed(2)}
+            &nbsp;${unit === 'usd' ? 'US$' : unit === 'pts' ? '' : 'R$'}${data[idx].toFixed(2)}${unit === 'pts' ? ' pts' : ''}
             <span style="color:var(--text3);font-size:10px"> — clique em outro ponto para ver a variação</span>
           `;
           infoBox.style.display = 'block';

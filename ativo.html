@@ -445,29 +445,6 @@ async function drawChartWithCDI() {
   });
 }
 
-function drawChart(){
-  const filt=filterByRange(histData,currentRange);
-  let pts,labels;
-  if(filt&&filt.length>2){
-    pts=filt.map(p=>p.close); labels=filt.map(p=>p.date);
-    const mn=Math.min(...pts),mx=Math.max(...pts);
-    document.getElementById('ch-min').textContent='R$ '+mn.toFixed(2);
-    document.getElementById('ch-max').textContent='R$ '+mx.toFixed(2);
-    const ret=((pts[pts.length-1]-pts[0])/pts[0]*100);
-    const el=document.getElementById('ch-ret');
-    el.textContent=(ret>=0?'+':'')+ret.toFixed(1)+'%';
-    el.className='ind-val '+(ret>=0?'up':'dn');
-  }else{
-    pts=genHistory(ativo?.p||10,ativo?.v||0);
-    labels=genLabels(pts.length);
-    ['ch-min','ch-max','ch-ret'].forEach(id=>document.getElementById(id).textContent='—');
-  }
-  const isUp=(ativo?.v||0)>=0;
-  const color=isUp?'#22C87A':'#E8503A';
-  if(mainChart)mainChart.destroy();
-  mainChart=createChart('mainChart',labels,pts,color,isUp?'rgba(34,200,122,0.06)':'rgba(232,80,58,0.06)');
-}
-
 function setRange(r,el){
   currentRange=r;
   document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active'));

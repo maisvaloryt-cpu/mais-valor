@@ -51,6 +51,7 @@ function coletarEEnviar() {
   }
 
   enviarParaGitHub(json);
+  acumularChartIntraday(json);  // Acumula série temporal intraday para o gráfico 1D
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -251,6 +252,115 @@ function enviarParaGitHub(dados) {
   } catch(e) {
     Logger.log('❌ Exceção ao enviar: ' + e.message);
     registrarErroLog(Utilities.formatDate(new Date(), 'America/Sao_Paulo', 'dd/MM/yyyy HH:mm'), 'EXC', e.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  ACUMULAR CHART INTRADAY
+//  Lê data/intraday/chart/{tipo}.json do GitHub, adiciona o ponto atual
+//  com timestamp (HH:mm) e salva de volta. Reseta automaticamente a cada dia.
+//
+//  Estrutura do arquivo:
+//  {
+//    "date": "2026-06-12",
+//    "updated_at": "12/06/2026 14:20",
+//    "points": [
+//      {"t": "10:00", "PETR4": 38.50, "VALE3": 72.30, ...},
+//      {"t": "10:20", "PETR4": 38.62, ...}
+//    ]
+//  }
+// ═══════════════════════════════════════════════════════════════════════════
+function acumularChartIntraday(dadosAtuais) {
+  const chartPath = JSON_PATHS[PLANILHA_TIPO].replace('data/intraday/', 'data/intraday/chart/');
+  const hoje  = Utilities.formatDate(new Date(), 'America/Sao_Paulo', 'yyyy-MM-dd');
+  const hora  = Utilities.formatDate(new Date(), 'America/Sao_Paulo', 'HH:mm');
+  const agora = Utilities.formatDate(new Date(), 'America/Sao_Paulo', 'dd/MM/yyyy HH:mm');
+
+  const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${chartPath}`;
+
+  // ── 1. Ler arquivo existente do GitHub ────────────────────────────────────
+  let sha = null;
+  let chartData = { date: '', points: [] };
+
+  try {
+    const resp = UrlFetchApp.fetch(apiUrl + `?ref=${GITHUB_BRANCH}`, {
+      method: 'get',
+      headers: { 'Authorization': 'Bearer ' + GITHUB_TOKEN, 'Accept': 'application/vnd.github+json' },
+      muteHttpExceptions: true,
+    });
+    const code = resp.getResponseCode();
+    if (code === 200) {
+      const parsed = JSON.parse(resp.getContentText());
+      sha = parsed.sha;
+      // O conteúdo vem em base64 com quebras de linha — remover antes de decodificar
+      const conteudo = Utilities.newBlob(
+        Utilities.base64Decode(parsed.content.replace(/\n/g, ''))
+      ).getDataAsString();
+      chartData = JSON.parse(conteudo);
+    } else if (code !== 404) {
+      Logger.log(`Chart: GET retornou HTTP ${code}`);
+    }
+  } catch(e) {
+    Logger.log('Chart: erro ao ler arquivo existente — ' + e.message);
+  }
+
+  // ── 2. Se não é de hoje, reinicia (mas mantém SHA para poder sobrescrever) ─
+  if (chartData.date !== hoje) {
+    chartData = { date: hoje, points: [] };
+    // sha é mantido: se o arquivo existia (de ontem), precisamos do SHA para update
+  }
+
+  // ── 3. Evitar duplicata do mesmo minuto ───────────────────────────────────
+  if (chartData.points.some(p => p.t === hora)) {
+    Logger.log(`Chart: ponto ${hora} já existe — nada a fazer.`);
+    return;
+  }
+
+  // ── 4. Montar ponto com preços atuais (todas as chaves do JSON) ───────────
+  const ponto = { t: hora };
+  const CHAVES = ['acoes', 'etfs', 'fiis', 'stocks', 'bdrs', 'cripto', 'macro'];
+  CHAVES.forEach(chave => {
+    if (!Array.isArray(dadosAtuais[chave])) return;
+    dadosAtuais[chave].forEach(item => {
+      if (item.ticker && item.price != null && !item.stale) {
+        ponto[item.ticker] = item.price;
+      }
+    });
+  });
+
+  chartData.points.push(ponto);
+  chartData.updated_at = agora;
+
+  // ── 5. Salvar de volta no GitHub ──────────────────────────────────────────
+  const conteudoBase64 = Utilities.base64Encode(
+    JSON.stringify(chartData, null, 2), Utilities.Charset.UTF_8
+  );
+  const body = {
+    message: `📈 Chart intraday ${PLANILHA_TIPO} — ${agora} (${chartData.points.length} pts)`,
+    content: conteudoBase64,
+    branch: GITHUB_BRANCH,
+  };
+  if (sha) body.sha = sha;
+
+  try {
+    const resp = UrlFetchApp.fetch(apiUrl, {
+      method: 'put',
+      headers: {
+        'Authorization': 'Bearer ' + GITHUB_TOKEN,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json',
+      },
+      payload: JSON.stringify(body),
+      muteHttpExceptions: true,
+    });
+    const code = resp.getResponseCode();
+    if (code === 200 || code === 201) {
+      Logger.log(`✅ Chart acumulado: ${chartPath} — ${chartData.points.length} pontos`);
+    } else {
+      Logger.log(`❌ Chart: erro HTTP ${code} — ${resp.getContentText().slice(0, 200)}`);
+    }
+  } catch(e) {
+    Logger.log('❌ Chart: exceção ao salvar — ' + e.message);
   }
 }
 
