@@ -191,10 +191,11 @@ function addChartOverlay(chart, canvas, labels, data, color, unit) {
           drawRangeSelection(from, to); pinIdx = null; lockedRange = { from, to };
         } else {
           pinIdx = idx;
+          const pfxPin = unit === 'usd' ? 'US$' : unit === 'pts' ? '' : 'R$';
+          const sfxPin = unit === 'pts' ? ' pts' : '';
           infoBox.innerHTML = `
-            <span style="color:#F5A623;font-weight:700">📌 ${labels[idx]}</span>
-            &nbsp;${unit === 'usd' ? 'US$' : unit === 'pts' ? '' : 'R$'}${data[idx].toFixed(2)}${unit === 'pts' ? ' pts' : ''}
-            <span style="color:var(--text3);font-size:10px"> — clique em outro ponto para ver a variação</span>
+            <div style="font-size:15px;font-weight:700;line-height:1">${pfxPin}${data[idx].toFixed(2)}${sfxPin}</div>
+            <div style="color:#F5A623;font-size:10px;margin-top:3px">${labels[idx]}</div>
           `;
           infoBox.style.display = 'block';
           drawCrosshair(idx, true);
