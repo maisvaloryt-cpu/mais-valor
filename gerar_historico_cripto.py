@@ -66,7 +66,7 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)
 DELAY_ENTRE_REQUESTS = 1.5
 
 
-def fetch_coingecko(coin_id: str, dias: int = 3650) -> list:
+def fetch_coingecko(coin_id: str, dias: int = 365) -> list:
     """
     Busca histórico de preços diários do CoinGecko em BRL.
     Retorna lista de {date, close} agrupada por mês (último dia do mês)
