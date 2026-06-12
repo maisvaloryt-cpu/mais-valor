@@ -7,6 +7,23 @@
 <title>Mais Valor — Ações, FIIs e Indicadores da B3</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="mobile.css">
+<style>
+  .carousel-arrow{
+    position:absolute;top:50%;transform:translateY(-50%);z-index:5;
+    width:34px;height:34px;border-radius:50%;border:1px solid var(--border3,rgba(255,255,255,.12));
+    background:rgba(17,17,19,.55);color:var(--text2,#aaa);font-size:18px;line-height:1;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    transition:background .15s,color .15s,opacity .15s;opacity:0;backdrop-filter:blur(2px);
+  }
+  .chart-panel:hover .carousel-arrow{opacity:1}
+  .carousel-arrow:hover{background:rgba(245,166,35,.18);color:var(--gold,#F5A623);border-color:rgba(245,166,35,.4)}
+  .carousel-arrow-left{left:6px}
+  .carousel-arrow-right{right:6px}
+  .carousel-dots{display:flex;gap:6px;justify-content:center;margin-top:10px}
+  .carousel-dot{width:7px;height:7px;border-radius:50%;cursor:pointer;background:var(--border3,rgba(255,255,255,.15));transition:background .2s,transform .2s}
+  .carousel-dot.active{background:var(--gold,#F5A623);transform:scale(1.25)}
+  .carousel-dot:hover{background:var(--gold,#F5A623)}
+</style>
 </head>
 <body>
 <div id="nav-placeholder"></div>
@@ -60,7 +77,7 @@
   <div class="main-grid">
     <div class="fade-in-2">
       <!-- CHART -->
-      <div class="chart-panel">
+      <div class="chart-panel" onmouseenter="pauseCarousel()" onmouseleave="resumeCarousel()">
         <div class="chart-header">
           <div>
             <div class="chart-logo-wrap">
@@ -87,7 +104,10 @@
         </div>
         <div style="position:relative;width:100%;height:210px">
           <canvas id="mainChart" role="img" aria-label="Gráfico histórico do ativo selecionado"></canvas>
+          <button class="carousel-arrow carousel-arrow-left" onclick="carouselPrev()" aria-label="Destaque anterior" title="Anterior">‹</button>
+          <button class="carousel-arrow carousel-arrow-right" onclick="carouselNext()" aria-label="Próximo destaque" title="Próximo">›</button>
         </div>
+        <div class="carousel-dots" id="carousel-dots"></div>
         <div style="font-size:10px;color:var(--text3);margin-top:6px;text-align:center">
           💡 Clique para travar · Segundo clique para variação · Arraste para período
         </div>
@@ -198,7 +218,7 @@ function renderTable(arr){
       <td class="r ${d.pvp&&d.pvp<1?'up':''}">${d.pvp?d.pvp.toFixed(2):'—'}</td>
       <td class="r">${scoreBadge(d)}</td>
       <td class="r" style="color:var(--text3)">${d.vol}</td>`;
-    tr.onclick = () => loadChart(d);
+    tr.onclick = () => { loadChart(d); resetCarouselTimer(); };
     tb.appendChild(tr);
   });
 }
@@ -209,18 +229,31 @@ async function loadChart(d) {
   if(logoEl) logoEl.innerHTML = logoHtml(d.t, 36);
   document.getElementById('c-ticker').textContent = d.t;
   const isUp = d.v >= 0;
-  document.getElementById('c-price').innerHTML = `R$&nbsp;${d.p.toFixed(2)}&nbsp;<span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span>`;
-  document.getElementById('c-meta').textContent = `${d.n} · ${d.setor} · B3`;
+  if (d.isIndex) {
+    const ptsFmt = (d.p || 0).toLocaleString('pt-BR', { maximumFractionDigits: 0 });
+    document.getElementById('c-price').innerHTML = `${ptsFmt}&nbsp;pts&nbsp;<span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span>`;
+    document.getElementById('c-meta').textContent = `${d.n} · principal índice da B3`;
+  } else {
+    document.getElementById('c-price').innerHTML = `R$&nbsp;${d.p.toFixed(2)}&nbsp;<span class="pill ${isUp?'up-pill':'dn-pill'}">${isUp?'+':''}${d.v.toFixed(2)}%</span>`;
+    document.getElementById('c-meta').textContent = `${d.n} · ${d.setor} · B3`;
+  }
   document.getElementById('c-dy').textContent  = d.dy>0 ? d.dy.toFixed(1)+'%' : '—';
   document.getElementById('c-pl').textContent  = d.pl ? (d.pl>0?d.pl.toFixed(1)+'x':d.pl<0?'neg.':'—') : '—';
   document.getElementById('c-pvp').textContent = d.pvp ? d.pvp.toFixed(2) : '—';
   document.getElementById('c-vol').textContent = d.vol;
-  document.getElementById('c-ver-mais').href = `ativo.html?t=${d.t}${currentTab==='fiis'?'&tipo=fii':''}`;
+  const verMais = document.getElementById('c-ver-mais');
+  if (d.isIndex) {
+    verMais.style.display = 'none';
+  } else {
+    verMais.style.display = '';
+    verMais.href = `ativo.html?t=${d.t}${currentTab==='fiis'?'&tipo=fii':''}`;
+  }
 
-  const hist = await loadHistoricoCompleto(d.t);
+  const histTicker = d.isIndex ? 'IBOV' : d.t;
+  const hist = await loadHistoricoCompleto(histTicker);
   let pts, labels;
   if (hist?.length) { const filt = filterByRange(hist, currentRange); pts = filt.map(p => p.close); labels = filt.map(p => p.date); }
-  else { pts = genHistory(d.p, d.v); labels = genLabels(pts.length); }
+  else { pts = genHistory(d.p || 100, d.v); labels = genLabels(pts.length); }
   const color = isUp ? '#1FC96E' : '#E8503A';
   if (mainChart) mainChart.destroy();
   mainChart = createChart('mainChart', labels, pts, color, isUp?'rgba(31,201,110,0.06)':'rgba(232,80,58,0.06)');
@@ -248,7 +281,7 @@ function switchTab(tab, el) {
   document.getElementById('ver-todos-link').href = tab === 'acoes' ? 'acoes.html' : 'fiis.html';
   document.getElementById('ver-todos-link').textContent = `Ver ${tab === 'acoes' ? 'todas as ações' : 'todos os FIIs'} →`;
   renderTable(currentData);
-  if (currentData.length) loadChart(currentData[0]);
+  if (currentData.length) { loadChart(currentData[0]); resetCarouselTimer(); }
 }
 
 function renderSidebar() {
@@ -323,6 +356,76 @@ function updateMiniCards() {
   if (topFii)  { document.getElementById('mc-dy-fii').textContent=topFii.dy.toFixed(1)+'%';   document.getElementById('mc-dy-fii-ticker').textContent=topFii.t+' · 12m'; }
 }
 
+// ── Carrossel do destaque (Home) ───────────────────────────────────
+let carouselItems = [];
+let carouselIdx = 0;
+let carouselTimer = null;
+const CAROUSEL_INTERVAL = 8000; // 8s entre trocas automáticas
+
+function buildCarouselItems() {
+  carouselItems = [];
+
+  // 1) Ibovespa sempre primeiro, se houver dado válido
+  if (typeof IBOV !== 'undefined' && typeof IBOV.val === 'number' && IBOV.val > 0) {
+    carouselItems.push({
+      t: 'IBOV', n: 'Ibovespa',
+      p: IBOV.val, v: IBOV.chg || 0,
+      dy: 0, pl: null, pvp: null, vol: '—',
+      setor: 'Índice', isIndex: true,
+    });
+  }
+
+  // 2) 5 destaques entre as maiores altas do dia (ações + FIIs)
+  const destaques = [...ACOES, ...FIIS]
+    .filter(d => d.p > 0)
+    .sort((a, b) => b.v - a.v)
+    .slice(0, 5);
+
+  carouselItems.push(...destaques);
+}
+
+function renderCarouselDots() {
+  const wrap = document.getElementById('carousel-dots');
+  if (!wrap) return;
+  if (carouselItems.length <= 1) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = carouselItems.map((it, i) => `
+    <span class="carousel-dot ${i === carouselIdx ? 'active' : ''}"
+      onclick="goToCarousel(${i})" title="${it.t}"></span>
+  `).join('');
+}
+
+async function showCarousel(idx, userTriggered = true) {
+  if (!carouselItems.length) return;
+  carouselIdx = ((idx % carouselItems.length) + carouselItems.length) % carouselItems.length;
+  await loadChart(carouselItems[carouselIdx]);
+  renderCarouselDots();
+  if (userTriggered) resetCarouselTimer();
+}
+
+function carouselNext() { showCarousel(carouselIdx + 1); }
+function carouselPrev() { showCarousel(carouselIdx - 1); }
+function goToCarousel(i) { showCarousel(i); }
+
+function resetCarouselTimer() {
+  if (carouselTimer) clearInterval(carouselTimer);
+  if (carouselItems.length <= 1) return;
+  carouselTimer = setInterval(() => showCarousel(carouselIdx + 1, false), CAROUSEL_INTERVAL);
+}
+
+function pauseCarousel() {
+  if (carouselTimer) { clearInterval(carouselTimer); carouselTimer = null; }
+}
+function resumeCarousel() {
+  if (!carouselTimer) resetCarouselTimer();
+}
+
+async function startCarousel() {
+  buildCarouselItems();
+  if (!carouselItems.length) return;
+  await showCarousel(0, false);
+  resetCarouselTimer();
+}
+
 async function init() {
   await loadData();
   try {
@@ -335,7 +438,7 @@ async function init() {
   } catch(e) {}
   currentData = [...ACOES];
   renderTable(currentData);
-  if (ACOES.length > 0) await loadChart(ACOES[0]);
+  await startCarousel();
   renderSidebar();
   updateMiniCards();
 }
