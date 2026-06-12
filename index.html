@@ -109,7 +109,7 @@
         </div>
         <div class="carousel-dots" id="carousel-dots"></div>
         <div style="font-size:10px;color:var(--text3);margin-top:6px;text-align:center">
-          💡 Clique para travar · Segundo clique para variação · Arraste para período
+          💡 Clique para travar · 2º clique (ou arraste) fixa a variação · novo clique reseta
         </div>
         <div class="chart-stats">
           <div class="chart-stat"><div class="chart-stat-label">DY 12m</div><div class="chart-stat-val gold" id="c-dy">—</div></div>
@@ -262,9 +262,9 @@ async function loadChart(d) {
   let pts, labels;
   if (hist?.length) { const filt = filterByRange(hist, currentRange); pts = filt.map(p => p.close); labels = filt.map(p => p.date); }
   else { pts = genHistory(d.p || 100, d.v); labels = genLabels(pts.length); }
-  const color = isUp ? '#1FC96E' : '#E8503A';
+  const color = isUp ? '#F5A623' : '#E8503A';
   if (mainChart) mainChart.destroy();
-  mainChart = createChart('mainChart', labels, pts, color, isUp?'rgba(31,201,110,0.06)':'rgba(232,80,58,0.06)');
+  mainChart = createChart('mainChart', labels, pts, color, isUp?'rgba(245,166,35,0.06)':'rgba(232,80,58,0.06)');
 }
 
 async function setRange(r, el) {

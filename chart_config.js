@@ -83,6 +83,7 @@ function createChart(canvasId, labels, data, color, bgColor) {
   let isDragging = false;
   let dragStart = null;    // índice início do drag
   let dragEnd   = null;    // índice fim do drag
+  let lockedRange = null;  // {from,to} — análise de variação fixa na tela
 
   function getIdx(mouseX) {
     const ca = chart.chartArea;
@@ -213,12 +214,23 @@ function createChart(canvasId, labels, data, color, bgColor) {
     const mouseX = e.clientX - rect.left;
     const ca = chart.chartArea;
     if (!ca || mouseX < ca.left || mouseX > ca.right) return;
+
+    if (lockedRange) {
+      // Já existe uma análise fixa na tela — qualquer clique a reseta
+      lockedRange = null;
+      pinIdx = null;
+      clearAll();
+      return;
+    }
+
     isDragging = true;
     dragStart = getIdx(mouseX);
     dragEnd   = null;
   });
 
   canvas.addEventListener('mousemove', (e) => {
+    if (lockedRange) return; // análise fixa na tela — ignora hover
+
     const rect = canvas.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
@@ -271,9 +283,10 @@ function createChart(canvasId, labels, data, color, bgColor) {
     isDragging = false;
 
     if (dragEnd !== null && Math.abs(dragEnd - dragStart) > 1) {
-      // Drag finalizado — mostra seleção de período
+      // Drag finalizado — mostra seleção de período e a fixa na tela
       drawRangeSelection(dragStart, dragEnd);
       pinIdx = null;
+      lockedRange = { from: dragStart, to: dragEnd };
     } else {
       // Click simples — toggle pin
       if (ca && mouseX >= ca.left && mouseX <= ca.right) {
@@ -284,10 +297,11 @@ function createChart(canvasId, labels, data, color, bgColor) {
           infoBox.style.display = 'none';
           clearAll();
         } else if (pinIdx !== null) {
-          // Segundo clique em outro ponto = mostra variação
+          // Segundo clique em outro ponto = mostra variação e fixa na tela
           const from = Math.min(pinIdx, idx), to = Math.max(pinIdx, idx);
           drawRangeSelection(from, to);
           pinIdx = null;
+          lockedRange = { from, to };
         } else {
           // Primeiro clique = trava
           pinIdx = idx;
@@ -306,13 +320,14 @@ function createChart(canvasId, labels, data, color, bgColor) {
 
   canvas.addEventListener('mouseleave', () => {
     isDragging = false;
+    if (lockedRange) return;     // mantém análise fixa mesmo saindo do gráfico
     if (pinIdx === null) clearAll();
     else hideTooltip(); // mantém pin mas esconde tooltip flutuante
   });
 
   // Duplo clique = limpa tudo
   canvas.addEventListener('dblclick', () => {
-    pinIdx = null; dragStart = null; dragEnd = null;
+    pinIdx = null; dragStart = null; dragEnd = null; lockedRange = null;
     clearAll();
   });
 
