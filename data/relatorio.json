@@ -1,9 +1,9 @@
 {
-  "gerado_em": "11/06/2026 03:05",
+  "gerado_em": "12/06/2026 03:23",
   "historico_mensal": {
-    "total": 790,
-    "ok": 770,
-    "poucos_dados": 20,
+    "total": 815,
+    "ok": 796,
+    "poucos_dados": 19,
     "lista_poucos": [
       {
         "ticker": "ADSH11",
@@ -26,10 +26,6 @@
         "pontos": 7
       },
       {
-        "ticker": "BTCBRL",
-        "pontos": 0
-      },
-      {
         "ticker": "CYRE4",
         "pontos": 6
       },
@@ -50,8 +46,8 @@
         "pontos": 8
       },
       {
-        "ticker": "IFIX",
-        "pontos": 0
+        "ticker": "MATICBRL",
+        "pontos": 5
       },
       {
         "ticker": "MIDW11",
@@ -89,9 +85,20 @@
   },
   "historico_diario": {
     "total": 769,
-    "atualizados": 769,
-    "desatualizados": 0,
-    "lista_desatualizados": []
+    "atualizados": 767,
+    "desatualizados": 2,
+    "lista_desatualizados": [
+      {
+        "ticker": "HGPO11",
+        "ultimo": "2026-06-08",
+        "dias_atras": 4
+      },
+      {
+        "ticker": "RBRF11",
+        "ultimo": "2026-06-08",
+        "dias_atras": 4
+      }
+    ]
   },
   "cotacoes": {
     "atualizado_em": "11/06/2026 02:53",
@@ -111,10 +118,17 @@
     "atualizado_fiis": "08/06/2026 06:15"
   },
   "criptos": {
-    "erro": "cripto_market.json não encontrado"
+    "atualizado_em": "12/06/2026 04:27 UTC",
+    "total_moedas": 0,
+    "com_dados": 0,
+    "sem_dados": 0,
+    "tickers_sem_dados": [],
+    "historico_ok": 100,
+    "historico_falhou": 0,
+    "historico_falhou_lista": []
   },
   "resumo": {
-    "acoes_com_historico": 770,
+    "acoes_com_historico": 796,
     "fiis_com_historico": 364,
     "cotacoes_atuais": 768,
     "indicadores_fundamentus": 783,
