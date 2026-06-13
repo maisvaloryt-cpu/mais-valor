@@ -752,24 +752,42 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
         <div class="param-group-label" onclick="toggleParamGroup('etapaDividendos')">Dividendos<span class="param-group-chev">▼</span></div>
         <div class="param-group-body">
         <div class="divmode-row">
-          <div class="divmode-btn" onclick="selectDivMode('none',this)">
+          <div class="divmode-btn divmode-div" onclick="selectDivMode('none',this)">
             <div class="divmode-btn-title">💰 Caixa</div>
             <div class="divmode-btn-sub">Não reinvestir</div>
           </div>
-          <div class="divmode-btn" onclick="selectDivMode('reinvest_same',this)">
+          <div class="divmode-btn divmode-div" onclick="selectDivMode('reinvest_same',this)">
             <div class="divmode-btn-title">🔄 Mesmo ativo</div>
             <div class="divmode-btn-sub">Reinveste no ativo</div>
           </div>
-          <div class="divmode-btn" onclick="selectDivMode('reinvest_class',this)">
+          <div class="divmode-btn divmode-div" onclick="selectDivMode('reinvest_class',this)">
             <div class="divmode-btn-title">📊 Na classe</div>
             <div class="divmode-btn-sub">Distribui na classe</div>
           </div>
-          <div class="divmode-btn" onclick="selectDivMode('reinvest_rebalance',this)">
+          <div class="divmode-btn divmode-div" onclick="selectDivMode('reinvest_rebalance',this)">
             <div class="divmode-btn-title">⚖️ Rebalancear</div>
             <div class="divmode-btn-sub">Reduz drift com dividendos</div>
           </div>
         </div>
         </div><!-- /param-group-body dividendos -->
+      </div>
+
+      <!-- 6b. Impostos (opcional, não bloqueia a cascata) -->
+      <div class="param-group etapa" id="etapaImpostos" style="display:none">
+        <div class="param-group-label">Impostos (estimativa)</div>
+        <div class="divmode-row" style="margin-bottom:0">
+          <div class="divmode-btn divmode-ir active" id="irNaoBtn" onclick="selectIR(false,this)">
+            <div class="divmode-btn-title">Bruto</div>
+            <div class="divmode-btn-sub">Sem IR</div>
+          </div>
+          <div class="divmode-btn divmode-ir" id="irSimBtn" onclick="selectIR(true,this)">
+            <div class="divmode-btn-title">Com IR</div>
+            <div class="divmode-btn-sub">Estimado</div>
+          </div>
+        </div>
+        <div style="font-size:9px;color:var(--sim-text3);line-height:1.5;margin-top:6px">
+          Estimativa simplificada: 15% sobre o ganho realizado em vendas do rebalanceamento ativo (20% para FIIs) e 15% sobre o rendimento da reserva/caixa em CDI. Não considera isenção de R$ 20 mil/mês, come-cotas nem corretagem.
+        </div>
       </div>
 
       <!-- 7. Nome -->
@@ -797,6 +815,7 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
         <div class="empty-icon">📊</div>
         <div class="empty-title">Simule sua carteira</div>
         <div class="empty-sub">Configure os parâmetros na sidebar e clique em <strong>Simular</strong>. Compare até 5 carteiras lado a lado.</div>
+        <button class="sim-ctrl-btn" style="flex:none;padding:7px 16px;font-size:11px" onclick="importarSims()">⬆ Importar simulações salvas</button>
       </div>
 
       <!-- Results -->
@@ -805,7 +824,10 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
         <!-- Actions bar -->
         <div class="actions-bar">
           <div class="actions-bar-title" id="resultsTitle">Simulações</div>
-
+          <div class="actions-bar-btns">
+            <button class="sim-ctrl-btn" style="flex:none;padding:6px 12px" onclick="exportarSims()">⬇ Exportar</button>
+            <button class="sim-ctrl-btn" style="flex:none;padding:6px 12px" onclick="importarSims()">⬆ Importar</button>
+          </div>
         </div>
 
         <!-- Abas Excel -->
@@ -1076,7 +1098,7 @@ const TOLERANCIA_SOMA = 0.5;
 // ══════════════════════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════════════════════
-let state = { classesSel: [], classesConfig: {}, dividendMode: '', rebalSim: null, rebalModeVal: 'passive' };
+let state = { classesSel: [], classesConfig: {}, dividendMode: '', rebalSim: null, rebalModeVal: 'passive', irSim: false };
 let _queryBuffer = {};
 let _pizzaChart = null;
 let _pizzaMode = false;
@@ -1102,10 +1124,16 @@ let _divComCache = {};  // ticker → {'YYYY-MM': 'YYYY-MM-DD' data-com}, quando
 // ══════════════════════════════════════════════════════════════
 
 // Converte array [{date, close}] para mapa {'YYYY-MM': price}
+// Mantém o fechamento da ÚLTIMA data de cada mês, independentemente da ordem
+// em que o JSON vier (antes, JSON em ordem decrescente deixava o PRIMEIRO).
 function histToMap(history) {
   const map = {};
+  const lastDate = {};
   (history || []).forEach(pt => {
-    if (pt.date && pt.close != null) map[pt.date.slice(0,7)] = pt.close;
+    if (pt.date && pt.close != null) {
+      const m = pt.date.slice(0,7);
+      if (!lastDate[m] || pt.date > lastDate[m]) { lastDate[m] = pt.date; map[m] = pt.close; }
+    }
   });
   return Object.keys(map).length > 0 ? map : null;
 }
@@ -1172,8 +1200,19 @@ const round = (v, d) => parseFloat((v ?? 0).toFixed(d));
 // Tickers que têm fallback client-side disponível
 const CLIENT_SIDE_TICKERS = new Set(['BTCBRL','ETHBRL','USDBRL','EURBRL']);
 
+// Requisições em voo: evita fetchs duplicados quando o mesmo ticker aparece
+// em mais de uma classe e os loads rodam em paralelo (Promise.all).
+const _priceInflight = {};
 async function loadRealPrices(ticker) {
   if (ticker in _priceCache) return _priceCache[ticker];
+  if (ticker in _priceInflight) return _priceInflight[ticker];
+  const promise = _loadRealPricesImpl(ticker);
+  _priceInflight[ticker] = promise;
+  try { return await promise; }
+  finally { delete _priceInflight[ticker]; }
+}
+
+async function _loadRealPricesImpl(ticker) {
 
   // 1. Tenta arquivo local do site
   try {
@@ -1400,7 +1439,7 @@ function buildAvailabilityLog(normAssets, allPrices, months) {
     msg += ' — dados de ' + monthLabel(firstM) + ' a ' + monthLabel(lastM);
     if (faseDepois.length > 0) {
       const dest = calcDestinoFase(a, normAssets, allPrices, faseDepois[0], byClass);
-      msg += ' — após ' + monthLabel(lastM) + ': aporte foi para ' + dest;
+      msg += ' — após ' + monthLabel(lastM) + ': posição vendida pelo último preço e realocada em ' + dest + '; novos aportes seguiram o mesmo destino';
     }
     logs.push({ type: 'partial', ticker: a.ticker, assetClass: a.assetClass, firstMonth: firstM,
       missingMonths: mesesSemDado.length, msg });
@@ -1461,7 +1500,7 @@ function buildInicioLog(primeiroMes, startDate) {
   if (primeiroMes === startDate) return [];
   return [{
     type: 'inicio_real',
-    msg: 'Primeiro dado disponível em ' + monthLabel(primeiroMes) + '. Os meses anteriores não foram simulados — nenhum ativo tinha preço real nesse período.',
+    msg: 'Primeiro dado disponível em ' + monthLabel(primeiroMes) + '. Os aportes dos meses anteriores ficaram em caixa rendendo CDI e foram investidos integralmente em ' + monthLabel(primeiroMes) + '.',
   }];
 }
 
@@ -1504,9 +1543,9 @@ const SEM_DIVIDENDOS = new Set([
   'BOVA11','SMAL11','IVVB11','SPXI11','FIND11',
 ]);
 
-// Índices de renda fixa usados como taxa livre de risco (risk-free) no Sharpe.
-// Preferência: CDI > SELIC. Os demais servem de fallback se forem os únicos na carteira.
-const RF_INDEX_FOR_RF = new Set(['CDI','SELIC','IRFM','IMA','IMAB','IMAB5','IMAB5P','IMAS','IPCA']);
+// Índices de renda fixa usados como taxa livre de risco (risk-free) no Sharpe:
+// a partir desta versão, o risk-free vem SEMPRE da série global do CDI
+// (cdiRetMensal), independentemente da composição da carteira.
 
 function runBacktest(config, allPrices, allDividends) {
   const months = generateMonthRange(config.startDate, config.endDate);
@@ -1540,6 +1579,39 @@ function runBacktest(config, allPrices, allDividends) {
     }
   });
   let totalInvested = 0, dividendsCash = 0, totalDividendsEver = 0;
+
+  // ── IR ESTIMADO (opcional) ──
+  // Quando config.considerarIR: 15% sobre o ganho em vendas do rebalanceamento
+  // ativo (20% para FIIs) e 15% sobre o rendimento da reserva/caixa em CDI.
+  // Estimativa simplificada: não considera isenção de R$20 mil/mês, come-cotas
+  // nem custos de corretagem.
+  const considerarIR = !!config.considerarIR;
+  const IR_RESERVA = 0.15;
+  const aliqVenda = (a) => a.assetClassId === 'fii' ? 0.20 : 0.15;
+  let irPago = 0;
+  // Custo de aquisição acumulado por ticker (base de cálculo do ganho no IR).
+  const custoBase = {};
+  normAssets.forEach(a => custoBase[a.ticker] = 0);
+
+  // ── CAIXA DE ESPERA ──
+  // Valor aguardando alocação: (a) aportes de meses em que NENHUM ativo tinha
+  // dado (antes eram descartados) e (b) posições liquidadas por fim de série
+  // (delistagem/incorporação — antes o valor sumia do patrimônio). Rende CDI
+  // enquanto espera e é integralmente investido, pelos pesos efetivos, no
+  // primeiro mês em que houver ativo com dado.
+  let caixaEspera = 0;
+
+  // Último mês com dado de cada ativo DENTRO do período (e o preço nesse mês),
+  // para detectar fim de série e liquidar a posição pelo último preço.
+  const lastMonthData = {}, lastPriceData = {};
+  normAssets.forEach(a => {
+    const pm = allPrices[a.ticker] || {};
+    for (let k = months.length - 1; k >= 0; k--) {
+      const m = months[k];
+      const tem = INDICES_ACUMULADOS.has(a.ticker) ? (pm[m] != null && m >= DATA_MINIMA) : !!pm[m];
+      if (tem) { lastMonthData[a.ticker] = m; lastPriceData[a.ticker] = INDICES_ACUMULADOS.has(a.ticker) ? 1 : pm[m]; break; }
+    }
+  });
 
   // ── RESERVA-CDI ──
   // Dividendos recebidos em caixa (modo 'none') não ficam parados: vão para uma
@@ -1583,15 +1655,30 @@ function runBacktest(config, allPrices, allDividends) {
     return p != null ? s + holdings[a.ticker] * p : s;
   }, 0);
 
+  // Compra: converte verba (R$) em cotas/saldo e registra o custo de aquisição
+  // (base para o IR estimado). Retorna o valor efetivamente alocado (0 se o
+  // ativo não tem preço no mês).
+  const comprar = (ticker, verba, month_) => {
+    if (!(verba > 0)) return 0;
+    if (INDICES_ACUMULADOS.has(ticker)) {
+      if (getPrice(ticker, month_) == null) return 0;
+      holdings[ticker] += verba; custoBase[ticker] += verba; return verba;
+    }
+    const p = getPrice(ticker, month_);
+    if (p && p > 0) { holdings[ticker] += verba / p; custoBase[ticker] += verba; return verba; }
+    return 0;
+  };
+
   const shouldRebalance = (month, i) => {
     if (i === 0) return false; // mês 0: aporte inicial recém-feito na meta, nada a rebalancear
     if (rebalFreq === 'none') return false;
     if (rebalFreq === 'monthly') return true;
-    const mo = parseInt(month.split('-')[1]);
-    if (rebalFreq === 'quarterly') return mo % 3 === 0;
-    if (rebalFreq === 'semiannual') return mo % 6 === 0;
-    if (rebalFreq === 'annual') return mo === 12;
-    return false;
+    // Contagem RELATIVA ao início da simulação (a cada k meses desde o mês 0).
+    // Antes era por mês-calendário (trimestral = mar/jun/set/dez; anual = só
+    // dezembro), o que fazia uma simulação de jan a jun com rebal anual nunca
+    // rebalancear.
+    const k = rebalFreq === 'quarterly' ? 3 : rebalFreq === 'semiannual' ? 6 : rebalFreq === 'annual' ? 12 : 0;
+    return k > 0 && i % k === 0;
   };
 
   for (let i = 0; i < months.length; i++) {
@@ -1609,11 +1696,34 @@ function runBacktest(config, allPrices, allDividends) {
       if (ret != null && holdings[a.ticker] > 0) holdings[a.ticker] *= (1 + ret);
     });
 
-    // Remunerar a reserva-CDI com o rendimento do CDI no mês (100% do CDI).
-    if (reservaCDI > 0) {
+    // Remunerar a reserva-CDI e o caixa de espera com o rendimento do CDI no
+    // mês (100% do CDI; com IR estimado, 15% sobre o rendimento positivo).
+    if (reservaCDI > 0 || caixaEspera > 0) {
       const rCdi = cdiRetMensal[month];
-      if (rCdi != null) reservaCDI *= (1 + rCdi);
+      if (rCdi != null) {
+        const rLiq = considerarIR && rCdi > 0 ? rCdi * (1 - IR_RESERVA) : rCdi;
+        if (considerarIR && rCdi > 0) irPago += (reservaCDI + caixaEspera) * rCdi * IR_RESERVA;
+        reservaCDI *= (1 + rLiq);
+        caixaEspera *= (1 + rLiq);
+      }
     }
+
+    // ── LIQUIDAÇÃO POR FIM DE SÉRIE ──
+    // Ativo cujo histórico terminou (delistagem/incorporação): a posição é
+    // "vendida" pelo último preço disponível e o valor vai para o caixa de
+    // espera, sendo realocado nos demais ativos pelos pesos efetivos ainda
+    // neste mês. Antes, o valor simplesmente sumia do patrimônio.
+    normAssets.forEach(a => {
+      const lm = lastMonthData[a.ticker];
+      if (lm && month > lm && holdings[a.ticker] > 0) {
+        const valor = INDICES_ACUMULADOS.has(a.ticker)
+          ? holdings[a.ticker]
+          : holdings[a.ticker] * lastPriceData[a.ticker];
+        caixaEspera += valor;
+        holdings[a.ticker] = 0;
+        custoBase[a.ticker] = 0;
+      }
+    });
 
     // Snapshot das cotas ANTES do aporte deste mês. Os dividendos do mês são pagos
     // apenas sobre as cotas que o investidor já possuía (abordagem conservadora:
@@ -1670,12 +1780,7 @@ function runBacktest(config, allPrices, allDividends) {
           let verba = aRedistribuir * (def / somaDef);
           // Sobra (quando o aporte cobre todos os déficits) segue o peso-meta
           if (sobra > 0) verba += sobra * effW[a.ticker];
-          const p = getPrice(a.ticker, month);
-          if (INDICES_ACUMULADOS.has(a.ticker)) {
-            holdings[a.ticker] += verba; aporteEsteMes += verba;
-          } else if (p && p > 0) {
-            holdings[a.ticker] += verba / p; aporteEsteMes += verba;
-          }
+          aporteEsteMes += comprar(a.ticker, verba, month);
         });
         // Se sobrou verba mas nenhum déficit aparente (carteira já no alvo),
         // ela é tratada pelo caminho dos pesos-meta abaixo via aporteRestante.
@@ -1684,13 +1789,7 @@ function runBacktest(config, allPrices, allDividends) {
           normAssets.forEach(a => {
             const w = effW[a.ticker];
             if (w <= 0) return;
-            const verba = aporteRestante * w;
-            const p = getPrice(a.ticker, month);
-            if (INDICES_ACUMULADOS.has(a.ticker)) {
-              holdings[a.ticker] += verba; aporteEsteMes += verba;
-            } else if (p && p > 0) {
-              holdings[a.ticker] += verba / p; aporteEsteMes += verba;
-            }
+            aporteEsteMes += comprar(a.ticker, aporteRestante * w, month);
           });
         }
       } else {
@@ -1699,17 +1798,34 @@ function runBacktest(config, allPrices, allDividends) {
         normAssets.forEach(a => {
           const w = effW[a.ticker];
           if (w <= 0) return;
-          const verba = aporte * w;
-          const p = getPrice(a.ticker, month);
-          if (INDICES_ACUMULADOS.has(a.ticker)) {
-            holdings[a.ticker] += verba; aporteEsteMes += verba;
-          } else if (p && p > 0) {
-            holdings[a.ticker] += verba / p; aporteEsteMes += verba;
-          }
+          aporteEsteMes += comprar(a.ticker, aporte * w, month);
         });
       }
       // Só conta como investido o que foi de fato alocado
       totalInvested += aporteEsteMes;
+    } else if (aporte > 0) {
+      // Nenhum ativo com dado neste mês: o aporte vai para o caixa de espera
+      // (rende CDI) e será investido no primeiro mês com dado. Antes, esses
+      // aportes eram simplesmente descartados da simulação.
+      caixaEspera += aporte;
+      totalInvested += aporte;
+      aporteEsteMes += aporte; // entrada de caixa do mês (descontada do retorno)
+    }
+
+    // ── DEPLOY DO CAIXA DE ESPERA ──
+    // Investe tudo que estava aguardando (aportes de meses sem dado + posições
+    // liquidadas por fim de série) pelos pesos efetivos do mês. Não soma em
+    // totalInvested: aportes já foram contados ao entrar no caixa, e o valor
+    // de liquidações é realocação interna.
+    if (caixaEspera > 0.005 && temDadoNoMes) {
+      const pot = caixaEspera;
+      let alocado = 0;
+      normAssets.forEach(a => {
+        const w = effW[a.ticker];
+        if (w <= 0) return;
+        alocado += comprar(a.ticker, pot * w, month);
+      });
+      caixaEspera -= alocado; // resíduo (se houver) segue esperando
     }
 
     // Dividendos (calculados sobre qtySnapshot, capturado antes do aporte — ver acima).
@@ -1740,9 +1856,11 @@ function runBacktest(config, allPrices, allDividends) {
       } else if (mode === 'reinvest_same') {
         normAssets.forEach(a => {
           const verba = divByTicker[a.ticker];
-          const p = getPrice(a.ticker, month);
-          if (INDICES_ACUMULADOS.has(a.ticker)) { holdings[a.ticker] += verba; }
-          else if (p && p > 0 && verba > 0) { holdings[a.ticker] += verba / p; }
+          if (!(verba > 0)) return;
+          const ok = comprar(a.ticker, verba, month);
+          // Pagador sem preço neste mês: a verba vai para a reserva-CDI em vez
+          // de ser destruída (antes era silenciosamente descartada).
+          if (ok === 0) reservaCDI += verba;
         });
       } else if (mode === 'reinvest_class') {
         normAssets.forEach(payer => {
@@ -1765,9 +1883,7 @@ function runBacktest(config, allPrices, allDividends) {
           const usarIgual = !(tw > 0);
           alvos.forEach(target => {
             const peso = usarIgual ? (1 / alvos.length) : ((effW[target.ticker] || 0) / tw);
-            const part = verba * peso;
-            const p = getPrice(target.ticker, month);
-            if (p && p > 0) holdings[target.ticker] += part / p;
+            comprar(target.ticker, verba * peso, month);
           });
         });
       } else if (mode === 'reinvest_rebalance') {
@@ -1785,16 +1901,12 @@ function runBacktest(config, allPrices, allDividends) {
           // dado no mês (não some, pode distorcer peso temporariamente).
           const alvos = normAssets.filter(a => getPrice(a.ticker, month) && !INDICES_ACUMULADOS.has(a.ticker));
           if (alvos.length > 0) {
-            alvos.forEach(a => {
-              const p = getPrice(a.ticker, month);
-              if (p && p > 0) holdings[a.ticker] += (totalDivMes / alvos.length) / p;
-            });
+            alvos.forEach(a => comprar(a.ticker, totalDivMes / alvos.length, month));
           }
         } else {
           targets.forEach(d => {
             const verba = totalDivMes * (totalDef > 0 ? Math.abs(d.drift)/totalDef : 1/targets.length);
-            const p = getPrice(d.a.ticker, month);
-            if (p && p > 0) holdings[d.a.ticker] += verba / p;
+            comprar(d.a.ticker, verba, month);
           });
         }
       }
@@ -1806,33 +1918,94 @@ function runBacktest(config, allPrices, allDividends) {
     //   direcionando a verba do mês para os ativos abaixo da meta, sem vender nada
     //   e sem criar dinheiro do nada.
     if (rebalMode === 'active' && shouldRebalance(month, i)) {
-      const pv = portValue(month);
+      // Rebalanceia APENAS o valor dos ativos com dado neste mês. Antes, um
+      // índice acumulado sem dado no mês de rebal tinha effW = 0 e o saldo era
+      // zerado (holdings = pv * 0), transferindo o valor aos demais ativos —
+      // uma liquidação involuntária. Agora ele fica de fora do bolo
+      // rebalanceável e mantém o saldo intacto (mesmo tratamento que ativos
+      // de cota sem preço já recebiam).
+      const valDisp = (a) => {
+        const p = getPrice(a.ticker, month);
+        if (p == null) return null;
+        return INDICES_ACUMULADOS.has(a.ticker) ? holdings[a.ticker] : holdings[a.ticker] * p;
+      };
+      const pv = normAssets.reduce((s,a) => { const v = valDisp(a); return v == null ? s : s + v; }, 0);
       if (pv > 0) {
         // Só rebalanceia se algum ativo desviou mais que o limite da meta.
         // (banda de tolerância — evita rebalancear por ruído mínimo)
         const needsRebal = normAssets.some(a => {
-          const p = getPrice(a.ticker, month);
-          const cw = p ? (holdings[a.ticker]*p)/pv : 0;
-          return Math.abs(cw - effW[a.ticker]) > REBAL_BAND;
+          const v = valDisp(a);
+          if (v == null) return false;
+          return Math.abs(v/pv - effW[a.ticker]) > REBAL_BAND;
         });
         if (needsRebal) {
-          normAssets.forEach(a => {
-            if (INDICES_ACUMULADOS.has(a.ticker)) {
-              holdings[a.ticker] = pv * effW[a.ticker];
-            } else {
-              const p = getPrice(a.ticker, month);
-              if (p && p > 0) holdings[a.ticker] = (pv * effW[a.ticker]) / p;
+          if (!considerarIR) {
+            normAssets.forEach(a => {
+              if (valDisp(a) == null) return; // sem dado: não vende nem compra
+              if (INDICES_ACUMULADOS.has(a.ticker)) {
+                // Ajusta o custo-base proporcionalmente à variação da posição
+                const v = holdings[a.ticker];
+                const alvo = pv * effW[a.ticker];
+                if (v > 0 && alvo < v) custoBase[a.ticker] *= alvo / v;
+                holdings[a.ticker] = alvo;
+                if (alvo > v) custoBase[a.ticker] += alvo - v;
+              } else {
+                const p = getPrice(a.ticker, month);
+                if (p && p > 0) {
+                  const v = holdings[a.ticker] * p;
+                  const alvo = pv * effW[a.ticker];
+                  if (v > 0 && alvo < v) custoBase[a.ticker] *= alvo / v;
+                  if (alvo > v) custoBase[a.ticker] += alvo - v;
+                  holdings[a.ticker] = alvo / p;
+                }
+              }
+            });
+          } else {
+            // ── COM IR ESTIMADO ──
+            // Fase 1: VENDAS (acima da meta). O IR incide sobre o ganho
+            // realizado (valor vendido − custo proporcional), com alíquota de
+            // 20% para FIIs e 15% para as demais classes.
+            let caixaVenda = 0;
+            const compradores = [];
+            normAssets.forEach(a => {
+              const v = valDisp(a);
+              if (v == null) return;
+              const alvo = pv * effW[a.ticker];
+              if (v > alvo + 1e-9) {
+                const vendido = v - alvo;
+                const frac = vendido / v;
+                const custoVendido = custoBase[a.ticker] * frac;
+                const ganho = Math.max(0, vendido - custoVendido);
+                const imposto = ganho * aliqVenda(a);
+                irPago += imposto;
+                caixaVenda += vendido - imposto;
+                custoBase[a.ticker] = Math.max(0, custoBase[a.ticker] - custoVendido);
+                if (INDICES_ACUMULADOS.has(a.ticker)) holdings[a.ticker] = alvo;
+                else { const p = getPrice(a.ticker, month); if (p && p > 0) holdings[a.ticker] = alvo / p; }
+              } else if (v < alvo - 1e-9) {
+                compradores.push({ a, deficit: alvo - v });
+              }
+            });
+            // Fase 2: COMPRAS proporcionais ao déficit, com o caixa LÍQUIDO de
+            // IR — quem está abaixo da meta recebe um pouco menos que o alvo,
+            // exatamente como aconteceria na corretora.
+            const totDef = compradores.reduce((s,c) => s + c.deficit, 0);
+            if (totDef > 0 && caixaVenda > 0) {
+              compradores.forEach(c => comprar(c.a.ticker, caixaVenda * (c.deficit / totDef), month));
+            } else if (caixaVenda > 0) {
+              caixaEspera += caixaVenda; // sem comprador disponível: não destrói o caixa
             }
-          });
+          }
         }
       }
     }
 
     const pv = portValue(month);
-    // Patrimônio total = valor dos ativos + reserva-CDI. A reserva entra aqui (no
-    // retorno e no valor final), mas NÃO no portValue usado para pesos/rebalanceamento,
-    // para não distorcer a alocação-alvo dos ativos.
-    const patrimonio = pv + reservaCDI;
+    // Patrimônio total = valor dos ativos + reserva-CDI + caixa de espera. A
+    // reserva e o caixa entram aqui (no retorno e no valor final), mas NÃO no
+    // portValue usado para pesos/rebalanceamento, para não distorcer a
+    // alocação-alvo dos ativos.
+    const patrimonio = pv + reservaCDI + caixaEspera;
     // Retorno do mês: desconta o aporte aplicado neste mês para não contar
     // entrada de caixa como rendimento (senão volatilidade/Sharpe ficam inflados).
     // Baseado no patrimônio total (inclui o rendimento da reserva-CDI).
@@ -1851,7 +2024,12 @@ function runBacktest(config, allPrices, allDividends) {
   }
 
   const finalValue = series[series.length-1]?.portfolioValue || 0;
-  const monthlyReturns = series.map(s => s.monthReturn).filter((_,i) => i > 0);
+  // Considera apenas os meses APÓS o primeiro dado real: meses anteriores têm
+  // retorno 0 por construção e deflacionavam média, volatilidade e Sharpe
+  // quando o período começava antes da existência dos ativos.
+  const monthlyReturns = primeiroMesComDado
+    ? series.filter(s => s.date > primeiroMesComDado).map(s => s.monthReturn)
+    : series.map(s => s.monthReturn).filter((_,i) => i > 0);
   const n = monthlyReturns.length;
   const avg = n > 0 ? monthlyReturns.reduce((s,r) => s+r, 0) / n : 0;
   const variance = n > 1 ? monthlyReturns.reduce((s,r) => s+(r-avg)**2, 0) / (n-1) : 0;
@@ -1900,20 +2078,19 @@ function runBacktest(config, allPrices, allDividends) {
     }
   }
 
-  // ── Risk-free dinâmico para o Sharpe ──
-  // Antes era fixo em 0,5%/mês (~6,17% a.a.) para qualquer período, o que distorce
-  // o Sharpe em épocas de Selic muito alta ou muito baixa. Se houver um índice de
-  // renda fixa na carteira (CDI/SELIC/IPCA/IMAB...), usamos o retorno mensal médio
-  // dele como taxa livre de risco do período. Caso contrário, mantemos o fallback.
+  // ── Risk-free do Sharpe: CDI global ──
+  // Usa SEMPRE a série de referência do CDI (cdiRetMensal, já carregada para a
+  // reserva), na mesma janela dos retornos da carteira. Antes, o risk-free
+  // dependia de haver um índice de RF DENTRO da carteira — duas simulações do
+  // mesmo período podiam usar bases diferentes, tornando os Sharpes
+  // incomparáveis entre si. Fallback: 0,5%/mês se o CDI não tiver dado.
   let rfMonthly = 0.005;
   {
-    // Preferência: CDI/SELIC; senão, qualquer índice de RF disponível na carteira.
-    const rfPref = normAssets.find(a => a.ticker === 'CDI' || a.ticker === 'SELIC')
-                 || normAssets.find(a => RF_INDEX_FOR_RF.has(a.ticker));
-    if (rfPref && retornoMensal[rfPref.ticker]) {
-      const rs = months.map(m => retornoMensal[rfPref.ticker]?.[m]).filter(r => r != null);
-      if (rs.length > 0) rfMonthly = rs.reduce((s,r) => s+r, 0) / rs.length;
-    }
+    const rs = months
+      .filter(m => !primeiroMesComDado || m > primeiroMesComDado)
+      .map(m => cdiRetMensal[m])
+      .filter(r => r != null);
+    if (rs.length > 0) rfMonthly = rs.reduce((s,r) => s+r, 0) / rs.length;
   }
   const sharpe = (variance > 0) ? ((avg - rfMonthly) / Math.sqrt(variance)) * Math.sqrt(12) : 0;
 
@@ -1951,7 +2128,7 @@ function runBacktest(config, allPrices, allDividends) {
   });
 
   const reservaFinal = series.length > 0 ? (series[series.length-1].reservaCDI || 0) : 0;
-  const ativosFinal = finalValue - reservaFinal;
+  const ativosFinal = finalValue - reservaFinal - caixaEspera;
 
   return {
     series, metrics: {
@@ -1960,6 +2137,7 @@ function runBacktest(config, allPrices, allDividends) {
       cagr, volatility: vol, sharpeRatio: sharpe, maxDrawdown: maxDD,
       totalDividends: totalDividendsEver, dividendsCash, months: months.length,
       reservaCDI: reservaFinal, ativosValue: ativosFinal,
+      caixaEspera, irPago,
       primeiroMesComDado
     },
     breakdown, dividendMode: mode
@@ -1976,7 +2154,10 @@ function buildAssetList() {
     const cls = CLASSES_DEF.find(c => c.id === sel.id);
     const classW = sel.pct / 100;
     if (!cfg || cfg.mode === 'indicador') {
-      const ticker = (cfg?.indicadorTicker || cls.defaultTickers[0] || 'CDI').trim().toUpperCase();
+      // Fallback: primeiro INDICADOR da classe (ex.: IBOV para Ações).
+      // Antes caía em defaultTickers[0], que para Ações era PETR4 — uma ação
+      // individual sendo usada como "indicador" da classe inteira.
+      const ticker = (cfg?.indicadorTicker || cls.indicadores?.[0]?.ticker || cls.defaultTickers[0] || 'CDI').trim().toUpperCase();
       assets.push({ ticker, weight: classW, assetClass: cls.name, assetClassId: sel.id, isIndicador: true });
     } else {
       const validos = cfg.ativos.filter(a => a.ticker.trim() && parseFloat(a.pct) > 0);
@@ -2050,6 +2231,13 @@ function parseDateInput(val) {
   const mm = parseInt(m[1]), yyyy = parseInt(m[2]);
   if (mm < 1 || mm > 12 || yyyy < 1900 || yyyy > 2100) return '';
   return yyyy + '-' + String(mm).padStart(2,'0');
+}
+
+// Converte YYYY-MM (formato interno/config) para MM/AAAA (formato do input).
+// Valores que já estão em MM/AAAA (ou qualquer outro) passam inalterados.
+function ymToInput(ym) {
+  const m = String(ym ?? '').match(/^(\d{4})-(\d{2})$/);
+  return m ? m[2] + '/' + m[1] : String(ym ?? '');
 }
 
 function diagnosticarBloqueio() {
@@ -2169,7 +2357,9 @@ function verificarCascata() {
   // Se nenhum ativo paga dividendo, garante que dividendMode tem valor neutro
   if (!algumPagaDividendo && !VALID_DIV_MODES.includes(state.dividendMode)) state.dividendMode = 'none';
 
-  // Nome — após dividendos ok
+  // Impostos (opcional) e Nome — após dividendos ok
+  const etaIR = document.getElementById('etapaImpostos');
+  if (etaIR) etaIR.style.display = (composicaoOk && rebalOk && dividendoOk) ? 'block' : 'none';
   const etaN = document.getElementById('etapaNome');
   if (etaN) etaN.style.display = (composicaoOk && rebalOk && dividendoOk) ? 'block' : 'none';
 
@@ -2318,10 +2508,29 @@ function renderClassesGrid() {
 
 function toggleClasse(id) {
   const idx = state.classesSel.findIndex(c => c.id === id);
-  if (idx >= 0) { state.classesSel.splice(idx, 1); delete state.classesConfig[id]; }
-  else state.classesSel.push({ id, pct: 0 });
-  const n = state.classesSel.length;
-  if (n > 0) { const base = Math.floor(100/n), rem = 100 - base*n; state.classesSel.forEach((c,i) => { c.pct = base + (i===0?rem:0); }); }
+  if (idx >= 0) {
+    // REMOÇÃO: a % liberada vai proporcionalmente para as classes restantes —
+    // os pesos que o usuário já ajustou são preservados (antes, tudo era
+    // redistribuído em partes iguais, apagando o ajuste manual).
+    const removida = state.classesSel[idx].pct;
+    state.classesSel.splice(idx, 1);
+    delete state.classesConfig[id];
+    const restantes = state.classesSel;
+    if (restantes.length > 0 && removida > 0) {
+      const totalRest = restantes.reduce((s,c) => s + c.pct, 0);
+      let acumulado = 0;
+      restantes.forEach((c,i) => {
+        const add = i === restantes.length - 1
+          ? removida - acumulado // última absorve o arredondamento (soma fecha exata)
+          : (totalRest > 0 ? Math.round(removida * (c.pct / totalRest)) : Math.floor(removida / restantes.length));
+        c.pct += add; acumulado += add;
+      });
+    }
+  } else {
+    // ADIÇÃO: pesos existentes preservados. A primeira classe entra com 100%;
+    // as seguintes entram com 0% para o usuário definir.
+    state.classesSel.push({ id, pct: state.classesSel.length === 0 ? 100 : 0 });
+  }
   if (_pizzaMode) editarClassesPizza(); else renderSidebar();
 }
 
@@ -2780,7 +2989,16 @@ function selectRebalMode(mode, el) {
 
 function selectDivMode(mode, el) {
   state.dividendMode = mode;
-  document.querySelectorAll('.divmode-btn').forEach(b => b.classList.remove('active'));
+  // .divmode-div: só os botões de DIVIDENDOS. Os botões de rebalanceamento
+  // compartilham a classe .divmode-btn e eram desmarcados indevidamente.
+  document.querySelectorAll('.divmode-div').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  verificarCascata();
+}
+
+function selectIR(val, el) {
+  state.irSim = !!val;
+  document.querySelectorAll('.divmode-ir').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   verificarCascata();
 }
@@ -2841,8 +3059,14 @@ function validate() {
   if (state.classesSel.length === 0) { showErr('Selecione ao menos uma classe.', document.getElementById('btnSimular')); return false; }
   const total = state.classesSel.reduce((s,c) => s+c.pct, 0);
   if (Math.abs(total - 100) > TOLERANCIA_SOMA) { showErr(`Soma: ${total}%. Deve ser 100%.`, document.getElementById('btnSimular')); return false; }
-  const sd = document.getElementById('startDate').value, ed = document.getElementById('endDate').value;
-  if (!sd || !ed) { showErr('Informe o período.', document.getElementById('btnSimular')); return false; }
+  // Datas são validadas no formato interno YYYY-MM (parseDateInput). A versão
+  // anterior comparava as strings MM/AAAA lexicalmente, o que bloqueava
+  // períodos válidos (ex.: 12/2019 → 01/2025) e tornava morta a checagem de
+  // data futura.
+  const sd = parseDateInput(document.getElementById('startDate').value);
+  const ed = parseDateInput(document.getElementById('endDate').value);
+  if (!sd || !ed) { showErr('Informe o período no formato MM/AAAA.', document.getElementById('btnSimular')); return false; }
+  if (sd < DATA_MINIMA) { showErr('Data mínima: 01/1995 (início do Plano Real estabilizado).', document.getElementById('btnSimular')); return false; }
   if (sd >= ed) { showErr('Início deve ser anterior ao fim.', document.getElementById('btnSimular')); return false; }
   {
     const _now = new Date();
@@ -2915,7 +3139,7 @@ async function simular() {
       weight: a.weight / assets.reduce((s,x) => s+x.weight, 0)
     })), allPrices, months);
 
-    const config = { assets, startDate, endDate, initialAmount, monthlyAmount, rebalance, rebalMode, dividendMode: state.dividendMode, cdiRef };
+    const config = { assets, startDate, endDate, initialAmount, monthlyAmount, rebalance, rebalMode, dividendMode: state.dividendMode, considerarIR: !!state.irSim, cdiRef };
     const result = runBacktest(config, allPrices, allDividends);
 
     const simName = document.getElementById('simName').value.trim() || `Simulação ${simulations.length + 1}`;
@@ -2980,20 +3204,23 @@ function duplicarSim() {
   editingSimIdx = activeSimIdx;
   renderExcelTabs();
   renderSingleView(activeSimIdx);
+  salvarEstado(); // sem isto, a cópia se perdia num F5 até a próxima interação
 }
 
 function novaSim() {
   editingSimIdx = null;
-  state.classesSel = []; state.classesConfig = {}; state.dividendMode = ''; state.rebalSim = null; state.rebalModeVal = 'passive';
+  state.classesSel = []; state.classesConfig = {}; state.dividendMode = ''; state.rebalSim = null; state.rebalModeVal = 'passive'; state.irSim = false;
   _etapaPeriodoOk = false; _etapaAportesOk = false;
   if (_pizzaMode) editarClassesPizza();
-  document.getElementById('startDate').value = '2019-01';
-  document.getElementById('endDate').value   = '2024-12';
+  document.getElementById('startDate').value = '01/2019';
+  document.getElementById('endDate').value   = '12/2024';
   document.getElementById('initialAmount').value = '10000';
   document.getElementById('monthlyAmount').value  = '500';
   if (document.getElementById('rebalance')) document.getElementById('rebalance').value = 'annual';
   document.getElementById('simName').value   = '';
   document.querySelectorAll('#rebalSimBtn,#rebalNaoBtn,#rebalPassivoBtn,#rebalAtivoBtn,.divmode-btn').forEach(b => b.classList.remove('active'));
+  state.irSim = false;
+  document.getElementById('irNaoBtn')?.classList.add('active');
   const rWrap = document.getElementById('rebalTipoWrap'); if(rWrap) rWrap.style.display='none';
   document.getElementById('btnSimular').textContent = '▶ Simular carteira';
   setSidebarLocked(false);
@@ -3012,8 +3239,8 @@ function loadSimIntoSidebar(idx) {
   state.classesSel    = JSON.parse(JSON.stringify(sim.classesSel));
   state.classesConfig = JSON.parse(JSON.stringify(sim.classesConfig));
   state.dividendMode  = sim.result.dividendMode;
-  document.getElementById('startDate').value     = sim.config.startDate;
-  document.getElementById('endDate').value       = sim.config.endDate;
+  document.getElementById('startDate').value     = ymToInput(sim.config.startDate);
+  document.getElementById('endDate').value       = ymToInput(sim.config.endDate);
   document.getElementById('initialAmount').value = sim.config.initialAmount;
   document.getElementById('monthlyAmount').value = sim.config.monthlyAmount;
   // Restore rebal state
@@ -3030,9 +3257,16 @@ function loadSimIntoSidebar(idx) {
     document.getElementById(state.rebalModeVal === 'active' ? 'rebalAtivoBtn' : 'rebalPassivoBtn')?.classList.add('active');
   }
   document.getElementById('simName').value       = sim.name;
-  document.querySelectorAll('.divmode-btn').forEach(b => b.classList.remove('active'));
+  // Restaura o toggle de IR a partir da config da simulação
+  state.irSim = !!sim.config.considerarIR;
+  document.querySelectorAll('.divmode-ir').forEach(b => b.classList.remove('active'));
+  document.getElementById(state.irSim ? 'irSimBtn' : 'irNaoBtn')?.classList.add('active');
+  // Marca o modo de dividendos usando APENAS os botões de dividendos
+  // (.divmode-div). Antes, o índice 0-3 em '.divmode-btn' acendia os botões
+  // de rebalanceamento, que vêm primeiro no DOM.
+  document.querySelectorAll('.divmode-div').forEach(b => b.classList.remove('active'));
   const modes = ['none','reinvest_same','reinvest_class','reinvest_rebalance'];
-  const dBtns = document.querySelectorAll('.divmode-btn');
+  const dBtns = document.querySelectorAll('.divmode-div');
   const dIdx  = modes.indexOf(sim.result.dividendMode);
   if (dBtns[dIdx]) dBtns[dIdx].classList.add('active');
   document.getElementById('btnSimular').textContent = '💾 Atualizar simulação';
@@ -3055,7 +3289,7 @@ function renderExcelTabs() {
     tab.className = 'excel-tab' + (idx === activeSimIdx && viewMode === 'single' ? ' active' : '');
     tab.innerHTML = `
       <div class="excel-tab-dot" style="background:${sim.color}"></div>
-      <span class="excel-tab-name">${sim.name}</span>
+      <span class="excel-tab-name">${escHtml(sim.name)}</span>
       <button class="excel-tab-rm" onclick="removeSim(event,${idx})" title="Remover">✕</button>
     `;
     tab.onclick = (e) => { if (!e.target.closest('.excel-tab-rm')) loadSimIntoSidebar(idx); };
@@ -3081,8 +3315,68 @@ function removeSim(e, idx) {
   editingSimIdx = Math.min(editingSimIdx ?? 0, simulations.length-1);
   renderExcelTabs();
   if (viewMode === 'compare') renderCompareView();
-  else renderSingleView(activeSimIdx);
+  else loadSimIntoSidebar(activeSimIdx); // recarrega a config da sim ativa na sidebar (evita estado fantasma)
   salvarEstado();
+}
+
+// ══════════════════════════════════════════════════════════════
+// EXPORTAR / IMPORTAR SIMULAÇÕES (JSON)
+// Persistência voluntária: o cache do localStorage expira em 30 min, mas o
+// usuário pode salvar as simulações em arquivo e restaurá-las quando quiser.
+// ══════════════════════════════════════════════════════════════
+function exportarSims() {
+  if (!simulations.length) { showPopup('Nenhuma simulação para exportar.'); return; }
+  const payload = {
+    app: 'maisvalor_simulador', version: 1, exportedAt: new Date().toISOString(),
+    simulations: simulations.map(s => ({
+      id: s.id, name: s.name, color: s.color,
+      config: s.config, result: s.result, availabilityLog: s.availabilityLog,
+      classesSel: s.classesSel, classesConfig: s.classesConfig,
+    })),
+  };
+  const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'simulacoes-maisvalor.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function importarSims() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'application/json,.json';
+  inp.onchange = () => {
+    const file = inp.files && inp.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const dados = JSON.parse(reader.result);
+        const sims = Array.isArray(dados) ? dados : dados.simulations;
+        if (!Array.isArray(sims) || !sims.length) throw new Error('arquivo sem simulações');
+        let add = 0, pulado = 0;
+        for (const s of sims) {
+          // Validação mínima da estrutura
+          if (!s || !s.config || !s.result || !Array.isArray(s.result.series) || !Array.isArray(s.classesSel)) { pulado++; continue; }
+          if (simulations.length >= 5) { pulado++; continue; }          // limite do app
+          if (simulations.some(x => x.id === s.id)) { pulado++; continue; } // já existe
+          simulations.push(s); add++;
+        }
+        if (add === 0) {
+          showPopup('Nada importado' + (pulado ? ` — ${pulado} ignorada(s) (limite de 5, duplicada ou inválida).` : '.'));
+          return;
+        }
+        document.getElementById('emptyState').style.display = 'none';
+        document.getElementById('resultsArea').style.display = 'block';
+        loadSimIntoSidebar(simulations.length - 1);
+        salvarEstado();
+        showPopup(`${add} simulação(ões) importada(s)` + (pulado ? `, ${pulado} ignorada(s)` : '') + '.');
+      } catch (e) {
+        showPopup('Arquivo inválido: ' + e.message);
+      }
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
 }
 
 function clearAll() {
@@ -3119,6 +3413,9 @@ function updateViewBtn() { const b=document.getElementById('btnView'); if(b) b.t
 // ══════════════════════════════════════════════════════════════
 const brl = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
 const pct = v => (v*100).toFixed(2) + '%';
+// Escapa HTML de strings fornecidas pelo usuário (ex.: nome da simulação)
+// antes de inseri-las via innerHTML.
+const escHtml = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const divModeLabel = { none:'Caixa', reinvest_same:'Mesmo ativo', reinvest_class:'Na classe', reinvest_rebalance:'Rebalancear' };
 
 function renderAtivosTimeline(breakdown, startDate, endDate, series, simName) {
@@ -3348,6 +3645,7 @@ function renderSingleView(idx) {
     <div class="metric-card"><div class="metric-label">Máx. Drawdown</div><div class="metric-value red">${pct(metrics.maxDrawdown)}</div></div>
     <div class="metric-card"><div class="metric-label">Meses</div><div class="metric-value">${metrics.months}</div></div>
     <div class="metric-card"><div class="metric-label">Estratégia Div.</div><div class="metric-value" style="font-size:11px;color:var(--sim-text2);font-family:var(--sim-font)">${divModeLabel[dividendMode]}</div></div>
+    ${(metrics.irPago || 0) > 0.005 ? `<div class="metric-card"><div class="metric-label">IR estimado pago</div><div class="metric-value red">${brl(metrics.irPago)}</div><div class="metric-sub">Vendas do rebal + reserva</div></div>` : ''}
   `;
 
   // Breakdown por ativo
@@ -3498,7 +3796,7 @@ function renderCompareView() {
       <div class="sim-card">
         <div class="sim-card-head">
           <div class="sim-card-dot" style="background:${sim.color}"></div>
-          <div class="sim-card-name">${sim.name}</div>
+          <div class="sim-card-name">${escHtml(sim.name)}</div>
           <div class="sim-card-period">${monthLabel(sim.config.startDate)}→${monthLabel(sim.config.endDate)}</div>
         </div>
         <div class="sim-card-body">
@@ -3527,13 +3825,20 @@ function renderCompareChart() {
   if (compareChartInst) { compareChartInst.destroy(); compareChartInst = null; }
   if (!simulations.length) return;
   const trimLZ = (pts) => { let f=pts.findIndex(v=>v>0); return f<=0?pts:pts.map((v,i)=>i<f?null:v); };
-  const longest = simulations.reduce((a,b) => a.result.series.length > b.result.series.length ? a : b);
-  const labels   = longest.result.series.map(s => monthLabel(s.date));
-  const datasets = simulations.map(sim => ({
-    label:sim.name,
-    data:trimLZ(sim.result.series.map(s=>s.portfolioValue)),
-    borderColor:sim.color, backgroundColor:'transparent', borderWidth:2, tension:.3, pointRadius:0, spanGaps:false
-  }));
+  // Eixo global por DATA (união dos períodos de todas as simulações).
+  // Antes, os labels vinham da simulação mais longa e as demais eram plotadas
+  // por índice — séries de períodos diferentes ficavam deslocadas no tempo.
+  const allMonths = [...new Set(simulations.flatMap(s => s.result.series.map(p => p.date)))].sort();
+  const labels = allMonths.map(monthLabel);
+  const datasets = simulations.map(sim => {
+    const byDate = {};
+    sim.result.series.forEach(p => { byDate[p.date] = p.portfolioValue; });
+    return {
+      label:sim.name,
+      data:trimLZ(allMonths.map(m => byDate[m] ?? null)),
+      borderColor:sim.color, backgroundColor:'transparent', borderWidth:2, tension:.3, pointRadius:0, spanGaps:false
+    };
+  });
   compareChartInst = new Chart(document.getElementById('compareChart').getContext('2d'), { type:'line', data:{labels,datasets}, options:chartOpts('R$') });
   // Render compare timeline below
   renderCompareTimeline();
@@ -3563,7 +3868,7 @@ function renderCompareTimeline() {
     const color = sim.color;
     return (
       '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
-        '<div style="width:90px;flex-shrink:0;font-size:10px;color:'+color+';font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+sim.name+'</div>' +
+        '<div style="width:90px;flex-shrink:0;font-size:10px;color:'+color+';font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escHtml(sim.name)+'</div>' +
         '<div style="flex:1;position:relative;height:14px">' +
           '<div style="position:absolute;top:50%;left:0;right:0;height:2px;background:var(--sim-border2);transform:translateY(-50%);border-radius:1px"></div>' +
           '<div style="position:absolute;top:50%;left:'+lP+'%;width:'+wP+'%;height:2px;background:'+color+';transform:translateY(-50%);border-radius:1px"></div>' +
@@ -3593,7 +3898,7 @@ function renderCompareTimeline() {
       return '<div style="border-top:1px solid var(--sim-border);padding:5px 0;margin-top:4px">' +
         '<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px">' +
           '<div style="width:8px;height:8px;border-radius:50%;background:'+sim.color+'"></div>' +
-          '<span style="font-size:10px;font-weight:700;color:'+sim.color+'">'+sim.name+'</span>' +
+          '<span style="font-size:10px;font-weight:700;color:'+sim.color+'">'+escHtml(sim.name)+'</span>' +
         '</div>' +
         '<div style="display:flex;justify-content:space-between;font-size:9px"><span style="color:var(--sim-text3)">Patrimônio</span><span style="font-family:var(--sim-mono);color:var(--sim-text)">'+brl(snap.portfolioValue)+'</span></div>' +
         '<div style="display:flex;justify-content:space-between;font-size:9px"><span style="color:var(--sim-text3)">Retorno</span><span style="font-family:var(--sim-mono);color:'+(parseFloat(ret)>=0?'var(--up)':'var(--dn)')+'">'+ret+'%</span></div>' +
@@ -3678,8 +3983,9 @@ function inferClassId(ticker) {
   const t = ticker.toUpperCase();
   // Índices/indicadores de renda fixa
   if (['CDI','SELIC','IPCA','IMAB','IMAS','IMAB5','IMAB5P','IRFM','IMA'].includes(t)) return 'rf';
-  // Câmbio (precisa vir ANTES da regra de cripto, pois também termina em BRL)
-  if (['USDBRL','EURBRL'].includes(t)) return 'ext';
+  // Câmbio e índices em BRL do exterior (precisam vir ANTES da regra de
+  // cripto, pois também terminam em BRL — SPXBRL caía como cripto)
+  if (['USDBRL','EURBRL','SPXBRL'].includes(t)) return 'ext';
   // Cripto BRL: termina em BRL, tem ao menos 6 chars (ex.: BTCBRL, ETHBRL).
   // O !startsWith('I') é uma guarda defensiva: evita classificar como cripto um
   // eventual índice hipotético terminado em BRL (ex.: "IBOVBRL"). Pares de câmbio
@@ -3814,6 +4120,7 @@ function salvarEstado() {
         dividendMode:  state.dividendMode,
         rebalSim:      state.rebalSim,
         rebalModeVal:  state.rebalModeVal,
+        irSim:         state.irSim,
       },
       pizzaMode: _pizzaMode,
       etapaPeriodoOk: _etapaPeriodoOk,
@@ -3852,8 +4159,8 @@ function restaurarEstado() {
 
     // Formulário
     const f = dados.form || {};
-    if (f.startDate)     document.getElementById('startDate').value     = f.startDate;
-    if (f.endDate)       document.getElementById('endDate').value       = f.endDate;
+    if (f.startDate)     document.getElementById('startDate').value     = ymToInput(f.startDate);
+    if (f.endDate)       document.getElementById('endDate').value       = ymToInput(f.endDate);
     if (f.initialAmount) document.getElementById('initialAmount').value = f.initialAmount;
     if (f.monthlyAmount) document.getElementById('monthlyAmount').value = f.monthlyAmount;
     if (f.rebalance)     document.getElementById('rebalance').value     = f.rebalance;
@@ -3868,11 +4175,15 @@ function restaurarEstado() {
     if (st.dividendMode) {
       state.dividendMode = st.dividendMode;
       const modes = ['none','reinvest_same','reinvest_class','reinvest_rebalance'];
-      document.querySelectorAll('.divmode-btn').forEach(b => b.classList.remove('active'));
-      const dBtns = document.querySelectorAll('.divmode-btn');
+      // .divmode-div: apenas os botões de dividendos (ver selectDivMode).
+      document.querySelectorAll('.divmode-div').forEach(b => b.classList.remove('active'));
+      const dBtns = document.querySelectorAll('.divmode-div');
       const dIdx  = modes.indexOf(st.dividendMode);
       if (dBtns[dIdx]) dBtns[dIdx].classList.add('active');
     }
+    state.irSim = !!st.irSim;
+    document.querySelectorAll('.divmode-ir').forEach(b => b.classList.remove('active'));
+    document.getElementById(state.irSim ? 'irSimBtn' : 'irNaoBtn')?.classList.add('active');
     if (st.rebalSim !== undefined && st.rebalSim !== null) {
       state.rebalSim = st.rebalSim;
       state.rebalModeVal = st.rebalModeVal || null;
@@ -3894,6 +4205,7 @@ function restaurarEstado() {
       editingSimIdx  = dados.editingSimIdx  ?? 0;
     }
 
+    if (dados.pizzaMode) _pizzaMode = true; // era salvo mas nunca restaurado
     if (dados.etapaPeriodoOk) _etapaPeriodoOk = dados.etapaPeriodoOk;
     if (dados.etapaAportesOk) _etapaAportesOk = dados.etapaAportesOk;
     return true;
@@ -3923,9 +4235,10 @@ initDynamicTickers().then(() => {
   state.classesSel.forEach(sel => atualizarBotaoAdd(sel.id));
 
   verificarCascata();
+  // Restaura a etapa de classes aplicadas mesmo sem simulações concluídas
+  // (ex.: F5 no meio da configuração).
+  if (temEstado && _pizzaMode) aplicarClassesPizza();
   if (temEstado && simulations.length > 0) {
-    // Restaura pizza mode se estava ativo
-    if (_pizzaMode) aplicarClassesPizza();
     // Mostra resultados
     document.getElementById('emptyState').style.display = 'none';
     document.getElementById('resultsArea').style.display = 'block';
