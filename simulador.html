@@ -2644,8 +2644,8 @@ function renderComposicao() {
       <div class="class-acc-body">
         ${hasIndicadores ? `
         <div class="mode-toggle" id="modeToggle_${sel.id}">
-          <button class="mode-toggle-btn ${cfg.mode==='custom'?'active':''}" onclick="setCfgMode('${sel.id}','custom')">🔧 Ativo</button>
-          <button class="mode-toggle-btn ${cfg.mode==='indicador'?'active':''}" onclick="setCfgMode('${sel.id}','indicador')">📊 Indicador</button>
+          <button class="mode-toggle-btn ${cfg.mode==='custom'?'active':''}" onclick="setCfgMode('${sel.id}','custom')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:5px"><line x1="12" y1="3" x2="12" y2="21"/><rect x="8" y="8" width="8" height="8" rx="1"/></svg>Ativo</button>
+          <button class="mode-toggle-btn ${cfg.mode==='indicador'?'active':''}" onclick="setCfgMode('${sel.id}','indicador')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:5px"><line x1="4" y1="20" x2="20" y2="20"/><line x1="7" y1="20" x2="7" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="17" y1="20" x2="17" y2="15"/></svg>Indicador</button>
         </div>
         <div id="indSection_${sel.id}" style="display:${cfg.mode==='indicador'?'block':'none'}">
           <div class="ind-grid" id="indGrid_${sel.id}"></div>
