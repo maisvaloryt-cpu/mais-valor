@@ -1,5 +1,5 @@
 {
-  "updated_at": "11/06/2026 17:44",
+  "updated_at": "12/06/2026 17:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,20 +1128,20 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 171497.23,
-      "changePct": 0.0171,
-      "high": 171926.72,
-      "low": 168280.39
+      "price": 171132.66,
+      "changePct": -0.0021,
+      "high": 172544.55,
+      "low": 169992.77
     },
     {
       "ticker": "INDEXBVMF:IFIX",
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3802.63,
-      "changePct": 0.0067,
-      "high": 3803.58,
-      "low": 3777.11
+      "price": 3814.03,
+      "changePct": 0.003,
+      "high": 3814.6,
+      "low": 3802.65
     },
     {
       "ticker": "INDEXBVMF:SMLL",
@@ -1158,10 +1158,10 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 12153.59,
-      "changePct": 0.018799999999999997,
-      "high": 12176.47,
-      "low": 11908.24
+      "price": 12117.78,
+      "changePct": -0.0029,
+      "high": 12234.82,
+      "low": 12055.9
     },
     {
       "ticker": "INDEXBVMF:IMAB",
@@ -1188,40 +1188,40 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7394.3,
-      "changePct": 0.0175,
-      "high": 7412.68,
-      "low": 7257.33
+      "price": 7431.46,
+      "changePct": 0.005,
+      "high": 7456.4,
+      "low": 7363.01
     },
     {
       "ticker": "INDEXNASDAQ:.IXIC",
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 25809.66,
-      "changePct": 0.0254,
-      "high": 25846.56,
-      "low": 25109.4
+      "price": 25888.84,
+      "changePct": 0.0031,
+      "high": 26010.31,
+      "low": 25599.94
     },
     {
       "ticker": "INDEXDJX:.DJI",
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 50848.75,
-      "changePct": 0.018600000000000002,
-      "high": 50968.95,
-      "low": 49972.07
+      "price": 51202.26,
+      "changePct": 0.006999999999999999,
+      "high": 51409.7,
+      "low": 50827.84
     },
     {
       "ticker": "INDEXRUSSELL:RUT",
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2921.03,
-      "changePct": 0.0302,
-      "high": 2923.93,
-      "low": 2854.23
+      "price": 2943.99,
+      "changePct": 0.0079,
+      "high": 2969.43,
+      "low": 2921.27
     },
     {
       "ticker": "CBOE:VIX",
@@ -1238,20 +1238,20 @@
       "stale": false,
       "descricao": "FTSE 100 (Reino Unido)",
       "tipo": "Índice Global",
-      "price": 10303.88,
-      "changePct": 0.0048,
-      "high": 10370.15,
-      "low": 10252.27
+      "price": 10471.72,
+      "changePct": 0.0163,
+      "high": 10471.72,
+      "low": 10302.68
     },
     {
       "ticker": "INDEXDB:DAX",
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 24209.71,
-      "changePct": 0.0006,
-      "high": 24327.69,
-      "low": 24080.64
+      "price": 24635.3,
+      "changePct": 0.0176,
+      "high": 24753.89,
+      "low": 24421.82
     },
     {
       "ticker": "INDEXEURO:SX5E",
@@ -1268,20 +1268,20 @@
       "stale": false,
       "descricao": "Nikkei 225 (Japão)",
       "tipo": "Índice Global",
-      "price": 64217.27,
-      "changePct": 0.0006,
-      "high": 64395.5,
-      "low": 62335.75
+      "price": 66020.04,
+      "changePct": 0.0281,
+      "high": 67065.94,
+      "low": 64998.11
     },
     {
       "ticker": "INDEXHANGSENG:HSI",
       "stale": false,
       "descricao": "Hang Seng (HK)",
       "tipo": "Índice Global",
-      "price": 24249.29,
-      "changePct": -0.006500000000000001,
-      "high": 24492.71,
-      "low": 23999.67
+      "price": 24718.1,
+      "changePct": 0.019299999999999998,
+      "high": 24771.61,
+      "low": 24445.51
     },
     {
       "ticker": "SHA:000001",
