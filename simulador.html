@@ -121,6 +121,7 @@
   justify-content: center; position: relative;
 }
 .sim-icon-btn:hover { border-color: var(--sim-accent); color: var(--sim-accent); background: var(--sim-accent-d); }
+.sim-icon-btn svg { width: 17px; height: 17px; flex: none; }
 .sim-icon-btn.danger:hover { border-color: var(--sim-danger); color: var(--sim-danger); background: rgba(232,80,58,.08); }
 .sim-icon-btn .tip {
   position: absolute; bottom: calc(100% + 6px); left: 50%;
@@ -626,10 +627,10 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
     <div class="sim-sidebar-header">
       <div class="sim-sidebar-title">Parâmetros</div>
       <div id="ctrlRow" class="sim-ctrl-row" style="display:none;gap:5px">
-        <button class="sim-icon-btn" onclick="editarSim()">✏️<span class="tip">Editar</span></button>
-        <button class="sim-icon-btn" onclick="duplicarSim()">📋<span class="tip">Duplicar</span></button>
-        <button class="sim-icon-btn" onclick="novaSim()">➕<span class="tip">Nova carteira</span></button>
-        <button class="sim-icon-btn danger" onclick="deleteSim()">🗑<span class="tip">Remover</span></button>
+        <button class="sim-icon-btn" onclick="editarSim()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l4 4-10 10-4.5 1 1-4.5z"/><line x1="12.5" y1="5.5" x2="16.5" y2="9.5"/></svg><span class="tip">Editar</span></button>
+        <button class="sim-icon-btn" onclick="duplicarSim()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><span class="tip">Duplicar</span></button>
+        <button class="sim-icon-btn" onclick="novaSim()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span class="tip">Nova carteira</span></button>
+        <button class="sim-icon-btn danger" onclick="deleteSim()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg><span class="tip">Remover</span></button>
       </div>
     </div>
 
@@ -753,21 +754,21 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
         <div class="param-group-label" onclick="toggleParamGroup('etapaDividendos')">Dividendos<span class="param-group-chev">▼</span></div>
         <div class="param-group-body">
         <div class="divmode-row">
-          <div class="divmode-btn divmode-div" onclick="selectDivMode('none',this)">
+          <div class="divmode-btn divmode-div sim-tooltip" onclick="selectDivMode('none',this)">
             <div class="divmode-btn-title"><svg class="divmode-icon" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="6.5" width="36" height="25" rx="3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="15.5" x2="37" y2="15.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="26" cy="24.5" r="3.5" fill="currentColor"/></svg> Caixa</div>
-            <div class="divmode-btn-sub">Não reinvestir</div>
+            <span class="sim-tip">Guarda em CDI, reinveste depois como "aporte".</span>
           </div>
-          <div class="divmode-btn divmode-div" onclick="selectDivMode('reinvest_same',this)">
+          <div class="divmode-btn divmode-div sim-tooltip" onclick="selectDivMode('reinvest_same',this)">
             <div class="divmode-btn-title"><svg class="divmode-icon" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12 A14 14 0 0 1 30 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><polyline points="30,0 30,8 22,8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M33 26 A14 14 0 0 1 8 33" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><polyline points="8,38 8,30 16,30" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Mesmo ativo</div>
-            <div class="divmode-btn-sub">Reinveste no ativo</div>
+            <span class="sim-tip">Reinveste no ativo</span>
           </div>
-          <div class="divmode-btn divmode-div" onclick="selectDivMode('reinvest_class',this)">
+          <div class="divmode-btn divmode-div sim-tooltip" onclick="selectDivMode('reinvest_class',this)">
             <div class="divmode-btn-title"><svg class="divmode-icon" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="8.5" stroke="currentColor" stroke-width="1.5"/><circle cx="29" cy="9" r="8.5" stroke="currentColor" stroke-width="1.5"/><circle cx="9" cy="29" r="8.5" stroke="currentColor" stroke-width="1.5"/><circle cx="29" cy="29" r="8.5" stroke="currentColor" stroke-width="1.5"/></svg> Na classe</div>
-            <div class="divmode-btn-sub">Distribui na classe</div>
+            <span class="sim-tip">Distribui na classe</span>
           </div>
-          <div class="divmode-btn divmode-div" onclick="selectDivMode('reinvest_rebalance',this)">
+          <div class="divmode-btn divmode-div sim-tooltip" onclick="selectDivMode('reinvest_rebalance',this)">
             <div class="divmode-btn-title"><svg class="divmode-icon" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><polyline points="1,19 8,19 12,6 20,32 25,19 32,19 37,19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Rebalancear</div>
-            <div class="divmode-btn-sub">Reduz drift com dividendos</div>
+            <span class="sim-tip">Reduz drift com dividendos</span>
           </div>
         </div>
         </div><!-- /param-group-body dividendos -->
