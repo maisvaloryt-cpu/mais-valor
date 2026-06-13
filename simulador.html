@@ -181,7 +181,7 @@ select.param-inp option { background: var(--sim-surf2); }
 }
 .cls-chip:hover { border-color: var(--sim-border2); color: var(--sim-text); }
 .cls-chip.selected { border-color: var(--sim-accent); background: var(--sim-accent-d); color: var(--sim-accent); }
-.cls-chip-icon { font-size: 13px; }
+.cls-chip-icon { font-size: 13px; display: flex; align-items: center; }
 .cls-chip-name { font-size: 11px; font-weight: 500; }
 .cls-chip-pct { margin-left: auto; font-family: var(--sim-mono); font-size: 10px; color: var(--sim-accent); }
 
@@ -198,7 +198,7 @@ select.param-inp option { background: var(--sim-surf2); }
 
 /* ── SLIDERS + INPUT ── */
 .slider-row { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
-.slider-icon { font-size: 12px; width: 18px; text-align: center; flex-shrink: 0; }
+.slider-icon { font-size: 12px; width: 18px; text-align: center; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 .slider-name { font-size: 10px; color: var(--sim-text2); width: 52px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 input[type="range"].pct-slider {
   -webkit-appearance: none; flex: 1; height: 3px;
@@ -352,7 +352,8 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
 }
 .divmode-btn:hover { border-color: var(--sim-border2); }
 .divmode-btn.active { border-color: var(--sim-accent); background: var(--sim-accent-d); color: var(--sim-accent); }
-.divmode-btn-title { font-weight: 700; font-size: 10px; }
+.divmode-btn-title { font-weight: 700; font-size: 10px; display: flex; align-items: center; gap: 5px; }
+.divmode-icon { width: 16px; height: 16px; flex: none; }
 .divmode-btn-sub { font-size: 9px; color: var(--sim-text3); margin-top: 2px; }
 .divmode-btn.active .divmode-btn-sub { color: var(--sim-accent); opacity: .7; }
 
@@ -753,19 +754,19 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
         <div class="param-group-body">
         <div class="divmode-row">
           <div class="divmode-btn divmode-div" onclick="selectDivMode('none',this)">
-            <div class="divmode-btn-title">💰 Caixa</div>
+            <div class="divmode-btn-title"><svg class="divmode-icon" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="6.5" width="36" height="25" rx="3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="15.5" x2="37" y2="15.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="26" cy="24.5" r="3.5" fill="currentColor"/></svg> Caixa</div>
             <div class="divmode-btn-sub">Não reinvestir</div>
           </div>
           <div class="divmode-btn divmode-div" onclick="selectDivMode('reinvest_same',this)">
-            <div class="divmode-btn-title">🔄 Mesmo ativo</div>
+            <div class="divmode-btn-title"><svg class="divmode-icon" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12 A14 14 0 0 1 30 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><polyline points="30,0 30,8 22,8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M33 26 A14 14 0 0 1 8 33" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><polyline points="8,38 8,30 16,30" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Mesmo ativo</div>
             <div class="divmode-btn-sub">Reinveste no ativo</div>
           </div>
           <div class="divmode-btn divmode-div" onclick="selectDivMode('reinvest_class',this)">
-            <div class="divmode-btn-title">📊 Na classe</div>
+            <div class="divmode-btn-title"><svg class="divmode-icon" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="8.5" stroke="currentColor" stroke-width="1.5"/><circle cx="29" cy="9" r="8.5" stroke="currentColor" stroke-width="1.5"/><circle cx="9" cy="29" r="8.5" stroke="currentColor" stroke-width="1.5"/><circle cx="29" cy="29" r="8.5" stroke="currentColor" stroke-width="1.5"/></svg> Na classe</div>
             <div class="divmode-btn-sub">Distribui na classe</div>
           </div>
           <div class="divmode-btn divmode-div" onclick="selectDivMode('reinvest_rebalance',this)">
-            <div class="divmode-btn-title">⚖️ Rebalancear</div>
+            <div class="divmode-btn-title"><svg class="divmode-icon" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><polyline points="1,19 8,19 12,6 20,32 25,19 32,19 37,19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Rebalancear</div>
             <div class="divmode-btn-sub">Reduz drift com dividendos</div>
           </div>
         </div>
@@ -917,7 +918,7 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
 // ══════════════════════════════════════════════════════════════
 const CLASSES_DEF = [
   {
-    id: 'acao', icon: '📈', name: 'Ações', sub: 'B3', color: '#5b8def',
+    id: 'acao', icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" stroke="#e0b84a" stroke-width="5" stroke-opacity="0.22"/><polyline points="16 7 22 7 22 13" stroke="#e0b84a" stroke-width="5" stroke-opacity="0.22"/><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" stroke="#e0b84a" stroke-width="1.5"/><polyline points="16 7 22 7 22 13" stroke="#e0b84a" stroke-width="1.5"/></svg>`, name: 'Ações', sub: 'B3', color: '#5b8def',
     indicadores: [
       { ticker: 'IBOV',  desc: 'Ibovespa' },
       { ticker: 'IDIV',  desc: 'Dividendos' },
@@ -964,7 +965,7 @@ const CLASSES_DEF = [
     ],
   },
   {
-    id: 'fii', icon: '🏢', name: 'FIIs', sub: 'Fundos Imob.', color: '#1FC96E',
+    id: 'fii', icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M3 21h18M5 21V9l7-6 7 6v12M9 21v-6h6v6" stroke="#e0b84a" stroke-width="5" stroke-opacity="0.22"/><path d="M3 21h18M5 21V9l7-6 7 6v12M9 21v-6h6v6" stroke="#e0b84a" stroke-width="1.5"/></svg>`, name: 'FIIs', sub: 'Fundos Imob.', color: '#1FC96E',
     indicadores: [
       { ticker: 'IFIX',  desc: 'Índice FII' },
       { ticker: 'MXRF11',desc: 'MXRF11' },
@@ -984,7 +985,7 @@ const CLASSES_DEF = [
     ],
   },
   {
-    id: 'rf', icon: '💵', name: 'Renda Fixa', sub: 'CDI, Tesouro', color: '#F5A623',
+    id: 'rf', icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><rect x="3" y="5" width="18" height="16" rx="2" fill="#e0b84a" fill-opacity="0.15" stroke="#e0b84a" stroke-width="1.4"/><line x1="3" y1="10" x2="21" y2="10" stroke="#e0b84a" stroke-width="1.3"/><line x1="8" y1="3" x2="8" y2="7" stroke="#e0b84a" stroke-width="1.4"/><line x1="16" y1="3" x2="16" y2="7" stroke="#e0b84a" stroke-width="1.4"/><text x="12" y="19" text-anchor="middle" font-size="7" fill="#e0b84a" font-family="monospace" font-weight="700">%</text></svg>`, name: 'Renda Fixa', sub: 'CDI, Tesouro', color: '#F5A623',
     indicadores: [
       { ticker: 'CDI',    desc: 'CDI' },
       { ticker: 'SELIC',  desc: 'Taxa Selic' },
@@ -1000,7 +1001,7 @@ const CLASSES_DEF = [
     exampleTickers: ['CDI','IPCA','IMAB','IMAB5','IMAS','IRFM','IMA'],
   },
   {
-    id: 'ext', icon: '🌍', name: 'Exterior', sub: 'BDRs, REITs, USD', color: '#9b72ef',
+    id: 'ext', icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><circle cx="12" cy="12" r="10" fill="#e0b84a" fill-opacity="0.12" stroke="#e0b84a" stroke-width="1.5"/><line x1="2" y1="12" x2="22" y2="12" stroke="#e0b84a" stroke-width="1" stroke-opacity="0.75"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke="#e0b84a" stroke-width="1" stroke-opacity="0.75"/></svg>`, name: 'Exterior', sub: 'BDRs, REITs, USD', color: '#9b72ef',
     indicadores: [
       { ticker: 'SPXBRL', desc: 'S&P 500 BRL' },
       { ticker: 'IVVB11', desc: 'S&P 500 ETF' },
@@ -1011,7 +1012,7 @@ const CLASSES_DEF = [
     exampleTickers: ['IVVB11','SPXI11','SPY:BRL','QQQ:BRL','AAPL:BRL','MSFT:BRL','AMZO34','MSFT34'],
   },
   {
-    id: 'cripto', icon: '₿', name: 'Cripto', sub: 'BTC, ETH, SOL, HASH11', color: '#f7931a',
+    id: 'cripto', icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M11.767 19.089c4.924.868 6.14-6.025 1.216-6.894M10.551 19.089L5.86 18.047m5.908 1.042-.347 1.97m1.563-8.864c4.924.869 6.14-6.025 1.215-6.893m-1.215 6.893-3.94-.694m5.155-6.2L8.29 5.26m5.908 1.042.348-1.97M7.48 20.364l3.126-17.727" stroke="#e0b84a" stroke-width="5" stroke-opacity="0.22"/><path d="M11.767 19.089c4.924.868 6.14-6.025 1.216-6.894M10.551 19.089L5.86 18.047m5.908 1.042-.347 1.97m1.563-8.864c4.924.869 6.14-6.025 1.215-6.893m-1.215 6.893-3.94-.694m5.155-6.2L8.29 5.26m5.908 1.042.348-1.97M7.48 20.364l3.126-17.727" stroke="#e0b84a" stroke-width="1.5"/></svg>`, name: 'Cripto', sub: 'BTC, ETH, SOL, HASH11', color: '#f7931a',
     indicadores: [
       { ticker: 'BTCBRL', desc: 'Bitcoin BRL' },
       { ticker: 'ETHBRL', desc: 'Ethereum BRL' },
@@ -1022,7 +1023,7 @@ const CLASSES_DEF = [
     exampleTickers: ['BTCBRL','ETHBRL','SOLBRL','BNBBRL','XRPBRL','ADABRL','DOGEBRL','AVAXBRL','LINKBRL','DOTBRL','LTCBRL','XLMBRL','ATOMBRL','TONBRL','NEARBRL','UNIBRL','BCHBRL','MATICBRL','ETCBRL','TRXBRL','ICPBRL','APTBRL','PEPEBRL','SHIBABRL','FILBRL','HASH11','QBTC11'],
   },
   {
-    id: 'etf', icon: '📦', name: 'ETFs', sub: 'ETFs B3', color: '#e05c5c',
+    id: 'etf', icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" fill="#e0b84a" fill-opacity="0.15" stroke="#e0b84a" stroke-width="1.4" stroke-linejoin="round"/><line x1="3" y1="6" x2="21" y2="6" stroke="#e0b84a" stroke-width="1.4"/><path d="M16 10a4 4 0 0 1-8 0" stroke="#e0b84a" stroke-width="1.4"/></svg>`, name: 'ETFs', sub: 'ETFs B3', color: '#e05c5c',
     indicadores: [
       { ticker: 'BOVA11', desc: 'Ibovespa ETF' },
       { ticker: 'SMAL11', desc: 'Small Cap ETF' },
@@ -1033,7 +1034,7 @@ const CLASSES_DEF = [
     exampleTickers: ['BOVA11','SMAL11','DIVO11','IVVB11','SPXI11','FIND11'],
   },
   {
-    id: 'commodity', icon: '🥇', name: 'Commodities', sub: 'Ouro, Prata, Agro', color: '#56c8d8',
+    id: 'commodity', icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M12 3 C12 3 5 11 5 15.5 a7 7 0 0 0 14 0 C19 11 12 3 12 3 Z" fill="#e0b84a" fill-opacity="0.18" stroke="#e0b84a" stroke-width="1.4"/><path d="M8.5 17 C9 15 10.5 14 12 14" stroke="#e0b84a" stroke-width="1.2" stroke-opacity="0.6"/></svg>`, name: 'Commodities', sub: 'Ouro, Prata, Agro', color: '#56c8d8',
     indicadores: [
       { ticker: 'OURO',   desc: 'Ouro BRL' },
       { ticker: 'GOLD11', desc: 'Ouro ETF B3' },
@@ -2403,9 +2404,9 @@ function aplicarClassesPizza() {
   // Mostra resumo em linha
   const label = state.classesSel.map(s => {
     const cls = CLASSES_DEF.find(c => c.id === s.id);
-    return cls.icon + ' ' + cls.name + ' ' + s.pct + '%';
+    return cls.icon + ' ' + s.pct + '%';
   }).join('  ·  ');
-  document.getElementById('classesResumoLabel').textContent = label;
+  document.getElementById('classesResumoLabel').innerHTML = label;
   document.getElementById('classesResumo').classList.add('show');
   // Mostra pizza
   document.getElementById('pizzaSection').classList.add('show');
@@ -2450,7 +2451,7 @@ function renderSlidersPizza() {
   state.classesSel.forEach(sel => {
     const cls = CLASSES_DEF.find(c => c.id === sel.id);
     const div = document.createElement('div'); div.className = 'slider-row';
-    const icon = document.createElement('span'); icon.className = 'slider-icon'; icon.textContent = cls.icon;
+    const icon = document.createElement('span'); icon.className = 'slider-icon'; icon.innerHTML = cls.icon;
     const name = document.createElement('span'); name.className = 'slider-name'; name.title = cls.name; name.textContent = cls.name;
     const range = document.createElement('input'); range.type = 'range'; range.className = 'pct-slider';
     range.min = 0; range.max = 100; range.step = 1; range.value = sel.pct; range.id = 'slp_' + sel.id;
@@ -2482,8 +2483,8 @@ function onSliderPizza(id, requested) {
   const inpEl = document.getElementById('slvp_'+id); if (inpEl && document.activeElement !== inpEl) inpEl.value = capped+'%';
   renderPizzaClasses();
   // Atualiza label do resumo
-  const label = state.classesSel.map(s => { const cls=CLASSES_DEF.find(c=>c.id===s.id); return cls.icon+' '+cls.name+' '+s.pct+'%'; }).join('  ·  ');
-  const el = document.getElementById('classesResumoLabel'); if (el) el.textContent = label;
+  const label = state.classesSel.map(s => { const cls=CLASSES_DEF.find(c=>c.id===s.id); return cls.icon+' '+s.pct+'%'; }).join('  ·  ');
+  const el = document.getElementById('classesResumoLabel'); if (el) el.innerHTML = label;
 }
 
 function renderSidebar() {
