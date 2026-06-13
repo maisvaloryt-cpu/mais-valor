@@ -15,12 +15,17 @@
   <p>Calculadoras e simuladores para tomar decisões melhores.</p>
 </div>
 <div class="container">
-  <div class="tabs fade-in-1" style="margin-bottom:1.5rem">
+  <div class="tabs fade-in-1" id="main-tabs" style="margin-bottom:1.5rem">
     <button class="tab active" onclick="show('juros',this)">Juros Compostos</button>
     <button class="tab" onclick="show('carteira',this)">Calculadora de Carteira</button>
     <button class="tab" onclick="show('aposentadoria',this)">Aposentadoria</button>
     <button class="tab" onclick="show('dy-calc',this)">Calculadora DY</button>
     <button class="tab" onclick="show('dcf',this)">Valuation DCF</button>
+    <button class="tab" onclick="show('bazin',this)">Preço Teto (Bazin)</button>
+    <button class="tab" onclick="show('graham',this)">Número de Graham</button>
+    <button class="tab" onclick="show('darf',this)">IR / DARF</button>
+    <button class="tab" onclick="show('rebalance',this)">Rebalanceamento</button>
+    <button class="tab" onclick="show('inflacao',this)">Conversor de Inflação</button>
     <a href="Calculadora_maisvalor/index.html" target="_blank"
       style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:9px;
              background:linear-gradient(135deg,var(--gold),#e8920a);color:#0A0A0A;
@@ -131,26 +136,48 @@
     <div class="tool-grid">
       <div class="calc-box">
         <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">📈 Calculadora de DY</div>
+        <label class="calc-label">Preço pago (compra) (R$)</label>
+        <input class="calc-input" type="number" id="dy-preco-pago" value="9.50" step="0.01" oninput="calcDY()">
         <label class="calc-label">Preço atual (R$)</label>
         <input class="calc-input" type="number" id="dy-preco" value="10.00" step="0.01" oninput="calcDY()">
-        <label class="calc-label">Dividendo / rendimento mensal (R$)</label>
+        <label class="calc-label">Dividendo / rendimento mensal por cota (R$)</label>
         <input class="calc-input" type="number" id="dy-div" value="0.10" step="0.01" oninput="calcDY()">
         <label class="calc-label">Quantidade de cotas</label>
         <input class="calc-input" type="number" id="dy-qtd" value="100" oninput="calcDY()">
+        <label class="calc-label">Reinvestir dividendos na projeção?</label>
+        <select class="calc-input" id="dy-reinvest" onchange="calcDY()">
+          <option value="sim">Sim — comprar mais cotas com o dividendo</option>
+          <option value="nao">Não — apenas acumular em caixa</option>
+        </select>
+        <label class="calc-label">Anos de projeção</label>
+        <input class="calc-input" type="number" id="dy-anos" value="10" oninput="calcDY()">
         <div class="calc-result">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
-            <div><div class="calc-result-label">DY mensal</div><div class="calc-result-val" id="dy-men">—</div></div>
-            <div><div class="calc-result-label">DY anual</div><div style="font-size:22px;font-weight:800;font-family:var(--font-mono);color:var(--up)" id="dy-anu">—</div></div>
+            <div><div class="calc-result-label">DY mensal (preço atual)</div><div class="calc-result-val" id="dy-men">—</div></div>
+            <div><div class="calc-result-label">DY anual (preço atual)</div><div style="font-size:22px;font-weight:800;font-family:var(--font-mono);color:var(--up)" id="dy-anu">—</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;border-top:1px solid var(--border);padding-top:1rem;margin-bottom:1rem">
+            <div><div class="calc-result-label">Yield on Cost mensal</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--gold)" id="dy-yoc-men">—</div></div>
+            <div><div class="calc-result-label">Yield on Cost anual</div><div style="font-size:22px;font-weight:800;font-family:var(--font-mono);color:var(--gold)" id="dy-yoc-anu">—</div></div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;border-top:1px solid var(--border);padding-top:1rem">
-            <div><div class="calc-result-label">Renda mensal</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--up)" id="dy-ren">—</div></div>
+            <div><div class="calc-result-label">Renda mensal atual</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--up)" id="dy-ren">—</div></div>
             <div><div class="calc-result-label">Total investido</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--text2)" id="dy-tot">—</div></div>
+          </div>
+          <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+            <div class="calc-result-label">Valorização da cota</div>
+            <div style="font-size:18px;font-weight:700;font-family:var(--font-mono)" id="dy-valoriz">—</div>
           </div>
         </div>
       </div>
       <div class="calc-box">
-        <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Renda por número de cotas</div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Projeção da renda mensal (com/sem reinvestimento)</div>
         <div style="position:relative;height:280px"><canvas id="dyChart"></canvas></div>
+        <div style="margin-top:1rem;font-size:12px;color:var(--text3);line-height:1.8">
+          <div>📌 <strong style="color:var(--text2)">DY</strong>: rendimento sobre o preço atual de mercado</div>
+          <div>📌 <strong style="color:var(--text2)">Yield on Cost</strong>: rendimento sobre o preço que você pagou — mostra o "DY real" da sua posição</div>
+          <div>📌 A projeção assume preço e dividendo por cota constantes — é uma simplificação</div>
+        </div>
       </div>
     </div>
   </div>
@@ -209,6 +236,207 @@
     </div>
   </div>
 
+  <!-- BAZIN -->
+  <div id="tool-bazin" style="display:none">
+    <div class="tool-grid">
+      <div class="calc-box">
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">🎯 Preço Teto (Método Bazin)</div>
+        <label class="calc-label">Dividendo médio mensal por cota/ação (R$)</label>
+        <input class="calc-input" type="number" id="bz-div-men" value="0.10" step="0.01" oninput="calcBazin()">
+        <label class="calc-label">Yield mínimo exigido (% a.a.)</label>
+        <input class="calc-input" type="number" id="bz-yield" value="6" step="0.5" oninput="calcBazin()">
+        <label class="calc-label">Preço atual de mercado (R$)</label>
+        <input class="calc-input" type="number" id="bz-preco" value="10.00" step="0.01" oninput="calcBazin()">
+        <div class="calc-result">
+          <div><div class="calc-result-label">Preço teto (Bazin)</div><div class="calc-result-val" id="bz-teto">—</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+            <div><div class="calc-result-label">Dividendo anual estimado</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--text2)" id="bz-div-anu">—</div></div>
+            <div><div class="calc-result-label">Yield no preço atual</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono)" id="bz-yield-atual">—</div></div>
+          </div>
+          <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+            <div class="calc-result-label">Situação</div>
+            <div style="font-size:16px;font-weight:800" id="bz-situacao">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="calc-box">
+        <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Preço atual vs. Preço Teto</div>
+        <div style="position:relative;height:260px"><canvas id="bazinChart"></canvas></div>
+        <div style="margin-top:1.25rem;padding:1rem;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.8">
+          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">📌 Como funciona o Método Bazin:</div>
+          <div>• Preço teto = Dividendo anual esperado ÷ Yield mínimo exigido</div>
+          <div>• Decio Bazin sugeria um yield mínimo de <strong style="color:var(--text)">6% a.a.</strong> para ações boas pagadoras de dividendos</div>
+          <div>• Comprar abaixo do preço teto tende a garantir o yield mínimo desejado a partir do preço pago</div>
+          <div>• ⚠️ Não considera crescimento, dívida ou qualidade do negócio — combine com outras análises</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRAHAM -->
+  <div id="tool-graham" style="display:none">
+    <div class="tool-grid">
+      <div class="calc-box">
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">📐 Número de Graham</div>
+        <label class="calc-label">LPA — Lucro por ação (R$)</label>
+        <input class="calc-input" type="number" id="gh-lpa" value="2.00" step="0.01" oninput="calcGraham()">
+        <label class="calc-label">VPA — Valor patrimonial por ação (R$)</label>
+        <input class="calc-input" type="number" id="gh-vpa" value="15.00" step="0.01" oninput="calcGraham()">
+        <label class="calc-label">Preço atual da ação (R$)</label>
+        <input class="calc-input" type="number" id="gh-preco" value="12.00" step="0.01" oninput="calcGraham()">
+        <div class="calc-result">
+          <div><div class="calc-result-label">Valor justo (Número de Graham)</div><div class="calc-result-val" id="gh-valor">—</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+            <div><div class="calc-result-label">Margem de segurança</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono)" id="gh-margem">—</div></div>
+            <div><div class="calc-result-label">Situação</div><div style="font-size:16px;font-weight:800" id="gh-situacao">—</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+            <div><div class="calc-result-label">P/L atual</div><div style="font-size:16px;font-weight:700;font-family:var(--font-mono);color:var(--text2)" id="gh-pl">—</div></div>
+            <div><div class="calc-result-label">P/VP atual</div><div style="font-size:16px;font-weight:700;font-family:var(--font-mono);color:var(--text2)" id="gh-pvp">—</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="calc-box">
+        <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Preço atual vs. Valor justo (Graham)</div>
+        <div style="position:relative;height:260px"><canvas id="grahamChart"></canvas></div>
+        <div style="margin-top:1.25rem;padding:1rem;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.8">
+          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">📌 Como funciona:</div>
+          <div>• Fórmula: Valor justo = √(22,5 × LPA × VPA)</div>
+          <div>• O fator 22,5 vem de um P/L máximo de 15 × um P/VP máximo de 1,5 — limites que Graham considerava razoáveis</div>
+          <div>• Funciona melhor para empresas maduras, lucrativas e com VPA positivo (ex: bancos, utilities, consumo)</div>
+          <div>• ⚠️ Pouco indicado para empresas de crescimento, com prejuízo ou de setores com contabilidade muito particular</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IR / DARF -->
+  <div id="tool-darf" style="display:none">
+    <div class="tool-grid">
+      <div class="calc-box">
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">🧾 Calculadora de IR / DARF</div>
+        <label class="calc-label">Tipo de operação</label>
+        <select class="calc-input" id="darf-tipo" onchange="calcDARF()">
+          <option value="acoes-swing">Ações / ETFs — operações comuns (Swing Trade)</option>
+          <option value="acoes-day">Ações / ETFs — Day Trade</option>
+          <option value="fii">Fundos Imobiliários (FIIs) — venda de cotas</option>
+        </select>
+        <label class="calc-label">Total vendido no mês (R$)</label>
+        <input class="calc-input" type="number" id="darf-venda" value="15000" step="0.01" oninput="calcDARF()">
+        <label class="calc-label">Custo de aquisição dos ativos vendidos (R$)</label>
+        <input class="calc-input" type="number" id="darf-custo" value="12000" step="0.01" oninput="calcDARF()">
+        <label class="calc-label">Corretagem e taxas (R$)</label>
+        <input class="calc-input" type="number" id="darf-taxas" value="0" step="0.01" oninput="calcDARF()">
+        <label class="calc-label">Prejuízo acumulado a compensar (R$)</label>
+        <input class="calc-input" type="number" id="darf-prejuizo" value="0" step="0.01" oninput="calcDARF()">
+        <div class="calc-result">
+          <div><div class="calc-result-label">Resultado do mês</div><div class="calc-result-val" id="darf-resultado">—</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+            <div><div class="calc-result-label">Isenção aplicável?</div><div style="font-size:16px;font-weight:800" id="darf-isencao">—</div></div>
+            <div><div class="calc-result-label">Alíquota</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono)" id="darf-aliquota">—</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+            <div><div class="calc-result-label">IR devido (DARF)</div><div style="font-size:22px;font-weight:800;font-family:var(--font-mono);color:var(--up)" id="darf-ir">—</div></div>
+            <div><div class="calc-result-label">Prejuízo a compensar (próx. mês)</div><div style="font-size:16px;font-weight:700;font-family:var(--font-mono);color:var(--text2)" id="darf-prejuizo-rest">—</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="calc-box">
+        <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Composição do resultado</div>
+        <div style="position:relative;height:230px"><canvas id="darfChart"></canvas></div>
+        <div style="margin-top:1.25rem;padding:1rem;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.8">
+          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">📌 Regras gerais (pessoa física):</div>
+          <div>• <strong style="color:var(--text)">Ações/ETFs (swing trade)</strong>: 15% sobre o lucro, isento se as vendas do mês somarem até R$ 20.000</div>
+          <div>• <strong style="color:var(--text)">Day trade</strong>: 20% sobre o lucro, sem isenção</div>
+          <div>• <strong style="color:var(--text)">FIIs</strong>: 20% sobre o ganho na venda de cotas, sem isenção (rendimentos mensais distribuídos costumam ser isentos, mas o ganho de capital na venda não)</div>
+          <div>• DARF abaixo de R$ 10 não precisa ser pago — some ao mês seguinte</div>
+          <div>• Vencimento: último dia útil do mês seguinte · código DARF usual 6015</div>
+          <div>• ⚠️ Ferramenta educativa — não substitui orientação de um contador</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REBALANCEAMENTO -->
+  <div id="tool-rebalance" style="display:none">
+    <div class="tool-grid">
+      <div class="calc-box">
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">⚖️ Rebalanceamento de Carteira</div>
+        <div class="tabs" style="margin-bottom:1rem">
+          <button class="tab active" id="reb-tab-passivo" onclick="setRebModo('passivo')">Passivo (com aportes)</button>
+          <button class="tab" id="reb-tab-ativo" onclick="setRebModo('ativo')">Ativo (comprar/vender)</button>
+        </div>
+        <div id="reb-aporte-box">
+          <label class="calc-label">Novo aporte disponível (R$)</label>
+          <input class="calc-input" type="number" id="reb-aporte" value="1000" step="0.01" oninput="calcRebalance()">
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:1rem">
+          <input class="calc-input" id="reb-nome" placeholder="Nome do ativo/classe" style="flex:1;margin:0">
+          <input class="calc-input" id="reb-valor" type="number" placeholder="Valor atual (R$)" style="width:130px;margin:0">
+          <input class="calc-input" id="reb-pct" type="number" placeholder="% alvo" style="width:90px;margin:0">
+          <button onclick="addAtivoReb()" style="background:var(--gold);color:#0A0A0A;border:none;border-radius:9px;padding:0 14px;font-weight:800;cursor:pointer;white-space:nowrap;font-family:var(--font-body);transition:all .15s"
+            onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">+ Add</button>
+        </div>
+        <div id="reb-lista" style="margin-bottom:1rem;min-height:60px"></div>
+        <div class="calc-result">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+            <div><div class="calc-result-label">Total da carteira</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--text2)" id="reb-total">R$ 0,00</div></div>
+            <div><div class="calc-result-label">Soma dos % alvo</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono)" id="reb-soma-pct">0%</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="calc-box">
+        <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Alocação atual vs. alvo</div>
+        <div style="position:relative;height:260px"><canvas id="rebChart"></canvas></div>
+        <div style="margin-top:1.25rem;padding:1rem;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.8">
+          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">📌 Passivo vs. Ativo:</div>
+          <div>• <strong style="color:var(--text)">Passivo</strong>: direciona o novo aporte para os ativos mais abaixo do alvo, sem vender nada — evita gerar impostos</div>
+          <div>• <strong style="color:var(--text)">Ativo</strong>: mostra o quanto comprar/vender de cada ativo para zerar o desvio imediatamente</div>
+          <div>• A soma dos % alvo deve ser 100% para o resultado ficar correto</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONVERSOR DE INFLAÇÃO -->
+  <div id="tool-inflacao" style="display:none">
+    <div class="tool-grid">
+      <div class="calc-box">
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">💸 Conversor de Inflação (IPCA)</div>
+        <label class="calc-label">Valor (R$)</label>
+        <input class="calc-input" type="number" id="inf-valor" value="100" step="0.01" oninput="calcInflacao()">
+        <label class="calc-label">Ano de referência (poder de compra no passado)</label>
+        <select class="calc-input" id="inf-ano" onchange="calcInflacao()"></select>
+        <div class="calc-result">
+          <div><div class="calc-result-label">Equivalente hoje (corrigido pelo IPCA)</div><div class="calc-result-val" id="inf-passado">—</div></div>
+          <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+            <div class="calc-result-label">Inflação acumulada no período</div>
+            <div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--up)" id="inf-acumulada">—</div>
+          </div>
+        </div>
+        <div style="margin-top:1.5rem;font-size:14px;font-weight:700;color:var(--gold)">Projeção futura</div>
+        <label class="calc-label">Anos no futuro</label>
+        <input class="calc-input" type="number" id="inf-anos-fut" value="20" oninput="calcInflacao()">
+        <label class="calc-label">Inflação média esperada ao ano (%)</label>
+        <input class="calc-input" type="number" id="inf-taxa-fut" value="4.5" step="0.1" oninput="calcInflacao()">
+        <div class="calc-result">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+            <div><div class="calc-result-label">Poder de compra em N anos</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--text2)" id="inf-poder-futuro">—</div></div>
+            <div><div class="calc-result-label">Valor nominal necessário em N anos</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--gold)" id="inf-nominal-futuro">—</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="calc-box">
+        <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Inflação acumulada (IPCA ano a ano)</div>
+        <div style="position:relative;height:280px"><canvas id="inflacaoChart"></canvas></div>
+        <div style="margin-top:1rem;font-size:12px;color:var(--text3);line-height:1.8">
+          <div>📌 Série IPCA anual aproximada (IBGE) — ajuste no array IPCA_HIST caso queira valores oficiais atualizados</div>
+          <div>📌 A projeção futura usa uma taxa média constante informada por você</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <div id="footer-placeholder"></div>
@@ -220,7 +448,10 @@ window.MV_LOGO_SVG = '<svg viewBox="0 0 530 530" xmlns="http://www.w3.org/2000/s
 <script src="data.js"></script><script src="nav.js"></script>
 <script>
 let jurosChart=null,apChart=null,dyChart=null,carteiraChart=null;
+let bazinChart=null,grahamChart=null,darfChart=null,rebChart=null,inflacaoChart=null;
 let carteira=[];
+let rebAtivos=[];
+let rebModo='passivo';
 
 const CHART_OPTS = {
   responsive:true,maintainAspectRatio:false,
@@ -232,19 +463,24 @@ const CHART_OPTS = {
 };
 
 function show(id,el){
-  ['juros','carteira','aposentadoria','dy-calc','dcf'].forEach(t=>{
+  ['juros','carteira','aposentadoria','dy-calc','dcf','bazin','graham','darf','rebalance','inflacao'].forEach(t=>{
     const el2=document.getElementById('tool-'+t);
     if(el2){ el2.style.display='none'; el2.classList.remove('fade-in-2'); }
   });
   const shown=document.getElementById('tool-'+id);
   if(shown){ shown.style.display=''; shown.classList.add('fade-in-2'); }
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#main-tabs .tab').forEach(b=>b.classList.remove('active'));
   if(el) el.classList.add('active');
   if(id==='dcf') calcDCF();
   if(id==='juros')calcJuros();
   if(id==='aposentadoria')calcAp();
   if(id==='dy-calc')calcDY();
   if(id==='carteira')renderCarteira();
+  if(id==='bazin')calcBazin();
+  if(id==='graham')calcGraham();
+  if(id==='darf')calcDARF();
+  if(id==='rebalance')calcRebalance();
+  if(id==='inflacao')calcInflacao();
 }
 
 function fmt(v){ return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
@@ -294,22 +530,54 @@ function calcAp(){
 }
 
 function calcDY(){
+  const pPago=+document.getElementById('dy-preco-pago').value||0;
   const p=+document.getElementById('dy-preco').value||0;
   const d=+document.getElementById('dy-div').value||0;
   const q=+document.getElementById('dy-qtd').value||0;
+  const reinvest=document.getElementById('dy-reinvest').value;
+  const anos=+document.getElementById('dy-anos').value||10;
   if(!p) return;
+
   document.getElementById('dy-men').textContent=(d/p*100).toFixed(2)+'%';
   document.getElementById('dy-anu').textContent=(d*12/p*100).toFixed(2)+'%';
+
+  if(pPago>0){
+    document.getElementById('dy-yoc-men').textContent=(d/pPago*100).toFixed(2)+'%';
+    document.getElementById('dy-yoc-anu').textContent=(d*12/pPago*100).toFixed(2)+'%';
+  } else {
+    document.getElementById('dy-yoc-men').textContent='—';
+    document.getElementById('dy-yoc-anu').textContent='—';
+  }
+
   document.getElementById('dy-ren').textContent=fmt(d*q);
-  document.getElementById('dy-tot').textContent=fmt(p*q);
-  const labels=[],data=[];
-  for(let i=100;i<=5000;i+=100){labels.push(i);data.push(+(d*i).toFixed(2));}
+  document.getElementById('dy-tot').textContent=fmt((pPago||p)*q);
+
+  const valEl=document.getElementById('dy-valoriz');
+  if(pPago>0){
+    const valoriz=(p-pPago)/pPago*100;
+    valEl.textContent=(valoriz>=0?'+':'')+valoriz.toFixed(2)+'%';
+    valEl.style.color=valoriz>=0?'var(--up)':'var(--dn)';
+  } else {
+    valEl.textContent='—';
+    valEl.style.color='';
+  }
+
+  // Projeção de renda mensal, com ou sem reinvestimento de dividendos
+  const taxaMensal=p>0?(d/p):0;
+  const labels=[],dataRenda=[];
+  for(let y=0;y<=anos;y++){
+    labels.push(y+'a');
+    if(y>0 && reinvest==='sim'){
+      const qProj=q*Math.pow(1+taxaMensal,12*y);
+      dataRenda.push(+(qProj*d).toFixed(2));
+    } else {
+      dataRenda.push(+(q*d).toFixed(2));
+    }
+  }
   if(dyChart) dyChart.destroy();
-  dyChart=new Chart(document.getElementById('dyChart'),{type:'bar',
-    data:{labels,datasets:[{label:'Renda mensal',data,backgroundColor:'rgba(245,166,35,0.75)',borderRadius:4}]},
-    options:{...CHART_OPTS,plugins:{legend:{display:false}},scales:{...CHART_OPTS.scales,
-      x:{...CHART_OPTS.scales.x,ticks:{...CHART_OPTS.scales.x.ticks,maxTicksLimit:10,callback:v=>v+'c'}},
-      y:{...CHART_OPTS.scales.y,ticks:{...CHART_OPTS.scales.y.ticks,callback:v=>'R$'+v}}}}
+  dyChart=new Chart(document.getElementById('dyChart'),{type:'line',
+    data:{labels,datasets:[{label:'Renda mensal projetada',data:dataRenda,borderColor:'#F5A623',borderWidth:2,pointRadius:0,fill:true,backgroundColor:'rgba(245,166,35,0.08)',tension:0.4}]},
+    options:{...CHART_OPTS,plugins:{legend:{display:false}},scales:{...CHART_OPTS.scales,y:{...CHART_OPTS.scales.y,ticks:{...CHART_OPTS.scales.y.ticks,callback:v=>'R$'+v}}}}
   });
 }
 
@@ -415,7 +683,310 @@ function calcDCF(){
   });
 }
 
-async function init(){ await loadData(); calcJuros(); }
+// ===================== BAZIN (PREÇO TETO) =====================
+function calcBazin(){
+  const divMen=+document.getElementById('bz-div-men').value||0;
+  const yieldMin=(+document.getElementById('bz-yield').value||0)/100;
+  const preco=+document.getElementById('bz-preco').value||0;
+
+  const divAnu=divMen*12;
+  const teto=yieldMin>0?divAnu/yieldMin:0;
+
+  document.getElementById('bz-teto').textContent=teto>0?fmt(teto):'—';
+  document.getElementById('bz-div-anu').textContent=fmt(divAnu);
+  document.getElementById('bz-yield-atual').textContent=preco>0?(divAnu/preco*100).toFixed(2)+'%':'—';
+
+  const sitEl=document.getElementById('bz-situacao');
+  if(preco>0 && teto>0){
+    const dif=(teto-preco)/preco*100;
+    if(preco<=teto){
+      sitEl.textContent='✅ Preço abaixo do teto ('+dif.toFixed(1)+'% de margem)';
+      sitEl.style.color='var(--up)';
+    } else {
+      sitEl.textContent='⚠️ Preço acima do teto ('+Math.abs(dif).toFixed(1)+'% acima)';
+      sitEl.style.color='var(--dn)';
+    }
+  } else {
+    sitEl.textContent='—';
+    sitEl.style.color='';
+  }
+
+  if(bazinChart) bazinChart.destroy();
+  bazinChart=new Chart(document.getElementById('bazinChart'),{type:'bar',
+    data:{labels:['Preço atual','Preço teto (Bazin)'],
+      datasets:[{data:[+preco.toFixed(2),+teto.toFixed(2)],
+        backgroundColor:[preco>teto&&teto>0?'rgba(232,80,58,0.6)':'rgba(31,201,110,0.6)','rgba(245,166,35,0.6)'],
+        borderRadius:6}]},
+    options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$ '+ctx.parsed.y.toFixed(2)}}},
+      scales:{...CHART_OPTS.scales,y:{...CHART_OPTS.scales.y,ticks:{...CHART_OPTS.scales.y.ticks,callback:v=>'R$'+v}}}}
+  });
+}
+
+// ===================== NÚMERO DE GRAHAM =====================
+function calcGraham(){
+  const lpa=+document.getElementById('gh-lpa').value||0;
+  const vpa=+document.getElementById('gh-vpa').value||0;
+  const preco=+document.getElementById('gh-preco').value||0;
+
+  let valorJusto=0;
+  if(lpa>0 && vpa>0) valorJusto=Math.sqrt(22.5*lpa*vpa);
+
+  document.getElementById('gh-valor').textContent=valorJusto>0?fmt(valorJusto):'—';
+
+  const margemEl=document.getElementById('gh-margem');
+  const sitEl=document.getElementById('gh-situacao');
+  if(valorJusto>0 && preco>0){
+    const margem=(valorJusto-preco)/valorJusto*100;
+    margemEl.textContent=margem.toFixed(1)+'%';
+    margemEl.style.color=margem>=0?'var(--up)':'var(--dn)';
+    if(preco<=valorJusto){
+      sitEl.textContent='✅ Abaixo do valor justo';
+      sitEl.style.color='var(--up)';
+    } else {
+      sitEl.textContent='⚠️ Acima do valor justo';
+      sitEl.style.color='var(--dn)';
+    }
+  } else {
+    margemEl.textContent='—'; margemEl.style.color='';
+    sitEl.textContent='—'; sitEl.style.color='';
+  }
+
+  document.getElementById('gh-pl').textContent=(preco>0&&lpa>0)?(preco/lpa).toFixed(2)+'x':'—';
+  document.getElementById('gh-pvp').textContent=(preco>0&&vpa>0)?(preco/vpa).toFixed(2)+'x':'—';
+
+  if(grahamChart) grahamChart.destroy();
+  grahamChart=new Chart(document.getElementById('grahamChart'),{type:'bar',
+    data:{labels:['Preço atual','Valor justo (Graham)'],
+      datasets:[{data:[+preco.toFixed(2),+valorJusto.toFixed(2)],
+        backgroundColor:[preco>valorJusto&&valorJusto>0?'rgba(232,80,58,0.6)':'rgba(31,201,110,0.6)','rgba(245,166,35,0.6)'],
+        borderRadius:6}]},
+    options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$ '+ctx.parsed.y.toFixed(2)}}},
+      scales:{...CHART_OPTS.scales,y:{...CHART_OPTS.scales.y,ticks:{...CHART_OPTS.scales.y.ticks,callback:v=>'R$'+v}}}}
+  });
+}
+
+// ===================== IR / DARF =====================
+function calcDARF(){
+  const tipo=document.getElementById('darf-tipo').value;
+  const venda=+document.getElementById('darf-venda').value||0;
+  const custo=+document.getElementById('darf-custo').value||0;
+  const taxas=+document.getElementById('darf-taxas').value||0;
+  const prejuizoAcum=+document.getElementById('darf-prejuizo').value||0;
+
+  const resultadoBruto=venda-custo-taxas;
+  const resEl=document.getElementById('darf-resultado');
+  resEl.textContent=(resultadoBruto>=0?'+':'')+fmt(resultadoBruto);
+  resEl.style.color=resultadoBruto>=0?'var(--up)':'var(--dn)';
+
+  let aliquota=0.15, isento=false;
+  if(tipo==='acoes-swing'){
+    aliquota=0.15;
+    isento=(venda<=20000 && resultadoBruto>0);
+  } else if(tipo==='acoes-day'){
+    aliquota=0.20;
+  } else {
+    aliquota=0.20;
+  }
+  document.getElementById('darf-aliquota').textContent=(aliquota*100).toFixed(0)+'%';
+
+  const isencaoEl=document.getElementById('darf-isencao');
+  let ir=0, novoPrejuizo=prejuizoAcum, prejuizoMes=0;
+
+  if(resultadoBruto<=0){
+    isencaoEl.textContent='—';
+    isencaoEl.style.color='';
+    prejuizoMes=Math.abs(resultadoBruto);
+    novoPrejuizo=prejuizoAcum+prejuizoMes;
+    ir=0;
+  } else if(isento){
+    isencaoEl.textContent='✅ Sim (vendas até R$ 20.000)';
+    isencaoEl.style.color='var(--up)';
+    novoPrejuizo=prejuizoAcum;
+    ir=0;
+  } else {
+    isencaoEl.textContent='❌ Não';
+    isencaoEl.style.color='var(--dn)';
+    const base=Math.max(0,resultadoBruto-prejuizoAcum);
+    novoPrejuizo=Math.max(0,prejuizoAcum-resultadoBruto);
+    ir=base*aliquota;
+  }
+
+  const irEl=document.getElementById('darf-ir');
+  if(ir>0 && ir<10){
+    irEl.innerHTML=fmt(ir)+'<div style="font-size:11px;color:var(--text3);font-weight:400;margin-top:4px">Abaixo de R$ 10 — some ao próximo mês</div>';
+  } else {
+    irEl.textContent=fmt(ir);
+  }
+  document.getElementById('darf-prejuizo-rest').textContent=fmt(novoPrejuizo);
+
+  const lucroLiquido=Math.max(0,resultadoBruto-ir);
+  if(darfChart) darfChart.destroy();
+  darfChart=new Chart(document.getElementById('darfChart'),{type:'doughnut',
+    data:{labels:['Custo de aquisição','Taxas','Lucro líquido','IR devido','Prejuízo do mês'],
+      datasets:[{data:[Math.max(0,custo),Math.max(0,taxas),lucroLiquido,ir,prejuizoMes],
+        backgroundColor:['#5E5C58','#A78BFA','#1FC96E','#E8503A','#F87171']}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#8A8884',font:{size:11}}}}}
+  });
+}
+
+// ===================== REBALANCEAMENTO =====================
+function setRebModo(modo){
+  rebModo=modo;
+  document.getElementById('reb-tab-passivo').classList.toggle('active',modo==='passivo');
+  document.getElementById('reb-tab-ativo').classList.toggle('active',modo==='ativo');
+  document.getElementById('reb-aporte-box').style.display=(modo==='passivo')?'':'none';
+  calcRebalance();
+}
+
+function addAtivoReb(){
+  const nome=document.getElementById('reb-nome').value.trim();
+  const valor=+document.getElementById('reb-valor').value||0;
+  const pct=+document.getElementById('reb-pct').value||0;
+  if(!nome||valor<=0) return;
+  rebAtivos.push({nome,valor,pct});
+  document.getElementById('reb-nome').value='';
+  document.getElementById('reb-valor').value='';
+  document.getElementById('reb-pct').value='';
+  calcRebalance();
+}
+
+function removeAtivoReb(i){
+  rebAtivos.splice(i,1);
+  calcRebalance();
+}
+
+function calcRebalance(){
+  const lista=document.getElementById('reb-lista');
+  const aporte=(rebModo==='passivo')?(+document.getElementById('reb-aporte').value||0):0;
+
+  if(!rebAtivos.length){
+    lista.innerHTML='<div style="color:var(--text3);font-size:12px;padding:.5rem 0">Adicione ativos ou classes (ex: Ações, FIIs, Renda Fixa) para calcular o rebalanceamento.</div>';
+    document.getElementById('reb-total').textContent=fmt(0);
+    const spEl=document.getElementById('reb-soma-pct');
+    spEl.textContent='0%'; spEl.style.color='';
+    if(rebChart){ rebChart.destroy(); rebChart=null; }
+    return;
+  }
+
+  const totalAtual=rebAtivos.reduce((s,a)=>s+a.valor,0);
+  const somaPct=rebAtivos.reduce((s,a)=>s+a.pct,0);
+  document.getElementById('reb-total').textContent=fmt(totalAtual);
+  const spEl=document.getElementById('reb-soma-pct');
+  spEl.textContent=somaPct.toFixed(1)+'%';
+  spEl.style.color=(Math.abs(somaPct-100)<0.01)?'var(--up)':'var(--dn)';
+
+  let acoes;
+  if(rebModo==='ativo'){
+    acoes=rebAtivos.map(a=>{
+      const valorAlvo=totalAtual*(a.pct/100);
+      return {...a, diff:valorAlvo-a.valor};
+    });
+  } else {
+    const totalFinal=totalAtual+aporte;
+    const diffsPos=rebAtivos.map(a=>Math.max(0,totalFinal*(a.pct/100)-a.valor));
+    const somaDiffsPos=diffsPos.reduce((s,d)=>s+d,0);
+    let alocacoes;
+    if(somaDiffsPos<=aporte){
+      const sobra=aporte-somaDiffsPos;
+      alocacoes=rebAtivos.map((a,i)=>diffsPos[i]+(somaPct>0?sobra*(a.pct/somaPct):0));
+    } else if(somaDiffsPos>0){
+      alocacoes=diffsPos.map(d=>d*(aporte/somaDiffsPos));
+    } else {
+      alocacoes=rebAtivos.map(a=>somaPct>0?aporte*(a.pct/somaPct):0);
+    }
+    acoes=rebAtivos.map((a,i)=>({...a, diff:alocacoes[i]}));
+  }
+
+  lista.innerHTML=acoes.map((a,i)=>{
+    const pctAtual=totalAtual>0?(a.valor/totalAtual*100):0;
+    let diffLabel, diffColor;
+    if(rebModo==='ativo'){
+      diffLabel=(a.diff>=0?'Comprar '+fmt(a.diff):'Vender '+fmt(Math.abs(a.diff)));
+      diffColor=a.diff>=0?'var(--up)':'var(--dn)';
+    } else {
+      diffLabel=(a.diff>0.005?'Aportar '+fmt(a.diff):'Sem aporte');
+      diffColor=a.diff>0.005?'var(--up)':'var(--text3)';
+    }
+    return `<div class="carteira-item">
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:13px">${a.nome}</div>
+        <div style="font-size:11px;color:var(--text3)">${fmt(a.valor)} · ${pctAtual.toFixed(1)}% atual · ${a.pct.toFixed(1)}% alvo</div>
+      </div>
+      <div style="text-align:right;margin-right:12px">
+        <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:${diffColor}">${diffLabel}</div>
+      </div>
+      <button onclick="removeAtivoReb(${i})" style="background:var(--dn-bg);color:var(--dn);border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px;font-weight:700">✕</button>
+    </div>`;
+  }).join('');
+
+  if(rebChart) rebChart.destroy();
+  rebChart=new Chart(document.getElementById('rebChart'),{type:'bar',
+    data:{labels:acoes.map(a=>a.nome),
+      datasets:[
+        {label:'Atual (%)',data:acoes.map(a=>totalAtual>0?+(a.valor/totalAtual*100).toFixed(1):0),backgroundColor:'rgba(245,166,35,0.55)',borderRadius:4},
+        {label:'Alvo (%)',data:acoes.map(a=>a.pct),backgroundColor:'rgba(31,201,110,0.55)',borderRadius:4}
+      ]},
+    options:{...CHART_OPTS,scales:{...CHART_OPTS.scales,y:{...CHART_OPTS.scales.y,ticks:{...CHART_OPTS.scales.y.ticks,callback:v=>v+'%'}}}}
+  });
+}
+
+// ===================== CONVERSOR DE INFLAÇÃO (IPCA) =====================
+// Série anual aproximada do IPCA (IBGE) — ajuste os valores caso queira números oficiais mais recentes
+const IPCA_HIST = {
+  2000:5.97, 2001:7.67, 2002:12.53, 2003:9.30, 2004:7.60, 2005:5.69, 2006:3.14, 2007:4.46,
+  2008:5.90, 2009:4.31, 2010:5.91, 2011:6.50, 2012:5.84, 2013:5.91, 2014:6.41, 2015:10.67,
+  2016:6.29, 2017:2.95, 2018:3.75, 2019:4.31, 2020:4.52, 2021:10.06, 2022:5.79, 2023:4.62,
+  2024:4.83, 2025:4.68
+};
+const IPCA_ANO_BASE=2025; // último ano com IPCA fechado considerado como "hoje"
+
+function populateInflacaoSelect(){
+  const sel=document.getElementById('inf-ano');
+  if(!sel) return;
+  const anos=Object.keys(IPCA_HIST).map(Number).sort((a,b)=>a-b);
+  sel.innerHTML='';
+  anos.forEach(a=>{
+    if(a>=IPCA_ANO_BASE) return;
+    const opt=document.createElement('option');
+    opt.value=a;
+    opt.textContent=a+' ('+(IPCA_ANO_BASE-a)+' anos atrás)';
+    sel.appendChild(opt);
+  });
+  sel.value=anos[0];
+}
+
+function calcInflacao(){
+  const valor=+document.getElementById('inf-valor').value||0;
+  const anoRef=+document.getElementById('inf-ano').value||anos0();
+  const anosFut=+document.getElementById('inf-anos-fut').value||20;
+  const taxaFut=(+document.getElementById('inf-taxa-fut').value||4.5)/100;
+
+  // Inflação acumulada de anoRef até o ano-base
+  let fator=1;
+  const labels=[],indices=[];
+  for(let y=anoRef;y<=IPCA_ANO_BASE;y++){
+    if(y>anoRef) fator*=(1+(IPCA_HIST[y]||0)/100);
+    labels.push(String(y));
+    indices.push(+fator.toFixed(4));
+  }
+  const valorCorrigido=valor*fator;
+  document.getElementById('inf-passado').textContent=fmt(valorCorrigido);
+  document.getElementById('inf-acumulada').textContent='+'+((fator-1)*100).toFixed(1)+'%';
+
+  // Projeção futura (taxa média estimada)
+  const fatorFut=Math.pow(1+taxaFut,anosFut);
+  document.getElementById('inf-poder-futuro').textContent=fmt(valor/fatorFut);
+  document.getElementById('inf-nominal-futuro').textContent=fmt(valor*fatorFut);
+
+  if(inflacaoChart) inflacaoChart.destroy();
+  inflacaoChart=new Chart(document.getElementById('inflacaoChart'),{type:'line',
+    data:{labels,datasets:[{label:'Índice acumulado (base 1,0 em '+anoRef+')',data:indices,borderColor:'#E8503A',borderWidth:2,pointRadius:0,fill:true,backgroundColor:'rgba(232,80,58,0.08)',tension:0.3}]},
+    options:{...CHART_OPTS,plugins:{legend:{display:false}},scales:{...CHART_OPTS.scales,y:{...CHART_OPTS.scales.y,ticks:{...CHART_OPTS.scales.y.ticks,callback:v=>v.toFixed(1)+'x'}}}}
+  });
+}
+function anos0(){ return Object.keys(IPCA_HIST).map(Number).sort((a,b)=>a-b)[0]; }
+
+async function init(){ await loadData(); calcJuros(); populateInflacaoSelect(); }
 init();
 </script>
 </body></html>
