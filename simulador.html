@@ -997,23 +997,25 @@ const CLASSES_DEF = [
     ],
     defaultTickers: ['PETR4','VALE3','ITUB4','BBDC4','WEGE3'],
     exampleTickers: [
-      'ABEV3','AGRO3','ALSO3','ALUP11','AMAR3','AMBP3','AMER3','ARZZ3','ASAI3','AURE3',
-      'AZUL4','B3SA3','BBAS3','BBDC3','BBDC4','BBSE3','BEEF3','BIDI11','BPAC11','BPAN4',
-      'BRAP3','BRAP4','BRFS3','BRKM3','BRKM5','BRML3','BRPR3','BRSR6','BTOW3','CAML3',
-      'CCRO3','CIEL3','CLSA3','CMIG3','CMIG4','COGN3','CPFE3','CPLE3','CPLE6','CRFB3',
-      'CSAN3','CSMG3','CSNA3','CURY3','CVCB3','CXSE3','CYRELA3','DASA3','DIRR3','DXCO3',
-      'ECOR3','EGIE3','ELET3','ELET6','EMBR3','ENEV3','ENGI11','EQTL3','EZTC3','FESA4',
-      'FLRY3','FRAS3','GBIO33','GGBR3','GGBR4','GOAU3','GOAU4','GOLL4','HAPV3','HBSA3',
-      'HYPE3','IGTA3','INTB3','IRBR3','ITSA3','ITSA4','ITUB3','ITUB4','JBSS3','JHSF3',
-      'KLBN11','KLBN3','KLBN4','LAME3','LAME4','LAVV3','LEVE3','LIGT3','LINX3','LJQQ3',
-      'LOGG3','LOGN3','LREN3','LWSA3','MDIA3','MEEI3','MGLU3','MILS3','MRFG3','MRVE3',
+      // ── Top 30 por market cap / mais negociados ──
+      'VALE3','PETR4','PETR3','ITUB4','ITUB3','BBDC4','BBDC3','BBAS3','WEGE3','ABEV3',
+      'RENT3','RADL3','SUZB3','EQTL3','RDOR3','LREN3','PRIO3','GGBR4','GGBR3','EMBR3',
+      'JBSS3','BRFS3','B3SA3','SANB11','ITSA4','ITSA3','CMIG4','CMIG3','ELET3','ELET6',
+      // ── Demais em ordem alfabética ──
+      'AGRO3','ALSO3','ALUP11','AMAR3','AMBP3','AMER3','ARZZ3','ASAI3','AURE3','AZUL4',
+      'BBSE3','BEEF3','BIDI11','BPAC11','BPAN4','BRAP3','BRAP4','BRKM3','BRKM5','BRML3',
+      'BRPR3','BRSR6','BTOW3','CAML3','CCRO3','CIEL3','CLSA3','COGN3','CPFE3','CPLE3',
+      'CPLE6','CRFB3','CSAN3','CSMG3','CSNA3','CURY3','CVCB3','CXSE3','CYRELA3','DASA3',
+      'DIRR3','DXCO3','ECOR3','EGIE3','ENEV3','ENGI11','EZTC3','FESA4','FLRY3','FRAS3',
+      'GBIO33','GOAU3','GOAU4','GOLL4','HAPV3','HBSA3','HYPE3','IGTA3','INTB3','IRBR3',
+      'JHSF3','KLBN11','KLBN3','KLBN4','LAME3','LAME4','LAVV3','LEVE3','LIGT3','LINX3',
+      'LJQQ3','LOGG3','LOGN3','LWSA3','MDIA3','MEEI3','MGLU3','MILS3','MRFG3','MRVE3',
       'MULT3','MYPK3','NATURA3','NEOE3','NFLX34','NTCO3','ODPV3','OIBR3','OIBR4','OMGE3',
-      'PCAR3','PETR3','PETR4','PETZ3','PGMN3','POMO3','POMO4','POSI3','PRIO3','PTBL3',
-      'QUAL3','RADL3','RAIZ4','RAIL3','RDOR3','RECV3','RENT3','ROMI3','ROXO34','SANB11',
-      'SANB3','SANB4','SBSP3','SEER3','SEQL3','SIMH3','SLCE3','SMTO3','SQIA3','STBP3',
-      'SUZB3','TAEE11','TAEE3','TAEE4','TASA3','TASA4','TEND3','TIMS3','TOTS3','TPIS3',
-      'TRPL3','TRPL4','UGPA3','UNIP3','UNIP6','USIM3','USIM5','VALE3','VBBR3','VIVT3',
-      'VLID3','VVAR3','WEGE3','WIZS3','YDUQ3','ZAMP3',
+      'PCAR3','PETZ3','PGMN3','POMO3','POMO4','POSI3','PTBL3','QUAL3','RAIZ4','RAIL3',
+      'RECV3','ROMI3','ROXO34','SANB3','SANB4','SBSP3','SEER3','SEQL3','SIMH3','SLCE3',
+      'SMTO3','SQIA3','STBP3','TAEE11','TAEE3','TAEE4','TASA3','TASA4','TEND3','TIMS3',
+      'TOTS3','TPIS3','TRPL3','TRPL4','UGPA3','UNIP3','UNIP6','USIM3','USIM5','VBBR3',
+      'VIVT3','VLID3','VVAR3','WIZS3','YDUQ3','ZAMP3',
     ],
   },
   {
@@ -1026,12 +1028,14 @@ const CLASSES_DEF = [
     ],
     defaultTickers: ['MXRF11','HGLG11','KNRI11','XPML11','VISC11'],
     exampleTickers: [
-      'MXRF11','HGLG11','KNRI11','XPML11','VISC11','BCFF11','RBRF11','BTLG11','HGRU11','IRDM11',
-      'BRCO11','BRCR11','BTCI11','CPTS11','CVBI11','DEVA11','FAED11','FIIB11','GGRC11','GTLG11',
-      'HABT11','HCRI11','HFOF11','HGBS11','HGPO11','HGRE11','HTMX11','HSML11','IMGR11','JRDM11',
-      'KNCR11','KNHY11','KNIP11','LVBI11','MALL11','MBRF11','MGFF11','MCCI11','MCRE11','MONO11',
-      'PATC11','PVBI11','RBHY11','RBRD11','RBRL11','RCFA11','RECR11','RECT11','RMAI11','RPRI11',
-      'RZAK11','RZTR11','SDIL11','SPTW11','TGAR11','URPR11','VGIP11','VGIR11','VILG11','VINO11',
+      // ── Top por PL / liquidez ──
+      'MXRF11','HGLG11','KNRI11','XPML11','VISC11','CPTS11','IRDM11','BTLG11','HGRU11','BCFF11',
+      'RBRF11','KNCR11','RECR11','BRCO11','BRCR11','MALL11','HGBS11','HGRE11','PVBI11','VGIP11',
+      // ── Demais em ordem alfabética ──
+      'BTCI11','CVBI11','DEVA11','FAED11','FIIB11','GGRC11','GTLG11','HABT11','HCRI11','HFOF11',
+      'HGPO11','HTMX11','HSML11','IMGR11','JRDM11','KNHY11','KNIP11','LVBI11','MBRF11','MCCI11',
+      'MCRE11','MGFF11','MONO11','PATC11','RBHY11','RBRD11','RBRL11','RCFA11','RECT11','RMAI11',
+      'RPRI11','RZAK11','RZTR11','SDIL11','SPTW11','TGAR11','URPR11','VGIR11','VILG11','VINO11',
       'VIUR11','VRTA11','VSHO11','VTLT11','VXXV11','WPLZ11','XPCA11','XPIN11','XPLG11','XPPR11',
       'XPTA11','XPCT11',
     ],
@@ -1061,7 +1065,7 @@ const CLASSES_DEF = [
       { ticker: 'EURBRL', desc: 'EUR/BRL' },
     ],
     defaultTickers: ['IVVB11','SPXI11'],
-    exampleTickers: ['IVVB11','SPXI11','SPY:BRL','QQQ:BRL','AAPL:BRL','MSFT:BRL','AMZO34','MSFT34'],
+    exampleTickers: ['IVVB11','SPXI11','SPY:BRL','QQQ:BRL','MSFT34','AMZO34','AAPL:BRL','MSFT:BRL'],
   },
   {
     id: 'cripto', icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M11.767 19.089c4.924.868 6.14-6.025 1.216-6.894M10.551 19.089L5.86 18.047m5.908 1.042-.347 1.97m1.563-8.864c4.924.869 6.14-6.025 1.215-6.893m-1.215 6.893-3.94-.694m5.155-6.2L8.29 5.26m5.908 1.042.348-1.97M7.48 20.364l3.126-17.727" stroke="#e0b84a" stroke-width="5" stroke-opacity="0.22"/><path d="M11.767 19.089c4.924.868 6.14-6.025 1.216-6.894M10.551 19.089L5.86 18.047m5.908 1.042-.347 1.97m1.563-8.864c4.924.869 6.14-6.025 1.215-6.893m-1.215 6.893-3.94-.694m5.155-6.2L8.29 5.26m5.908 1.042.348-1.97M7.48 20.364l3.126-17.727" stroke="#e0b84a" stroke-width="1.5"/></svg>`, name: 'Cripto', sub: 'BTC, ETH, SOL, HASH11', color: '#f7931a',
@@ -1072,7 +1076,7 @@ const CLASSES_DEF = [
       { ticker: 'HASH11', desc: 'Cripto B3' },
     ],
     defaultTickers: ['BTCBRL','ETHBRL'],
-    exampleTickers: ['BTCBRL','ETHBRL','SOLBRL','BNBBRL','XRPBRL','ADABRL','DOGEBRL','AVAXBRL','LINKBRL','DOTBRL','LTCBRL','XLMBRL','ATOMBRL','TONBRL','NEARBRL','UNIBRL','BCHBRL','MATICBRL','ETCBRL','TRXBRL','ICPBRL','APTBRL','PEPEBRL','SHIBABRL','FILBRL','HASH11','QBTC11'],
+    exampleTickers: ['BTCBRL','ETHBRL','SOLBRL','BNBBRL','XRPBRL','DOGEBRL','ADABRL','TRXBRL','AVAXBRL','TONBRL','LINKBRL','BCHBRL','DOTBRL','NEARBRL','LTCBRL','SHIBABRL','PEPEBRL','UNIBRL','ICPBRL','APTBRL','ETCBRL','XLMBRL','ATOMBRL','FILBRL','MATICBRL','HASH11','QBTC11'],
   },
   {
     id: 'etf', icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" fill="#e0b84a" fill-opacity="0.15" stroke="#e0b84a" stroke-width="1.4" stroke-linejoin="round"/><line x1="3" y1="6" x2="21" y2="6" stroke="#e0b84a" stroke-width="1.4"/><path d="M16 10a4 4 0 0 1-8 0" stroke="#e0b84a" stroke-width="1.4"/></svg>`, name: 'ETFs', sub: 'ETFs B3', color: '#e05c5c',
@@ -4205,10 +4209,14 @@ async function initDynamicTickers() {
     // Se não reconheceu a classe, não adiciona — evita poluir listas erradas
   });
 
-  // Aplica de volta, ordenado
+  // Aplica de volta: preserva a ordem original, novos tickers vão no final em ordem alfabética
   CLASSES_DEF.forEach(cls => {
     if (classMap[cls.id]) {
-      cls.exampleTickers = Array.from(classMap[cls.id]).sort();
+      const originais = cls.exampleTickers;
+      const novos = Array.from(classMap[cls.id])
+        .filter(t => !originais.includes(t))
+        .sort();
+      cls.exampleTickers = [...originais, ...novos];
     }
   });
 
