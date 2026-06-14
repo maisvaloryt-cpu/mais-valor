@@ -2,13 +2,19 @@
 fetch_historico_indices.py — Historico mensal de indices para o Simulador
 Merge incremental: nunca apaga dados existentes, so adiciona o que falta.
 
-ESTRATEGIA EM CASCATA por categoria:
+ESTRATEGIA por categoria:
   ETFs B3 (IMAB11, SMAL11, etc): Yahoo (.SA) → Brapi (rodizio de tokens)
   Indices raw (^BVSP, BRL=X):    Yahoo → Brapi (rodizio de tokens)
   CDI/IPCA:                       BCB → (sem alternativa, unico dado oficial)
   Cambio:                         Yahoo → AwesomeAPI
   Cripto:                         CoinGecko → Yahoo
+  Indices EUA (^GSPC, SPY):       Yahoo + Massive (complementar, AMBOS mergeados)
   Calculados (SPXBRL, OURO):      derivados dos acima
+
+NOTA IMPORTANTE sobre Massive para indices EUA:
+  Nao e cascata (parar no primeiro sucesso).
+  Yahoo e Massive sao buscados SEMPRE e mergeados juntos.
+  Yahoo da 15 anos; Massive complementa com 2 anos (preenche gaps recentes).
 """
 import json, datetime, os, sys, time, requests
 
@@ -195,6 +201,52 @@ def fetch_coingecko(coin_id):
             time.sleep(5)
     return []
 
+def fetch_massive_monthly_hist(ticker, anos=2):
+    """
+    Busca historico mensal via Massive API (fonte complementar ao Yahoo).
+    Usa rodizio de chaves Brapi (as chaves Massive ficam em MASSIVE_TOKEN_1..5).
+    Retorna lista de {date, close}.
+    """
+    import os as _os
+    massive_keys = [k for k in [
+        _os.environ.get("MASSIVE_TOKEN_1",""),
+        _os.environ.get("MASSIVE_TOKEN_2",""),
+        _os.environ.get("MASSIVE_TOKEN_3",""),
+        _os.environ.get("MASSIVE_TOKEN_4",""),
+        _os.environ.get("MASSIVE_TOKEN_5",""),
+    ] if k]
+    if not massive_keys:
+        return []
+    key = massive_keys[0]  # usa primeira chave disponivel
+    today = datetime.date.today()
+    end_dt = today.strftime("%Y-%m-%d")
+    start_dt = today.replace(year=today.year - anos).strftime("%Y-%m-%d")
+    url = (f"https://api.massive.com/v2/aggs/ticker/{ticker}/range/1/month/"
+           f"{start_dt}/{end_dt}?apiKey={key}")
+    try:
+        r = requests.get(url, headers=YAHOO_HEADERS, timeout=20)
+        if r.status_code == 429:
+            print(f"    [massive] rate limit, aguardando 15s...", end=" ")
+            time.sleep(15)
+            return []
+        if r.status_code != 200:
+            return []
+        results = r.json().get("results", [])
+        pts = []
+        for res in results:
+            t_ms = res.get("t") or res.get("timestamp", 0)
+            c = res.get("c") or res.get("close", 0)
+            if t_ms and c:
+                dt = datetime.datetime.fromtimestamp(
+                    t_ms / 1000, tz=datetime.timezone.utc
+                )
+                pts.append({"date": dt.strftime("%Y-%m-%d"), "close": round(float(c), 2)})
+        pts.sort(key=lambda x: x["date"])
+        return pts
+    except Exception as e:
+        print(f"    [massive] erro: {e}", end=" ")
+        return []
+
 def fetch_awesomeapi_hist(code):
     """Busca historico de cambio via AwesomeAPI (ultimos 30 dias como fallback)."""
     try:
@@ -308,12 +360,22 @@ def main():
     print("\n── Indices calculados ──")
 
     print("[SPX_USD] S&P 500 em USD...", end=" ", flush=True)
-    pts = fetch_yahoo("^GSPC") or fetch_yahoo("SPY")
-    if pts:
-        merge_historico("data/historico/SPX_USD.json", "SPX_USD", pts)
-        print(f"{len(pts)} pts via Yahoo")
+    spx_pts = fetch_yahoo("^GSPC") or fetch_yahoo("SPY")
+    if spx_pts:
+        print(f"Yahoo:{len(spx_pts)}pts", end=" ")
     else:
-        print("sem dados")
+        print("Yahoo:0pts", end=" ")
+    # Massive como complemento (busca mesmo que Yahoo tenha funcionado)
+    massive_spx = fetch_massive_monthly_hist("I:SPX", anos=2)
+    if massive_spx:
+        print(f"Massive:{len(massive_spx)}pts", end=" ")
+        spx_pts = (spx_pts or []) + massive_spx
+    all_spx = spx_pts or []
+    if all_spx:
+        adicionados = merge_historico("data/historico/SPX_USD.json", "SPX_USD", all_spx)
+        print(f"→ +{adicionados} novos")
+    else:
+        print("→ sem dados")
     time.sleep(1.2)
 
     print("[SPXBRL] S&P 500 em BRL...", end=" ", flush=True)

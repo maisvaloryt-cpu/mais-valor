@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consolidador de Carteira — Rentabilidade</title>
+<link rel="stylesheet" href="common.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
+</head>
+<body>
+<h2 class="sr-only">Consolidador de Carteira — Rentabilidade por classe e por ativo</h2>
+
+<div class="app">
+  <div class="header">
+    <h1><i class="ti ti-chart-pie" aria-hidden="true" style="color:var(--blue)"></i>Consolidador de Carteira</h1>
+    <div class="header-actions" id="header-actions"></div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div id="tab-rentabilidade">
+    <div class="metrics" id="metrics-rent"></div>
+    <div class="card" style="margin-bottom:1.25rem">
+      <div class="card-title">Rentabilidade por Classe (%)</div>
+      <div style="position:relative;height:200px"><canvas id="chartRentClasse" role="img" aria-label="Rentabilidade por classe"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Rentabilidade por Ativo</div>
+      <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>Ticker</th><th>Classe</th><th class="r">Preço Médio</th><th class="r">Cotação Atual</th><th class="r">Variação R$</th><th class="r">Variação %</th><th class="r">Rentabilidade</th></tr></thead>
+        <tbody id="tbody-rent"></tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="common.js"></script>
+<script>
+renderHeaderAndNav('rentabilidade');
+injectModals();
+
+function renderRentabilidade(){
+  const c=calcAtivos();
+  const t=getTotals();
+  document.getElementById('metrics-rent').innerHTML=`
+    <div class="mcard"><div class="mcard-label">Rentabilidade Total</div><div class="mcard-value ${t.resPct>=0?'positive':'negative'}">${fmtP(t.resPct)}</div></div>
+    <div class="mcard"><div class="mcard-label">Melhor Ativo</div><div class="mcard-value positive">${c.slice().sort((a,b)=>b.resPct-a.resPct)[0]?.ticker||'-'}</div></div>
+    <div class="mcard"><div class="mcard-label">Pior Ativo</div><div class="mcard-value negative">${c.slice().sort((a,b)=>a.resPct-b.resPct)[0]?.ticker||'-'}</div></div>
+  `;
+  const bcc={};
+  c.forEach(a=>{if(!bcc[a.classe])bcc[a.classe]={vt:0,custo:0};bcc[a.classe].vt+=a.vt;bcc[a.classe].custo+=a.custo});
+  const clsKeys=Object.keys(bcc);
+  const rentVals=clsKeys.map(k=>bcc[k].custo>0?parseFloat((((bcc[k].vt-bcc[k].custo)/bcc[k].custo)*100).toFixed(2)):0);
+  if(charts.rentCls)charts.rentCls.destroy();
+  charts.rentCls=new Chart(document.getElementById('chartRentClasse').getContext('2d'),{
+    type:'bar',data:{labels:clsKeys.map(k=>CLASS_LABEL[k]||k),datasets:[{label:'Rentabilidade',data:rentVals,backgroundColor:rentVals.map(v=>v>=0?'#1D9E75':'#E24B4A'),borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+(c.raw>=0?'+':'')+c.raw+'%'}}},scales:{x:{grid:{display:false},ticks:{color:'#888',font:{size:11}}},y:{grid:{color:'rgba(128,128,128,0.08)'},ticks:{color:'#888',font:{size:11},callback:v=>v+'%'}}}}
+  });
+  const tb=document.getElementById('tbody-rent');
+  tb.innerHTML=c.sort((a,b)=>b.resPct-a.resPct).map(a=>`
+    <tr><td><strong>${a.ticker}</strong></td><td><span class="badge ${CLASS_BADGE[a.classe]||''}">${CLASS_LABEL[a.classe]||a.classe}</span></td>
+    <td class="r">${fmtR(a.pm)}</td><td class="r">${fmtR(a.cotacao)}</td>
+    <td class="r ${a.res>=0?'positive':'negative'}">${a.res>=0?'+':''}${fmtR(a.res)}</td>
+    <td class="r"><span class="pill ${a.resPct>=0?'pill-up':'pill-dn'}">${a.resPct>=0?'▲':'▼'} ${fmt(Math.abs(a.resPct))}%</span></td>
+    <td class="r ${a.resPct>=0?'positive':'negative'}">${fmtP(a.resPct)}</td></tr>
+  `).join('');
+}
+
+function renderAll(){
+  renderRentabilidade();
+}
+
+renderAll();
+</script>
+</body>
+</html>

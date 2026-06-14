@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consolidador de Carteira — Resumo</title>
+<link rel="stylesheet" href="common.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
+</head>
+<body>
+<h2 class="sr-only">Consolidador de Carteira — Resumo geral da carteira</h2>
+
+<div class="app">
+  <div class="header">
+    <h1><i class="ti ti-chart-pie" aria-hidden="true" style="color:var(--blue)"></i>Consolidador de Carteira</h1>
+    <div class="header-actions" id="header-actions"></div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div id="tab-resumo">
+    <div class="metrics" id="metrics-resumo"></div>
+    <div class="charts-row">
+      <div class="card">
+        <div class="card-title">
+          Evolução do Patrimônio
+          <select onchange="renderEvolucao(this.value)" style="font-size:11px;padding:3px 6px;border:0.5px solid var(--color-border-secondary);border-radius:6px;background:var(--color-background-primary);color:var(--color-text-secondary)">
+            <option>12 Meses</option><option>6 Meses</option><option>Todo período</option>
+          </select>
+        </div>
+        <div style="position:relative;height:190px"><canvas id="chartEvol" role="img" aria-label="Evolução do patrimônio mensal"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Ativos na Carteira
+          <select onchange="renderPizza(this.value)" style="font-size:11px;padding:3px 6px;border:0.5px solid var(--color-border-secondary);border-radius:6px;background:var(--color-background-primary);color:var(--color-text-secondary)">
+            <option value="classe">Todos os tipos</option><option value="ativo">Por ativo</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="position:relative;width:140px;height:140px;flex-shrink:0"><canvas id="chartPizza" role="img" aria-label="Alocação por tipo de ativo"></canvas></div>
+          <div id="legendPizza" style="flex:1;display:flex;flex-direction:column;gap:5px"></div>
+        </div>
+      </div>
+    </div>
+    <div class="section-title"><i class="ti ti-stack" aria-hidden="true"></i>Meus Ativos <span id="total-count" style="font-size:12px;color:var(--color-text-secondary);font-weight:400"></span></div>
+    <div id="grupos-ativos"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="common.js"></script>
+<script>
+renderHeaderAndNav('resumo');
+injectModals();
+
+function renderMetricsResumo(){
+  const t=getTotals();
+  document.getElementById('metrics-resumo').innerHTML=`
+    <div class="mcard">
+      <div class="mcard-label"><i class="ti ti-wallet" aria-hidden="true"></i> Patrimônio total</div>
+      <div class="mcard-value">${fmtR(t.total)}</div>
+      <div class="mcard-sub">Valor investido: <strong>${fmtR(t.custo)}</strong></div>
+    </div>
+    <div class="mcard">
+      <div class="mcard-label"><i class="ti ti-trending-up" aria-hidden="true"></i> Lucro total</div>
+      <div class="mcard-value ${t.res>=0?'positive':'negative'}">${t.res>=0?'+':''}${fmtR(t.res)}</div>
+      <div class="mcard-sub">Ganho de Capital: <span class="${t.res>=0?'positive':'negative'}">${t.res>=0?'+':''}${fmtR(t.res)}</span></div>
+    </div>
+    <div class="mcard">
+      <div class="mcard-label"><i class="ti ti-coin" aria-hidden="true"></i> Proventos (12M)</div>
+      <div class="mcard-value positive">${fmtR(t.provAno)}</div>
+      <div class="mcard-sub">DY médio: <strong class="positive">${fmt(t.dyMed)}%</strong></div>
+    </div>
+    <div class="mcard">
+      <div class="mcard-label"><i class="ti ti-chart-bar" aria-hidden="true"></i> Variação</div>
+      <div class="mcard-value ${t.resPct>=0?'positive':'negative'}">${fmtP(t.resPct)}</div>
+      <div class="mcard-sub">${fmtR(Math.abs(t.res))} ${t.res>=0?'acima':'abaixo'} do custo</div>
+    </div>
+    <div class="mcard">
+      <div class="mcard-label"><i class="ti ti-percent" aria-hidden="true"></i> Rentabilidade</div>
+      <div class="mcard-value ${t.resPct>=0?'positive':'negative'}">${fmtP(t.resPct)}</div>
+      <div class="mcard-sub">${ativos.length} ativos em ${new Set(ativos.map(a=>a.classe)).size} classes</div>
+    </div>
+  `;
+}
+
+function renderEvolucao(){
+  const meses=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const base=getTotals().custo;
+  const va=meses.map((_,i)=>parseFloat((base*0.6+(i*base*0.03)).toFixed(2)));
+  const gc=meses.map((_,i)=>parseFloat((i*base*0.025).toFixed(2)));
+  if(charts.evol)charts.evol.destroy();
+  charts.evol=new Chart(document.getElementById('chartEvol').getContext('2d'),{
+    type:'bar',
+    data:{labels:meses,datasets:[
+      {label:'Valor aplicado',data:va,backgroundColor:'#1D9E75',borderRadius:2,stack:'s'},
+      {label:'Ganho de Capital',data:gc,backgroundColor:'#9FE1CB',borderRadius:2,stack:'s'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtR(c.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#888',font:{size:10}}},y:{grid:{color:'rgba(128,128,128,0.08)'},ticks:{color:'#888',font:{size:10},callback:v=>'R$'+Math.round(v/1000)+'k'}}}}
+  });
+}
+
+function renderPizza(mode='classe'){
+  const c=calcAtivos();
+  const total=c.reduce((s,a)=>s+a.vt,0);
+  let labels,vals,colors;
+  if(mode==='ativo'){
+    labels=c.map(a=>a.ticker);
+    vals=c.map(a=>parseFloat(a.vt.toFixed(2)));
+    colors=['#185FA5','#3B6D11','#BA7517','#534AB7','#0F6E56','#993C1D','#1D9E75','#D85A30','#9FE1CB','#378ADD'];
+  } else {
+    const bc=byClasse(c);
+    labels=Object.keys(bc).map(k=>CLASS_LABEL[k]||k);
+    vals=Object.values(bc).map(v=>parseFloat(v.toFixed(2)));
+    colors=Object.keys(bc).map(k=>CLASS_COLORS[k]||'#888');
+  }
+  if(charts.pizza)charts.pizza.destroy();
+  charts.pizza=new Chart(document.getElementById('chartPizza').getContext('2d'),{
+    type:'doughnut',
+    data:{labels,datasets:[{data:vals,backgroundColor:colors,borderWidth:0,hoverOffset:3}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtR(c.raw)+' ('+((c.raw/total)*100).toFixed(1)+'%)'}}}}
+  });
+  document.getElementById('legendPizza').innerHTML=labels.map((l,i)=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)">
+        <span style="width:9px;height:9px;border-radius:50%;background:${colors[i]};flex-shrink:0"></span>${l}
+      </span>
+      <span style="font-size:11px;font-weight:500;color:var(--color-text-primary)">${total?((vals[i]/total)*100).toFixed(1):0}%</span>
+    </div>
+  `).join('');
+}
+
+function renderGrupos(){
+  const c=calcAtivos();
+  const total=c.reduce((s,a)=>s+a.vt,0);
+  const totalAtivos=c.length;
+  document.getElementById('total-count').textContent='('+totalAtivos+')';
+  const grupos={};
+  c.forEach(a=>{if(!grupos[a.classe])grupos[a.classe]=[];grupos[a.classe].push(a)});
+  let html='';
+  Object.entries(grupos).forEach(([cls,items])=>{
+    const gVt=items.reduce((s,a)=>s+a.vt,0);
+    const gCusto=items.reduce((s,a)=>s+a.custo,0);
+    const gVar=gCusto>0?((gVt-gCusto)/gCusto)*100:0;
+    const gRent=gVar;
+    const pctCart=total>0?((gVt/total)*100).toFixed(1):0;
+    html+=`<div class="grupo">
+      <div class="grupo-header" onclick="toggleGrupo('g-${cls}',this)">
+        <div class="grupo-icon" style="background:${CLASS_COLORS[cls]}22;color:${CLASS_COLORS[cls]}">${(CLASS_LABEL[cls]||cls).slice(0,2)}</div>
+        <span class="grupo-name">${CLASS_LABEL[cls]||cls}</span>
+        <div class="grupo-stats">
+          <div class="grupo-stat"><div class="gs-label">Ativos</div><div class="gs-value">${items.length}</div></div>
+          <div class="grupo-stat"><div class="gs-label">Valor total</div><div class="gs-value">${fmtR(gVt)}</div></div>
+          <div class="grupo-stat"><div class="gs-label">Variação</div><div class="gs-value ${gVar>=0?'positive':'negative'}">${fmtP(gVar)}</div></div>
+          <div class="grupo-stat"><div class="gs-label">Rentabilidade</div><div class="gs-value ${gRent>=0?'positive':'negative'}">${fmtP(gRent)}</div></div>
+          <div class="grupo-stat"><div class="gs-label">% carteira</div><div class="gs-value">${pctCart}%</div></div>
+        </div>
+        <i class="ti ti-chevron-down chevron open" aria-hidden="true"></i>
+      </div>
+      <div id="g-${cls}">
+        <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Ativo</th><th class="r">Quant.</th><th class="r">Preço Médio</th><th class="r">Preço Atual</th><th class="r">Variação</th><th class="r">Rentabilidade</th><th class="r">Saldo</th><th class="r">Nota</th><th class="r">% Carteira</th><th class="r">% Ideal</th><th class="r">Comprar?</th><th></th></tr></thead>
+          <tbody>
+            ${items.map(a=>`<tr>
+              <td><strong>${a.ticker}</strong></td>
+              <td class="r">${a.qtd.toLocaleString('pt-BR')}</td>
+              <td class="r">${fmtR(a.pm)}</td>
+              <td class="r">${fmtR(a.cotacao)}</td>
+              <td class="r"><span class="pill ${a.res>=0?'pill-up':'pill-dn'}">${a.res>=0?'▲':'▼'} ${fmt(Math.abs(a.resPct))}%</span></td>
+              <td class="r ${a.resPct>=0?'positive':'negative'}">${fmtP(a.resPct)}</td>
+              <td class="r">${fmtR(a.vt)}</td>
+              <td class="r"><span class="nota" style="background:${NOTA_COLOR(a.nota||0)}">${a.nota||'-'}</span></td>
+              <td class="r">${total?((a.vt/total)*100).toFixed(1):0}% / ${a.ideal||0}%</td>
+              <td class="r">${a.ideal||0}%</td>
+              <td class="r ${a.comprar==='Sim'?'comprar-sim':'comprar-nao'}">${a.comprar==='Sim'?'✓ Sim':'✕ Não'}</td>
+              <td><button class="btn btn-sm" onclick="removeAtivo('${a.ticker}')"><i class="ti ti-trash" aria-hidden="true"></i></button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('grupos-ativos').innerHTML=html||'<div class="empty">Nenhum ativo cadastrado. Clique em "+ Adicionar Lançamento".</div>';
+}
+
+function renderAll(){
+  renderMetricsResumo();
+  renderEvolucao();
+  renderPizza();
+  renderGrupos();
+}
+
+renderAll();
+</script>
+</body>
+</html>

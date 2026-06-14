@@ -1,12 +1,87 @@
 """
 fetch_indices.py — Busca índices com estratégia em cascata:
   1. yfinance (Yahoo Finance direto, sem token)
-  2. AwesomeAPI (câmbio, cripto, commodities)
-  3. Brapi (fallback final, alterna tokens, tenta lote e depois individual)
-  4. stale (último valor salvo)
+  2. Massive API (índices EUA e forex — NUNCA substitui yfinance, apenas preenche gaps)
+  3. AwesomeAPI (câmbio, cripto, commodities)
+  4. Brapi (fallback final, alterna tokens, tenta lote e depois individual)
+  5. stale (último valor salvo)
 Salva em data/indices.json
 """
 import json, datetime, os, requests, time
+
+# ── Massive API Keys (rodízio) ───────────────────────────────────────────────
+MASSIVE_KEYS = [k for k in [
+    os.environ.get("MASSIVE_TOKEN_1", ""),
+    os.environ.get("MASSIVE_TOKEN_2", ""),
+    os.environ.get("MASSIVE_TOKEN_3", ""),
+    os.environ.get("MASSIVE_TOKEN_4", ""),
+    os.environ.get("MASSIVE_TOKEN_5", ""),
+] if k]
+_massive_idx = 0
+
+def next_massive_key():
+    global _massive_idx
+    if not MASSIVE_KEYS:
+        return ""
+    k = MASSIVE_KEYS[_massive_idx % len(MASSIVE_KEYS)]
+    _massive_idx += 1
+    return k
+
+MASSIVE_BASE = "https://api.massive.com"
+
+# Mapeamento: chave do JSON → ticker Massive
+MASSIVE_US_MAP = {
+    "sp500":   "I:SPX",
+    "nasdaq":  "I:NDX",
+    "dow":     "I:DJI",
+    "russell": "I:RUT",
+    "dolar":   "C:USDBRL",
+    "euro":    "C:EURBRL",
+}
+
+def fetch_massive_indices(keys_needed):
+    """
+    Busca índices EUA e forex via Massive API.
+    keys_needed: lista de chaves JSON (ex: ['sp500', 'nasdaq', 'dolar'])
+    Retorna {key: {val, chg, chg_pts}}
+    """
+    out = {}
+    massive_key = next_massive_key()
+    if not massive_key:
+        return out
+    rate_interval = max(0.1, 60 / (5 * max(1, len(MASSIVE_KEYS))))
+    for key in keys_needed:
+        ticker = MASSIVE_US_MAP.get(key)
+        if not ticker:
+            continue
+        url = f"{MASSIVE_BASE}/v2/aggs/ticker/{ticker}/prev?apiKey={massive_key}"
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=15)
+            if r.status_code == 429:
+                print(f"  [massive] rate limit, aguardando 15s...")
+                time.sleep(15)
+                continue
+            if r.status_code != 200:
+                print(f"  [massive] {key} ({ticker}): HTTP {r.status_code}")
+                continue
+            results = r.json().get("results", [])
+            if not results:
+                print(f"  [massive] {key}: sem resultados")
+                continue
+            res = results[0]
+            c = float(res.get("c") or res.get("close") or 0)
+            o = float(res.get("o") or res.get("open") or 0)
+            if not c:
+                continue
+            chg_pts = round(c - o, 4) if o else 0
+            chg_pct = round((chg_pts / o) * 100, 2) if o else 0
+            decimals = 4 if key in ("dolar", "euro") else 2
+            out[key] = {"val": round(c, decimals), "chg": chg_pct, "chg_pts": chg_pts}
+            print(f"  [massive] {key.upper()}: {round(c, decimals)} ({chg_pct:+.2f}%)")
+        except Exception as e:
+            print(f"  [massive] {key}: erro — {e}")
+        time.sleep(rate_interval)
+    return out
 
 # ── Tokens Brapi (rodízio) ────────────────────────────────────────────────────
 BRAPI_TOKENS = [
@@ -203,6 +278,7 @@ def main():
     now_str = now.strftime("%d/%m/%Y %H:%M")
 
     print(f"Tokens Brapi disponíveis: {len(BRAPI_TOKENS)}")
+    print(f"Chaves Massive disponíveis: {len(MASSIVE_KEYS)}")
 
     # Carregar lastValid para fallback stale
     last_valid = {}
@@ -243,40 +319,51 @@ def main():
     for key, data in yf_data.items():
         fill(key, data)
 
-    # ── 2. AwesomeAPI: câmbio ────────────────────────────────────────────────
-    print("\n── 2. AwesomeAPI: câmbio ──")
+    # ── 2. Massive: índices EUA e forex (preenche gaps do yfinance) ─────────
+    # Nunca sobrescreve dados frescos do yfinance — só atua no que falta
+    massive_keys_needed = [k for k in MASSIVE_US_MAP if k not in fresh]
+    if massive_keys_needed and MASSIVE_KEYS:
+        print(f"\n── 2. Massive: {len(massive_keys_needed)} índices/forex ainda sem dados ──")
+        massive_data = fetch_massive_indices(massive_keys_needed)
+        for key, data in massive_data.items():
+            fill(key, data)
+    else:
+        print("\n── 2. Massive: todos os índices EUA/forex já têm dados ou sem chaves ──")
+
+    # ── 3. AwesomeAPI: câmbio ────────────────────────────────────────────────
+    print("\n── 3. AwesomeAPI: câmbio ──")
     cambio = fetch_awesomeapi(["USD-BRL","EUR-BRL","GBP-BRL","JPY-BRL","ARS-BRL"], "câmbio")
     for code, (key, dec) in {"USDBRL":("dolar",4),"EURBRL":("euro",4),"GBPBRL":("gbp",4),"JPYBRL":("jpy",4),"ARSBRL":("ars",4)}.items():
         fill(key, parse_awesomeapi(cambio, code, dec))
         if key in fresh: print(f"  [awesome] {key.upper()}: {output[key]['val']}")
 
-    # ── 2b. AwesomeAPI: cripto ───────────────────────────────────────────────
-    print("\n── 2b. AwesomeAPI: cripto ──")
+    # ── 3b. AwesomeAPI: cripto ───────────────────────────────────────────────
+    print("\n── 3b. AwesomeAPI: cripto ──")
     cripto = fetch_awesomeapi(["BTC-USD","ETH-USD","SOL-USD","BNB-USD"], "cripto")
     for code, key in {"BTCUSD":"btc","ETHUSD":"eth","SOLUSD":"sol","BNBUSD":"bnb"}.items():
         fill(key, parse_awesomeapi(cripto, code, 2))
         if key in fresh: print(f"  [awesome] {key.upper()}: {output[key]['val']}")
 
-    # ── 2c. AwesomeAPI: commodities ──────────────────────────────────────────
-    print("\n── 2c. AwesomeAPI: commodities ──")
+    # ── 3c. AwesomeAPI: commodities ──────────────────────────────────────────
+    print("\n── 3c. AwesomeAPI: commodities ──")
     comms = fetch_awesomeapi(["XAU-USD","XAG-USD","WTI-USD"], "commodities")
     for code, key in {"XAUUSD":"ouro","XAGUSD":"prata","WTIUSD":"petroleo"}.items():
         fill(key, parse_awesomeapi(comms, code, 2))
         if key in fresh: print(f"  [awesome] {key.upper()}: {output[key]['val']}")
 
-    # ── 3. Brapi: apenas o que ainda não tem dado fresco ─────────────────────
+    # ── 4. Brapi: apenas o que ainda não tem dado fresco ─────────────────────
     all_brapi_map = {**BRAPI_BR_MAP, **BRAPI_US_MAP}
     missing = {sym: key for sym, key in all_brapi_map.items() if key not in fresh}
 
     if missing:
-        print(f"\n── 3. Brapi: buscando {len(missing)} índices ainda sem dados ──")
+        print(f"\n── 4. Brapi: buscando {len(missing)} índices ainda sem dados ──")
         brapi_data = fetch_brapi(missing)
         for key, data in brapi_data.items():
             fill(key, data)
     else:
-        print("\n── 3. Brapi: todos os índices já têm dados, pulando ──")
+        print("\n── 4. Brapi: todos os índices já têm dados, pulando ──")
 
-    # ── 4. stale: preenche o que ainda sobrou ────────────────────────────────
+    # ── 5. stale: preenche o que ainda sobrou ────────────────────────────────
     all_keys = list(YFINANCE_MAP.values()) + ["dolar","euro","gbp","jpy","ars","btc","eth","sol","bnb","ouro","prata","petroleo"]
     for key in all_keys:
         if key not in output:

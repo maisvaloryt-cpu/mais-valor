@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consolidador de Carteira — Análise</title>
+<link rel="stylesheet" href="common.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
+</head>
+<body>
+<h2 class="sr-only">Consolidador de Carteira — Análise de concentração, correlação e rebalanceamento</h2>
+
+<div class="app">
+  <div class="header">
+    <h1><i class="ti ti-chart-pie" aria-hidden="true" style="color:var(--blue)"></i>Consolidador de Carteira</h1>
+    <div class="header-actions" id="header-actions"></div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div id="tab-analise">
+    <div class="metrics" id="metrics-analise"></div>
+    <div class="analise-grid">
+      <div class="card">
+        <div class="card-title">Concentração — Top 5 Ativos</div>
+        <div style="position:relative;height:180px"><canvas id="chartConc" role="img" aria-label="Top 5 ativos por concentração"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Correlação por Classe</div>
+        <div style="position:relative;height:180px"><canvas id="chartCorr" role="img" aria-label="Diversificação por classe"></canvas></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Recomendação de Rebalanceamento</div>
+      <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>Classe</th><th class="r">% Atual</th><th class="r">% Ideal</th><th class="r">Diferença</th><th class="r">Ação Sugerida</th></tr></thead>
+        <tbody id="tbody-rebal"></tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="common.js"></script>
+<script>
+renderHeaderAndNav('analise');
+injectModals();
+
+function renderAnalise(){
+  const c=calcAtivos().sort((a,b)=>b.vt-a.vt);
+  const total=c.reduce((s,a)=>s+a.vt,0);
+  const dyMed=total>0?c.reduce((s,a)=>s+(a.dy*(a.vt/total)),0):0;
+  document.getElementById('metrics-analise').innerHTML=`
+    <div class="mcard"><div class="mcard-label">Diversificação</div><div class="mcard-value">${new Set(c.map(a=>a.classe)).size} classes</div></div>
+    <div class="mcard"><div class="mcard-label">DY Médio</div><div class="mcard-value positive">${fmt(dyMed)}%</div></div>
+    <div class="mcard"><div class="mcard-label">Ativo mais concentrado</div><div class="mcard-value">${c[0]?.ticker||'-'} (${total?fmt((c[0]?.vt||0)/total*100):0}%)</div></div>
+  `;
+  const top5=c.slice(0,5);
+  if(charts.conc)charts.conc.destroy();
+  charts.conc=new Chart(document.getElementById('chartConc').getContext('2d'),{
+    type:'bar',data:{labels:top5.map(a=>a.ticker),datasets:[{label:'% Carteira',data:top5.map(a=>parseFloat(((a.vt/total)*100).toFixed(1))),backgroundColor:['#185FA5','#3B6D11','#BA7517','#534AB7','#0F6E56'],borderRadius:4}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.raw+'%'}}},scales:{x:{grid:{color:'rgba(128,128,128,0.08)'},ticks:{color:'#888',font:{size:10},callback:v=>v+'%'}},y:{grid:{display:false},ticks:{color:'#888',font:{size:11}}}}}
+  });
+  const bc=byClasse(c);
+  const clsKeys=Object.keys(bc);
+  if(charts.corr)charts.corr.destroy();
+  charts.corr=new Chart(document.getElementById('chartCorr').getContext('2d'),{
+    type:'polarArea',data:{labels:clsKeys.map(k=>CLASS_LABEL[k]||k),datasets:[{data:clsKeys.map(k=>parseFloat(((bc[k]/total)*100).toFixed(1))),backgroundColor:clsKeys.map(k=>CLASS_COLORS[k]+'99'),borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'right',labels:{font:{size:10},color:'#888',boxWidth:10}}}}
+  });
+  const rebalTb=document.getElementById('tbody-rebal');
+  rebalTb.innerHTML=metas.map(m=>{
+    const atual=total>0?((bc[m.classe]||0)/total)*100:0;
+    const diff=atual-m.ideal;
+    let acao='',cor='';
+    if(diff>3){acao='Reduzir / Não aportar';cor='#E24B4A'}
+    else if(diff<-3){acao='Aumentar aporte';cor='#BA7517'}
+    else{acao='Manter';cor='#1D9E75'}
+    return`<tr><td><strong>${CLASS_LABEL[m.classe]||m.classe}</strong></td><td class="r">${fmt(atual)}%</td><td class="r">${m.ideal}%</td><td class="r" style="color:${diff>=0?'#E24B4A':'#BA7517'}">${diff>=0?'+':''}${fmt(diff)}%</td><td class="r" style="color:${cor};font-weight:500">${acao}</td></tr>`;
+  }).join('');
+}
+
+function renderAll(){
+  renderAnalise();
+}
+
+renderAll();
+</script>
+</body>
+</html>

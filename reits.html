@@ -105,20 +105,46 @@ window.MV_LOGO_SVG = '<svg viewBox="0 0 530 530" xmlns="http://www.w3.org/2000/s
 <script>
 let currentSort = 'mktcap';
 
-const REITS = [
-  {t:'PLD',  n:'Prologis Inc.',           p:118.40, v:0.65,  mktcap:108e9, dy:3.2, pvp:1.42, v12:5.8,  vol:'US$1.2B', volNum:1.2e9, setor:'Industrial'},
-  {t:'AMT',  n:'American Tower Corp.',    p:192.80, v:0.30,  mktcap:89e9,  dy:3.5, pvp:null,  v12:-2.1, vol:'US$0.9B', volNum:0.9e9, setor:'Infraestrutura'},
-  {t:'EQIX', n:'Equinix Inc.',            p:824.50, v:0.88,  mktcap:78e9,  dy:2.1, pvp:3.20,  v12:12.4, vol:'US$0.6B', volNum:0.6e9, setor:'Data Center'},
-  {t:'WELL', n:'Welltower Inc.',          p:96.20,  v:0.42,  mktcap:42e9,  dy:2.8, pvp:2.85,  v12:28.5, vol:'US$0.5B', volNum:0.5e9, setor:'Saúde'},
-  {t:'SPG',  n:'Simon Property Group',   p:148.60, v:-0.25, mktcap:47e9,  dy:5.4, pvp:null,  v12:8.2,  vol:'US$0.7B', volNum:0.7e9, setor:'Varejo'},
-  {t:'DLR',  n:'Digital Realty Trust',   p:148.20, v:1.20,  mktcap:42e9,  dy:3.0, pvp:2.10,  v12:22.8, vol:'US$0.5B', volNum:0.5e9, setor:'Data Center'},
-  {t:'O',    n:'Realty Income Corp.',     p:54.80,  v:0.15,  mktcap:34e9,  dy:5.8, pvp:1.22,  v12:2.1,  vol:'US$0.8B', volNum:0.8e9, setor:'Varejo'},
-  {t:'VTR',  n:'Ventas Inc.',             p:46.20,  v:0.55,  mktcap:18e9,  dy:3.8, pvp:2.40,  v12:18.4, vol:'US$0.3B', volNum:0.3e9, setor:'Saúde'},
-  {t:'ARE',  n:'Alexandria Real Estate', p:112.40, v:-0.40, mktcap:18e9,  dy:4.5, pvp:1.05,  v12:-14.2,vol:'US$0.2B', volNum:0.2e9, setor:'Saúde'},
-  {t:'EQR',  n:'Equity Residential',     p:66.80,  v:0.22,  mktcap:25e9,  dy:4.0, pvp:2.80,  v12:4.5,  vol:'US$0.4B', volNum:0.4e9, setor:'Residencial'},
-  {t:'AVB',  n:'AvalonBay Communities',  p:194.50, v:0.38,  mktcap:26e9,  dy:3.4, pvp:2.60,  v12:8.2,  vol:'US$0.3B', volNum:0.3e9, setor:'Residencial'},
-  {t:'BXP',  n:'Boston Properties',      p:64.20,  v:-0.80, mktcap:10e9,  dy:5.9, pvp:0.88,  v12:-18.5,vol:'US$0.2B', volNum:0.2e9, setor:'Escritório'},
+// Dados de demonstração — substituídos por data/stocks_us.json em runtime
+const REITS_FALLBACK = [
+  {t:'PLD',  n:'Prologis Inc.',           p:118.40, v:0.65,  mktcap:108e9, dy:3.2, pvp:1.42, v12:5.8,  setor:'Industrial',     tipo:'reit'},
+  {t:'AMT',  n:'American Tower Corp.',    p:192.80, v:0.30,  mktcap:89e9,  dy:3.5, pvp:null,  v12:-2.1, setor:'Infraestrutura', tipo:'reit'},
+  {t:'EQIX', n:'Equinix Inc.',            p:824.50, v:0.88,  mktcap:78e9,  dy:2.1, pvp:3.20,  v12:12.4, setor:'Data Center',    tipo:'reit'},
+  {t:'WELL', n:'Welltower Inc.',          p:96.20,  v:0.42,  mktcap:42e9,  dy:2.8, pvp:2.85,  v12:28.5, setor:'Saúde',          tipo:'reit'},
+  {t:'SPG',  n:'Simon Property Group',   p:148.60, v:-0.25, mktcap:47e9,  dy:5.4, pvp:null,  v12:8.2,  setor:'Varejo',         tipo:'reit'},
+  {t:'DLR',  n:'Digital Realty Trust',   p:148.20, v:1.20,  mktcap:42e9,  dy:3.0, pvp:2.10,  v12:22.8, setor:'Data Center',    tipo:'reit'},
+  {t:'O',    n:'Realty Income Corp.',     p:54.80,  v:0.15,  mktcap:34e9,  dy:5.8, pvp:1.22,  v12:2.1,  setor:'Varejo',         tipo:'reit'},
+  {t:'VTR',  n:'Ventas Inc.',             p:46.20,  v:0.55,  mktcap:18e9,  dy:3.8, pvp:2.40,  v12:18.4, setor:'Saúde',          tipo:'reit'},
+  {t:'ARE',  n:'Alexandria Real Estate', p:112.40, v:-0.40, mktcap:18e9,  dy:4.5, pvp:1.05,  v12:-14.2,setor:'Saúde',          tipo:'reit'},
+  {t:'EQR',  n:'Equity Residential',     p:66.80,  v:0.22,  mktcap:25e9,  dy:4.0, pvp:2.80,  v12:4.5,  setor:'Residencial',    tipo:'reit'},
+  {t:'AVB',  n:'AvalonBay Communities',  p:194.50, v:0.38,  mktcap:26e9,  dy:3.4, pvp:2.60,  v12:8.2,  setor:'Residencial',    tipo:'reit'},
+  {t:'BXP',  n:'Boston Properties',      p:64.20,  v:-0.80, mktcap:10e9,  dy:5.9, pvp:0.88,  v12:-18.5,setor:'Escritório',     tipo:'reit'},
 ];
+let REITS = [...REITS_FALLBACK];
+
+async function loadData() {
+  try {
+    const r = await fetch('data/stocks_us.json?t=' + Date.now());
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    // Filtra apenas REITs com preço disponível
+    const lista = (data.stocks || []).filter(s => s.tipo === 'reit' && s.p > 0);
+    if (lista.length > 0) {
+      // Garante campos necessários (pvp e v12 podem ser null no JSON)
+      REITS = lista.map(s => ({...s, pvp: s.pvp ?? null, v12: s.v12 ?? 0}));
+      const ts = document.getElementById('data-timestamp');
+      if (ts) ts.textContent = '· Atualizado em ' + data.updated_at + ' (' + lista.length + ' REITs)';
+      console.log('stocks_us.json: ' + lista.length + ' REITs carregados');
+    } else {
+      throw new Error('Sem REITs válidos no JSON');
+    }
+  } catch(e) {
+    console.warn('stocks_us.json indisponível, usando dados demonstrativos:', e.message);
+    REITS = [...REITS_FALLBACK];
+    const ts = document.getElementById('data-timestamp');
+    if (ts) ts.textContent = '· Dados demonstrativos';
+  }
+}
 
 function fmtCap(v) {
   if (!v) return '—';
@@ -229,8 +255,6 @@ async function init() {
   await loadData();
   filterTable();
   renderSidebar();
-  const ts = document.getElementById('data-timestamp');
-  if (ts) ts.textContent = '· Dados demonstrativos';
 }
 init();
 </script>

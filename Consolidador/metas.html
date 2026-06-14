@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consolidador de Carteira — Metas</title>
+<link rel="stylesheet" href="common.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
+</head>
+<body>
+<h2 class="sr-only">Consolidador de Carteira — Metas de alocação ideal vs. atual</h2>
+
+<div class="app">
+  <div class="header">
+    <h1><i class="ti ti-chart-pie" aria-hidden="true" style="color:var(--blue)"></i>Consolidador de Carteira</h1>
+    <div class="header-actions" id="header-actions"></div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div id="tab-metas">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <div class="section-title" style="margin:0"><i class="ti ti-target" aria-hidden="true"></i>Alocação Ideal vs. Atual</div>
+      <button class="btn btn-sm" onclick="openModalMeta()"><i class="ti ti-plus" aria-hidden="true"></i> Nova Meta</button>
+    </div>
+    <div id="metas-lista"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="common.js"></script>
+<script>
+renderHeaderAndNav('metas');
+injectModals();
+
+function renderMetas(){
+  const c=calcAtivos();
+  const total=c.reduce((s,a)=>s+a.vt,0);
+  const bc=byClasse(c);
+  let html='';
+  metas.forEach(m=>{
+    const atual=total>0?((bc[m.classe]||0)/total)*100:0;
+    const diff=atual-m.ideal;
+    const pct=Math.min(100,m.ideal>0?(atual/m.ideal)*100:0);
+    const cor=diff>2?'#E24B4A':diff<-2?'#BA7517':'#1D9E75';
+    html+=`<div class="meta-card">
+      <div class="meta-header">
+        <div>
+          <div class="meta-title">${CLASS_LABEL[m.classe]||m.classe}</div>
+          <div class="meta-pcts">Atual: <strong>${fmt(atual)}%</strong> &nbsp;·&nbsp; Ideal: <strong>${m.ideal}%</strong> &nbsp;·&nbsp; Diferença: <strong style="color:${cor}">${diff>=0?'+':''}${fmt(diff)}%</strong></div>
+        </div>
+        <span style="font-size:12px;color:${cor};font-weight:500">${diff>2?'↑ Acima':diff<-2?'↓ Abaixo':'✓ OK'}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${cor}"></div></div>
+    </div>`;
+  });
+  document.getElementById('metas-lista').innerHTML=html||'<div class="empty">Nenhuma meta definida.</div>';
+}
+
+function renderAll(){
+  renderMetas();
+}
+
+renderAll();
+</script>
+</body>
+</html>

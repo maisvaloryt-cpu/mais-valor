@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       modo:
-        description: 'diario | g1-g5 | fii1-fii4 | dividendos | indices | relatorio | fundamentalistas | setup'
+        description: 'diario | g1-g5 | fii1-fii4 | dividendos | indices | relatorio | fundamentalistas | setup | us-diario | us1 | us2 | us3 | us4 | us5'
         required: false
         default: 'diario'
 
@@ -24,7 +24,7 @@ jobs:
           python-version: '3.11'
 
       - name: Dependências
-        run: pip install requests yfinance
+        run: pip install requests yfinance lxml
 
       - name: Decidir modo
         id: modo
@@ -96,6 +96,17 @@ jobs:
           BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
           BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
         run: python fetch_data.py
+
+      # ── AÇÕES EUA (S&P 500) ──────────────────────────────────────────────────
+      - name: Cotações EUA — S&P 500 (Yahoo + Massive fallback)
+        if: ${{ steps.modo.outputs.modo == 'diario' || steps.modo.outputs.modo == 'us-diario' }}
+        env:
+          MASSIVE_TOKEN_1: ${{ secrets.MASSIVE_TOKEN_1 }}
+          MASSIVE_TOKEN_2: ${{ secrets.MASSIVE_TOKEN_2 }}
+          MASSIVE_TOKEN_3: ${{ secrets.MASSIVE_TOKEN_3 }}
+          MASSIVE_TOKEN_4: ${{ secrets.MASSIVE_TOKEN_4 }}
+          MASSIVE_TOKEN_5: ${{ secrets.MASSIVE_TOKEN_5 }}
+        run: python fetch_stocks_us.py
 
       - name: Relatório
         if: ${{ steps.modo.outputs.modo == 'diario' }}
@@ -200,6 +211,57 @@ jobs:
           BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
           BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
         run: python fetch_historico_fii_g4.py
+
+      # ── HISTÓRICO EUA (S&P 500) — grupos de ~100 tickers cada ─────────────────
+      - name: Histórico EUA US1 (~100 tickers)
+        if: ${{ steps.modo.outputs.modo == 'us1' }}
+        env:
+          MASSIVE_TOKEN_1: ${{ secrets.MASSIVE_TOKEN_1 }}
+          MASSIVE_TOKEN_2: ${{ secrets.MASSIVE_TOKEN_2 }}
+          MASSIVE_TOKEN_3: ${{ secrets.MASSIVE_TOKEN_3 }}
+          MASSIVE_TOKEN_4: ${{ secrets.MASSIVE_TOKEN_4 }}
+          MASSIVE_TOKEN_5: ${{ secrets.MASSIVE_TOKEN_5 }}
+        run: python fetch_historico_us.py us1
+
+      - name: Histórico EUA US2 (~100 tickers)
+        if: ${{ steps.modo.outputs.modo == 'us2' }}
+        env:
+          MASSIVE_TOKEN_1: ${{ secrets.MASSIVE_TOKEN_1 }}
+          MASSIVE_TOKEN_2: ${{ secrets.MASSIVE_TOKEN_2 }}
+          MASSIVE_TOKEN_3: ${{ secrets.MASSIVE_TOKEN_3 }}
+          MASSIVE_TOKEN_4: ${{ secrets.MASSIVE_TOKEN_4 }}
+          MASSIVE_TOKEN_5: ${{ secrets.MASSIVE_TOKEN_5 }}
+        run: python fetch_historico_us.py us2
+
+      - name: Histórico EUA US3 (~100 tickers)
+        if: ${{ steps.modo.outputs.modo == 'us3' }}
+        env:
+          MASSIVE_TOKEN_1: ${{ secrets.MASSIVE_TOKEN_1 }}
+          MASSIVE_TOKEN_2: ${{ secrets.MASSIVE_TOKEN_2 }}
+          MASSIVE_TOKEN_3: ${{ secrets.MASSIVE_TOKEN_3 }}
+          MASSIVE_TOKEN_4: ${{ secrets.MASSIVE_TOKEN_4 }}
+          MASSIVE_TOKEN_5: ${{ secrets.MASSIVE_TOKEN_5 }}
+        run: python fetch_historico_us.py us3
+
+      - name: Histórico EUA US4 (~100 tickers)
+        if: ${{ steps.modo.outputs.modo == 'us4' }}
+        env:
+          MASSIVE_TOKEN_1: ${{ secrets.MASSIVE_TOKEN_1 }}
+          MASSIVE_TOKEN_2: ${{ secrets.MASSIVE_TOKEN_2 }}
+          MASSIVE_TOKEN_3: ${{ secrets.MASSIVE_TOKEN_3 }}
+          MASSIVE_TOKEN_4: ${{ secrets.MASSIVE_TOKEN_4 }}
+          MASSIVE_TOKEN_5: ${{ secrets.MASSIVE_TOKEN_5 }}
+        run: python fetch_historico_us.py us4
+
+      - name: Histórico EUA US5 (~100 tickers)
+        if: ${{ steps.modo.outputs.modo == 'us5' }}
+        env:
+          MASSIVE_TOKEN_1: ${{ secrets.MASSIVE_TOKEN_1 }}
+          MASSIVE_TOKEN_2: ${{ secrets.MASSIVE_TOKEN_2 }}
+          MASSIVE_TOKEN_3: ${{ secrets.MASSIVE_TOKEN_3 }}
+          MASSIVE_TOKEN_4: ${{ secrets.MASSIVE_TOKEN_4 }}
+          MASSIVE_TOKEN_5: ${{ secrets.MASSIVE_TOKEN_5 }}
+        run: python fetch_historico_us.py us5
 
       - name: Histórico Dividendos (rode uma vez)
         if: ${{ steps.modo.outputs.modo == 'dividendos' }}
