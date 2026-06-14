@@ -25,18 +25,7 @@ function classificarB3(ticker,nome){
 const STORAGE_ATIVOS='consolidador_ativos_v2';
 const STORAGE_METAS='consolidador_metas_v2';
 
-const DEFAULT_ATIVOS=[
-  {ticker:'PETR4',classe:'B3',tipo:'Compra',qtd:200,pm:32.5,cotacao:38.2,dy:8.2,data:'2024-03-15',moeda:'BRL',nota:8,ideal:5,comprar:'Sim'},
-  {ticker:'BBAS3',classe:'B3',tipo:'Compra',qtd:150,pm:48.0,cotacao:45.2,dy:9.5,data:'2024-04-01',moeda:'BRL',nota:7,ideal:4,comprar:'Não'},
-  {ticker:'MXRF11',classe:'FII',tipo:'Compra',qtd:300,pm:10.2,cotacao:10.8,dy:12.5,data:'2024-04-10',moeda:'BRL',nota:9,ideal:8,comprar:'Sim'},
-  {ticker:'HGLG11',classe:'FII',tipo:'Compra',qtd:50,pm:158,cotacao:167,dy:8.9,data:'2024-02-20',moeda:'BRL',nota:8,ideal:5,comprar:'Sim'},
-  {ticker:'BTC',classe:'Crypto',tipo:'Compra',qtd:0.05,pm:280000,cotacao:345000,dy:0,data:'2024-01-20',moeda:'BRL',nota:6,ideal:5,comprar:'Não'},
-  {ticker:'AAPL',classe:'Exterior',tipo:'Compra',qtd:5,pm:870,cotacao:940,dy:1.2,data:'2024-05-01',moeda:'USD',nota:8,ideal:6,comprar:'Sim'},
-  {ticker:'TSLA',classe:'Exterior',tipo:'Compra',qtd:3,pm:600,cotacao:520,dy:0,data:'2024-06-01',moeda:'USD',nota:5,ideal:3,comprar:'Não'},
-  {ticker:'TESOURO SELIC',classe:'RF',tipo:'Compra',qtd:1,pm:15000,cotacao:16200,dy:10.75,data:'2023-11-01',moeda:'BRL',nota:9,ideal:10,comprar:'Sim'},
-  {ticker:'BOVA11',classe:'ETF',tipo:'Compra',qtd:50,pm:110,cotacao:118,dy:4.5,data:'2024-02-14',moeda:'BRL',nota:7,ideal:4,comprar:'Sim'},
-  {ticker:'VALE3',classe:'B3',tipo:'Compra',qtd:100,pm:68,cotacao:62,dy:11.2,data:'2023-12-10',moeda:'BRL',nota:7,ideal:4,comprar:'Não'},
-];
+const DEFAULT_ATIVOS=[];
 
 const DEFAULT_METAS=[
   {classe:'B3',ideal:30},{classe:'FII',ideal:25},{classe:'RF',ideal:20},{classe:'Crypto',ideal:10},{classe:'Exterior',ideal:10},{classe:'ETF',ideal:5}
