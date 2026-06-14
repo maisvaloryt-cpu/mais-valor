@@ -827,19 +827,14 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
 
       <!-- 6b. Impostos (opcional, não bloqueia a cascata) -->
       <div class="param-group etapa" id="etapaImpostos" style="display:none">
-        <div class="param-group-label">Impostos (estimativa)</div>
+        <div class="param-group-label" title="Estimativa simplificada de imposto de renda. Aplica 15% sobre o rendimento da reserva/caixa em CDI e 15% sobre o ganho em vendas do rebalanceamento ativo (20% para FIIs). Não considera a isenção de R$ 20 mil/mês na venda de ações, a tabela regressiva, o come-cotas nem custos de corretagem — tende a estimar um pouco mais de imposto que a realidade." style="cursor:help">Impostos (estimativa)</div>
         <div class="divmode-row" style="margin-bottom:0">
-          <div class="divmode-btn divmode-ir active" id="irNaoBtn" onclick="selectIR(false,this)">
-            <div class="divmode-btn-title">Bruto</div>
-            <div class="divmode-btn-sub">Sem IR</div>
+          <div class="divmode-btn divmode-ir active" id="irNaoBtn" onclick="selectIR(false,this)" title="Simula o retorno bruto, sem descontar impostos.">
+            <div class="divmode-btn-title">Sem IR</div>
           </div>
-          <div class="divmode-btn divmode-ir" id="irSimBtn" onclick="selectIR(true,this)">
+          <div class="divmode-btn divmode-ir" id="irSimBtn" onclick="selectIR(true,this)" title="Simula o retorno líquido, descontando o imposto estimado sobre rendimentos e vendas.">
             <div class="divmode-btn-title">Com IR</div>
-            <div class="divmode-btn-sub">Estimado</div>
           </div>
-        </div>
-        <div style="font-size:9px;color:var(--sim-text3);line-height:1.5;margin-top:6px">
-          Estimativa simplificada: 15% sobre o ganho realizado em vendas do rebalanceamento ativo (20% para FIIs) e 15% sobre o rendimento da reserva/caixa em CDI. Não considera isenção de R$ 20 mil/mês, come-cotas nem corretagem.
         </div>
       </div>
 
@@ -1155,7 +1150,7 @@ const TOLERANCIA_SOMA = 0.5;
 // ══════════════════════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════════════════════
-let state = { classesSel: [], classesConfig: {}, dividendMode: '', rebalSim: null, rebalModeVal: 'passive', irSim: false };
+let state = { classesSel: [], classesConfig: {}, dividendMode: '', rebalSim: null, rebalModeVal: null, irSim: false };
 let _queryBuffer = {};
 let _pizzaChart = null;
 let _pizzaMode = false;
@@ -1217,7 +1212,9 @@ async function fetchClientSideCripto(ticker) {
       const ts = pt[0], price = pt[1];
       if (ts == null || price == null) return;
       const d = new Date(ts);
-      const chave = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+      // Usa UTC para casar com o timezone dos timestamps da CoinGecko e evitar
+      // que um tick às 00:30 UTC de 1º caia no mês anterior em fusos negativos.
+      const chave = `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}`;
       por_mes[chave] = price;
     });
     const map = {};
@@ -1240,10 +1237,10 @@ async function fetchClientSideCambio(ticker) {
     const por_mes = {};
     data.forEach(d => {
       const ts = d.timestamp;
-      const bid = parseFloat(d.bid || d.ask || 0);
+      const bid = parseFloat(d.bid ?? d.ask ?? 0); // ?? em vez de || para não tratar '0' como ausente
       if (!ts || !bid) return;
       const dt = new Date(parseInt(ts) * 1000);
-      const chave = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`;
+      const chave = `${dt.getUTCFullYear()}-${String(dt.getUTCMonth()+1).padStart(2,'0')}`;
       por_mes[chave] = bid;
     });
     const map = {};
@@ -1338,7 +1335,7 @@ async function loadRealDividends(ticker) {
     (j.dividendos || []).forEach(d => {
       if (d.date && d.value) {
         const m = d.date.slice(0,7);
-        map[m] = (map[m] || 0) + d.value;
+        map[m] = (map[m] || 0) + parseFloat(d.value || 0);
         // Data-com (ex-date): aceita várias chaves possíveis no JSON. Se ausente,
         // simplesmente não é registrada — o cálculo cai na regra conservadora.
         const dataCom = d.data_com || d.dataCom || d.date_com || d.ex_date || d.exDate || d.com || null;
@@ -1622,8 +1619,15 @@ function runBacktest(config, allPrices, allDividends) {
   normAssets.forEach(a => holdings[a.ticker] = 0);
 
   // Retorno mensal de índices acumulados: close[t]/close[t-1]-1
-  // Pré-calculado para todo o período
+  // Pré-calculado para todo o período.
+  //
+  // IMPORTANTE: só calcula o retorno quando meses[mi-1] e meses[mi] são
+  // meses CONSECUTIVOS no calendário (diferença = 1 mês). Se houver gap
+  // (ex.: dados de jan e mar mas não fev), a diferença seria bimestral mas
+  // tratada como mensal — inflando artificialmente o retorno do mês de mar.
   const retornoMensal = {};
+  // Helper: converte YYYY-MM em número de meses desde época para comparação.
+  const ymToMeses = ym => { const [y,m] = ym.split('-').map(Number); return y*12 + m; };
   normAssets.forEach(a => {
     if (!INDICES_ACUMULADOS.has(a.ticker)) return;
     const pm = allPrices[a.ticker] || {};
@@ -1631,6 +1635,10 @@ function runBacktest(config, allPrices, allDividends) {
     retornoMensal[a.ticker] = {};
     for (let mi = 1; mi < meses.length; mi++) {
       if (meses[mi] < DATA_MINIMA) continue; // pré-Real: moeda incomparável, ignorar
+      // Verifica que os dois meses são consecutivos (gap = exatamente 1 mês).
+      // Se houver gap (dado ausente em meses intermediários), o retorno seria
+      // multi-mensal aplicado como mensal — não registramos para evitar distorção.
+      if (ymToMeses(meses[mi]) - ymToMeses(meses[mi-1]) !== 1) continue;
       const prev = pm[meses[mi-1]], curr = pm[meses[mi]];
       if (prev && curr && prev > 0) retornoMensal[a.ticker][meses[mi]] = (curr / prev) - 1;
     }
@@ -1685,6 +1693,8 @@ function runBacktest(config, allPrices, allDividends) {
       const mesesCdi = Object.keys(pmCdi).sort();
       for (let mi = 1; mi < mesesCdi.length; mi++) {
         if (mesesCdi[mi] < DATA_MINIMA) continue;
+        // Mesmo guard do retornoMensal: só meses consecutivos (gap = 1 mês).
+        if (ymToMeses(mesesCdi[mi]) - ymToMeses(mesesCdi[mi-1]) !== 1) continue;
         const prev = pmCdi[mesesCdi[mi-1]], curr = pmCdi[mesesCdi[mi]];
         if (prev && curr && prev > 0) cdiRetMensal[mesesCdi[mi]] = (curr / prev) - 1;
       }
@@ -1770,6 +1780,10 @@ function runBacktest(config, allPrices, allDividends) {
     // "vendida" pelo último preço disponível e o valor vai para o caixa de
     // espera, sendo realocado nos demais ativos pelos pesos efetivos ainda
     // neste mês. Antes, o valor simplesmente sumia do patrimônio.
+    //
+    // Esta transferência é PATRIMÔNIO-NEUTRA: o valor apenas migra de holdings
+    // para caixaEspera, e ambos compõem o patrimônio total. Por isso NÃO entra
+    // no cálculo de monthReturn (não é nem aporte nem rendimento).
     normAssets.forEach(a => {
       const lm = lastMonthData[a.ticker];
       if (lm && month > lm && holdings[a.ticker] > 0) {
@@ -2063,9 +2077,15 @@ function runBacktest(config, allPrices, allDividends) {
     // portValue usado para pesos/rebalanceamento, para não distorcer a
     // alocação-alvo dos ativos.
     const patrimonio = pv + reservaCDI + caixaEspera;
-    // Retorno do mês: desconta o aporte aplicado neste mês para não contar
-    // entrada de caixa como rendimento (senão volatilidade/Sharpe ficam inflados).
-    // Baseado no patrimônio total (inclui o rendimento da reserva-CDI).
+    // Retorno do mês: desconta apenas o aporte (entrada de caixa externa) aplicado
+    // neste mês, para não contar capital novo como rendimento.
+    //
+    // NÃO se desconta a liquidação por fim de série: ela é PATRIMÔNIO-NEUTRA — o
+    // valor apenas migra de holdings para caixaEspera, e ambos compõem o patrimônio.
+    // O patrimônio total não muda no instante da liquidação, então o monthReturn
+    // já reflete corretamente "sem rendimento". Subtrair liquidadoMes aqui criaria
+    // um retorno negativo falso no mês da delistagem (ex.: -50% para um ativo que
+    // era 50% da carteira), distorcendo volatilidade, Sharpe e drawdown.
     const monthRet = prevVal != null && prevVal > 0
       ? (patrimonio - prevVal - aporteEsteMes) / prevVal
       : 0;
@@ -2088,7 +2108,13 @@ function runBacktest(config, allPrices, allDividends) {
     ? series.filter(s => s.date > primeiroMesComDado).map(s => s.monthReturn)
     : series.map(s => s.monthReturn).filter((_,i) => i > 0);
   const n = monthlyReturns.length;
-  const avg = n > 0 ? monthlyReturns.reduce((s,r) => s+r, 0) / n : 0;
+  // Média geométrica dos retornos mensais da carteira — correto para o Sharpe.
+  // A média aritmética é sempre >= geométrica; em carteiras voláteis (cripto,
+  // small caps) a diferença pode ser ~2%/mês, inflando o Sharpe artificialmente.
+  // Consistente com o rfMonthly que também usa média geométrica.
+  const _produtoReturns = n > 0 ? monthlyReturns.reduce((p,r) => p * (1 + r), 1) : 1;
+  // Guard: produto negativo (perda > 100%) causaria NaN na raiz. Retorna -1 (perda total).
+  const avg = n > 0 ? (_produtoReturns > 0 ? Math.pow(_produtoReturns, 1/n) - 1 : -1) : 0;
   const variance = n > 1 ? monthlyReturns.reduce((s,r) => s+(r-avg)**2, 0) / (n-1) : 0;
   const vol = Math.sqrt(variance * 12);
   const years = months.length / 12;
@@ -2115,23 +2141,30 @@ function runBacktest(config, allPrices, allDividends) {
     const npv = (rate) => flows.reduce((s, cf, t) => s + cf / Math.pow(1 + rate, t), 0);
     const temFluxo = flows.some(f => f < 0) && finalValue > 0;
     if (temFluxo) {
-      let lo = -0.9, hi = 1.0; // taxa mensal entre -90% e +100%
+      // Intervalo amplo: -99,99%/mês até +1000%/mês. Garante que a raiz esteja
+      // dentro mesmo em carteiras com perda severa (ex.: cripto em bear market).
+      // O fallback para a fórmula de múltiplo foi removido pois ela está
+      // incorreta para aportes recorrentes (trata todos os aportes como se
+      // tivessem rendido pelo período inteiro, superestimando o retorno).
+      let lo = -0.9999, hi = 10.0;
       let fLo = npv(lo), fHi = npv(hi);
       if (fLo * fHi < 0) {
-        for (let k = 0; k < 200; k++) {
+        for (let k = 0; k < 300; k++) {
           const mid = (lo + hi) / 2;
           const fMid = npv(mid);
-          if (Math.abs(fMid) < 1e-7) { lo = hi = mid; break; }
+          if (Math.abs(fMid) < 1e-8) { lo = hi = mid; break; }
           if (fLo * fMid < 0) { hi = mid; fHi = fMid; } else { lo = mid; fLo = fMid; }
         }
         const iMensal = (lo + hi) / 2;
         cagr = Math.pow(1 + iMensal, 12) - 1; // anualiza
       } else {
-        // fora do intervalo de bisseção — fallback para a fórmula de múltiplo
-        cagr = years > 0 && totalInvested > 0 ? (finalValue/totalInvested)**(1/years) - 1 : 0;
+        // Raiz fora do intervalo (caso extremamente raro). Retorna NaN para
+        // sinalizar que o CAGR não pôde ser calculado — melhor que exibir
+        // um valor incorreto gerado pela fórmula de múltiplo.
+        cagr = NaN;
       }
     } else {
-      cagr = years > 0 && totalInvested > 0 ? (finalValue/totalInvested)**(1/years) - 1 : 0;
+      cagr = 0;
     }
   }
 
@@ -2141,13 +2174,20 @@ function runBacktest(config, allPrices, allDividends) {
   // dependia de haver um índice de RF DENTRO da carteira — duas simulações do
   // mesmo período podiam usar bases diferentes, tornando os Sharpes
   // incomparáveis entre si. Fallback: 0,5%/mês se o CDI não tiver dado.
+  // Risk-free mensal: média GEOMÉTRICA dos retornos do CDI na janela da carteira.
+  // A média aritmética subestima o custo de oportunidade quando o CDI oscila
+  // (ex.: Selic 2% em 2021 vs 14% em 2023), inflando o Sharpe artificialmente.
+  // Média geométrica: (produto(1+r_i))^(1/n) - 1
   let rfMonthly = 0.005;
   {
     const rs = months
       .filter(m => !primeiroMesComDado || m > primeiroMesComDado)
       .map(m => cdiRetMensal[m])
       .filter(r => r != null);
-    if (rs.length > 0) rfMonthly = rs.reduce((s,r) => s+r, 0) / rs.length;
+    if (rs.length > 0) {
+      const produto = rs.reduce((acc, r) => acc * (1 + r), 1);
+      rfMonthly = Math.pow(produto, 1 / rs.length) - 1;
+    }
   }
   const sharpe = (variance > 0) ? ((avg - rfMonthly) / Math.sqrt(variance)) * Math.sqrt(12) : 0;
 
@@ -2165,27 +2205,36 @@ function runBacktest(config, allPrices, allDividends) {
   });
 
   const breakdown = normAssets.map(a => {
-    const p = getPrice(a.ticker, months[months.length-1]);
-    const fv = p ? holdings[a.ticker] * p : 0;
     const priceMap = allPrices[a.ticker];
     const mesesComDado = priceMap ? months.filter(m => priceMap[m]).length : 0;
+    // Último mês com dado: varre de trás pra frente sem copiar/reverter o array.
+    const lastM = priceMap ? (() => {
+      for (let k = months.length - 1; k >= 0; k--) if (priceMap[months[k]]) return months[k];
+      return null;
+    })() : null;
+    // Usa o último mês com dado do ativo (não necessariamente o último mês do período)
+    // para calcular o valor final. Sem isso, ativos sem dado no último mês do período
+    // (ex.: delistados em novembro num período até dezembro) aparecem com fv=0 no
+    // breakdown, mesmo que ainda tenham cotas/saldo real.
+    const pFinal = lastM ? getPrice(a.ticker, lastM) : null;
+    const fv = INDICES_ACUMULADOS.has(a.ticker)
+      ? holdings[a.ticker]                                   // saldo BRL direto
+      : (pFinal && pFinal > 0 ? holdings[a.ticker] * pFinal : 0);
     return {
       ticker: a.ticker, assetClass: a.assetClass, targetWeight: a.weight,
       finalValue: fv, contribution: finalValue > 0 ? fv/finalValue : 0,
       totalDividends: dividendsByTicker[a.ticker] || 0,
       mesesComDado, totalMeses: months.length,
       firstMonth: priceMap ? months.find(m => priceMap[m]) || null : null,
-      // Último mês com dado: varre de trás pra frente sem copiar/reverter o array
-      // (evita alocação O(n) por ativo).
-      lastMonth: priceMap ? (() => {
-        for (let k = months.length - 1; k >= 0; k--) if (priceMap[months[k]]) return months[k];
-        return null;
-      })() : null,
+      lastMonth: lastM,
     };
   });
 
-  const reservaFinal = series.length > 0 ? (series[series.length-1].reservaCDI || 0) : 0;
-  const ativosFinal = finalValue - reservaFinal - caixaEspera;
+  const reservaFinal  = series.length > 0 ? (series[series.length-1].reservaCDI || 0) : 0;
+  const caixaFinal    = caixaEspera; // saldo residual não alocado no fim do período
+  // ativosFinal = patrimônio total menos reserva-CDI menos caixa de espera residual.
+  // Representa o valor efetivamente investido em ativos com cota.
+  const ativosFinal   = Math.max(0, finalValue - reservaFinal - caixaFinal);
 
   return {
     series, metrics: {
@@ -2194,7 +2243,8 @@ function runBacktest(config, allPrices, allDividends) {
       cagr, volatility: vol, sharpeRatio: sharpe, maxDrawdown: maxDD,
       totalDividends: totalDividendsEver, dividendsCash, months: months.length,
       reservaCDI: reservaFinal, ativosValue: ativosFinal,
-      caixaEspera, irPago,
+      caixaEspera: caixaFinal, irPago,
+      mesesRetorno: n,   // nº de meses de retorno usados nas métricas de risco
       primeiroMesComDado
     },
     breakdown, dividendMode: mode
@@ -2271,7 +2321,18 @@ function maskDateInput(el, fieldId) {
   // Remove tudo que não é dígito
   let v = el.value.replace(/\D/g, '');
   if (v.length > 6) v = v.slice(0, 6);
-  // Formata MM/____
+
+  // Validação em tempo real do mês (primeiros 2 dígitos):
+  // impede meses inválidos (00, 13+) antes de o usuário completar o campo.
+  if (v.length >= 2) {
+    const mm = parseInt(v.slice(0, 2), 10);
+    if (mm < 1 || mm > 12) {
+      // Descarta o segundo dígito e mantém só o primeiro para o usuário corrigir
+      v = v.slice(0, 1);
+    }
+  }
+
+  // Formata MM/AAAA
   if (v.length > 2) v = v.slice(0,2) + '/' + v.slice(2);
   el.value = v;
   // Auto-avança para endDate ao completar startDate
@@ -2446,6 +2507,12 @@ function confirmarPeriodo() {
 }
 
 function confirmarAportes() {
+  const initialAmt = parseFloat(document.getElementById('initialAmount').value) || 0;
+  const monthlyAmt = parseFloat(document.getElementById('monthlyAmount').value) || 0;
+  if (initialAmt < 0 || monthlyAmt < 0) {
+    showErr('Os aportes não podem ser negativos.', document.getElementById('btnConfirmarAportes'));
+    return;
+  }
   _etapaAportesOk = true;
   salvarEstado();
   verificarCascata();
@@ -3207,6 +3274,11 @@ function validate() {
     const mesAtual = `${_now.getFullYear()}-${String(_now.getMonth()+1).padStart(2,'0')}`;
     if (ed > mesAtual) { showErr(`A data fim não pode ser no futuro (máximo: ${monthLabel(mesAtual)}).`, document.getElementById('btnSimular')); return false; }
   }
+  // Garante que ao menos um aporte foi informado para haver resultado
+  const initialAmt = parseFloat(document.getElementById('initialAmount').value) || 0;
+  const monthlyAmt = parseFloat(document.getElementById('monthlyAmount').value) || 0;
+  if (initialAmt < 0 || monthlyAmt < 0) { showErr('Os aportes não podem ser negativos.', document.getElementById('btnSimular')); return false; }
+  if (initialAmt <= 0 && monthlyAmt <= 0) { showErr('Informe ao menos um valor de aporte (inicial ou mensal).', document.getElementById('btnSimular')); return false; }
   for (const sel of state.classesSel) {
     const cfg = state.classesConfig[sel.id];
     if (cfg?.mode === 'custom') {
@@ -3343,19 +3415,20 @@ function duplicarSim() {
 
 function novaSim() {
   editingSimIdx = null;
-  state.classesSel = []; state.classesConfig = {}; state.dividendMode = ''; state.rebalSim = null; state.rebalModeVal = 'passive'; state.irSim = false;
+  state.classesSel = []; state.classesConfig = {}; state.dividendMode = ''; state.rebalSim = null; state.rebalModeVal = null; state.irSim = false;
   _etapaPeriodoOk = false; _etapaAportesOk = false;
   if (_pizzaMode) editarClassesPizza();
   document.getElementById('startDate').value = '01/2019';
   document.getElementById('endDate').value   = '12/2024';
   document.getElementById('initialAmount').value = '10000';
   document.getElementById('monthlyAmount').value  = '500';
-  if (document.getElementById('rebalance')) document.getElementById('rebalance').value = 'annual';
+  if (document.getElementById('rebalance')) document.getElementById('rebalance').value = '';
   document.getElementById('simName').value   = '';
   document.querySelectorAll('#rebalSimBtn,#rebalNaoBtn,#rebalPassivoBtn,#rebalAtivoBtn,.divmode-btn').forEach(b => b.classList.remove('active'));
   state.irSim = false;
   document.getElementById('irNaoBtn')?.classList.add('active');
   const rWrap = document.getElementById('rebalTipoWrap'); if(rWrap) rWrap.style.display='none';
+  const rFreqWrap = document.getElementById('rebalFreqWrap'); if(rFreqWrap) rFreqWrap.style.display='none';
   document.getElementById('btnSimular').textContent = '▶ Simular carteira';
   setSidebarLocked(false);
   renderSidebar();
@@ -3380,7 +3453,10 @@ function loadSimIntoSidebar(idx) {
   // Restore rebal state
   const wasRebal = sim.config.rebalance && sim.config.rebalance !== 'none';
   state.rebalSim = wasRebal;
-  state.rebalModeVal = sim.config.rebalMode || 'passive';
+  // Quando não há rebalanceamento, rebalModeVal deve ser null (não 'passive') para
+  // evitar inconsistência entre estado interno e UI. Se o usuário editar e clicar
+  // "Sim" depois de "Não", a UI exigirá nova escolha de tipo em vez de assumir passivo.
+  state.rebalModeVal = wasRebal ? (sim.config.rebalMode || 'passive') : null;
   document.querySelectorAll('#rebalSimBtn,#rebalNaoBtn').forEach(b => b.classList.remove('active'));
   document.getElementById(wasRebal ? 'rebalSimBtn' : 'rebalNaoBtn')?.classList.add('active');
   const tipoWrapL = document.getElementById('rebalTipoWrap'); if(tipoWrapL) tipoWrapL.style.display = wasRebal ? 'block' : 'none';
@@ -3389,6 +3465,10 @@ function loadSimIntoSidebar(idx) {
     if (document.getElementById('rebalance')) document.getElementById('rebalance').value = sim.config.rebalance;
     document.querySelectorAll('#rebalPassivoBtn,#rebalAtivoBtn').forEach(b => b.classList.remove('active'));
     document.getElementById(state.rebalModeVal === 'active' ? 'rebalAtivoBtn' : 'rebalPassivoBtn')?.classList.add('active');
+  } else {
+    // Garante que os botões de tipo ficam limpos quando não há rebalanceamento
+    document.querySelectorAll('#rebalPassivoBtn,#rebalAtivoBtn').forEach(b => b.classList.remove('active'));
+    if (document.getElementById('rebalance')) document.getElementById('rebalance').value = '';
   }
   document.getElementById('simName').value       = sim.name;
   // Restaura o toggle de IR a partir da config da simulação
@@ -3404,8 +3484,29 @@ function loadSimIntoSidebar(idx) {
   const dIdx  = modes.indexOf(sim.result.dividendMode);
   if (dBtns[dIdx]) dBtns[dIdx].classList.add('active');
   document.getElementById('btnSimular').textContent = '💾 Atualizar simulação';
+  // Restaura _pizzaMode para que a composição de ativos fique visível ao
+  // clicar em "Editar". Sem isso, o grupo de composição fica escondido porque
+  // renderComposicao() verifica _pizzaMode antes de exibir os acordeons.
+  _pizzaMode = true;
   setSidebarLocked(true);
   renderSidebar();
+  // Exibe a pizza, o resumo de classes e os sliders — estado pós-aplicar.
+  // renderSlidersPizza() é necessário para popular os controles de % por classe;
+  // sem isso, a seção de pizza fica vazia ao carregar uma simulação existente.
+  if (state.classesSel.length > 0) {
+    const label = state.classesSel.map(s => {
+      const cls = CLASSES_DEF.find(c => c.id === s.id);
+      return cls ? cls.icon + ' ' + s.pct + '%' : '';
+    }).join('  ·  ');
+    const resumoLabel = document.getElementById('classesResumoLabel');
+    if (resumoLabel) resumoLabel.innerHTML = label;
+    document.getElementById('classesResumo')?.classList.add('show');
+    document.getElementById('pizzaSection')?.classList.add('show');
+    document.getElementById('classesMiniGrid').style.display = 'none';
+    document.getElementById('allocBarWrap').style.display = 'none';
+    renderPizzaClasses();
+    renderSlidersPizza();
+  }
   activeSimIdx = idx; viewMode = 'single';
   renderExcelTabs();
   renderSingleView(idx);
@@ -3489,8 +3590,9 @@ function importarSims() {
         if (!Array.isArray(sims) || !sims.length) throw new Error('arquivo sem simulações');
         let add = 0, pulado = 0;
         for (const s of sims) {
-          // Validação mínima da estrutura
-          if (!s || !s.config || !s.result || !Array.isArray(s.result.series) || !Array.isArray(s.classesSel)) { pulado++; continue; }
+          // Validação mais completa da estrutura — evita TypeError em renderSingleView()
+          if (!s || !s.config || !s.result || !Array.isArray(s.result.series) || !Array.isArray(s.classesSel)
+              || !s.result.metrics || !Array.isArray(s.result.breakdown) || !s.result.dividendMode) { pulado++; continue; }
           if (simulations.length >= 5) { pulado++; continue; }          // limite do app
           if (simulations.some(x => x.id === s.id)) { pulado++; continue; } // já existe
           simulations.push(s); add++;
@@ -3765,17 +3867,27 @@ function renderSingleView(idx) {
   // Métricas row 1
   const pos = metrics.totalReturn >= 0;
   const temReserva = (metrics.reservaCDI || 0) > 0.005;
+  const temCaixa   = (metrics.caixaEspera || 0) > 0.005;
+  const subValorFinal = (() => {
+    if (temReserva || temCaixa) {
+      const partes = ['Ativos: ' + brl(metrics.ativosValue)];
+      if (temReserva) partes.push('Reserva CDI: ' + brl(metrics.reservaCDI));
+      if (temCaixa)   partes.push('Caixa: ' + brl(metrics.caixaEspera));
+      return partes.join(' + ');
+    }
+    return 'Aportado: ' + brl(metrics.totalInvested);
+  })();
   document.getElementById('metricsRow1').innerHTML = `
-    <div class="metric-card"><div class="metric-label">Valor Final</div><div class="metric-value ${pos?'green':'red'}">${brl(metrics.finalValue)}</div><div class="metric-sub">${temReserva ? 'Ativos: '+brl(metrics.ativosValue)+' + Reserva: '+brl(metrics.reservaCDI) : 'Aportado: '+brl(metrics.totalInvested)}</div></div>
+    <div class="metric-card"><div class="metric-label">Valor Final</div><div class="metric-value ${pos?'green':'red'}">${brl(metrics.finalValue)}</div><div class="metric-sub">${subValorFinal}</div></div>
     <div class="metric-card"><div class="metric-label">Retorno Total</div><div class="metric-value ${pos?'green':'red'}">${pct(metrics.totalReturn)}</div><div class="metric-sub">Lucro: ${brl(metrics.profit)}</div></div>
-    <div class="metric-card"><div class="metric-label">CAGR (a.a.)</div><div class="metric-value ${metrics.cagr>=0?'green':'red'}">${pct(metrics.cagr)}</div><div class="metric-sub">Retorno anualizado</div></div>
+    <div class="metric-card"><div class="metric-label">CAGR (a.a.)</div><div class="metric-value ${isNaN(metrics.cagr) ? '' : metrics.cagr>=0?'green':'red'}">${isNaN(metrics.cagr) ? 'N/D' : pct(metrics.cagr)}</div><div class="metric-sub">${isNaN(metrics.cagr) ? 'Não calculável neste cenário' : 'Retorno anualizado'}</div></div>
     <div class="metric-card"><div class="metric-label">Dividendos</div><div class="metric-value gold">${brl(metrics.totalDividends)}</div><div class="metric-sub">${dividendMode==='none'?'Reserva CDI: '+brl(metrics.reservaCDI||0):'Reinvestidos'}</div></div>
   `;
 
   // Métricas row 2
   document.getElementById('metricsRow2').innerHTML = `
     <div class="metric-card"><div class="metric-label">Volatilidade a.a.</div><div class="metric-value">${pct(metrics.volatility)}</div></div>
-    <div class="metric-card"><div class="metric-label">Sharpe Ratio</div><div class="metric-value ${metrics.sharpeRatio>=1?'green':''}">${metrics.sharpeRatio.toFixed(2)}</div></div>
+    <div class="metric-card"><div class="metric-label">Sharpe Ratio</div><div class="metric-value ${(metrics.mesesRetorno||0) >= 12 && metrics.sharpeRatio>=1?'green':''}">${(metrics.mesesRetorno||0) < 12 ? 'N/D' : metrics.sharpeRatio.toFixed(2)}</div>${(metrics.mesesRetorno||0) < 12 ? '<div class="metric-sub">Requer 12+ meses</div>' : ''}</div>
     <div class="metric-card"><div class="metric-label">Máx. Drawdown</div><div class="metric-value red">${pct(metrics.maxDrawdown)}</div></div>
     <div class="metric-card"><div class="metric-label">Meses</div><div class="metric-value">${metrics.months}</div></div>
     <div class="metric-card"><div class="metric-label">Estratégia Div.</div><div class="metric-value" style="font-size:11px;color:var(--sim-text2);font-family:var(--sim-font)">${divModeLabel[dividendMode]}</div></div>
@@ -3883,7 +3995,12 @@ function showChart(type, el) {
     const activeData = simulations[activeSimIdx].result.series.map(pt => pt.portfolioValue);
     addChartOverlay(chartInst, canvasEl, labels, activeData, color, 'brl');
   } else if (type === 'monthly') {
-    chartInst = new Chart(ctx, { type:'bar', data:{labels,datasets:[{ label:'Retorno %', data:series.map(s=>+(s.monthReturn*100).toFixed(2)), backgroundColor:series.map(s=>s.monthReturn>=0?color+'b3':'#E8503Ab3'), borderRadius:2 }]}, options:chartOpts('%') });
+    // O mês 0 (primeiro mês) sempre tem retorno 0% por construção (prevVal=null):
+    // é o mês de entrada de capital, sem rentabilidade a calcular. Exibimos null
+    // (barra ausente) em vez de 0% para não induzir leitura de "rendeu 0%".
+    const monthlyData = series.map((s,i) => i === 0 ? null : +(s.monthReturn*100).toFixed(2));
+    const monthlyColors = series.map((s,i) => i === 0 ? 'transparent' : (s.monthReturn>=0?color+'b3':'#E8503Ab3'));
+    chartInst = new Chart(ctx, { type:'bar', data:{labels,datasets:[{ label:'Retorno %', data:monthlyData, backgroundColor:monthlyColors, borderRadius:2 }]}, options:chartOpts('%') });
   } else if (type === 'dividends') {
     chartInst = new Chart(ctx, { type:'bar', data:{labels,datasets:[{ label:'Dividendos R$', data:series.map(s=>s.dividendsMonth), backgroundColor:'rgba(245,166,35,0.7)', borderRadius:2 }]}, options:chartOpts('R$') });
   } else if (type === 'allocation') {
@@ -3915,13 +4032,21 @@ function renderCompareView() {
   const best = {
     finalValue:     Math.max(...simulations.map(s=>s.result.metrics.finalValue)),
     totalReturn:    Math.max(...simulations.map(s=>s.result.metrics.totalReturn)),
-    cagr:           Math.max(...simulations.map(s=>s.result.metrics.cagr)),
+    cagr:           Math.max(...simulations.map(s=>isNaN(s.result.metrics.cagr) ? -Infinity : s.result.metrics.cagr)),
     sharpeRatio:    Math.max(...simulations.map(s=>s.result.metrics.sharpeRatio)),
     volatility:     Math.min(...simulations.map(s=>s.result.metrics.volatility)),
     maxDrawdown:    Math.max(...simulations.map(s=>s.result.metrics.maxDrawdown)),
     totalDividends: Math.max(...simulations.map(s=>s.result.metrics.totalDividends)),
   };
-  const isBest = (key, val) => n >= 2 && Math.abs(val - best[key]) < 0.0001;
+  // Tolerância relativa: evita erros de ponto flutuante em valores próximos.
+  // Para métricas próximas de zero usa tolerância absoluta mínima de 1e-6.
+  const isBest = (key, val) => {
+    if (n < 2) return false;
+    if (isNaN(val) || isNaN(best[key])) return false;
+    const ref = Math.abs(best[key]);
+    const tol = ref > 1e-6 ? ref * 1e-4 : 1e-6;
+    return Math.abs(val - best[key]) <= tol;
+  };
   cont.innerHTML = simulations.map(sim => {
     const m = sim.result.metrics;
     const pos = m.totalReturn >= 0;
@@ -3936,8 +4061,8 @@ function renderCompareView() {
         <div class="sim-card-body">
           <div class="metric-item"><div class="metric-item-label">Valor Final ${b('finalValue',m.finalValue)}</div><div class="metric-item-val ${pos?'green':'red'}">${brl(m.finalValue)}</div><div class="metric-item-sub">Aportado: ${brl(m.totalInvested)}</div></div>
           <div class="metric-item"><div class="metric-item-label">Retorno Total ${b('totalReturn',m.totalReturn)}</div><div class="metric-item-val ${pos?'green':'red'}">${pct(m.totalReturn)}</div><div class="metric-item-sub">Lucro: ${brl(m.profit)}</div></div>
-          <div class="metric-item"><div class="metric-item-label">CAGR ${b('cagr',m.cagr)}</div><div class="metric-item-val ${m.cagr>=0?'green':'red'}">${pct(m.cagr)}</div></div>
-          <div class="metric-item"><div class="metric-item-label">Sharpe ${b('sharpeRatio',m.sharpeRatio)}</div><div class="metric-item-val ${m.sharpeRatio>=1?'green':''}">${m.sharpeRatio.toFixed(2)}</div></div>
+          <div class="metric-item"><div class="metric-item-label">CAGR ${b('cagr',m.cagr)}</div><div class="metric-item-val ${isNaN(m.cagr) ? '' : m.cagr>=0?'green':'red'}">${isNaN(m.cagr) ? 'N/D' : pct(m.cagr)}</div></div>
+          <div class="metric-item"><div class="metric-item-label">Sharpe ${(m.mesesRetorno||0)>=12 ? b('sharpeRatio',m.sharpeRatio) : ''}</div><div class="metric-item-val ${(m.mesesRetorno||0)>=12 && m.sharpeRatio>=1?'green':''}">${(m.mesesRetorno||0)<12 ? 'N/D' : m.sharpeRatio.toFixed(2)}</div></div>
           <div class="metric-item"><div class="metric-item-label">Volatilidade ${b('volatility',m.volatility)}</div><div class="metric-item-val">${pct(m.volatility)}</div></div>
           <div class="metric-item"><div class="metric-item-label">Máx. Drawdown ${b('maxDrawdown',m.maxDrawdown)}</div><div class="metric-item-val red">${pct(m.maxDrawdown)}</div></div>
           <div class="metric-item"><div class="metric-item-label">Dividendos ${b('totalDividends',m.totalDividends)}</div><div class="metric-item-val" style="color:var(--gold)">${brl(m.totalDividends)}</div><div class="metric-item-sub">${divModeLabel[sim.result.dividendMode]}</div></div>
@@ -4085,7 +4210,7 @@ function renderCompareBarChart() {
   compareBarChartInst = new Chart(document.getElementById('compareBarChart').getContext('2d'), {
     type: 'bar',
     data: { labels, datasets: [
-      { label:'CAGR %', data:simulations.map(s=>+(s.result.metrics.cagr*100).toFixed(2)), backgroundColor:colors.map(c=>c+'cc'), borderRadius:4 },
+      { label:'CAGR %', data:simulations.map(s=>{ const c=s.result.metrics.cagr; return isNaN(c) ? 0 : +(c*100).toFixed(2); }), backgroundColor:colors.map(c=>c+'cc'), borderRadius:4 },
       { label:'Volatilidade %', data:simulations.map(s=>+(s.result.metrics.volatility*100).toFixed(2)), backgroundColor:simulations.map(()=>'#4E4D4A80'), borderRadius:4 },
       { label:'Sharpe', data:simulations.map(s=>+s.result.metrics.sharpeRatio.toFixed(2)), backgroundColor:simulations.map(()=>'#9b72ef80'), borderRadius:4 },
     ]},
@@ -4276,8 +4401,9 @@ function salvarEstado() {
   } catch(e) {
     // Falha ao salvar (ex.: quota do navegador cheia). Não quebra a aplicação —
     // a simulação na tela continua intacta; apenas a rede de segurança de F5
-    // não estará disponível desta vez.
+    // não estará disponível desta vez. Avisa o usuário para exportar.
     console.warn('Cache temporário não pôde ser salvo:', e && e.message);
+    showPopup('⚠ Cache indisponível — use "Exportar" para salvar suas simulações.');
   }
 }
 
@@ -4343,9 +4469,9 @@ function restaurarEstado() {
       editingSimIdx  = dados.editingSimIdx  ?? 0;
     }
 
-    if (dados.pizzaMode) _pizzaMode = true; // era salvo mas nunca restaurado
-    if (dados.etapaPeriodoOk) _etapaPeriodoOk = dados.etapaPeriodoOk;
-    if (dados.etapaAportesOk) _etapaAportesOk = dados.etapaAportesOk;
+    _pizzaMode      = !!dados.pizzaMode;
+    _etapaPeriodoOk = !!dados.etapaPeriodoOk;
+    _etapaAportesOk = !!dados.etapaAportesOk;
     return true;
   } catch(e) { return false; }
 }
