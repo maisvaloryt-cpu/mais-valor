@@ -46,6 +46,7 @@ const NAV_LINKS = [
   { href: 'analise.html',      label: '✦ Análise' },
   { href: 'watchlist.html',    label: '★ Watchlist' },
   { href: 'simulador.html',    label: 'Simulador' },
+  { href: 'Consolidador/index.html', label: 'Carteira' },
   { href: 'status.html',       label: '● Status' },
 ];
 
@@ -102,10 +103,13 @@ function scoreBadge(d) {
 }
 window.scoreBadge = scoreBadge;
 
+// ── Base path (para subpastas como /Consolidador/) ────────────────
+const NAV_BASE = window.NAV_BASE_PATH || '';
+
 // ── BCB data ──────────────────────────────────────────────────────
 async function loadBCBNav() {
   try {
-    const r = await fetch('data/bcb.json?t=' + Date.now());
+    const r = await fetch(NAV_BASE + 'data/bcb.json?t=' + Date.now());
     if (!r.ok) return;
     const j = await r.json();
     window.BCB_DATA = j;
@@ -170,7 +174,7 @@ function pillHtml(v) { return v?.val > 0 ? `<span class="pill ${chgClass(v)}">${
 
 async function loadIndicesNav() {
   const [jsonResult, liveResult] = await Promise.allSettled([
-    fetch('data/indices.json?t=' + Date.now()).then(r => r.ok ? r.json() : {}),
+    fetch(NAV_BASE + 'data/indices.json?t=' + Date.now()).then(r => r.ok ? r.json() : {}),
     fetchLiveIndices(),
   ]);
 
@@ -320,6 +324,51 @@ function toggleMobileMenu() {
   document.body.style.overflow = open ? 'hidden' : '';
 }
 
+function renderNavSlim() {
+  const page = location.pathname.split('/').pop() || 'index.html';
+  const links = NAV_LINKS.map(l => {
+    const cls = page === l.href.split('/').pop() ? 'active' : '';
+    return `<a href="${NAV_BASE}${l.href}" class="${cls}">${l.label}</a>`;
+  }).join('');
+  document.getElementById('nav-placeholder').innerHTML = `
+  <style>
+  .nav-slim{
+    position:sticky;top:0;z-index:200;
+    background:rgba(8,8,9,0.95);
+    backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--border,rgba(255,255,255,0.06));
+    padding:0 2rem;
+    display:flex;align-items:center;gap:1.5rem;
+    animation:slideDown 0.35s ease both;
+    overflow-x:auto;
+  }
+  [data-theme="light"] .nav-slim{background:rgba(245,245,240,0.95);}
+  .nav-slim-logo{
+    display:flex;align-items:center;gap:8px;
+    flex-shrink:0;text-decoration:none;padding:14px 0;
+    font-size:18px;font-weight:800;color:var(--text,#ECEAE4);
+    border-bottom:none!important;
+  }
+  .nav-slim-logo em{color:var(--gold,#F5A623);font-style:normal;}
+  .nav-slim-links{display:flex;align-items:center;gap:0;overflow-x:auto;flex:1;}
+  .nav-slim a{
+    font-size:13px;font-weight:600;color:var(--text2,#8A8884);
+    padding:0 10px;height:48px;display:inline-flex;align-items:center;
+    text-decoration:none;white-space:nowrap;
+    border-bottom:2px solid transparent;
+    transition:color .15s,border-color .15s;
+  }
+  .nav-slim a:hover,.nav-slim a.active{color:var(--text,#ECEAE4);}
+  .nav-slim a.active{color:var(--gold,#F5A623);border-bottom-color:var(--gold,#F5A623);}
+  </style>
+  <div class="nav-slim">
+    <a class="nav-slim-logo" href="${NAV_BASE}index.html">${LOGO_SVG_HTML}<span>Mais <em>Valor</em></span></a>
+    <div class="nav-slim-links">${links}</div>
+    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Alternar tema" style="flex-shrink:0;background:transparent;border:none;cursor:pointer;font-size:16px;padding:4px 8px;color:var(--text2)">☀️</button>
+  </div>`;
+  applyTheme(getTheme());
+}
+
 function renderNav() {
   const page = location.pathname.split('/').pop() || 'index.html';
 
@@ -330,30 +379,30 @@ function renderNav() {
   const beforeExt = NAV_LINKS.slice(0, criptosPos + 1).map(l => {
     const isStatus = l.href === 'status.html';
     const style = isStatus ? 'color:var(--up);font-size:11px' : '';
-    const cls = page === l.href ? 'active' : '';
-    return `<a href="${l.href}" class="${cls}" style="${style}">${l.label}</a>`;
+    const cls = page === l.href.split('/').pop() ? 'active' : '';
+    return `<a href="${NAV_BASE}${l.href}" class="${cls}" style="${style}">${l.label}</a>`;
   }).join('');
   const afterExt = NAV_LINKS.slice(criptosPos + 1).map(l => {
     const isStatus = l.href === 'status.html';
     const style = isStatus ? 'color:var(--up);font-size:11px' : '';
-    const cls = page === l.href ? 'active' : '';
-    return `<a href="${l.href}" class="${cls}" style="${style}">${l.label}</a>`;
+    const cls = page === l.href.split('/').pop() ? 'active' : '';
+    return `<a href="${NAV_BASE}${l.href}" class="${cls}" style="${style}">${l.label}</a>`;
   }).join('');
 
   // Exterior trigger — sem dropdown inline, dropdown vai no body via JS
   const exteriorHtml = `<span id="mv-ext-btn" class="${extActive ? 'active' : ''}" style="cursor:pointer;font-size:13px;font-weight:600;color:var(--text2);padding:4px 2px;transition:color .15s;white-space:nowrap;${extActive?'color:var(--text)':''}">Exterior ▾</span>`;
 
   const extMobileLinks = `
-    <a href="bdrs.html" class="${page==='bdrs.html'?'active':''}" onclick="toggleMobileMenu()">🇧🇷 BDRs</a>
-    <a href="etfs.html" class="${page==='etfs.html'?'active':''}" onclick="toggleMobileMenu()">📊 ETFs</a>
-    <a href="reits.html" class="${page==='reits.html'?'active':''}" onclick="toggleMobileMenu()">🏢 REITs</a>
-    <a href="stocks.html" class="${page==='stocks.html'?'active':''}" onclick="toggleMobileMenu()">🇺🇸 Stocks</a>`;
+    <a href="${NAV_BASE}bdrs.html" class="${page==='bdrs.html'?'active':''}" onclick="toggleMobileMenu()">🇧🇷 BDRs</a>
+    <a href="${NAV_BASE}etfs.html" class="${page==='etfs.html'?'active':''}" onclick="toggleMobileMenu()">📊 ETFs</a>
+    <a href="${NAV_BASE}reits.html" class="${page==='reits.html'?'active':''}" onclick="toggleMobileMenu()">🏢 REITs</a>
+    <a href="${NAV_BASE}stocks.html" class="${page==='stocks.html'?'active':''}" onclick="toggleMobileMenu()">🇺🇸 Stocks</a>`;
 
   const mobileLinksHtml = (arr) => arr.map(l => {
     const isStatus = l.href === 'status.html';
-    const cls = page === l.href ? 'active' : '';
+    const cls = page === l.href.split('/').pop() ? 'active' : '';
     const style = isStatus ? 'color:var(--up)' : '';
-    return `<a href="${l.href}" class="${cls}" style="${style}" onclick="toggleMobileMenu()">${l.label}</a>`;
+    return `<a href="${NAV_BASE}${l.href}" class="${cls}" style="${style}" onclick="toggleMobileMenu()">${l.label}</a>`;
   }).join('');
 
   const mobileLinks = mobileLinksHtml(NAV_LINKS.slice(0, criptosPos + 1)) + extMobileLinks + mobileLinksHtml(NAV_LINKS.slice(criptosPos + 1));
@@ -388,7 +437,7 @@ function renderNav() {
 
   <div id="nav-mobile-menu">
     <div class="mob-header">
-      <a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;border:none;padding:0">
+      <a href="${NAV_BASE}index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;border:none;padding:0">
         ${LOGO_SVG_HTML}
         <span style="font-size:20px;font-weight:800;color:#fff">Mais <em style="color:#D4A017;font-style:normal">Valor</em></span>
       </a>
@@ -398,7 +447,7 @@ function renderNav() {
   </div>
 
   <nav>
-    <a class="nav-logo" href="index.html">
+    <a class="nav-logo" href="${NAV_BASE}index.html">
       ${LOGO_SVG_HTML}
       <span>Mais <em>Valor</em></span>
     </a>
@@ -494,10 +543,10 @@ function renderNav() {
   const drop = document.createElement('div');
   drop.id = 'mv-ext-floatdrop';
   drop.innerHTML = `
-    <a href="bdrs.html" class="${page==='bdrs.html'?'active':''}">🇧🇷 BDRs</a>
-    <a href="etfs.html" class="${page==='etfs.html'?'active':''}">📊 ETFs</a>
-    <a href="reits.html" class="${page==='reits.html'?'active':''}">🏢 REITs</a>
-    <a href="stocks.html" class="${page==='stocks.html'?'active':''}">🇺🇸 Stocks</a>`;
+    <a href="${NAV_BASE}bdrs.html" class="${page==='bdrs.html'?'active':''}">🇧🇷 BDRs</a>
+    <a href="${NAV_BASE}etfs.html" class="${page==='etfs.html'?'active':''}">📊 ETFs</a>
+    <a href="${NAV_BASE}reits.html" class="${page==='reits.html'?'active':''}">🏢 REITs</a>
+    <a href="${NAV_BASE}stocks.html" class="${page==='stocks.html'?'active':''}">🇺🇸 Stocks</a>`;
   document.body.appendChild(drop);
 
   let dropTimer;
@@ -572,7 +621,7 @@ function navSearchLive(q) {
   box.innerHTML = results.map(d => {
     const score = scoreBadge(d);
     return `
-    <div onclick="location.href='ativo.html?t=${d.t}${isFii(d) ? '&tipo=fii' : ''}'"
+    <div onclick="location.href='${NAV_BASE}ativo.html?t=${d.t}${isFii(d) ? '&tipo=fii' : ''}'"
       style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .12s"
       onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
       <div style="display:flex;align-items:center;gap:10px">
@@ -601,13 +650,15 @@ function navSearchGo(q) {
     ...(typeof FIIS  !== 'undefined' ? FIIS  : []),
   ];
   const found = all.find(d => d.t.toLowerCase() === q.toLowerCase());
-  if (found) location.href = `ativo.html?t=${found.t}${found.t.match(/\d{2}$/) ? '&tipo=fii' : ''}`;
-  else location.href = `acoes.html?q=${q}`;
+  if (found) location.href = `${NAV_BASE}ativo.html?t=${found.t}${found.t.match(/\d{2}$/) ? '&tipo=fii' : ''}`;
+  else location.href = `${NAV_BASE}acoes.html?q=${q}`;
 }
 
 function renderFooter() {
+  const el = document.getElementById('footer-placeholder');
+  if (!el) return;
   const year = new Date().getFullYear();
-  document.getElementById('footer-placeholder').innerHTML = `
+  el.innerHTML = `
   <footer>
     <p>© ${year} <em>Mais Valor</em> — dados atualizados diariamente após o fechamento do pregão B3.<br>
     Não constitui recomendação de investimento.</p>
@@ -615,6 +666,7 @@ function renderFooter() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  if (window.NAV_SLIM) { renderNavSlim(); return; }
   renderNav();
   renderFooter();
   navUpdateTotal();

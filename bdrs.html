@@ -106,20 +106,101 @@ window.MV_LOGO_SVG = '<svg viewBox="0 0 530 530" xmlns="http://www.w3.org/2000/s
 <script>
 let currentSort = 'liq';
 
-const BDRS = [
-  {t:'AAPL34', n:'Apple Inc.',            p:124.80, v:0.82,  dy:0.4,  pl:29.8, v12:18.2, vol:'R$42M',  volNum:42e6,  setor:'Tecnologia',  origem:'EUA'},
-  {t:'MSFT34', n:'Microsoft Corp.',       p:218.40, v:0.65,  dy:0.6,  pl:36.2, v12:24.5, vol:'R$28M',  volNum:28e6,  setor:'Tecnologia',  origem:'EUA'},
-  {t:'AMZO34', n:'Amazon.com Inc.',       p:98.20,  v:1.20,  dy:0.0,  pl:52.1, v12:41.8, vol:'R$22M',  volNum:22e6,  setor:'Consumo',     origem:'EUA'},
-  {t:'GOGL34', n:'Alphabet Inc.',         p:88.60,  v:0.44,  dy:0.0,  pl:25.4, v12:32.1, vol:'R$18M',  volNum:18e6,  setor:'Tecnologia',  origem:'EUA'},
-  {t:'NVDC34', n:'NVIDIA Corp.',          p:456.20, v:2.10,  dy:0.03, pl:68.5, v12:192.4,vol:'R$15M',  volNum:15e6,  setor:'Tecnologia',  origem:'EUA'},
-  {t:'TSLA34', n:'Tesla Inc.',            p:128.40, v:-1.20, dy:0.0,  pl:62.4, v12:-12.8,vol:'R$12M',  volNum:12e6,  setor:'Consumo',     origem:'EUA'},
-  {t:'META34', n:'Meta Platforms Inc.',   p:258.80, v:1.85,  dy:0.3,  pl:28.6, v12:55.3, vol:'R$10M',  volNum:10e6,  setor:'Comunicação', origem:'EUA'},
-  {t:'JPMC34', n:'JPMorgan Chase & Co.', p:102.60, v:0.55,  dy:2.1,  pl:12.1, v12:22.8, vol:'R$8M',   volNum:8e6,   setor:'Financeiro',  origem:'EUA'},
-  {t:'NFLX34', n:'Netflix Inc.',          p:288.40, v:0.90,  dy:0.0,  pl:38.5, v12:62.4, vol:'R$6M',   volNum:6e6,   setor:'Comunicação', origem:'EUA'},
-  {t:'LVMH34', n:'LVMH Moët Hennessy',   p:412.80, v:-0.40, dy:1.8,  pl:22.4, v12:-8.2, vol:'R$4M',   volNum:4e6,   setor:'Consumo',     origem:'Europa'},
-  {t:'SAMS34', n:'Samsung Electronics',  p:48.20,  v:0.30,  dy:2.4,  pl:18.2, v12:12.5, vol:'R$3M',   volNum:3e6,   setor:'Tecnologia',  origem:'Outros'},
-  {t:'BABA34', n:'Alibaba Group',         p:38.60,  v:1.50,  dy:0.0,  pl:14.8, v12:28.4, vol:'R$5M',   volNum:5e6,   setor:'Consumo',     origem:'China'},
+const BDRS_FALLBACK = [
+  // Tech EUA
+  {t:'AAPL34', n:'Apple Inc.',               p:124.80, v:0.82,  dy:0.4,  pl:29.8, v12:18.2,  vol:'R$42M',  volNum:42e6,  setor:'Tecnologia',      origem:'EUA'},
+  {t:'MSFT34', n:'Microsoft Corp.',           p:218.40, v:0.65,  dy:0.6,  pl:36.2, v12:24.5,  vol:'R$28M',  volNum:28e6,  setor:'Tecnologia',      origem:'EUA'},
+  {t:'AMZO34', n:'Amazon.com Inc.',           p:98.20,  v:1.20,  dy:0.0,  pl:52.1, v12:41.8,  vol:'R$22M',  volNum:22e6,  setor:'Consumo/Tech',    origem:'EUA'},
+  {t:'GOGL34', n:'Alphabet (Google)',         p:88.60,  v:0.44,  dy:0.0,  pl:25.4, v12:32.1,  vol:'R$18M',  volNum:18e6,  setor:'Tecnologia',      origem:'EUA'},
+  {t:'NVDC34', n:'NVIDIA Corp.',              p:456.20, v:2.10,  dy:0.03, pl:68.5, v12:192.4, vol:'R$15M',  volNum:15e6,  setor:'Semicondutores',  origem:'EUA'},
+  {t:'TSLA34', n:'Tesla Inc.',                p:128.40, v:-1.20, dy:0.0,  pl:62.4, v12:-12.8, vol:'R$12M',  volNum:12e6,  setor:'Automotivo',      origem:'EUA'},
+  {t:'META34', n:'Meta Platforms Inc.',       p:258.80, v:1.85,  dy:0.3,  pl:28.6, v12:55.3,  vol:'R$10M',  volNum:10e6,  setor:'Tecnologia',      origem:'EUA'},
+  {t:'INTC34', n:'Intel Corp.',               p:32.40,  v:-0.45, dy:1.2,  pl:20.4, v12:-28.4, vol:'R$6M',   volNum:6e6,   setor:'Semicondutores',  origem:'EUA'},
+  {t:'CSCO34', n:'Cisco Systems',             p:48.80,  v:0.22,  dy:3.1,  pl:14.8, v12:8.4,   vol:'R$5M',   volNum:5e6,   setor:'Tecnologia',      origem:'EUA'},
+  {t:'IBM34',  n:'IBM Corp.',                 p:168.40, v:0.35,  dy:4.5,  pl:16.2, v12:12.8,  vol:'R$4M',   volNum:4e6,   setor:'Tecnologia',      origem:'EUA'},
+  {t:'ADBE34', n:'Adobe Inc.',                p:488.40, v:0.92,  dy:0.0,  pl:40.2, v12:18.4,  vol:'R$5M',   volNum:5e6,   setor:'Tecnologia',      origem:'EUA'},
+  {t:'QCOM34', n:'Qualcomm Inc.',             p:128.40, v:0.48,  dy:2.3,  pl:18.4, v12:12.5,  vol:'R$4M',   volNum:4e6,   setor:'Semicondutores',  origem:'EUA'},
+  {t:'AMD34',  n:'Advanced Micro Devices',    p:158.40, v:1.82,  dy:0.0,  pl:35.4, v12:42.5,  vol:'R$6M',   volNum:6e6,   setor:'Semicondutores',  origem:'EUA'},
+  {t:'AVGO34', n:'Broadcom Inc.',             p:148.80, v:0.62,  dy:1.5,  pl:28.4, v12:38.4,  vol:'R$4M',   volNum:4e6,   setor:'Semicondutores',  origem:'EUA'},
+  // Pagamentos
+  {t:'VISA34', n:'Visa Inc.',                 p:248.80, v:0.55,  dy:0.7,  pl:28.4, v12:18.5,  vol:'R$8M',   volNum:8e6,   setor:'Pagamentos',      origem:'EUA'},
+  {t:'MAST34', n:'Mastercard Inc.',           p:428.40, v:0.58,  dy:0.6,  pl:32.4, v12:20.4,  vol:'R$6M',   volNum:6e6,   setor:'Pagamentos',      origem:'EUA'},
+  {t:'PYPL34', n:'PayPal Holdings',           p:62.80,  v:0.45,  dy:0.0,  pl:18.4, v12:-12.4, vol:'R$4M',   volNum:4e6,   setor:'Fintech',         origem:'EUA'},
+  {t:'AMEX34', n:'American Express',          p:188.40, v:0.42,  dy:1.2,  pl:18.4, v12:22.4,  vol:'R$3M',   volNum:3e6,   setor:'Pagamentos',      origem:'EUA'},
+  // Bancos
+  {t:'JPMC34', n:'JPMorgan Chase & Co.',      p:102.60, v:0.55,  dy:2.1,  pl:12.1, v12:22.8,  vol:'R$8M',   volNum:8e6,   setor:'Bancos',          origem:'EUA'},
+  {t:'BACR34', n:'Bank of America',           p:38.40,  v:0.42,  dy:2.5,  pl:12.4, v12:18.4,  vol:'R$5M',   volNum:5e6,   setor:'Bancos',          origem:'EUA'},
+  {t:'GSGI34', n:'Goldman Sachs Group',       p:488.40, v:0.62,  dy:2.0,  pl:12.8, v12:28.4,  vol:'R$4M',   volNum:4e6,   setor:'Bancos',          origem:'EUA'},
+  {t:'WFC34',  n:'Wells Fargo & Co.',         p:58.40,  v:0.38,  dy:2.8,  pl:12.2, v12:22.4,  vol:'R$3M',   volNum:3e6,   setor:'Bancos',          origem:'EUA'},
+  // Saúde
+  {t:'JNJB34', n:'Johnson & Johnson',         p:158.40, v:0.22,  dy:2.9,  pl:16.4, v12:2.4,   vol:'R$6M',   volNum:6e6,   setor:'Saúde',           origem:'EUA'},
+  {t:'PFIZ34', n:'Pfizer Inc.',               p:28.40,  v:-0.35, dy:5.5,  pl:12.4, v12:-28.4, vol:'R$5M',   volNum:5e6,   setor:'Farmacêutica',    origem:'EUA'},
+  {t:'ABBV34', n:'AbbVie Inc.',               p:168.40, v:0.35,  dy:4.0,  pl:14.2, v12:8.4,   vol:'R$4M',   volNum:4e6,   setor:'Farmacêutica',    origem:'EUA'},
+  {t:'MRK34',  n:'Merck & Co.',               p:128.40, v:0.28,  dy:2.6,  pl:15.4, v12:5.4,   vol:'R$4M',   volNum:4e6,   setor:'Farmacêutica',    origem:'EUA'},
+  {t:'LLY34',  n:'Eli Lilly and Co.',         p:788.40, v:0.82,  dy:0.7,  pl:55.4, v12:88.4,  vol:'R$5M',   volNum:5e6,   setor:'Farmacêutica',    origem:'EUA'},
+  {t:'AMGN34', n:'Amgen Inc.',                p:288.40, v:0.32,  dy:3.0,  pl:18.4, v12:5.4,   vol:'R$3M',   volNum:3e6,   setor:'Biotecnologia',   origem:'EUA'},
+  // Consumo
+  {t:'MCD34',  n:"McDonald's Corp.",          p:278.40, v:0.22,  dy:2.3,  pl:22.4, v12:8.4,   vol:'R$5M',   volNum:5e6,   setor:'Alimentação',     origem:'EUA'},
+  {t:'COCA34', n:'Coca-Cola Co.',             p:58.40,  v:0.18,  dy:3.0,  pl:22.4, v12:2.4,   vol:'R$5M',   volNum:5e6,   setor:'Bebidas',         origem:'EUA'},
+  {t:'NIKE34', n:'Nike Inc.',                 p:88.40,  v:-0.32, dy:1.4,  pl:28.4, v12:-28.4, vol:'R$4M',   volNum:4e6,   setor:'Vestuário',       origem:'EUA'},
+  {t:'WMT34',  n:'Walmart Inc.',              p:168.40, v:0.35,  dy:1.4,  pl:28.4, v12:28.4,  vol:'R$4M',   volNum:4e6,   setor:'Varejo',          origem:'EUA'},
+  {t:'COST34', n:'Costco Wholesale',          p:788.40, v:0.42,  dy:0.6,  pl:45.4, v12:42.4,  vol:'R$4M',   volNum:4e6,   setor:'Varejo',          origem:'EUA'},
+  {t:'PEP34',  n:'PepsiCo Inc.',              p:168.40, v:0.15,  dy:2.8,  pl:22.4, v12:2.4,   vol:'R$3M',   volNum:3e6,   setor:'Bebidas',         origem:'EUA'},
+  {t:'SBUX34', n:'Starbucks Corp.',           p:92.40,  v:-0.42, dy:2.5,  pl:22.4, v12:-8.4,  vol:'R$3M',   volNum:3e6,   setor:'Alimentação',     origem:'EUA'},
+  // Digital/Entretenimento
+  {t:'NFLX34', n:'Netflix Inc.',              p:288.40, v:0.90,  dy:0.0,  pl:38.5, v12:62.4,  vol:'R$6M',   volNum:6e6,   setor:'Streaming',       origem:'EUA'},
+  {t:'DISB34', n:'The Walt Disney Co.',       p:88.40,  v:-0.40, dy:0.5,  pl:25.4, v12:-8.4,  vol:'R$4M',   volNum:4e6,   setor:'Entretenimento',  origem:'EUA'},
+  {t:'UBER34', n:'Uber Technologies',         p:72.40,  v:0.82,  dy:0.0,  pl:0.0,  v12:42.4,  vol:'R$3M',   volNum:3e6,   setor:'Mobilidade',      origem:'EUA'},
+  {t:'SPOT34', n:'Spotify Technology',        p:228.40, v:1.25,  dy:0.0,  pl:0.0,  v12:58.4,  vol:'R$3M',   volNum:3e6,   setor:'Streaming',       origem:'EUA'},
+  // Industrial
+  {t:'BOEI34', n:'The Boeing Co.',            p:192.40, v:0.45,  dy:0.0,  pl:0.0,  v12:8.4,   vol:'R$3M',   volNum:3e6,   setor:'Aeroespacial',    origem:'EUA'},
+  {t:'GE34',   n:'General Electric Co.',      p:148.40, v:0.38,  dy:0.2,  pl:20.4, v12:58.4,  vol:'R$3M',   volNum:3e6,   setor:'Industrial',      origem:'EUA'},
+  {t:'CAT34',  n:'Caterpillar Inc.',          p:288.40, v:0.32,  dy:1.8,  pl:16.4, v12:12.4,  vol:'R$3M',   volNum:3e6,   setor:'Maquinário',      origem:'EUA'},
+  {t:'CVX34',  n:'Chevron Corp.',             p:148.40, v:0.25,  dy:4.0,  pl:14.4, v12:5.4,   vol:'R$3M',   volNum:3e6,   setor:'Petróleo & Gás',  origem:'EUA'},
+  // Ásia
+  {t:'SAMS34', n:'Samsung Electronics',       p:48.20,  v:0.30,  dy:2.4,  pl:18.2, v12:12.5,  vol:'R$3M',   volNum:3e6,   setor:'Semicondutores',  origem:'Coreia'},
+  {t:'TOYT34', n:'Toyota Motor Corp.',        p:188.40, v:0.22,  dy:2.5,  pl:10.4, v12:8.4,   vol:'R$2M',   volNum:2e6,   setor:'Automotivo',      origem:'Japão'},
+  {t:'TSMC34', n:'Taiwan Semiconductor',      p:128.40, v:0.82,  dy:1.5,  pl:20.4, v12:48.4,  vol:'R$3M',   volNum:3e6,   setor:'Semicondutores',  origem:'Taiwan'},
+  {t:'BABA34', n:'Alibaba Group',             p:38.60,  v:1.50,  dy:0.0,  pl:14.8, v12:28.4,  vol:'R$5M',   volNum:5e6,   setor:'Consumo/Tech',    origem:'China'},
+  {t:'SONY34', n:'Sony Group Corp.',          p:88.40,  v:0.32,  dy:0.6,  pl:18.4, v12:8.4,   vol:'R$2M',   volNum:2e6,   setor:'Eletrônicos',     origem:'Japão'},
+  // Europa
+  {t:'LVMH34', n:'LVMH Moët Hennessy',       p:412.80, v:-0.40, dy:1.8,  pl:22.4, v12:-8.2,  vol:'R$4M',   volNum:4e6,   setor:'Luxo',            origem:'França'},
+  {t:'SAP34',  n:'SAP SE',                    p:188.40, v:0.42,  dy:1.5,  pl:28.4, v12:28.4,  vol:'R$3M',   volNum:3e6,   setor:'Tecnologia',      origem:'Alemanha'},
+  {t:'ASML34', n:'ASML Holding NV',           p:788.40, v:0.65,  dy:0.8,  pl:40.4, v12:28.4,  vol:'R$3M',   volNum:3e6,   setor:'Semicondutores',  origem:'Holanda'},
+  {t:'NVO34',  n:'Novo Nordisk A/S',          p:128.40, v:0.55,  dy:1.0,  pl:30.4, v12:58.4,  vol:'R$3M',   volNum:3e6,   setor:'Farmacêutica',    origem:'Dinamarca'},
+  {t:'HOND34', n:'Honda Motor Co.',           p:34.20,  v:0.28,  dy:3.2,  pl:8.4,  v12:5.4,   vol:'R$2M',   volNum:2e6,   setor:'Automotivo',      origem:'Japão'},
+  // Diversificados
+  {t:'BERK34', n:'Berkshire Hathaway',        p:348.40, v:0.35,  dy:0.0,  pl:20.4, v12:18.4,  vol:'R$3M',   volNum:3e6,   setor:'Diversificado',   origem:'EUA'},
 ];
+let BDRS = [...BDRS_FALLBACK];
+
+async function loadData() {
+  try {
+    const r = await fetch('data/bdrs.json?t=' + Date.now());
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    const lista = (data.bdrs || []).filter(b => b.p > 0).map(b => ({
+      t: b.t, n: b.n, p: b.p, v: b.v ?? 0,
+      dy: b.dy ?? 0,
+      pl: b.pl ?? 0,
+      v12: b.v12 ?? 0,
+      vol: '—', volNum: 0,
+      setor: b.setor ?? '—',
+      origem: b.origem ?? '—',
+    }));
+    if (lista.length > 0) {
+      BDRS = lista;
+      const ts = document.getElementById('data-timestamp');
+      if (ts) ts.textContent = '· Atualizado em ' + data.updated_at + ' (' + lista.length + ' BDRs)';
+    } else {
+      throw new Error('Sem dados válidos');
+    }
+  } catch(e) {
+    BDRS = [...BDRS_FALLBACK];
+    const ts = document.getElementById('data-timestamp');
+    if (ts) ts.textContent = '· Dados demonstrativos';
+  }
+}
 
 function setRank(el) {
   document.querySelectorAll('.rank-btn').forEach(b => b.classList.remove('active'));
@@ -214,8 +295,6 @@ async function init() {
   await loadData();
   filterTable();
   renderSidebar();
-  const ts = document.getElementById('data-timestamp');
-  if (ts) ts.textContent = '· Dados demonstrativos';
 }
 init();
 </script>

@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       modo:
-        description: 'diario | g1-g5 | fii1-fii4 | dividendos | indices | relatorio | fundamentalistas | setup | us-diario | us1 | us2 | us3 | us4 | us5'
+        description: 'diario | g1-g5 | fii1-fii4 | dividendos | indices | relatorio | fundamentalistas | setup | us-diario | us1 | us2 | us3 | us4 | us5 | etfs | bdrs | hist-etfs | hist-bdrs'
         required: false
         default: 'diario'
 
@@ -96,6 +96,33 @@ jobs:
           BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
           BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
         run: python fetch_data.py
+
+      # ── ETFs ─────────────────────────────────────────────────────────────────
+      - name: ETFs — BR (Brapi+Yahoo) e EUA (Yahoo+Massive)
+        if: ${{ steps.modo.outputs.modo == 'diario' || steps.modo.outputs.modo == 'etfs' }}
+        env:
+          BRAPI_TOKEN_1: ${{ secrets.BRAPI_TOKEN_1 }}
+          BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
+          BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
+          BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
+          BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
+          MASSIVE_TOKEN_1: ${{ secrets.MASSIVE_TOKEN_1 }}
+          MASSIVE_TOKEN_2: ${{ secrets.MASSIVE_TOKEN_2 }}
+          MASSIVE_TOKEN_3: ${{ secrets.MASSIVE_TOKEN_3 }}
+          MASSIVE_TOKEN_4: ${{ secrets.MASSIVE_TOKEN_4 }}
+          MASSIVE_TOKEN_5: ${{ secrets.MASSIVE_TOKEN_5 }}
+        run: python fetch_etfs.py
+
+      # ── BDRs ──────────────────────────────────────────────────────────────
+      - name: BDRs — BR (Brapi+Yahoo)
+        if: ${{ steps.modo.outputs.modo == 'diario' || steps.modo.outputs.modo == 'bdrs' }}
+        env:
+          BRAPI_TOKEN_1: ${{ secrets.BRAPI_TOKEN_1 }}
+          BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
+          BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
+          BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
+          BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
+        run: python fetch_bdrs.py
 
       # ── AÇÕES EUA (S&P 500) ──────────────────────────────────────────────────
       - name: Cotações EUA — S&P 500 (Yahoo + Massive fallback)
@@ -263,6 +290,33 @@ jobs:
           MASSIVE_TOKEN_5: ${{ secrets.MASSIVE_TOKEN_5 }}
         run: python fetch_historico_us.py us5
 
+      # ── HISTÓRICO ETFs ────────────────────────────────────────────────────────
+      - name: Histórico ETFs BR+EUA
+        if: ${{ steps.modo.outputs.modo == 'hist-etfs' }}
+        env:
+          BRAPI_TOKEN_1: ${{ secrets.BRAPI_TOKEN_1 }}
+          BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
+          BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
+          BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
+          BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
+          MASSIVE_TOKEN_1: ${{ secrets.MASSIVE_TOKEN_1 }}
+          MASSIVE_TOKEN_2: ${{ secrets.MASSIVE_TOKEN_2 }}
+          MASSIVE_TOKEN_3: ${{ secrets.MASSIVE_TOKEN_3 }}
+          MASSIVE_TOKEN_4: ${{ secrets.MASSIVE_TOKEN_4 }}
+          MASSIVE_TOKEN_5: ${{ secrets.MASSIVE_TOKEN_5 }}
+        run: python fetch_historico_etfs.py
+
+      # ── HISTÓRICO BDRs ────────────────────────────────────────────────────────
+      - name: Histórico BDRs
+        if: ${{ steps.modo.outputs.modo == 'hist-bdrs' }}
+        env:
+          BRAPI_TOKEN_1: ${{ secrets.BRAPI_TOKEN_1 }}
+          BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
+          BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
+          BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
+          BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
+        run: python fetch_historico_bdrs.py
+
       - name: Histórico Dividendos (rode uma vez)
         if: ${{ steps.modo.outputs.modo == 'dividendos' }}
         run: python fetch_dividendos_historico.py
@@ -281,5 +335,8 @@ jobs:
           git config user.email "bot@maisvalor.com"
           git add data/
           git diff --staged --quiet || git commit -m "📊 Atualização $(date +'%d/%m/%Y %H:%M') — ${{ steps.modo.outputs.modo }}"
-          git pull --rebase origin main
-          git push
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push && break
+            echo "⚠️ Push falhou (tentativa $i/5) — aguardando 20s..."
+            sleep 20
+          done

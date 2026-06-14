@@ -6,6 +6,22 @@ const CLASS_BADGE={'B3':'badge-b3','FII':'badge-fii','Crypto':'badge-crypto','RF
 const IRPF_CODE={'B3':'03','FII':'73','Crypto':'08','RF':'45','ETF':'03','Exterior':'03','BDR':'04'};
 const NOTA_COLOR=n=>n>=8?'#1D9E75':n>=5?'#BA7517':'#E24B4A';
 
+/* ---- UNITs B3: ações que terminam em 11 (não são FIIs nem ETFs) ---- */
+const UNITS_SUFIXO_11=new Set(['BPAC11','SANB11','ENGI11','KLBN11','TAEE11','SAPR11','ALUP11','IGTI11','BRBI11','DMMO11']);
+
+function classificarB3(ticker,nome){
+  const t=ticker.toUpperCase().trim();
+  const n=(nome||'').toUpperCase();
+  if(t.endsWith('34'))return 'BDR';
+  if(/TESOURO|CDB\b|LCI\b|LCA\b|LFT\b|NTN-/i.test(n))return 'RF';
+  if(t.endsWith('11')){
+    if(UNITS_SUFIXO_11.has(t))return 'B3';
+    if(/[ÍI]NDICE|INDEX|\bETF\b/i.test(n))return 'ETF';
+    return 'FII';
+  }
+  return 'B3';
+}
+
 const STORAGE_ATIVOS='consolidador_ativos_v2';
 const STORAGE_METAS='consolidador_metas_v2';
 
@@ -158,13 +174,19 @@ function handleCSVImport(input){
   if(!file)return;
   const name=file.name.toLowerCase();
   if(name.endsWith('.xlsx')||name.endsWith('.xls')){
-    if(typeof XLSX==='undefined'){toast('Biblioteca de Excel não carregada.');return}
+    if(typeof XLSX==='undefined'){toast('Biblioteca de Excel não carregada.');return;}
     const reader=new FileReader();
     reader.onload=e=>{
       const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
       const sheet=wb.Sheets[wb.SheetNames[0]];
       const rows=XLSX.utils.sheet_to_json(sheet,{header:1,raw:false,defval:''});
-      processImportRows(rows);
+      // Auto-detecta: se tiver coluna "Movimentação" e "Produto" é arquivo B3
+      const header=(rows[0]||[]).join('|').toLowerCase();
+      if(header.includes('movimenta')&&header.includes('produto')){
+        processB3Rows(rows);
+      }else{
+        processImportRows(rows);
+      }
       input.value='';
     };
     reader.readAsArrayBuffer(file);
@@ -179,6 +201,117 @@ function handleCSVImport(input){
     };
     reader.readAsText(file);
   }
+}
+
+/* ---- importar extrato B3 (Transferência - Liquidação) ---- */
+function processB3Rows(rows){
+  // Localizar cabeçalho
+  let hi=-1,col={};
+  for(let i=0;i<Math.min(10,rows.length);i++){
+    const r=rows[i];
+    const s=r.join('|').toLowerCase();
+    if(s.includes('produto')&&s.includes('quantidade')){
+      hi=i;
+      r.forEach((h,idx)=>{
+        const k=(h||'').toString().toLowerCase().trim();
+        if(k.includes('entrada')||k.includes('sa'))col.tipo=idx; // Entrada/Saída
+        if(k==='data')col.data=idx;
+        if(k.includes('movimenta'))col.mov=idx;
+        if(k==='produto')col.produto=idx;
+        if(k==='quantidade')col.qtd=idx;
+        if(k.includes('pre')&&k.includes('unit'))col.preco=idx;
+      });
+      break;
+    }
+  }
+  if(hi<0){toast('Formato não reconhecido. Use o extrato de movimentação da B3.');return;}
+
+  const ops={}; // ticker → {nome, txs:[{data,side,qtd,preco}]}
+
+  for(let i=hi+1;i<rows.length;i++){
+    const r=rows[i];
+    if(!r||r.length<4)continue;
+    const mov=String(r[col.mov]||'').trim();
+    if(!mov.toLowerCase().includes('liquid'))continue;
+
+    // Normaliza "Credito"/"Crédito"/"Debito"/"Débito"
+    const tipoNorm=String(r[col.tipo]||'').trim().toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g,'');
+    const isBuy=tipoNorm==='debito';   // dinheiro saiu → comprou
+    const isSell=tipoNorm==='credito'; // dinheiro entrou → vendeu
+    if(!isBuy&&!isSell)continue;
+
+    const produtoRaw=String(r[col.produto]||'').trim();
+    if(!produtoRaw)continue;
+
+    // "TICKER4 - Nome completo"
+    const dashIdx=produtoRaw.indexOf(' - ');
+    const ticker=(dashIdx>0?produtoRaw.slice(0,dashIdx):produtoRaw.split(/\s/)[0]).trim().toUpperCase();
+    const nome=dashIdx>0?produtoRaw.slice(dashIdx+3).trim():'';
+    if(!ticker||!/^[A-Z]{3,6}\d{1,2}$/.test(ticker))continue;
+
+    // Parse data DD/MM/YYYY → YYYY-MM-DD
+    let dataStr='';
+    const dv=r[col.data];
+    if(dv instanceof Date)dataStr=dv.toISOString().slice(0,10);
+    else{
+      const ds=String(dv||'').trim();
+      const m=ds.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      if(m)dataStr=`${m[3]}-${m[2]}-${m[1]}`;
+      else dataStr=ds.slice(0,10);
+    }
+
+    const qtd=parseFloat(String(r[col.qtd]||'0').replace(',','.'))||0;
+    const preco=parseFloat(String(r[col.preco]||'0').replace(',','.'))||0;
+    if(qtd<=0)continue;
+
+    if(!ops[ticker])ops[ticker]={nome,txs:[]};
+    if(nome&&!ops[ticker].nome)ops[ticker].nome=nome;
+    ops[ticker].txs.push({data:dataStr,side:isBuy?'buy':'sell',qtd,preco});
+  }
+
+  let importados=0,ignorados=0;
+
+  for(const [ticker,{nome,txs}] of Object.entries(ops)){
+    // Ordenar cronologicamente
+    txs.sort((a,b)=>a.data.localeCompare(b.data));
+
+    // PM iterativo: PM ponderado recalculado a cada compra; vendas só reduzem qtd
+    let pmAtual=0,qtdAtual=0,dataCompra='';
+    for(const tx of txs){
+      if(tx.side==='buy'){
+        if(qtdAtual===0)pmAtual=tx.preco;
+        else pmAtual=(pmAtual*qtdAtual+tx.preco*tx.qtd)/(qtdAtual+tx.qtd);
+        qtdAtual+=tx.qtd;
+        if(!dataCompra)dataCompra=tx.data;
+      }else{
+        qtdAtual=Math.max(0,qtdAtual-tx.qtd);
+        if(qtdAtual===0){pmAtual=0;dataCompra='';}
+      }
+    }
+
+    // Corrigir erros de ponto flutuante
+    qtdAtual=Math.round(qtdAtual*10000)/10000;
+    if(qtdAtual<=0){ignorados++;continue;}
+
+    const classe=classificarB3(ticker,nome);
+    const pm=parseFloat(pmAtual.toFixed(4));
+    const obj={ticker,classe,tipo:'Compra',qtd:qtdAtual,pm,cotacao:pm,dy:0,
+      data:dataCompra||new Date().toISOString().slice(0,10),nota:0,ideal:0,moeda:'BRL',comprar:'Não'};
+
+    const idx=ativos.findIndex(a=>a.ticker===ticker);
+    if(idx>=0){
+      // Preserva campos do usuário (nota, ideal, comprar, cotacao, dy)
+      ativos[idx]={...ativos[idx],qtd:obj.qtd,pm:obj.pm,classe:obj.classe,data:obj.data};
+    }else{
+      ativos.push(obj);
+    }
+    importados++;
+  }
+
+  saveAtivos();
+  toast(`B3: ${importados} ativo(s) importado(s)${ignorados?', '+ignorados+' zerado(s) ignorado(s)':''}.`);
+  if(typeof renderAll==='function')renderAll();
 }
 
 /* ---- navegação ---- */

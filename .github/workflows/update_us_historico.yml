@@ -1,0 +1,84 @@
+name: Histórico EUA Mensal (S&P 500)
+
+on:
+  schedule:
+    # Todo dia 1 do mês às 22h UTC (19h Brasília)
+    - cron: '0 22 1 * *'
+  workflow_dispatch: {}  # Permite rodar manualmente também
+
+jobs:
+  historico-us:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Dependências
+        run: pip install requests yfinance lxml
+
+      - name: Histórico EUA US1 (~100 tickers)
+        env:
+          MASSIVE_TOKEN_1: ${{ secrets.MASSIVE_TOKEN_1 }}
+          MASSIVE_TOKEN_2: ${{ secrets.MASSIVE_TOKEN_2 }}
+          MASSIVE_TOKEN_3: ${{ secrets.MASSIVE_TOKEN_3 }}
+          MASSIVE_TOKEN_4: ${{ secrets.MASSIVE_TOKEN_4 }}
+          MASSIVE_TOKEN_5: ${{ secrets.MASSIVE_TOKEN_5 }}
+        run: python fetch_historico_us.py us1
+
+      - name: Histórico EUA US2 (~100 tickers)
+        env:
+          MASSIVE_TOKEN_1: ${{ secrets.MASSIVE_TOKEN_1 }}
+          MASSIVE_TOKEN_2: ${{ secrets.MASSIVE_TOKEN_2 }}
+          MASSIVE_TOKEN_3: ${{ secrets.MASSIVE_TOKEN_3 }}
+          MASSIVE_TOKEN_4: ${{ secrets.MASSIVE_TOKEN_4 }}
+          MASSIVE_TOKEN_5: ${{ secrets.MASSIVE_TOKEN_5 }}
+        run: python fetch_historico_us.py us2
+
+      - name: Histórico EUA US3 (~100 tickers)
+        env:
+          MASSIVE_TOKEN_1: ${{ secrets.MASSIVE_TOKEN_1 }}
+          MASSIVE_TOKEN_2: ${{ secrets.MASSIVE_TOKEN_2 }}
+          MASSIVE_TOKEN_3: ${{ secrets.MASSIVE_TOKEN_3 }}
+          MASSIVE_TOKEN_4: ${{ secrets.MASSIVE_TOKEN_4 }}
+          MASSIVE_TOKEN_5: ${{ secrets.MASSIVE_TOKEN_5 }}
+        run: python fetch_historico_us.py us3
+
+      - name: Histórico EUA US4 (~100 tickers)
+        env:
+          MASSIVE_TOKEN_1: ${{ secrets.MASSIVE_TOKEN_1 }}
+          MASSIVE_TOKEN_2: ${{ secrets.MASSIVE_TOKEN_2 }}
+          MASSIVE_TOKEN_3: ${{ secrets.MASSIVE_TOKEN_3 }}
+          MASSIVE_TOKEN_4: ${{ secrets.MASSIVE_TOKEN_4 }}
+          MASSIVE_TOKEN_5: ${{ secrets.MASSIVE_TOKEN_5 }}
+        run: python fetch_historico_us.py us4
+
+      - name: Histórico EUA US5 (~100 tickers)
+        env:
+          MASSIVE_TOKEN_1: ${{ secrets.MASSIVE_TOKEN_1 }}
+          MASSIVE_TOKEN_2: ${{ secrets.MASSIVE_TOKEN_2 }}
+          MASSIVE_TOKEN_3: ${{ secrets.MASSIVE_TOKEN_3 }}
+          MASSIVE_TOKEN_4: ${{ secrets.MASSIVE_TOKEN_4 }}
+          MASSIVE_TOKEN_5: ${{ secrets.MASSIVE_TOKEN_5 }}
+        run: python fetch_historico_us.py us5
+
+      - name: Gerar tickers.json
+        run: bash gerar_tickers_json.sh
+
+      - name: Commit e Push
+        run: |
+          git config user.name "Mais Valor Bot"
+          git config user.email "bot@maisvalor.com"
+          git add data/
+          git diff --staged --quiet || git commit -m "📈 Histórico EUA mensal — $(date +'%m/%Y')"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push && break
+            echo "⚠️ Push falhou (tentativa $i/5) — aguardando 20s..."
+            sleep 20
+          done

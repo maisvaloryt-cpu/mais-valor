@@ -168,34 +168,56 @@ def fetch_statusinvest_ativo(ticker: str) -> list:
         return []
 
 
-def fetch_ativo_cascata(ticker: str, verbose: bool = True) -> tuple:
+def fetch_ativo_complementar(ticker: str, verbose: bool = True) -> tuple:
     """
-    Tenta buscar histórico mensal em cascata:
+    Busca histórico mensal em TODAS as fontes e mergeia (complementar, não cascata):
       1. Brapi (se tiver token)
       2. Yahoo Finance
       3. Status Invest
 
-    Retorna (pontos, fonte) onde fonte é 'brapi'|'yahoo'|'statusinvest'|None
-    Para de buscar assim que encontra dados válidos.
+    Retorna (pontos_merged, fontes_str) — nunca para no primeiro sucesso.
+    Pontos duplicados por date são deduplicados automaticamente.
     """
+    all_pts = []
+    fontes = []
+
     # 1. Brapi
     if BRAPI_TOKEN:
         pts = fetch_brapi_mensal(ticker)
         if pts:
-            if verbose: print(f"  {ticker}: {len(pts)} pts via Brapi")
-            return pts, "brapi"
+            all_pts.extend(pts)
+            fontes.append(f"Brapi:{len(pts)}")
 
     # 2. Yahoo Finance
     pts = fetch_yahoo_mensal(ticker + ".SA")
     if pts:
-        if verbose: print(f"  {ticker}: {len(pts)} pts via Yahoo")
-        return pts, "yahoo"
+        all_pts.extend(pts)
+        fontes.append(f"Yahoo:{len(pts)}")
 
     # 3. Status Invest
     pts = fetch_statusinvest_ativo(ticker)
     if pts:
-        if verbose: print(f"  {ticker}: {len(pts)} pts via StatusInvest")
-        return pts, "statusinvest"
+        all_pts.extend(pts)
+        fontes.append(f"SI:{len(pts)}")
 
-    if verbose: print(f"  {ticker}: sem dados em nenhuma fonte")
-    return [], None
+    if not all_pts:
+        if verbose: print(f"  {ticker}: sem dados em nenhuma fonte")
+        return [], None
+
+    # Deduplica por date (mantém o último valor encontrado por data)
+    por_data = {}
+    for p in all_pts:
+        por_data[p["date"]] = p
+    merged = sorted(por_data.values(), key=lambda x: x["date"])
+
+    fonte_str = "+".join(fontes)
+    if verbose: print(f"  {ticker}: {len(merged)} pts ({fonte_str})")
+    return merged, fonte_str
+
+
+def fetch_ativo_cascata(ticker: str, verbose: bool = True) -> tuple:
+    """
+    Alias de fetch_ativo_complementar — mantido para compatibilidade.
+    Agora busca TODAS as fontes e mergeia em vez de parar no primeiro sucesso.
+    """
+    return fetch_ativo_complementar(ticker, verbose)
