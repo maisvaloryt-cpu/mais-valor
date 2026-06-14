@@ -140,7 +140,11 @@ def get_sp500_list():
     try:
         import pandas as pd
         url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
-        df = pd.read_html(url)[0]
+        # User-Agent necessário para evitar bloqueio 403 no GitHub Actions
+        df = pd.read_html(
+            url,
+            storage_options={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+        )[0]
         companies = []
         for _, row in df.iterrows():
             raw_sym = str(row.iloc[0]).strip()
