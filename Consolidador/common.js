@@ -111,12 +111,12 @@ async function fetchHistoricoTicker(ticker){
 }
 
 async function loadAllHistorico(){
-  await Promise.allSettled(ativos.map(a=>fetchHistoricoTicker(a.ticker)));
+  const tickers=[...new Set(ativos.map(a=>a.ticker))];
+  await Promise.allSettled(tickers.map(t=>fetchHistoricoTicker(t)));
 }
 
 /* calcula evolução real do patrimônio mês a mês usando preços históricos */
 function calcEvolucaoPatrimonio(nMeses=24){
-  // monta lista de meses a exibir
   const hoje=new Date();
   const meses=[];
   for(let i=nMeses-1;i>=0;i--){
@@ -124,11 +124,12 @@ function calcEvolucaoPatrimonio(nMeses=24){
     meses.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'));
   }
   return meses.map(ym=>{
+    // posições líquidas considerando apenas lançamentos até este mês
+    const txAte=ativos.filter(a=>!a.data||a.data.slice(0,7)<=ym);
+    const posicoes=calcPosicoes(txAte);
     let vt=0,custo=0;
-    ativos.forEach(a=>{
-      if(!a.data||a.data.slice(0,7)>ym)return; // ainda não tinha comprado
+    posicoes.forEach(a=>{
       const hist=HISTORICO_CACHE[a.ticker]||{};
-      // pega o preço deste mês, ou o mais recente anterior disponível
       let price=hist[ym];
       if(!price){
         const anterior=Object.keys(hist).filter(k=>k<=ym).sort();
@@ -153,26 +154,38 @@ async function fetchDividendosTicker(ticker){
 }
 
 async function loadAllDividendos(){
-  await Promise.allSettled(ativos.map(a=>fetchDividendosTicker(a.ticker)));
+  const tickers=[...new Set(ativos.map(a=>a.ticker))];
+  await Promise.allSettled(tickers.map(t=>fetchDividendosTicker(t)));
 }
 
 /* -- helpers de cálculo de proventos ---------------------------------------- */
-function calcProventosAtivo(ticker,dataCompra,qtd){
+
+/* Retorna a qtd líquida de um ticker em uma data específica */
+function getQtdTickerAtDate(ticker,dateStr){
+  let qtd=0;
+  ativos.filter(a=>a.ticker===ticker&&a.data<=dateStr).forEach(a=>{
+    if((a.tipo||'Compra')==='Venda')qtd=Math.max(0,qtd-a.qtd);
+    else qtd+=a.qtd;
+  });
+  return qtd;
+}
+
+function calcProventosAtivo(ticker,dataCompra,_qtd){
   const from=dataCompra||'1900-01-01';
   return(DIVIDENDOS_CACHE[ticker]||[])
     .filter(d=>d.date>=from)
-    .reduce((s,d)=>s+d.value*qtd,0);
+    .reduce((s,d)=>s+d.value*getQtdTickerAtDate(ticker,d.date),0);
 }
 
 function calcProventosUltimos12m(){
   const cutoff=new Date();
   cutoff.setFullYear(cutoff.getFullYear()-1);
   const cutoffStr=cutoff.toISOString().slice(0,10);
-  return ativos.reduce((sum,a)=>{
-    const from=a.data&&a.data>cutoffStr?a.data:cutoffStr;
-    return sum+(DIVIDENDOS_CACHE[a.ticker]||[])
-      .filter(d=>d.date>=from)
-      .reduce((s,d)=>s+d.value*a.qtd,0);
+  const tickers=[...new Set(ativos.map(a=>a.ticker))];
+  return tickers.reduce((sum,ticker)=>{
+    return sum+(DIVIDENDOS_CACHE[ticker]||[])
+      .filter(d=>d.date>=cutoffStr)
+      .reduce((s,d)=>s+d.value*getQtdTickerAtDate(ticker,d.date),0);
   },0);
 }
 
@@ -185,7 +198,7 @@ function getDividendosPorMes(){
     const ym=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
     map[ym]={total:0,tickers:{}};
   }
-  ativos.forEach(a=>{
+  calcPosicoes().forEach(a=>{
     const from=a.data||'1900-01-01';
     (DIVIDENDOS_CACHE[a.ticker]||[]).forEach(d=>{
       if(d.date<from)return;
@@ -209,13 +222,45 @@ async function initConsolidador(){
 window.addEventListener('load',()=>initConsolidador());
 
 /* ---- cálculos ---- */
+
+/* Agrega lançamentos em posições líquidas por ticker (PM ponderado, qtd líquida) */
+function calcPosicoes(txArray){
+  const arr=txArray||ativos;
+  const map={};
+  arr.forEach(a=>{
+    const t=a.ticker;
+    if(!map[t]){
+      map[t]={ticker:t,classe:a.classe,qtd:0,pm:0,_custo:0,
+        cotacao:a.cotacao||0,dy:a.dy||0,data:'',
+        nota:0,ideal:0,moeda:a.moeda||'BRL',comprar:'Não'};
+    }
+    if(a.nota)map[t].nota=a.nota;
+    if(a.ideal)map[t].ideal=a.ideal;
+    if(a.comprar&&a.comprar!=='Não')map[t].comprar=a.comprar;
+    if(a.classe)map[t].classe=a.classe;
+    if(a.moeda)map[t].moeda=a.moeda;
+    const isSell=(a.tipo||'Compra')==='Venda';
+    if(isSell){
+      map[t].qtd=Math.max(0,map[t].qtd-a.qtd);
+      map[t]._custo=map[t].qtd*map[t].pm;
+    }else{
+      const newQtd=map[t].qtd+a.qtd;
+      map[t]._custo+=a.qtd*a.pm;
+      map[t].pm=newQtd>0?map[t]._custo/newQtd:0;
+      map[t].qtd=newQtd;
+      if(!map[t].data||a.data<map[t].data)map[t].data=a.data;
+    }
+  });
+  return Object.values(map).filter(a=>a.qtd>0.0001).map(({_custo,...rest})=>rest);
+}
+
 function calcAtivos(){
-  return ativos.map(a=>{
+  return calcPosicoes().map(a=>{
     const cotacao=COTACOES[a.ticker]||a.cotacao||0;
     const vt=a.qtd*cotacao, custo=a.qtd*a.pm;
     const res=vt-custo, resPct=custo>0?((vt-custo)/custo)*100:0;
     const proventos=calcProventosAtivo(a.ticker,a.data,a.qtd);
-    const dy=custo>0?(proventos/custo)*100:0; // DY real recebido desde a compra
+    const dy=custo>0?(proventos/custo)*100:0;
     const lucroTotal=res+proventos;
     const rentTotal=custo>0?(lucroTotal/custo)*100:0;
     return{...a,cotacao,vt,custo,res,resPct,proventos,dy,lucroTotal,rentTotal};
@@ -309,8 +354,7 @@ function processImportRows(rows){
       moeda:moeda?String(moeda).trim():'BRL',
       comprar:comprar?String(comprar).trim():'Não'
     };
-    const idx=ativos.findIndex(a=>a.ticker===obj.ticker);
-    if(idx>=0)ativos[idx]=obj; else ativos.push(obj);
+    ativos.push(obj);
     count++;
   }
   saveAtivos();
