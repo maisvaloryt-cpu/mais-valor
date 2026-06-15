@@ -1,7 +1,7 @@
 /* ============ FIREBASE — Consolidador de Carteira ============ */
 
 const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyBDojPPrdkrqr52WxDL-WPy5wLifsWo1HI",
+  apiKey: "AIzaSyBDojPPrdkrqr52WxDL-WPy5wL1fsWo1HI",
   authDomain: "consolidador-de-carteira-c3a83.firebaseapp.com",
   projectId: "consolidador-de-carteira-c3a83",
   storageBucket: "consolidador-de-carteira-c3a83.firebasestorage.app",
