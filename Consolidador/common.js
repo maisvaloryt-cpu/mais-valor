@@ -478,7 +478,6 @@ function renderHeaderAndNav(active){
   const headerActions=document.getElementById('header-actions');
   if(headerActions){
     headerActions.innerHTML=`
-      <div id="auth-area" style="display:flex;align-items:center;gap:8px"></div>
       <button class="btn" onclick="infoB3()"><i class="ti ti-building-bank" aria-hidden="true"></i> Integração B3</button>
       <button class="btn" onclick="openImport()"><i class="ti ti-file-spreadsheet" aria-hidden="true"></i> Importar Excel</button>
       <input type="file" id="csv-input" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleCSVImport(this)">
