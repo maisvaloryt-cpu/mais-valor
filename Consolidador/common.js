@@ -198,15 +198,16 @@ function getDividendosPorMes(){
     const ym=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
     map[ym]={total:0,tickers:{}};
   }
-  calcPosicoes().forEach(a=>{
-    const from=a.data||'1900-01-01';
-    (DIVIDENDOS_CACHE[a.ticker]||[]).forEach(d=>{
-      if(d.date<from)return;
+  const tickers=[...new Set(ativos.map(a=>a.ticker))];
+  tickers.forEach(ticker=>{
+    (DIVIDENDOS_CACHE[ticker]||[]).forEach(d=>{
       const ym=d.date.slice(0,7);
       if(!map[ym])return;
-      const val=d.value*a.qtd;
+      const qtd=getQtdTickerAtDate(ticker,d.date);
+      if(qtd<=0)return;
+      const val=d.value*qtd;
       map[ym].total+=val;
-      map[ym].tickers[a.ticker]=(map[ym].tickers[a.ticker]||0)+val;
+      map[ym].tickers[ticker]=(map[ym].tickers[ticker]||0)+val;
     });
   });
   return Object.entries(map)
