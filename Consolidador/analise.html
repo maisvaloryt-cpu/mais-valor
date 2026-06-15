@@ -57,10 +57,10 @@ injectModals();
 function renderAnalise(){
   const c=calcAtivos().sort((a,b)=>b.vt-a.vt);
   const total=c.reduce((s,a)=>s+a.vt,0);
-  const dyMed=total>0?c.reduce((s,a)=>s+(a.dy*(a.vt/total)),0):0;
+  const t=getTotals();
   document.getElementById('metrics-analise').innerHTML=`
     <div class="mcard"><div class="mcard-label">Diversificação</div><div class="mcard-value">${new Set(c.map(a=>a.classe)).size} classes</div></div>
-    <div class="mcard"><div class="mcard-label">DY Médio</div><div class="mcard-value positive">${fmt(dyMed)}%</div></div>
+    <div class="mcard"><div class="mcard-label">DY Médio (12M)</div><div class="mcard-value positive">${fmt(t.dyMed)}%</div></div>
     <div class="mcard"><div class="mcard-label">Ativo mais concentrado</div><div class="mcard-value">${c[0]?.ticker||'-'} (${total?fmt((c[0]?.vt||0)/total*100):0}%)</div></div>
   `;
   const top5=c.slice(0,5);

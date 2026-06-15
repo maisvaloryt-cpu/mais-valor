@@ -84,6 +84,64 @@ async function atualizarCotacoes(){
   }catch(e){console.warn('atualizarCotacoes:',e);}
 }
 
+/* -- histórico mensal de preços por ticker ----------------------------------- */
+const HISTORICO_CACHE={};  // ticker → {YYYY-MM: close}
+
+async function fetchHistoricoTicker(ticker){
+  if(HISTORICO_CACHE[ticker]!==undefined)return HISTORICO_CACHE[ticker];
+  const map={};
+  try{
+    // preços mensais
+    const r=await fetch('../data/historico/'+ticker+'.json?t='+Date.now());
+    if(r.ok){
+      const j=await r.json();
+      (j.history||[]).forEach(p=>{map[p.date.slice(0,7)]=p.close;});
+    }
+  }catch(e){}
+  try{
+    // preços diários recentes (sobrescreve o mês se tiver dado mais novo)
+    const r2=await fetch('../data/diario/'+ticker+'.json?t='+Date.now());
+    if(r2.ok){
+      const j2=await r2.json();
+      (j2.history||[]).forEach(p=>{map[p.date.slice(0,7)]=p.close;});
+    }
+  }catch(e){}
+  HISTORICO_CACHE[ticker]=map;
+  return map;
+}
+
+async function loadAllHistorico(){
+  await Promise.allSettled(ativos.map(a=>fetchHistoricoTicker(a.ticker)));
+}
+
+/* calcula evolução real do patrimônio mês a mês usando preços históricos */
+function calcEvolucaoPatrimonio(nMeses=24){
+  // monta lista de meses a exibir
+  const hoje=new Date();
+  const meses=[];
+  for(let i=nMeses-1;i>=0;i--){
+    const d=new Date(hoje.getFullYear(),hoje.getMonth()-i,1);
+    meses.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'));
+  }
+  return meses.map(ym=>{
+    let vt=0,custo=0;
+    ativos.forEach(a=>{
+      if(!a.data||a.data.slice(0,7)>ym)return; // ainda não tinha comprado
+      const hist=HISTORICO_CACHE[a.ticker]||{};
+      // pega o preço deste mês, ou o mais recente anterior disponível
+      let price=hist[ym];
+      if(!price){
+        const anterior=Object.keys(hist).filter(k=>k<=ym).sort();
+        if(anterior.length)price=hist[anterior[anterior.length-1]];
+      }
+      if(price){vt+=a.qtd*price;custo+=a.qtd*a.pm;}
+    });
+    const [y,m]=ym.split('-');
+    const nomes=['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    return{ym,label:nomes[parseInt(m)]+'/'+y.slice(2),vt:parseFloat(vt.toFixed(2)),custo:parseFloat(custo.toFixed(2))};
+  });
+}
+
 /* -- dividendos por ticker --------------------------------------------------- */
 async function fetchDividendosTicker(ticker){
   if(DIVIDENDOS_CACHE[ticker]!==undefined)return DIVIDENDOS_CACHE[ticker];
@@ -143,9 +201,9 @@ function getDividendosPorMes(){
     .map(([ym,v])=>({ym,...v}));
 }
 
-/* -- init assíncrono: carrega cotações + dividendos e re-renderiza ----------- */
+/* -- init assíncrono: carrega cotações + dividendos + histórico e re-renderiza */
 async function initConsolidador(){
-  await Promise.all([atualizarCotacoes(),loadAllDividendos()]);
+  await Promise.all([atualizarCotacoes(),loadAllDividendos(),loadAllHistorico()]);
   if(typeof renderAll==='function')renderAll();
 }
 window.addEventListener('load',()=>initConsolidador());
@@ -455,8 +513,7 @@ function injectModals(){
       <div class="form-group"><label>Data</label><input id="f-data" type="date"></div>
       <div class="form-group"><label>Quantidade</label><input id="f-qtd" type="number" placeholder="100" min="0"></div>
       <div class="form-group"><label>Preço Médio (R$)</label><input id="f-pm" type="number" placeholder="28.50" step="0.01"></div>
-      <div class="form-group"><label>Cotação Atual (R$)</label><input id="f-cotacao" type="number" placeholder="32.10" step="0.01"></div>
-      <div class="form-group"><label>DY Anual (%)</label><input id="f-dy" type="number" placeholder="6.5" step="0.01"></div>
+      <div class="form-group"><label>Cotação Atual (R$) <small style="color:var(--color-text-secondary)">(auto)</small></label><input id="f-cotacao" type="number" placeholder="Preenchido pelo site" step="0.01"></div>
       <div class="form-group"><label>Nota (0–10)</label><input id="f-nota" type="number" placeholder="8" min="0" max="10"></div>
       <div class="form-group"><label>% Ideal na Carteira</label><input id="f-ideal" type="number" placeholder="5" step="0.1"></div>
       <div class="form-group"><label>Moeda</label>
@@ -495,7 +552,7 @@ function injectModals(){
 }
 
 function openModal(){injectModals();document.getElementById('modal').style.display='flex';document.getElementById('f-data').value=new Date().toISOString().slice(0,10)}
-function closeModal(){document.getElementById('modal').style.display='none';['f-ticker','f-qtd','f-pm','f-cotacao','f-dy','f-nota','f-ideal'].forEach(id=>{document.getElementById(id).value=''})}
+function closeModal(){document.getElementById('modal').style.display='none';['f-ticker','f-qtd','f-pm','f-cotacao','f-nota','f-ideal'].forEach(id=>{document.getElementById(id).value=''})}
 function openModalMeta(){injectModals();document.getElementById('modal-meta').style.display='flex'}
 function closeModalMeta(){document.getElementById('modal-meta').style.display='none'}
 
@@ -505,8 +562,7 @@ function addAtivo(){
   const tipo=document.getElementById('f-tipo').value;
   const qtd=parseFloat(document.getElementById('f-qtd').value)||0;
   const pm=parseFloat(document.getElementById('f-pm').value)||0;
-  const cotacao=parseFloat(document.getElementById('f-cotacao').value)||pm;
-  const dy=parseFloat(document.getElementById('f-dy').value)||0;
+  const cotacao=parseFloat(document.getElementById('f-cotacao').value)||0; // fallback se site não tiver
   const data=document.getElementById('f-data').value;
   const nota=parseInt(document.getElementById('f-nota').value)||0;
   const ideal=parseFloat(document.getElementById('f-ideal').value)||0;
@@ -514,11 +570,11 @@ function addAtivo(){
   const comprar=document.getElementById('f-comprar').value;
   if(!ticker||!qtd||!pm){alert('Preencha Ticker, Quantidade e Preço Médio.');return}
   const idx=ativos.findIndex(a=>a.ticker===ticker);
-  const obj={ticker,classe,tipo,qtd,pm,cotacao,dy,data,nota,ideal,moeda,comprar};
+  const obj={ticker,classe,tipo,qtd,pm,cotacao,data,nota,ideal,moeda,comprar};
   if(idx>=0)ativos[idx]=obj; else ativos.push(obj);
   saveAtivos();
   closeModal();
-  if(typeof renderAll==='function')renderAll();
+  initConsolidador(); // recarrega cotação e proventos do site
   toast('Lançamento salvo.');
 }
 

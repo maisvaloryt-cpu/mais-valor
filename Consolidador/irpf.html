@@ -62,10 +62,10 @@ function renderIRPF(){
   const c=calcAtivos();
   const total=c.reduce((s,a)=>s+a.vt,0);
   const custo=c.reduce((s,a)=>s+a.custo,0);
-  const provAno=c.reduce((s,a)=>s+(a.vt*(a.dy/100)),0);
+  const proventosTotal=c.reduce((s,a)=>s+a.proventos,0);
   document.getElementById('metrics-irpf').innerHTML=`
     <div class="mcard"><div class="mcard-label">Total Bens e Direitos</div><div class="mcard-value">${fmtR(custo)}</div><div class="mcard-sub">Custo de aquisição declarado</div></div>
-    <div class="mcard"><div class="mcard-label">Rendimentos Isentos (est.)</div><div class="mcard-value positive">${fmtR(provAno)}</div><div class="mcard-sub">FIIs, dividendos isentos</div></div>
+    <div class="mcard"><div class="mcard-label">Rendimentos Recebidos</div><div class="mcard-value positive">${fmtR(proventosTotal)}</div><div class="mcard-sub">Proventos desde a data de compra</div></div>
     <div class="mcard"><div class="mcard-label">Ganho de Capital</div><div class="mcard-value ${total-custo>=0?'positive':'negative'}">${total-custo>=0?'+':''}${fmtR(total-custo)}</div><div class="mcard-sub">Posição aberta — não realizado</div></div>
   `;
   document.getElementById('tbody-irpf').innerHTML=c.map(a=>`
@@ -76,7 +76,7 @@ function renderIRPF(){
     const isento=a.classe==='FII'||a.classe==='B3';
     const trib=isento?'<span style="color:#1D9E75;font-weight:500">Isento</span>':'<span style="color:#BA7517;font-weight:500">Tributável</span>';
     return`<tr><td><strong>${a.ticker}</strong></td><td><span class="badge ${CLASS_BADGE[a.classe]||''}">${CLASS_LABEL[a.classe]||a.classe}</span></td>
-    <td class="r">${fmt(a.dy)}%</td><td class="r positive">${fmtR(a.vt*(a.dy/100))}</td><td>${trib}</td></tr>`;
+    <td class="r">${fmt(a.dy)}%</td><td class="r positive">${fmtR(a.proventos)}</td><td>${trib}</td></tr>`;
   }).join('');
 }
 

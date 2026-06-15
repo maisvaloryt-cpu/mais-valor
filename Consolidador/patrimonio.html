@@ -26,13 +26,17 @@
   <div id="tab-patrimonio">
     <div class="metrics" id="metrics-patri"></div>
     <div class="card" style="margin-bottom:1.25rem">
-      <div class="card-title">Evolução Histórica Acumulada</div>
-      <div style="position:relative;height:220px"><canvas id="chartPatri" role="img" aria-label="Evolução histórica do patrimônio"></canvas></div>
+      <div class="card-title">Evolução Real do Patrimônio
+        <select id="sel-periodo" onchange="renderEvolucaoPatri(+this.value)" style="font-size:11px;padding:3px 6px;border:0.5px solid var(--color-border-secondary);border-radius:6px;background:var(--color-background-primary);color:var(--color-text-secondary)">
+          <option value="12">12 meses</option><option value="24" selected>24 meses</option><option value="60">5 anos</option><option value="120">10 anos</option>
+        </select>
+      </div>
+      <div style="position:relative;height:220px"><canvas id="chartPatri" role="img" aria-label="Evolução real do patrimônio"></canvas></div>
     </div>
     <div class="analise-grid">
       <div class="card">
-        <div class="card-title">Valor Aplicado vs. Ganho de Capital</div>
-        <div style="position:relative;height:170px"><canvas id="chartVaGc" role="img" aria-label="Valor aplicado vs ganho de capital"></canvas></div>
+        <div class="card-title">Custo vs Ganho de Capital por Classe</div>
+        <div style="position:relative;height:170px"><canvas id="chartVaGc" role="img" aria-label="Custo vs ganho de capital por classe"></canvas></div>
       </div>
       <div class="card">
         <div class="card-title">Alocação Atual por Classe</div>
@@ -55,30 +59,51 @@ function renderPatrimonio(){
     <div class="mcard"><div class="mcard-label">Patrimônio Atual</div><div class="mcard-value">${fmtR(t.total)}</div></div>
     <div class="mcard"><div class="mcard-label">Total Investido</div><div class="mcard-value">${fmtR(t.custo)}</div></div>
     <div class="mcard"><div class="mcard-label">Ganho de Capital</div><div class="mcard-value ${t.res>=0?'positive':'negative'}">${t.res>=0?'+':''}${fmtR(t.res)}</div></div>
-    <div class="mcard"><div class="mcard-label">Proventos Recebidos</div><div class="mcard-value positive">${fmtR(t.provAno)}</div></div>
+    <div class="mcard"><div class="mcard-label">Proventos Recebidos (total)</div><div class="mcard-value positive">${fmtR(t.proventosTotal)}</div><div class="mcard-sub">Últimos 12M: ${fmtR(t.provAno)}</div></div>
   `;
-  const labels=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const base=t.custo;
-  const vals=labels.map((_,i)=>parseFloat((base+i*base*0.025).toFixed(2)));
-  if(charts.patri)charts.patri.destroy();
-  charts.patri=new Chart(document.getElementById('chartPatri').getContext('2d'),{
-    type:'line',data:{labels,datasets:[{label:'Patrimônio',data:vals,borderColor:'#185FA5',backgroundColor:'rgba(24,95,165,0.07)',fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:'#185FA5'}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtR(c.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#888',font:{size:10}}},y:{grid:{color:'rgba(128,128,128,0.08)'},ticks:{color:'#888',font:{size:10},callback:v=>'R$'+Math.round(v/1000)+'k'}}}}
-  });
-  const va=labels.map((_,i)=>parseFloat((base*0.85).toFixed(2)));
-  const gc=labels.map((_,i)=>parseFloat((base*0.15+i*base*0.02).toFixed(2)));
+  // Gráfico 1: Evolução real do patrimônio (preços históricos do site)
+  renderEvolucaoPatri(24);
+
+  // Gráfico 2: Custo vs ganho de capital por classe (dados reais)
+  const c=calcAtivos();
+  const bcc={};
+  c.forEach(a=>{if(!bcc[a.classe])bcc[a.classe]={custo:0,res:0};bcc[a.classe].custo+=a.custo;bcc[a.classe].res+=a.res;});
+  const clsKeys=Object.keys(bcc);
   if(charts.vagc)charts.vagc.destroy();
   charts.vagc=new Chart(document.getElementById('chartVaGc').getContext('2d'),{
-    type:'bar',data:{labels,datasets:[{label:'Valor Aplicado',data:va,backgroundColor:'#185FA5',stack:'s',borderRadius:2},{label:'Ganho de Capital',data:gc,backgroundColor:'#9FE1CB',stack:'s',borderRadius:2}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#888',font:{size:10}}},y:{grid:{color:'rgba(128,128,128,0.08)'},ticks:{color:'#888',font:{size:10},callback:v=>'R$'+Math.round(v/1000)+'k'}}}}
+    type:'bar',
+    data:{
+      labels:clsKeys.map(k=>CLASS_LABEL[k]||k),
+      datasets:[
+        {label:'Custo',data:clsKeys.map(k=>parseFloat(bcc[k].custo.toFixed(2))),backgroundColor:'#185FA5',stack:'s',borderRadius:2},
+        {label:'Ganho',data:clsKeys.map(k=>parseFloat(Math.max(0,bcc[k].res).toFixed(2))),backgroundColor:'#1D9E75',stack:'s',borderRadius:2},
+        {label:'Perda',data:clsKeys.map(k=>parseFloat(Math.min(0,bcc[k].res).toFixed(2))),backgroundColor:'#E24B4A',stack:'s',borderRadius:2}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtR(c.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#888',font:{size:10}}},y:{grid:{color:'rgba(128,128,128,0.08)'},ticks:{color:'#888',font:{size:10},callback:v=>'R$'+Math.round(v/1000)+'k'}}}}
   });
-  const c=calcAtivos();
   const bc=byClasse(c);
-  const clsKeys=Object.keys(bc);
+  const bcKeys=Object.keys(bc);
   if(charts.patriPizza)charts.patriPizza.destroy();
   charts.patriPizza=new Chart(document.getElementById('chartPatriPizza').getContext('2d'),{
-    type:'doughnut',data:{labels:clsKeys.map(k=>CLASS_LABEL[k]||k),datasets:[{data:Object.values(bc).map(v=>parseFloat(v.toFixed(2))),backgroundColor:clsKeys.map(k=>CLASS_COLORS[k]),borderWidth:0}]},
+    type:'doughnut',data:{labels:bcKeys.map(k=>CLASS_LABEL[k]||k),datasets:[{data:bcKeys.map(k=>parseFloat(bc[k].toFixed(2))),backgroundColor:bcKeys.map(k=>CLASS_COLORS[k]),borderWidth:0}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:true,position:'right',labels:{font:{size:11},color:'#888',boxWidth:10}}}}
+  });
+}
+
+function renderEvolucaoPatri(nMeses){
+  const evol=calcEvolucaoPatrimonio(nMeses).filter(m=>m.vt>0||m.custo>0);
+  if(charts.patri)charts.patri.destroy();
+  charts.patri=new Chart(document.getElementById('chartPatri').getContext('2d'),{
+    type:'line',
+    data:{
+      labels:evol.map(m=>m.label),
+      datasets:[
+        {label:'Patrimônio',data:evol.map(m=>m.vt),borderColor:'#185FA5',backgroundColor:'rgba(24,95,165,0.08)',fill:true,tension:0.3,pointRadius:2,pointBackgroundColor:'#185FA5'},
+        {label:'Custo',data:evol.map(m=>m.custo),borderColor:'#888',borderDash:[4,4],backgroundColor:'transparent',tension:0.3,pointRadius:0}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtR(c.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#888',font:{size:10}}},y:{grid:{color:'rgba(128,128,128,0.08)'},ticks:{color:'#888',font:{size:10},callback:v=>'R$'+Math.round(v/1000)+'k'}}}}
   });
 }
 

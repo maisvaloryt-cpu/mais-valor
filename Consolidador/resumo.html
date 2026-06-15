@@ -27,10 +27,9 @@
     <div class="metrics" id="metrics-resumo"></div>
     <div class="charts-row">
       <div class="card">
-        <div class="card-title">
-          Evolução do Patrimônio
-          <select onchange="renderEvolucao(this.value)" style="font-size:11px;padding:3px 6px;border:0.5px solid var(--color-border-secondary);border-radius:6px;background:var(--color-background-primary);color:var(--color-text-secondary)">
-            <option>12 Meses</option><option>6 Meses</option><option>Todo período</option>
+        <div class="card-title">Evolução Real do Patrimônio
+          <select onchange="renderEvolucao(+this.value)" style="font-size:11px;padding:3px 6px;border:0.5px solid var(--color-border-secondary);border-radius:6px;background:var(--color-background-primary);color:var(--color-text-secondary)">
+            <option value="12">12 meses</option><option value="24" selected>24 meses</option><option value="60">5 anos</option>
           </select>
         </div>
         <div style="position:relative;height:190px"><canvas id="chartEvol" role="img" aria-label="Evolução do patrimônio mensal"></canvas></div>
@@ -90,18 +89,18 @@ function renderMetricsResumo(){
   `;
 }
 
-function renderEvolucao(){
-  const meses=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const base=getTotals().custo;
-  const va=meses.map((_,i)=>parseFloat((base*0.6+(i*base*0.03)).toFixed(2)));
-  const gc=meses.map((_,i)=>parseFloat((i*base*0.025).toFixed(2)));
+function renderEvolucao(nMeses=24){
+  const evol=calcEvolucaoPatrimonio(nMeses).filter(m=>m.vt>0||m.custo>0);
   if(charts.evol)charts.evol.destroy();
   charts.evol=new Chart(document.getElementById('chartEvol').getContext('2d'),{
-    type:'bar',
-    data:{labels:meses,datasets:[
-      {label:'Valor aplicado',data:va,backgroundColor:'#1D9E75',borderRadius:2,stack:'s'},
-      {label:'Ganho de Capital',data:gc,backgroundColor:'#9FE1CB',borderRadius:2,stack:'s'}
-    ]},
+    type:'line',
+    data:{
+      labels:evol.map(m=>m.label),
+      datasets:[
+        {label:'Patrimônio',data:evol.map(m=>m.vt),borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.08)',fill:true,tension:0.3,pointRadius:2,pointBackgroundColor:'#1D9E75'},
+        {label:'Custo',data:evol.map(m=>m.custo),borderColor:'#888',borderDash:[4,4],backgroundColor:'transparent',tension:0.3,pointRadius:0}
+      ]
+    },
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtR(c.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#888',font:{size:10}}},y:{grid:{color:'rgba(128,128,128,0.08)'},ticks:{color:'#888',font:{size:10},callback:v=>'R$'+Math.round(v/1000)+'k'}}}}
   });
 }
