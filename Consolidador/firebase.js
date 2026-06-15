@@ -22,12 +22,17 @@ function logoutUser(){
   _auth.signOut().then(() => toast('Saiu da conta.'));
 }
 
-/* ---- salva ativos + metas no Firestore ---- */
+/* ---- salva ativos + metas da carteira ATIVA, e a lista de carteiras, no Firestore ---- */
 async function syncFirestore(){
   const user = _auth.currentUser;
   if(!user) return;
   try{
-    await _db.collection('carteiras').doc(user.uid).set({ativos, metas}, {merge: true});
+    const cInfo = carteiras.find(c=>c.id===carteiraAtual);
+    await _db.collection('carteiras').doc(user.uid).set({
+      listaCarteiras: carteiras,
+      carteiraAtual,
+      dados: { [carteiraAtual]: { ativos, metas, nome: cInfo?cInfo.nome:'' } }
+    }, {merge: true});
   }catch(e){ console.warn('syncFirestore:', e); }
 }
 
@@ -78,23 +83,51 @@ _auth.onAuthStateChanged(async user => {
       const doc = await _db.collection('carteiras').doc(user.uid).get();
       if(doc.exists){
         const d = doc.data();
-        // Bug #15 fix: não sobrescreve dados locais com formato antigo da nuvem
-        if(_cloudFormatoAntigo(d.ativos)){
-          // Nuvem tem formato antigo (1 entrada por ticker), local é mais rico
-          // Migra local para nuvem sem perder dados
-          await _db.collection('carteiras').doc(user.uid).set({ativos, metas}, {merge: true});
-          toast('Formato antigo detectado na nuvem — carteira local mantida e sincronizada. ☁️');
+        if(d.dados){
+          // Formato novo (multi-carteira): mescla a lista de carteiras da nuvem com a local
+          if(Array.isArray(d.listaCarteiras) && d.listaCarteiras.length){
+            d.listaCarteiras.forEach(cc=>{
+              const local = carteiras.find(c=>c.id===cc.id);
+              if(local) local.nome = cc.nome;
+              else carteiras.push({id: cc.id, nome: cc.nome});
+            });
+            try{ localStorage.setItem(STORAGE_CARTEIRAS, JSON.stringify(carteiras)); }catch(e){}
+            if(!carteiras.some(c=>c.id===carteiraAtual)){
+              carteiraAtual = carteiras[0].id;
+              try{ localStorage.setItem(STORAGE_CARTEIRA_ATUAL, carteiraAtual); }catch(e){}
+            }
+          }
+          // Baixa os dados de cada carteira presente na nuvem
+          Object.entries(d.dados).forEach(([id, val])=>{
+            if(val && val.ativos!==undefined) localStorage.setItem(_keyAtivos(id), JSON.stringify(val.ativos));
+            if(val && val.metas!==undefined)  localStorage.setItem(_keyMetas(id),  JSON.stringify(val.metas));
+          });
+          ativos = loadAtivos();
+          metas  = loadMetas();
+        } else if(d.ativos){
+          // Formato antigo (uma única carteira salva direto na raiz do documento)
+          // Bug #15 fix: não sobrescreve dados locais com formato antigo da nuvem
+          if(_cloudFormatoAntigo(d.ativos)){
+            // Nuvem tem formato antigo (1 entrada por ticker), local é mais rico
+            // Migra local para nuvem (já no formato novo) sem perder dados
+            await syncFirestore();
+            toast('Formato antigo detectado na nuvem — carteira local mantida e sincronizada. ☁️');
+          } else {
+            ativos = d.ativos; localStorage.setItem(_keyAtivos(carteiraAtual), JSON.stringify(ativos));
+            if(d.metas){ metas = d.metas; localStorage.setItem(_keyMetas(carteiraAtual), JSON.stringify(metas)); }
+            await syncFirestore(); // migra o documento para o novo formato multi-carteira
+          }
         } else {
-          // Formato novo (ou nuvem vazia): nuvem tem prioridade
-          if(d.ativos){ ativos = d.ativos; localStorage.setItem(STORAGE_ATIVOS, JSON.stringify(ativos)); }
-          if(d.metas){  metas  = d.metas;  localStorage.setItem(STORAGE_METAS,  JSON.stringify(metas));  }
+          // documento existe mas vazio: sobe os dados locais
+          await syncFirestore();
         }
       } else {
         // primeiro login: sobe o que está no localStorage para a nuvem
-        await _db.collection('carteiras').doc(user.uid).set({ativos, metas});
+        await syncFirestore();
         toast('Carteira sincronizada com a nuvem! ☁️');
       }
     }catch(e){ console.warn('onAuthStateChanged:', e); }
+    if(typeof renderCarteiraSwitcher === 'function') renderCarteiraSwitcher();
     if(typeof renderAll === 'function') renderAll();
   }
   renderAuthUI(user);

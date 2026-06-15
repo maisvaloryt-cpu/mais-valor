@@ -31,23 +31,61 @@ const DEFAULT_METAS=[
   {classe:'B3',ideal:30},{classe:'FII',ideal:25},{classe:'RF',ideal:20},{classe:'Crypto',ideal:10},{classe:'Exterior',ideal:10},{classe:'ETF',ideal:5}
 ];
 
+/* ===================== MÚLTIPLAS CARTEIRAS ===================== */
+const STORAGE_CARTEIRAS='consolidador_carteiras_v1';
+const STORAGE_CARTEIRA_ATUAL='consolidador_carteira_atual_v1';
+
+function _keyAtivos(id){ return STORAGE_ATIVOS+'__'+id; }
+function _keyMetas(id){ return STORAGE_METAS+'__'+id; }
+
+/* Inicializa a lista de carteiras. Se for a primeira vez (ou versão antiga,
+   de antes da existência de múltiplas carteiras), cria a "Carteira Principal"
+   e migra os dados antigos (chaves sem sufixo) para ela, sem perder nada. */
+function initCarteiras(){
+  let lista=[];
+  try{
+    const raw=localStorage.getItem(STORAGE_CARTEIRAS);
+    if(raw)lista=JSON.parse(raw);
+  }catch(e){}
+  if(!Array.isArray(lista)||!lista.length){
+    const id='default';
+    lista=[{id,nome:'Carteira Principal'}];
+    try{
+      const oldAtivos=localStorage.getItem(STORAGE_ATIVOS);
+      const oldMetas=localStorage.getItem(STORAGE_METAS);
+      if(oldAtivos!==null && localStorage.getItem(_keyAtivos(id))===null) localStorage.setItem(_keyAtivos(id),oldAtivos);
+      if(oldMetas!==null && localStorage.getItem(_keyMetas(id))===null) localStorage.setItem(_keyMetas(id),oldMetas);
+    }catch(e){}
+    try{ localStorage.setItem(STORAGE_CARTEIRAS,JSON.stringify(lista)); }catch(e){}
+  }
+  let atual;
+  try{ atual=localStorage.getItem(STORAGE_CARTEIRA_ATUAL); }catch(e){}
+  if(!atual || !lista.some(c=>c.id===atual)) atual=lista[0].id;
+  try{ localStorage.setItem(STORAGE_CARTEIRA_ATUAL,atual); }catch(e){}
+  return {lista, atual};
+}
+
+const _carteirasInit=initCarteiras();
+let carteiras=_carteirasInit.lista;
+let carteiraAtual=_carteirasInit.atual;
+
 function loadAtivos(){
   try{
-    const raw=localStorage.getItem(STORAGE_ATIVOS);
+    const raw=localStorage.getItem(_keyAtivos(carteiraAtual));
     if(raw)return JSON.parse(raw);
   }catch(e){}
   return JSON.parse(JSON.stringify(DEFAULT_ATIVOS));
 }
-function saveAtivos(){ localStorage.setItem(STORAGE_ATIVOS, JSON.stringify(ativos)); if(typeof syncFirestore==='function')syncFirestore(); }
+function saveAtivos(){ localStorage.setItem(_keyAtivos(carteiraAtual), JSON.stringify(ativos)); if(typeof syncFirestore==='function')syncFirestore(); }
 
 function loadMetas(){
   try{
-    const raw=localStorage.getItem(STORAGE_METAS);
+    const raw=localStorage.getItem(_keyMetas(carteiraAtual));
     if(raw)return JSON.parse(raw);
   }catch(e){}
   return JSON.parse(JSON.stringify(DEFAULT_METAS));
 }
-function saveMetas(){ localStorage.setItem(STORAGE_METAS, JSON.stringify(metas)); if(typeof syncFirestore==='function')syncFirestore(); }
+function saveMetas(){ localStorage.setItem(_keyMetas(carteiraAtual), JSON.stringify(metas)); if(typeof syncFirestore==='function')syncFirestore(); }
 
 let ativos=loadAtivos();
 let metas=loadMetas();
@@ -566,6 +604,120 @@ function processB3Rows(rows){
   initConsolidador(); // recarrega cotações + dividendos e re-renderiza
 }
 
+/* ===================== GERENCIAMENTO DE CARTEIRAS ===================== */
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* Troca a carteira ativa, recarrega os dados e re-renderiza a página */
+function trocarCarteira(id){
+  if(id===carteiraAtual||!carteiras.some(c=>c.id===id))return;
+  carteiraAtual=id;
+  try{ localStorage.setItem(STORAGE_CARTEIRA_ATUAL,carteiraAtual); }catch(e){}
+  ativos=loadAtivos();
+  metas=loadMetas();
+  if(typeof syncFirestore==='function')syncFirestore();
+  renderCarteiraSwitcher();
+  if(typeof initConsolidador==='function'){ initConsolidador(); } // recarrega cotações/proventos e re-renderiza
+  else if(typeof renderAll==='function'){ renderAll(); }
+  toast('Carteira selecionada: '+(carteiras.find(c=>c.id===id)?.nome||''));
+}
+
+/* Cria uma nova carteira vazia e troca para ela */
+function criarCarteira(nome){
+  nome=(nome||'').trim();
+  if(!nome)return;
+  const id='c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  carteiras.push({id,nome});
+  try{
+    localStorage.setItem(STORAGE_CARTEIRAS,JSON.stringify(carteiras));
+    localStorage.setItem(_keyAtivos(id),JSON.stringify(DEFAULT_ATIVOS));
+    localStorage.setItem(_keyMetas(id),JSON.stringify(DEFAULT_METAS));
+  }catch(e){}
+  trocarCarteira(id);
+  toast('Carteira "'+nome+'" criada.');
+}
+
+/* Renomeia uma carteira existente */
+function renomearCarteira(id,novoNome){
+  novoNome=(novoNome||'').trim();
+  if(!novoNome)return;
+  const c=carteiras.find(c=>c.id===id);
+  if(!c)return;
+  c.nome=novoNome;
+  try{ localStorage.setItem(STORAGE_CARTEIRAS,JSON.stringify(carteiras)); }catch(e){}
+  renderCarteiraSwitcher();
+  if(typeof syncFirestore==='function')syncFirestore();
+  toast('Carteira renomeada.');
+}
+
+/* Exclui uma carteira (sempre deve restar ao menos uma) */
+function excluirCarteira(id){
+  if(carteiras.length<=1){ alert('Você precisa ter ao menos uma carteira.'); return; }
+  const c=carteiras.find(c=>c.id===id);
+  if(!c)return;
+  if(!confirm('Excluir a carteira "'+c.nome+'"? Todos os lançamentos e metas dela serão perdidos. Essa ação não pode ser desfeita.'))return;
+  carteiras=carteiras.filter(x=>x.id!==id);
+  try{
+    localStorage.removeItem(_keyAtivos(id));
+    localStorage.removeItem(_keyMetas(id));
+    localStorage.setItem(STORAGE_CARTEIRAS,JSON.stringify(carteiras));
+  }catch(e){}
+  if(carteiraAtual===id){
+    trocarCarteira(carteiras[0].id);
+  }
+  renderGerenciarCarteiras();
+  renderCarteiraSwitcher();
+  if(typeof syncFirestore==='function')syncFirestore();
+  toast('Carteira excluída.');
+}
+
+/* Renderiza o seletor de carteira no cabeçalho */
+function renderCarteiraSwitcher(){
+  const el=document.getElementById('carteira-switcher');
+  if(!el)return;
+  el.innerHTML=`
+    <select id="sel-carteira" onchange="trocarCarteira(this.value)" title="Selecionar carteira">
+      ${carteiras.map(c=>`<option value="${c.id}" ${c.id===carteiraAtual?'selected':''}>${escapeHtml(c.nome)}</option>`).join('')}
+    </select>
+    <button class="btn btn-sm" onclick="openModalCarteiras()" title="Gerenciar carteiras"><i class="ti ti-folders" aria-hidden="true"></i></button>
+  `;
+}
+
+/* Renderiza a lista de carteiras dentro do modal de gerenciamento */
+function renderGerenciarCarteiras(){
+  const el=document.getElementById('lista-carteiras');
+  if(!el)return;
+  el.innerHTML=carteiras.map(c=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <input type="text" value="${escapeHtml(c.nome)}" style="flex:1;font-size:12px;padding:7px 10px;border:1px solid var(--border3, rgba(255,255,255,0.12));border-radius:var(--border-radius-md);background:var(--bg3, #141418);color:var(--text, #ECEAE4);font-family:var(--font-sans)"
+        onchange="renomearCarteira('${c.id}', this.value)">
+      ${c.id===carteiraAtual
+        ? '<span class="badge badge-b3" style="white-space:nowrap">Ativa</span>'
+        : `<button class="btn btn-sm" onclick="trocarCarteira('${c.id}');renderGerenciarCarteiras()">Usar</button>`}
+      <button class="btn btn-sm" onclick="excluirCarteira('${c.id}')" title="Excluir carteira" ${carteiras.length<=1?'disabled':''}><i class="ti ti-trash" aria-hidden="true"></i></button>
+    </div>
+  `).join('');
+}
+
+function openModalCarteiras(){
+  injectModals();
+  renderGerenciarCarteiras();
+  document.getElementById('nc-nome').value='';
+  document.getElementById('modal-carteiras').style.display='flex';
+}
+function closeModalCarteiras(){ document.getElementById('modal-carteiras').style.display='none'; }
+
+function adicionarCarteiraModal(){
+  const input=document.getElementById('nc-nome');
+  const nome=input.value.trim();
+  if(!nome){ alert('Digite um nome para a nova carteira.'); return; }
+  criarCarteira(nome);
+  input.value='';
+  renderGerenciarCarteiras();
+}
+
 /* ---- navegação ---- */
 const NAV_TABS=[
   {id:'resumo',label:'Resumo',icon:'ti-layout-dashboard',href:'resumo.html'},
@@ -582,11 +734,13 @@ function renderHeaderAndNav(active){
   const headerActions=document.getElementById('header-actions');
   if(headerActions){
     headerActions.innerHTML=`
+      <div class="carteira-switcher" id="carteira-switcher"></div>
       <button class="btn" onclick="infoB3()"><i class="ti ti-building-bank" aria-hidden="true"></i> Integração B3</button>
       <button class="btn" onclick="openImport()"><i class="ti ti-file-spreadsheet" aria-hidden="true"></i> Importar Excel</button>
       <input type="file" id="csv-input" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleCSVImport(this)">
       <button class="btn btn-primary" onclick="openModal()"><i class="ti ti-edit" aria-hidden="true"></i> Modo Manual</button>
     `;
+    renderCarteiraSwitcher();
   }
   const tabsEl=document.getElementById('tabs');
   if(tabsEl){
@@ -649,6 +803,19 @@ function injectModals(){
     <div class="modal-actions">
       <button class="btn" onclick="closeModalMeta()">Cancelar</button>
       <button class="btn btn-primary" onclick="addMeta()"><i class="ti ti-check" aria-hidden="true"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+<div class="modal-bg" id="modal-carteiras" style="display:none" onclick="if(event.target===this)closeModalCarteiras()">
+  <div class="modal">
+    <h2><i class="ti ti-folders" aria-hidden="true" style="margin-right:6px"></i>Gerenciar Carteiras</h2>
+    <div id="lista-carteiras"></div>
+    <div class="modal-grid" style="margin-top:10px">
+      <div class="form-group" style="grid-column:1/-1"><label>Nova Carteira</label><input id="nc-nome" type="text" placeholder="Ex: Carteira da Esposa, Aposentadoria..."></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModalCarteiras()">Fechar</button>
+      <button class="btn btn-primary" onclick="adicionarCarteiraModal()"><i class="ti ti-plus" aria-hidden="true"></i> Adicionar Carteira</button>
     </div>
   </div>
 </div>`;

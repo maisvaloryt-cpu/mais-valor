@@ -54,7 +54,31 @@ body { padding: 0 0 2rem; }
   align-items: center;
   gap: 8px;
 }
-.header-actions { display: flex; gap: 7px; flex-wrap: wrap; }
+.header-actions { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+
+/* ── Seletor de Carteira ── */
+.carteira-switcher {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 4px;
+}
+.carteira-switcher select {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 10px;
+  border: 1px solid var(--border3, rgba(255,255,255,0.12));
+  border-radius: var(--border-radius-md);
+  background: var(--bg3, #141418);
+  color: var(--text, #ECEAE4);
+  font-family: var(--font-sans);
+  max-width: 180px;
+  cursor: pointer;
+}
+.carteira-switcher select:focus {
+  outline: none;
+  border-color: var(--gold, #F5A623);
+}
 
 /* ── Botões ── */
 .btn {
@@ -435,4 +459,6 @@ select option { background: var(--bg2, #0E0E11); color: var(--text, #ECEAE4); }
   .charts-row, .analise-grid, .modal-grid { grid-template-columns: 1fr; }
   .app { padding: 1rem 1rem; }
   .grupo-stats { display: none; }
+  .carteira-switcher { width: 100%; order: -1; margin-right: 0; margin-bottom: 6px; }
+  .carteira-switcher select { flex: 1; max-width: none; }
 }
