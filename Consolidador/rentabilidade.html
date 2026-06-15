@@ -33,7 +33,7 @@
       <div class="card-title">Rentabilidade por Ativo</div>
       <div class="tbl-wrap">
       <table class="tbl">
-        <thead><tr><th>Ticker</th><th>Classe</th><th class="r">Preço Médio</th><th class="r">Cotação Atual</th><th class="r">Variação R$</th><th class="r">Variação %</th><th class="r">Rentabilidade</th></tr></thead>
+        <thead><tr><th>Ticker</th><th>Classe</th><th class="r">Preço Médio</th><th class="r">Cotação Atual</th><th class="r">Ganho Capital</th><th class="r">Proventos</th><th class="r">Rentabilidade %</th><th class="r">Rent. Total</th></tr></thead>
         <tbody id="tbody-rent"></tbody>
       </table>
       </div>
@@ -51,27 +51,33 @@ injectModals();
 function renderRentabilidade(){
   const c=calcAtivos();
   const t=getTotals();
+  const melhor=c.slice().sort((a,b)=>b.rentTotal-a.rentTotal)[0];
+  const pior=c.slice().sort((a,b)=>a.rentTotal-b.rentTotal)[0];
   document.getElementById('metrics-rent').innerHTML=`
-    <div class="mcard"><div class="mcard-label">Rentabilidade Total</div><div class="mcard-value ${t.resPct>=0?'positive':'negative'}">${fmtP(t.resPct)}</div></div>
-    <div class="mcard"><div class="mcard-label">Melhor Ativo</div><div class="mcard-value positive">${c.slice().sort((a,b)=>b.resPct-a.resPct)[0]?.ticker||'-'}</div></div>
-    <div class="mcard"><div class="mcard-label">Pior Ativo</div><div class="mcard-value negative">${c.slice().sort((a,b)=>a.resPct-b.resPct)[0]?.ticker||'-'}</div></div>
+    <div class="mcard"><div class="mcard-label">Rentabilidade Total (c/ proventos)</div><div class="mcard-value ${t.rentTotal>=0?'positive':'negative'}">${fmtP(t.rentTotal)}</div><div class="mcard-sub">Só capital: ${fmtP(t.resPct)}</div></div>
+    <div class="mcard"><div class="mcard-label">Melhor Ativo</div><div class="mcard-value positive">${melhor?.ticker||'-'}</div><div class="mcard-sub">${fmtP(melhor?.rentTotal||0)}</div></div>
+    <div class="mcard"><div class="mcard-label">Pior Ativo</div><div class="mcard-value negative">${pior?.ticker||'-'}</div><div class="mcard-sub">${fmtP(pior?.rentTotal||0)}</div></div>
   `;
   const bcc={};
-  c.forEach(a=>{if(!bcc[a.classe])bcc[a.classe]={vt:0,custo:0};bcc[a.classe].vt+=a.vt;bcc[a.classe].custo+=a.custo});
+  c.forEach(a=>{if(!bcc[a.classe])bcc[a.classe]={vt:0,custo:0,prov:0};bcc[a.classe].vt+=a.vt;bcc[a.classe].custo+=a.custo;bcc[a.classe].prov+=a.proventos;});
   const clsKeys=Object.keys(bcc);
-  const rentVals=clsKeys.map(k=>bcc[k].custo>0?parseFloat((((bcc[k].vt-bcc[k].custo)/bcc[k].custo)*100).toFixed(2)):0);
+  const rentVals=clsKeys.map(k=>{
+    const d=bcc[k];
+    return d.custo>0?parseFloat((((d.vt-d.custo+d.prov)/d.custo)*100).toFixed(2)):0;
+  });
   if(charts.rentCls)charts.rentCls.destroy();
   charts.rentCls=new Chart(document.getElementById('chartRentClasse').getContext('2d'),{
-    type:'bar',data:{labels:clsKeys.map(k=>CLASS_LABEL[k]||k),datasets:[{label:'Rentabilidade',data:rentVals,backgroundColor:rentVals.map(v=>v>=0?'#1D9E75':'#E24B4A'),borderRadius:4}]},
+    type:'bar',data:{labels:clsKeys.map(k=>CLASS_LABEL[k]||k),datasets:[{label:'Rentabilidade total',data:rentVals,backgroundColor:rentVals.map(v=>v>=0?'#1D9E75':'#E24B4A'),borderRadius:4}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+(c.raw>=0?'+':'')+c.raw+'%'}}},scales:{x:{grid:{display:false},ticks:{color:'#888',font:{size:11}}},y:{grid:{color:'rgba(128,128,128,0.08)'},ticks:{color:'#888',font:{size:11},callback:v=>v+'%'}}}}
   });
   const tb=document.getElementById('tbody-rent');
-  tb.innerHTML=c.sort((a,b)=>b.resPct-a.resPct).map(a=>`
+  tb.innerHTML=c.sort((a,b)=>b.rentTotal-a.rentTotal).map(a=>`
     <tr><td><strong>${a.ticker}</strong></td><td><span class="badge ${CLASS_BADGE[a.classe]||''}">${CLASS_LABEL[a.classe]||a.classe}</span></td>
     <td class="r">${fmtR(a.pm)}</td><td class="r">${fmtR(a.cotacao)}</td>
     <td class="r ${a.res>=0?'positive':'negative'}">${a.res>=0?'+':''}${fmtR(a.res)}</td>
-    <td class="r"><span class="pill ${a.resPct>=0?'pill-up':'pill-dn'}">${a.resPct>=0?'▲':'▼'} ${fmt(Math.abs(a.resPct))}%</span></td>
-    <td class="r ${a.resPct>=0?'positive':'negative'}">${fmtP(a.resPct)}</td></tr>
+    <td class="r positive">${fmtR(a.proventos)}</td>
+    <td class="r"><span class="pill ${a.rentTotal>=0?'pill-up':'pill-dn'}">${a.rentTotal>=0?'▲':'▼'} ${fmt(Math.abs(a.rentTotal))}%</span></td>
+    <td class="r ${a.rentTotal>=0?'positive':'negative'}">${fmtP(a.rentTotal)}</td></tr>
   `).join('');
 }
 

@@ -58,11 +58,109 @@ const fmt=(v,d=2)=>(v||0).toLocaleString('pt-BR',{minimumFractionDigits:d,maximu
 const fmtR=v=>'R$ '+fmt(v);
 const fmtP=(v,plus=true)=>(plus&&v>=0?'+':'')+fmt(v)+'%';
 
+/* ===================== BANCO DE DADOS DO SITE (em memória) ===================== */
+
+let COTACOES={};            // ticker → preço atual (carregado do site a cada página)
+const DIVIDENDOS_CACHE={};  // ticker → [{date, value}]  (carregado do site a cada página)
+
+/* -- preços atuais ----------------------------------------------------------- */
+async function atualizarCotacoes(){
+  try{
+    const base='../data/';
+    const reqs=await Promise.allSettled([
+      fetch(base+'cotacoes.json?t='+Date.now()).then(r=>r.ok?r.json():{}),
+      fetch(base+'intraday/acoes-br.json?t='+Date.now()).then(r=>r.ok?r.json():{}),
+      fetch(base+'intraday/fiis.json?t='+Date.now()).then(r=>r.ok?r.json():{}),
+      fetch(base+'intraday/internacional.json?t='+Date.now()).then(r=>r.ok?r.json():{}),
+      fetch(base+'intraday/cripto-macro.json?t='+Date.now()).then(r=>r.ok?r.json():{}),
+    ]);
+    const [cotJson,iaJson,ifJson,iiJson,icJson]=reqs.map(r=>r.status==='fulfilled'?r.value:{});
+    const add=(arr=[])=>arr.forEach(it=>{if(it&&it.ticker&&it.price>0)COTACOES[it.ticker]=it.price;});
+    add(cotJson.acoes); add(cotJson.fiis);
+    add(iaJson.acoes);  add(iaJson.etfs);
+    add(ifJson.fiis);
+    add(iiJson.stocks); add(iiJson.bdrs);
+    add(icJson.macro);
+  }catch(e){console.warn('atualizarCotacoes:',e);}
+}
+
+/* -- dividendos por ticker --------------------------------------------------- */
+async function fetchDividendosTicker(ticker){
+  if(DIVIDENDOS_CACHE[ticker]!==undefined)return DIVIDENDOS_CACHE[ticker];
+  try{
+    const r=await fetch('../data/dividendos/'+ticker+'.json?t='+Date.now());
+    DIVIDENDOS_CACHE[ticker]=r.ok?(await r.json()).dividendos||[]:[];
+  }catch(e){DIVIDENDOS_CACHE[ticker]=[];}
+  return DIVIDENDOS_CACHE[ticker];
+}
+
+async function loadAllDividendos(){
+  await Promise.allSettled(ativos.map(a=>fetchDividendosTicker(a.ticker)));
+}
+
+/* -- helpers de cálculo de proventos ---------------------------------------- */
+function calcProventosAtivo(ticker,dataCompra,qtd){
+  const from=dataCompra||'1900-01-01';
+  return(DIVIDENDOS_CACHE[ticker]||[])
+    .filter(d=>d.date>=from)
+    .reduce((s,d)=>s+d.value*qtd,0);
+}
+
+function calcProventosUltimos12m(){
+  const cutoff=new Date();
+  cutoff.setFullYear(cutoff.getFullYear()-1);
+  const cutoffStr=cutoff.toISOString().slice(0,10);
+  return ativos.reduce((sum,a)=>{
+    const from=a.data&&a.data>cutoffStr?a.data:cutoffStr;
+    return sum+(DIVIDENDOS_CACHE[a.ticker]||[])
+      .filter(d=>d.date>=from)
+      .reduce((s,d)=>s+d.value*a.qtd,0);
+  },0);
+}
+
+/* retorna [{ym:'YYYY-MM', total, tickers:{TICKER:valor}}] últimos 13 meses */
+function getDividendosPorMes(){
+  const now=new Date();
+  const map={};
+  for(let i=12;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    const ym=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    map[ym]={total:0,tickers:{}};
+  }
+  ativos.forEach(a=>{
+    const from=a.data||'1900-01-01';
+    (DIVIDENDOS_CACHE[a.ticker]||[]).forEach(d=>{
+      if(d.date<from)return;
+      const ym=d.date.slice(0,7);
+      if(!map[ym])return;
+      const val=d.value*a.qtd;
+      map[ym].total+=val;
+      map[ym].tickers[a.ticker]=(map[ym].tickers[a.ticker]||0)+val;
+    });
+  });
+  return Object.entries(map)
+    .sort((a,b)=>a[0].localeCompare(b[0]))
+    .map(([ym,v])=>({ym,...v}));
+}
+
+/* -- init assíncrono: carrega cotações + dividendos e re-renderiza ----------- */
+async function initConsolidador(){
+  await Promise.all([atualizarCotacoes(),loadAllDividendos()]);
+  if(typeof renderAll==='function')renderAll();
+}
+window.addEventListener('load',()=>initConsolidador());
+
 /* ---- cálculos ---- */
 function calcAtivos(){
   return ativos.map(a=>{
-    const vt=a.qtd*a.cotacao, custo=a.qtd*a.pm, res=vt-custo, resPct=custo>0?((vt-custo)/custo)*100:0;
-    return{...a,vt,custo,res,resPct};
+    const cotacao=COTACOES[a.ticker]||a.cotacao||0;
+    const vt=a.qtd*cotacao, custo=a.qtd*a.pm;
+    const res=vt-custo, resPct=custo>0?((vt-custo)/custo)*100:0;
+    const proventos=calcProventosAtivo(a.ticker,a.data,a.qtd);
+    const dy=custo>0?(proventos/custo)*100:0; // DY real recebido desde a compra
+    const lucroTotal=res+proventos;
+    const rentTotal=custo>0?(lucroTotal/custo)*100:0;
+    return{...a,cotacao,vt,custo,res,resPct,proventos,dy,lucroTotal,rentTotal};
   });
 }
 function getTotals(){
@@ -71,9 +169,12 @@ function getTotals(){
   const custo=c.reduce((s,a)=>s+a.custo,0);
   const res=total-custo;
   const resPct=custo>0?((total-custo)/custo)*100:0;
-  const provAno=c.reduce((s,a)=>s+(a.vt*(a.dy/100)),0);
-  const dyMed=total>0?c.reduce((s,a)=>s+(a.dy*(a.vt/total)),0):0;
-  return{total,custo,res,resPct,provAno,dyMed};
+  const proventosTotal=c.reduce((s,a)=>s+a.proventos,0);
+  const lucroTotal=res+proventosTotal;
+  const rentTotal=custo>0?(lucroTotal/custo)*100:0;
+  const provAno=calcProventosUltimos12m();
+  const dyMed=total>0?(provAno/total)*100:0;
+  return{total,custo,res,resPct,proventosTotal,lucroTotal,rentTotal,provAno,dyMed};
 }
 function byClasse(c){
   const m={};
@@ -300,7 +401,7 @@ function processB3Rows(rows){
 
   saveAtivos();
   toast(`B3: ${importados} ativo(s) importado(s)${ignorados?', '+ignorados+' zerado(s) ignorado(s)':''}.`);
-  if(typeof renderAll==='function')renderAll();
+  initConsolidador(); // recarrega cotações + dividendos e re-renderiza
 }
 
 /* ---- navegação ---- */

@@ -69,8 +69,8 @@ function renderMetricsResumo(){
     </div>
     <div class="mcard">
       <div class="mcard-label"><i class="ti ti-trending-up" aria-hidden="true"></i> Lucro total</div>
-      <div class="mcard-value ${t.res>=0?'positive':'negative'}">${t.res>=0?'+':''}${fmtR(t.res)}</div>
-      <div class="mcard-sub">Ganho de Capital: <span class="${t.res>=0?'positive':'negative'}">${t.res>=0?'+':''}${fmtR(t.res)}</span></div>
+      <div class="mcard-value ${t.lucroTotal>=0?'positive':'negative'}">${t.lucroTotal>=0?'+':''}${fmtR(t.lucroTotal)}</div>
+      <div class="mcard-sub">Capital: <span class="${t.res>=0?'positive':'negative'}">${t.res>=0?'+':''}${fmtR(t.res)}</span> + Prov: <span class="positive">${fmtR(t.proventosTotal)}</span></div>
     </div>
     <div class="mcard">
       <div class="mcard-label"><i class="ti ti-coin" aria-hidden="true"></i> Proventos (12M)</div>
@@ -78,13 +78,13 @@ function renderMetricsResumo(){
       <div class="mcard-sub">DY médio: <strong class="positive">${fmt(t.dyMed)}%</strong></div>
     </div>
     <div class="mcard">
-      <div class="mcard-label"><i class="ti ti-chart-bar" aria-hidden="true"></i> Variação</div>
+      <div class="mcard-label"><i class="ti ti-chart-bar" aria-hidden="true"></i> Variação (capital)</div>
       <div class="mcard-value ${t.resPct>=0?'positive':'negative'}">${fmtP(t.resPct)}</div>
       <div class="mcard-sub">${fmtR(Math.abs(t.res))} ${t.res>=0?'acima':'abaixo'} do custo</div>
     </div>
     <div class="mcard">
-      <div class="mcard-label"><i class="ti ti-percent" aria-hidden="true"></i> Rentabilidade</div>
-      <div class="mcard-value ${t.resPct>=0?'positive':'negative'}">${fmtP(t.resPct)}</div>
+      <div class="mcard-label"><i class="ti ti-percent" aria-hidden="true"></i> Rentabilidade total</div>
+      <div class="mcard-value ${t.rentTotal>=0?'positive':'negative'}">${fmtP(t.rentTotal)}</div>
       <div class="mcard-sub">${ativos.length} ativos em ${new Set(ativos.map(a=>a.classe)).size} classes</div>
     </div>
   `;
