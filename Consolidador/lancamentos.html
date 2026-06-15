@@ -34,15 +34,31 @@
       <select id="filtro-tipo" onchange="renderLancamentos()">
         <option value="">Todos os tipos</option>
         <option value="Compra">Compra</option><option value="Venda">Venda</option>
-        <option value="Provento">Provento</option>
       </select>
     </div>
     <div class="card">
       <div class="tbl-wrap">
       <table class="tbl">
-        <thead><tr><th>Data</th><th>Ticker</th><th>Classe</th><th>Tipo</th><th class="r">Qtd</th><th class="r">Preço</th><th class="r">Total</th></tr></thead>
+        <thead><tr><th>Data</th><th>Ticker</th><th>Classe</th><th>Tipo</th><th class="r">Qtd</th><th class="r">Preço</th><th class="r">Total</th><th></th></tr></thead>
         <tbody id="tbody-lanc"></tbody>
       </table>
+      </div>
+    </div>
+
+    <!-- Seção separada: Proventos Importados (fallback — usados só se site não tiver dados) -->
+    <div id="proventos-importados-section" style="display:none;margin-top:1.5rem">
+      <div class="section-title" style="font-size:13px">
+        <i class="ti ti-coins" aria-hidden="true"></i>
+        Proventos Importados
+        <span style="font-size:11px;font-weight:400;color:var(--color-text-secondary)"> — fallback usado quando o site não tem dados de dividendos do ativo</span>
+      </div>
+      <div class="card">
+        <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Data</th><th>Ticker</th><th>Classe</th><th class="r">Qtd Ações</th><th class="r">Valor/Ação</th><th class="r">Total Recebido</th><th></th></tr></thead>
+          <tbody id="tbody-prov"></tbody>
+        </table>
+        </div>
       </div>
     </div>
   </div>
@@ -62,8 +78,21 @@ injectModals();
 function renderLancamentos(){
   const fc=document.getElementById('filtro-classe').value;
   const ft=document.getElementById('filtro-tipo').value;
-  const sorted=[...ativos].sort((a,b)=>new Date(b.data)-new Date(a.data));
-  const filtered=sorted.filter(a=>(!fc||a.classe===fc)&&(!ft||a.tipo===ft));
+
+  // Bug #9 fix: sort robusto com datas inválidas
+  const sortFn=(a,b)=>{
+    const da=a.data?new Date(a.data):new Date(0);
+    const db=b.data?new Date(b.data):new Date(0);
+    return db-da;
+  };
+
+  // Bug #13 fix: preservar índice original para permitir exclusão por linha
+  // Indexa cada entrada com sua posição real em ativos[]
+  const mainTx=ativos
+    .map((a,i)=>({...a,_idx:i}))
+    .filter(a=>(a.tipo||'Compra')!=='Provento')
+    .sort(sortFn);
+  const filtered=mainTx.filter(a=>(!fc||a.classe===fc)&&(!ft||a.tipo===ft));
   document.getElementById('tbody-lanc').innerHTML=filtered.length?filtered.map(a=>`
     <tr>
       <td>${a.data?new Date(a.data).toLocaleDateString('pt-BR'):'-'}</td>
@@ -73,8 +102,29 @@ function renderLancamentos(){
       <td class="r">${a.qtd.toLocaleString('pt-BR')}</td>
       <td class="r">${fmtR(a.pm)}</td>
       <td class="r">${fmtR(a.qtd*a.pm)}</td>
+      <td><button class="btn btn-sm" title="Remover lançamento" onclick="removeAtivoIdx(${a._idx})"><i class="ti ti-trash" aria-hidden="true"></i></button></td>
     </tr>
-  `).join(''):'<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:var(--color-text-secondary);font-size:12px">Nenhum lançamento encontrado.</td></tr>';
+  `).join(''):'<tr><td colspan="8" style="text-align:center;padding:1.5rem;color:var(--color-text-secondary);font-size:12px">Nenhum lançamento encontrado.</td></tr>';
+
+  // Seção de Proventos Importados (fallback)
+  const provSection=document.getElementById('proventos-importados-section');
+  const proventos=ativos.map((a,i)=>({...a,_idx:i})).filter(a=>a.tipo==='Provento').sort(sortFn);
+  if(proventos.length){
+    provSection.style.display='';
+    document.getElementById('tbody-prov').innerHTML=proventos.map(a=>`
+      <tr>
+        <td>${a.data?new Date(a.data).toLocaleDateString('pt-BR'):'-'}</td>
+        <td><strong>${a.ticker}</strong></td>
+        <td><span class="badge ${CLASS_BADGE[a.classe]||''}">${CLASS_LABEL[a.classe]||a.classe}</span></td>
+        <td class="r">${a.qtd.toLocaleString('pt-BR')}</td>
+        <td class="r">${fmtR(a.pm)}</td>
+        <td class="r positive">${fmtR(a.qtd*a.pm)}</td>
+        <td><button class="btn btn-sm" title="Remover provento" onclick="removeAtivoIdx(${a._idx})"><i class="ti ti-trash" aria-hidden="true"></i></button></td>
+      </tr>
+    `).join('');
+  }else{
+    provSection.style.display='none';
+  }
 }
 
 function renderAll(){

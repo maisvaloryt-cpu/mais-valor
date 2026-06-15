@@ -1,0 +1,273 @@
+=========================================================
+  CONSOLIDADOR DE CARTEIRA — RELATÓRIO DE BUGS E RISCOS
+  Gerado em: 14/06/2026
+=========================================================
+
+LEGENDA DE SEVERIDADE
+  [CRÍTICO]  Causa cálculo errado ou comportamento imprevisível
+  [MÉDIO]    Dado exibido errado mas sem crash
+  [BAIXO]    Cosmético, edge case raro ou inconsistência menor
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  GRUPO 1 — MODELO DE DADOS / LANÇAMENTOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[CRÍTICO] #1 — addAtivo() ainda deduplica por ticker
+Arquivo: common.js → função addAtivo()
+Problema:
+  O modal de lançamento manual ainda faz findIndex(ticker) e sobrescreve
+  a entrada existente. Com o novo modelo de transações, adicionar
+  manualmente uma Venda de um ticker que já tem Compra apaga a Compra.
+  O comportamento é oposto ao que o Excel import agora faz (push sempre).
+Impacto: Perda silenciosa de lançamentos ao usar o modal manual.
+Correção sugerida: Trocar o findIndex+overwrite por push simples,
+  igual ao que foi feito em processImportRows().
+
+---
+
+[CRÍTICO] #2 — tipo 'Provento' tratado como Compra em calcPosicoes()
+Arquivo: common.js → função calcPosicoes()
+Problema:
+  A lógica verifica apenas se tipo === 'Venda'. Qualquer outro tipo
+  (incluindo 'Provento') cai no else e incrementa qtd e custo como se
+  fosse uma Compra. Se o usuário adicionar um lançamento de Provento
+  manualmente, a quantidade do ativo aumenta incorretamente.
+Código afetado:
+  const isSell=(a.tipo||'Compra')==='Venda';
+  // 'Provento' não é 'Venda', então entra no else → soma qtd
+Impacto: Posição inflada; PM distorcido; patrimônio errado.
+Correção sugerida:
+  const isBuy=(a.tipo||'Compra')==='Compra';
+  const isSell=(a.tipo||'Compra')==='Venda';
+  if(isSell){...} else if(isBuy){...}
+  // Provento não mexe na posição
+
+---
+
+[CRÍTICO] #3 — Re-importação do mesmo Excel duplica tudo
+Arquivo: common.js → função processImportRows()
+Problema:
+  Com a deduplicação removida, importar o mesmo arquivo duas vezes
+  empurra todas as linhas novamente. O usuário fica com posições
+  dobradas e não percebe.
+Impacto: Patrimônio, PM e proventos todos dobrados.
+Correção sugerida: Deduplicar por (ticker + tipo + data + qtd + pm).
+  Se a combinação já existe em ativos[], ignorar a linha.
+  Exemplo:
+    const key = obj.ticker+'|'+obj.tipo+'|'+obj.data+'|'+obj.qtd+'|'+obj.pm;
+    if(ativos.some(a=>a.ticker+'|'+a.tipo+'|'+a.data+'|'+a.qtd+'|'+a.pm===key)) continue;
+    ativos.push(obj);
+
+---
+
+[CRÍTICO] #4 — Datas vazias em getQtdTickerAtDate() incluem o lançamento em todo período
+Arquivo: common.js → função getQtdTickerAtDate()
+Problema:
+  O filtro é: a.data <= dateStr
+  Em JavaScript, '' <= '2025-01-01' é true (string vazia é menor que
+  qualquer string não-vazia). Então um lançamento sem data é contado
+  para TODOS os cálculos históricos.
+Impacto: Posições aparecem em datas anteriores à compra real;
+  proventos calculados sobre período indevido.
+Correção sugerida: Adicionar guard para data vazia:
+  ativos.filter(a => a.ticker===ticker && a.data && a.data<=dateStr)
+
+---
+
+[CRÍTICO] #5 — Proventos de tickers totalmente vendidos somem dos totais
+Arquivo: common.js → funções calcAtivos() e getTotals()
+Problema:
+  calcPosicoes() filtra fora qualquer ticker com qtd <= 0.0001.
+  calcAtivos() usa calcPosicoes(), portanto calcProventosAtivo() nunca
+  é chamado para tickers vendidos totalmente.
+  O proventosTotal em getTotals() não inclui dividendos recebidos
+  antes da venda de ativos que foram zerados.
+Exemplo: Comprou PETR4 em jan/24, recebeu R$500 em dividendos,
+  vendeu tudo em jun/24. O proventosTotal mostra R$0 para PETR4.
+Impacto: proventosTotal, rentTotal e lucroTotal subestimados.
+Nota: getDividendosPorMes() e calcProventosUltimos12m() estão CORRETOS
+  (usam Set de todos os tickers), mas o resumo de cards está errado.
+Correção sugerida: Calcular proventosTotal direto do getDividendosPorMes()
+  ou iterar todos os tickers (não só posições abertas) para o total.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  GRUPO 2 — EXIBIÇÃO / DADOS INCORRETOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[MÉDIO] #6 — Contador "X ativos em Y classes" conta transações, não posições
+Arquivo: resumo.html → função renderMetricsResumo()
+Código:
+  ${ativos.length} ativos em ${new Set(ativos.map(a=>a.classe)).size} classes
+Problema:
+  Com o novo modelo, ativos[] tem uma entrada por transação.
+  Se o usuário tem 5 lançamentos (3 compras + 2 vendas), aparece "5 ativos".
+Correção sugerida:
+  const c = calcAtivos();
+  ${c.length} ativos em ${new Set(c.map(a=>a.classe)).size} classes
+
+---
+
+[MÉDIO] #7 — Rentabilidade do grupo (Resumo) ignora proventos
+Arquivo: resumo.html → função renderGrupos()
+Código:
+  const gVar=gCusto>0?((gVt-gCusto)/gCusto)*100:0;
+  const gRent=gVar;  // ← cópia exata, sem proventos
+Problema:
+  gRent é idêntico a gVar. A rentabilidade total do grupo deveria
+  incluir proventos, mas não inclui.
+Impacto: Card "Rentabilidade" do grupo mostra dado igual a "Variação".
+Correção sugerida:
+  const gProv=items.reduce((s,a)=>s+a.proventos,0);
+  const gRent=gCusto>0?((gVt-gCusto+gProv)/gCusto)*100:0;
+
+---
+
+[MÉDIO] #8 — processB3Rows() usa modelo antigo (posição única por ticker)
+Arquivo: common.js → função processB3Rows()
+Problema:
+  A importação B3 ainda faz findIndex+overwrite, armazenando apenas
+  a posição líquida final (1 linha por ticker). As transações individuais
+  não ficam salvas. Isso é inconsistente com processImportRows() que
+  agora salva cada linha.
+  Consequência: ao usar o import B3, o lançamentos.html mostra apenas
+  1 linha por ticker, sem histórico de compras e vendas individuais.
+  Também, getQtdTickerAtDate() não consegue reconstruir o histórico
+  de um ticker importado via B3.
+Impacto: Histórico incompleto; proventos calculados com qtd incorreta
+  em datas passadas para tickers B3.
+Nota: Por ora não causa crash, mas é inconsistente com o resto.
+
+---
+
+[MÉDIO] #9 — Ordenação em lancamentos.html quebra com datas inválidas
+Arquivo: lancamentos.html → função renderLancamentos()
+Código:
+  const sorted=[...ativos].sort((a,b)=>new Date(b.data)-new Date(a.data));
+Problema:
+  new Date(undefined) ou new Date('') retorna Invalid Date.
+  Aritmética com NaN é NaN, e sort com NaN é comportamento indefinido
+  em JS (pode ordenar de forma aleatória ou não ordenar).
+Correção sugerida:
+  .sort((a,b)=>{
+    const da=a.data?new Date(a.data):new Date(0);
+    const db=b.data?new Date(b.data):new Date(0);
+    return db-da;
+  });
+
+---
+
+[MÉDIO] #10 — IRPF: ano hardcoded em 2025 (já desatualizado em 2026)
+Arquivo: irpf.html
+Problema:
+  <span class="tag-irpf">Ano-Calendário 2025</span>
+  "Bens e Direitos — Posição em 31/12/2025"
+  O ano atual é 2026. O texto está errado.
+Correção sugerida: Usar new Date().getFullYear() - 1 para o
+  ano-calendário e new Date().getFullYear() para o ano de exercício.
+
+---
+
+[MÉDIO] #11 — IRPF: ganho de capital mostra ganho NÃO realizado
+Arquivo: irpf.html + common.js (exportarRelatorioIRPF)
+Problema:
+  O campo "Ganho de Capital" mostra a.res = valorAtual - custoAquisicao
+  de posições ABERTAS (não realizadas).
+  Para o IRPF o que importa é o ganho REALIZADO em vendas efetivadas
+  no ano-calendário, não o ganho em papel de posições ainda abertas.
+Impacto: Dado enganoso para quem usar para declaração.
+Nota: Para funcionar corretamente precisaria rastrear as vendas e
+  calcular lucro = (preço de venda - PM) × qtd vendida.
+
+---
+
+[MÉDIO] #12 — IRPF: B3 classificado como "Isento" de forma genérica
+Arquivo: irpf.html
+Código:
+  const isento=a.classe==='FII'||a.classe==='B3';
+Problema:
+  Dividendos de ações B3 são isentos, mas JCP (Juros sobre Capital
+  Próprio) é tributável na fonte (15%). Classificar todo B3 como
+  isento é impreciso.
+  ETFs e BDRs caem em "Tributável" pelo else, o que pode ou não ser
+  correto dependendo do tipo específico.
+Impacto: Informação incorreta para declaração de IRPF.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  GRUPO 3 — UX / BAIXA SEVERIDADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[BAIXO] #13 — Sem opção de remover lançamento individual
+Arquivo: lancamentos.html
+Problema:
+  removeAtivo(ticker) apaga TODOS os lançamentos daquele ticker.
+  Não há como remover apenas um lançamento específico (ex: corrigir
+  uma linha errada de import sem perder os outros).
+  Isso é um limitação de UX relevante com o novo modelo de transações.
+
+---
+
+[BAIXO] #14 — Performance: calcEvolucaoPatrimonio() com período longo
+Arquivo: common.js → calcEvolucaoPatrimonio()
+Problema:
+  Para cada um dos até 120 meses (opção "10 anos"), filtra e recalcula
+  calcPosicoes() do zero. Com carteira grande pode ser lento.
+  Também getQtdTickerAtDate() é O(n) por chamada e é chamado uma vez
+  por dividendo por ticker.
+Impacto: Lentidão perceptível em carteiras com muitos lançamentos.
+Nota: Para uso pessoal com <200 transações, provavelmente imperceptível.
+
+---
+
+[BAIXO] #15 — Firebase carrega formato antigo com prioridade sobre localStorage
+Arquivo: firebase.js → onAuthStateChanged
+Problema:
+  Se um usuário tiver dados no Firestore no formato antigo (posições,
+  não transações), ao logar esses dados sobrescrevem o localStorage
+  e o sistema volta ao modelo antigo silenciosamente.
+Impacto: Apenas relevante se houver dados de produção no Firestore.
+  Como o site está em desenvolvimento, o risco é baixo por ora.
+
+---
+
+[BAIXO] #16 — pizza "Por ativo" usa array fixo de 10 cores
+Arquivo: resumo.html → função renderPizza()
+Código:
+  colors=['#185FA5','#3B6D11','#BA7517','#534AB7','#0F6E56',
+          '#993C1D','#1D9E75','#D85A30','#9FE1CB','#378ADD'];
+Problema:
+  Se a carteira tiver mais de 10 ativos, os ativos do índice 10+ ficam
+  sem cor definida (undefined), resultando em fatias sem cor no gráfico.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  RESUMO PRIORIZADO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Prioridade ALTA (corrigir antes de usar em produção):
+    #1  addAtivo() sobrescreve lançamentos — perda de dados
+    #2  Tipo 'Provento' soma quantidade — cálculo errado
+    #3  Re-import duplica tudo — patrimônio dobrado
+    #4  Data vazia inclui lançamento em todo histórico
+    #5  Proventos de vendidos somem do total
+
+  Prioridade MÉDIA (importante mas não bloqueia uso):
+    #6  Contador de ativos errado no Resumo
+    #7  Rentabilidade de grupo ignora proventos
+    #8  Import B3 inconsistente com novo modelo
+    #9  Sort por data quebra com datas inválidas
+    #10 Ano do IRPF hardcoded / desatualizado
+    #11 Ganho de capital no IRPF é não-realizado
+    #12 Classificação tributária do IRPF imprecisa
+
+  Prioridade BAIXA:
+    #13 Sem remoção de lançamento individual
+    #14 Performance em carteiras grandes
+    #15 Firebase com dados antigos
+    #16 Mais de 10 ativos sem cor no gráfico pizza
+
+=========================================================
+  FIM DO RELATÓRIO
+=========================================================

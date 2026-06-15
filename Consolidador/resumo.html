@@ -64,6 +64,7 @@ injectModals();
 
 function renderMetricsResumo(){
   const t=getTotals();
+  const c=calcAtivos(); // Bug #6 fix: contagem real de posições, não de lançamentos
   document.getElementById('metrics-resumo').innerHTML=`
     <div class="mcard">
       <div class="mcard-label"><i class="ti ti-wallet" aria-hidden="true"></i> Patrimônio total</div>
@@ -88,7 +89,7 @@ function renderMetricsResumo(){
     <div class="mcard">
       <div class="mcard-label"><i class="ti ti-percent" aria-hidden="true"></i> Rentabilidade total</div>
       <div class="mcard-value ${t.rentTotal>=0?'positive':'negative'}">${fmtP(t.rentTotal)}</div>
-      <div class="mcard-sub">${ativos.length} ativos em ${new Set(ativos.map(a=>a.classe)).size} classes</div>
+      <div class="mcard-sub">${c.length} ativos em ${new Set(c.map(a=>a.classe)).size} classes</div>
     </div>
   `;
 }
@@ -109,6 +110,23 @@ function renderEvolucao(nMeses=24){
   });
 }
 
+// Bug #16 fix: gera N cores distintas usando ângulo dourado em HSL (funciona com qualquer nº de ativos)
+function _gerarCores(n){
+  if(n<=10){
+    const paleta=['#185FA5','#3B6D11','#BA7517','#534AB7','#0F6E56','#993C1D','#1D9E75','#D85A30','#9FE1CB','#378ADD'];
+    return paleta.slice(0,n);
+  }
+  const cores=[];
+  const goldenAngle=137.508;
+  for(let i=0;i<n;i++){
+    const h=(i*goldenAngle)%360;
+    const s=55+((i*7)%20); // varia entre 55–75%
+    const l=38+((i*11)%20); // varia entre 38–58%
+    cores.push(`hsl(${h.toFixed(0)},${s}%,${l}%)`);
+  }
+  return cores;
+}
+
 function renderPizza(mode='classe'){
   const c=calcAtivos();
   const total=c.reduce((s,a)=>s+a.vt,0);
@@ -116,7 +134,7 @@ function renderPizza(mode='classe'){
   if(mode==='ativo'){
     labels=c.map(a=>a.ticker);
     vals=c.map(a=>parseFloat(a.vt.toFixed(2)));
-    colors=['#185FA5','#3B6D11','#BA7517','#534AB7','#0F6E56','#993C1D','#1D9E75','#D85A30','#9FE1CB','#378ADD'];
+    colors=_gerarCores(labels.length);
   } else {
     const bc=byClasse(c);
     labels=Object.keys(bc).map(k=>CLASS_LABEL[k]||k);
@@ -151,7 +169,9 @@ function renderGrupos(){
     const gVt=items.reduce((s,a)=>s+a.vt,0);
     const gCusto=items.reduce((s,a)=>s+a.custo,0);
     const gVar=gCusto>0?((gVt-gCusto)/gCusto)*100:0;
-    const gRent=gVar;
+    // Bug #7 fix: rentabilidade inclui proventos (não é igual à variação de capital)
+    const gProv=items.reduce((s,a)=>s+a.proventos,0);
+    const gRent=gCusto>0?((gVt-gCusto+gProv)/gCusto)*100:0;
     const pctCart=total>0?((gVt/total)*100).toFixed(1):0;
     html+=`<div class="grupo">
       <div class="grupo-header" onclick="toggleGrupo('g-${cls}',this)">

@@ -163,18 +163,28 @@ async function loadAllDividendos(){
 /* Retorna a qtd líquida de um ticker em uma data específica */
 function getQtdTickerAtDate(ticker,dateStr){
   let qtd=0;
-  ativos.filter(a=>a.ticker===ticker&&a.data<=dateStr).forEach(a=>{
-    if((a.tipo||'Compra')==='Venda')qtd=Math.max(0,qtd-a.qtd);
-    else qtd+=a.qtd;
+  // Bug #4 fix: guard data vazia ('' <= qualquer string em JS → incluiria lançamentos sem data)
+  ativos.filter(a=>a.ticker===ticker&&a.data&&a.data<=dateStr).forEach(a=>{
+    const tipo=a.tipo||'Compra';
+    if(tipo==='Venda')qtd=Math.max(0,qtd-a.qtd);
+    else if(tipo==='Compra')qtd+=a.qtd;
+    // Provento: não altera quantidade
   });
   return qtd;
 }
 
 function calcProventosAtivo(ticker,dataCompra,_qtd){
   const from=dataCompra||'1900-01-01';
-  return(DIVIDENDOS_CACHE[ticker]||[])
-    .filter(d=>d.date>=from)
-    .reduce((s,d)=>s+d.value*getQtdTickerAtDate(ticker,d.date),0);
+  const cache=DIVIDENDOS_CACHE[ticker]||[];
+  if(cache.length>0){
+    return cache
+      .filter(d=>d.date>=from)
+      .reduce((s,d)=>s+d.value*getQtdTickerAtDate(ticker,d.date),0);
+  }
+  // Fallback: proventos importados via Excel (só usados se site não tiver dados)
+  return ativos
+    .filter(a=>a.ticker===ticker&&a.tipo==='Provento'&&a.data&&a.data>=from)
+    .reduce((s,a)=>s+a.qtd*a.pm,0);
 }
 
 function calcProventosUltimos12m(){
@@ -183,9 +193,16 @@ function calcProventosUltimos12m(){
   const cutoffStr=cutoff.toISOString().slice(0,10);
   const tickers=[...new Set(ativos.map(a=>a.ticker))];
   return tickers.reduce((sum,ticker)=>{
-    return sum+(DIVIDENDOS_CACHE[ticker]||[])
-      .filter(d=>d.date>=cutoffStr)
-      .reduce((s,d)=>s+d.value*getQtdTickerAtDate(ticker,d.date),0);
+    const cache=DIVIDENDOS_CACHE[ticker]||[];
+    if(cache.length>0){
+      return sum+cache
+        .filter(d=>d.date>=cutoffStr)
+        .reduce((s,d)=>s+d.value*getQtdTickerAtDate(ticker,d.date),0);
+    }
+    // Fallback: proventos importados
+    return sum+ativos
+      .filter(a=>a.ticker===ticker&&a.tipo==='Provento'&&a.data&&a.data>=cutoffStr)
+      .reduce((s,a)=>s+a.qtd*a.pm,0);
   },0);
 }
 
@@ -200,19 +217,57 @@ function getDividendosPorMes(){
   }
   const tickers=[...new Set(ativos.map(a=>a.ticker))];
   tickers.forEach(ticker=>{
-    (DIVIDENDOS_CACHE[ticker]||[]).forEach(d=>{
-      const ym=d.date.slice(0,7);
-      if(!map[ym])return;
-      const qtd=getQtdTickerAtDate(ticker,d.date);
-      if(qtd<=0)return;
-      const val=d.value*qtd;
-      map[ym].total+=val;
-      map[ym].tickers[ticker]=(map[ym].tickers[ticker]||0)+val;
-    });
+    const cache=DIVIDENDOS_CACHE[ticker]||[];
+    if(cache.length>0){
+      // Usa dados do site
+      cache.forEach(d=>{
+        const ym=d.date.slice(0,7);
+        if(!map[ym])return;
+        const qtd=getQtdTickerAtDate(ticker,d.date);
+        if(qtd<=0)return;
+        const val=d.value*qtd;
+        map[ym].total+=val;
+        map[ym].tickers[ticker]=(map[ym].tickers[ticker]||0)+val;
+      });
+    }else{
+      // Fallback: proventos importados via Excel
+      ativos.filter(a=>a.ticker===ticker&&a.tipo==='Provento'&&a.data).forEach(a=>{
+        const ym=a.data.slice(0,7);
+        if(!map[ym])return;
+        const val=a.qtd*a.pm;
+        if(val<=0)return;
+        map[ym].total+=val;
+        map[ym].tickers[ticker]=(map[ym].tickers[ticker]||0)+val;
+      });
+    }
   });
   return Object.entries(map)
     .sort((a,b)=>a[0].localeCompare(b[0]))
     .map(([ym,v])=>({ym,...v}));
+}
+
+/* Calcula ganhos de capital REALIZADOS em vendas efetivadas no ano-calendário */
+function getGanhosRealizados(ano){
+  const anoStr=String(ano);
+  const vendas=ativos
+    .filter(a=>a.tipo==='Venda'&&a.data&&a.data.slice(0,4)===anoStr)
+    .sort((a,b)=>a.data.localeCompare(b.data));
+  return vendas.reduce((total,venda)=>{
+    // Reconstrói posição antes da venda para obter o PM correto na data
+    const txAntes=ativos.filter(a=>a.ticker===venda.ticker&&a.data&&a.data<venda.data);
+    const pos=calcPosicoes(txAntes);
+    const pmCompra=pos.find(p=>p.ticker===venda.ticker)?.pm||0;
+    return total+(venda.pm-pmCompra)*venda.qtd;
+  },0);
+}
+
+/* Remove um lançamento individual pelo índice no array ativos[] */
+function removeAtivoIdx(idx){
+  if(!confirm('Remover este lançamento?'))return;
+  ativos.splice(idx,1);
+  saveAtivos();
+  if(typeof renderAll==='function')renderAll();
+  toast('Lançamento removido.');
 }
 
 /* -- init assíncrono: carrega cotações + dividendos + histórico e re-renderiza */
@@ -240,17 +295,20 @@ function calcPosicoes(txArray){
     if(a.comprar&&a.comprar!=='Não')map[t].comprar=a.comprar;
     if(a.classe)map[t].classe=a.classe;
     if(a.moeda)map[t].moeda=a.moeda;
+    // Bug #2 fix: Provento não altera posição (não é Compra nem Venda)
+    const isBuy=(a.tipo||'Compra')==='Compra';
     const isSell=(a.tipo||'Compra')==='Venda';
     if(isSell){
       map[t].qtd=Math.max(0,map[t].qtd-a.qtd);
       map[t]._custo=map[t].qtd*map[t].pm;
-    }else{
+    }else if(isBuy){
       const newQtd=map[t].qtd+a.qtd;
       map[t]._custo+=a.qtd*a.pm;
       map[t].pm=newQtd>0?map[t]._custo/newQtd:0;
       map[t].qtd=newQtd;
       if(!map[t].data||a.data<map[t].data)map[t].data=a.data;
     }
+    // else: Provento — ignora (não afeta qtd nem PM)
   });
   return Object.values(map).filter(a=>a.qtd>0.0001).map(({_custo,...rest})=>rest);
 }
@@ -273,7 +331,17 @@ function getTotals(){
   const custo=c.reduce((s,a)=>s+a.custo,0);
   const res=total-custo;
   const resPct=custo>0?((total-custo)/custo)*100:0;
-  const proventosTotal=c.reduce((s,a)=>s+a.proventos,0);
+  // Bug #5 fix: inclui proventos de tickers totalmente vendidos (não só posições abertas)
+  const proventosAbertos=c.reduce((s,a)=>s+a.proventos,0);
+  const tickersAbertos=new Set(c.map(a=>a.ticker));
+  const proventosFechados=[...new Set(ativos.map(a=>a.ticker))]
+    .filter(t=>!tickersAbertos.has(t))
+    .reduce((sum,ticker)=>{
+      const firstBuy=ativos.filter(a=>a.ticker===ticker&&(a.tipo||'Compra')==='Compra')
+        .sort((a,b)=>(a.data||'').localeCompare(b.data||''))[0];
+      return sum+calcProventosAtivo(ticker,firstBuy?.data,0);
+    },0);
+  const proventosTotal=proventosAbertos+proventosFechados;
   const lucroTotal=res+proventosTotal;
   const rentTotal=custo>0?(lucroTotal/custo)*100:0;
   const provAno=calcProventosUltimos12m();
@@ -355,6 +423,9 @@ function processImportRows(rows){
       moeda:moeda?String(moeda).trim():'BRL',
       comprar:comprar?String(comprar).trim():'Não'
     };
+    // Bug #3 fix: deduplicar por chave composta — evita duplicar ao re-importar o mesmo Excel
+    const key=`${obj.ticker}|${obj.tipo}|${obj.data}|${obj.qtd}|${obj.pm}`;
+    if(ativos.some(a=>`${a.ticker}|${a.tipo}|${a.data}|${a.qtd}|${a.pm}`===key))continue;
     ativos.push(obj);
     count++;
   }
@@ -463,47 +534,35 @@ function processB3Rows(rows){
     ops[ticker].txs.push({data:dataStr,side:isBuy?'buy':'sell',qtd,preco});
   }
 
-  let importados=0,ignorados=0;
+  let importados=0;
 
   for(const [ticker,{nome,txs}] of Object.entries(ops)){
-    // Ordenar cronologicamente
     txs.sort((a,b)=>a.data.localeCompare(b.data));
-
-    // PM iterativo: PM ponderado recalculado a cada compra; vendas só reduzem qtd
-    let pmAtual=0,qtdAtual=0,dataCompra='';
-    for(const tx of txs){
-      if(tx.side==='buy'){
-        if(qtdAtual===0)pmAtual=tx.preco;
-        else pmAtual=(pmAtual*qtdAtual+tx.preco*tx.qtd)/(qtdAtual+tx.qtd);
-        qtdAtual+=tx.qtd;
-        if(!dataCompra)dataCompra=tx.data;
-      }else{
-        qtdAtual=Math.max(0,qtdAtual-tx.qtd);
-        if(qtdAtual===0){pmAtual=0;dataCompra='';}
-      }
-    }
-
-    // Corrigir erros de ponto flutuante
-    qtdAtual=Math.round(qtdAtual*10000)/10000;
-    if(qtdAtual<=0){ignorados++;continue;}
-
     const classe=classificarB3(ticker,nome);
-    const pm=parseFloat(pmAtual.toFixed(4));
-    const obj={ticker,classe,tipo:'Compra',qtd:qtdAtual,pm,cotacao:pm,dy:0,
-      data:dataCompra||new Date().toISOString().slice(0,10),nota:0,ideal:0,moeda:'BRL',comprar:'Não'};
 
-    const idx=ativos.findIndex(a=>a.ticker===ticker);
-    if(idx>=0){
-      // Preserva campos do usuário (nota, ideal, comprar, cotacao, dy)
-      ativos[idx]={...ativos[idx],qtd:obj.qtd,pm:obj.pm,classe:obj.classe,data:obj.data};
-    }else{
+    // Bug #8 fix: salva cada transação individual (igual ao processImportRows)
+    // calcPosicoes() cuida do PM ponderado e qtd líquida
+    for(const tx of txs){
+      const tipo=tx.side==='buy'?'Compra':'Venda';
+      const obj={
+        ticker,classe,tipo,
+        qtd:Math.round(tx.qtd*10000)/10000,
+        pm:parseFloat(tx.preco.toFixed(4)),
+        cotacao:parseFloat(tx.preco.toFixed(4)),
+        dy:0,
+        data:tx.data||new Date().toISOString().slice(0,10),
+        nota:0,ideal:0,moeda:'BRL',comprar:'Não'
+      };
+      // Dedup: evita duplicar ao re-importar o mesmo extrato
+      const key=`${obj.ticker}|${obj.tipo}|${obj.data}|${obj.qtd}|${obj.pm}`;
+      if(ativos.some(a=>`${a.ticker}|${a.tipo}|${a.data}|${a.qtd}|${a.pm}`===key))continue;
       ativos.push(obj);
+      importados++;
     }
-    importados++;
   }
 
   saveAtivos();
-  toast(`B3: ${importados} ativo(s) importado(s)${ignorados?', '+ignorados+' zerado(s) ignorado(s)':''}.`);
+  toast(`B3: ${importados} lançamento(s) importado(s).`);
   initConsolidador(); // recarrega cotações + dividendos e re-renderiza
 }
 
@@ -614,9 +673,9 @@ function addAtivo(){
   const moeda=document.getElementById('f-moeda').value;
   const comprar=document.getElementById('f-comprar').value;
   if(!ticker||!qtd||!pm){alert('Preencha Ticker, Quantidade e Preço Médio.');return}
-  const idx=ativos.findIndex(a=>a.ticker===ticker);
+  // Bug #1 fix: sempre push — novo modelo de transações (não sobrescreve lançamentos anteriores)
   const obj={ticker,classe,tipo,qtd,pm,cotacao,data,nota,ideal,moeda,comprar};
-  if(idx>=0)ativos[idx]=obj; else ativos.push(obj);
+  ativos.push(obj);
   saveAtivos();
   closeModal();
   initConsolidador(); // recarrega cotação e proventos do site

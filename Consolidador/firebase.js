@@ -58,16 +58,37 @@ function renderAuthUI(user){
   }
 }
 
+/* ---- detecta se um array de ativos é formato antigo (uma entrada por ticker) ---- */
+function _cloudFormatoAntigo(cloudAtivos){
+  if(!cloudAtivos||!cloudAtivos.length) return false;
+  // Formato antigo: todos os tickers únicos E nenhum tem tipo='Venda'
+  const tickers = cloudAtivos.map(a=>a.ticker);
+  const todosUnicos = tickers.length === new Set(tickers).size;
+  const semVenda = !cloudAtivos.some(a=>a.tipo==='Venda');
+  // Local tem lançamentos duplicados ou vendas → é o formato novo
+  const localTemDups = (()=>{ const t=ativos.map(a=>a.ticker); return t.length!==new Set(t).size; })();
+  const localTemVenda = ativos.some(a=>a.tipo==='Venda');
+  return todosUnicos && semVenda && (localTemDups || localTemVenda);
+}
+
 /* ---- observador de autenticação ---- */
 _auth.onAuthStateChanged(async user => {
   if(user){
     try{
       const doc = await _db.collection('carteiras').doc(user.uid).get();
       if(doc.exists){
-        // carrega dados do Firestore (nuvem tem prioridade)
         const d = doc.data();
-        if(d.ativos){ ativos = d.ativos; localStorage.setItem(STORAGE_ATIVOS, JSON.stringify(ativos)); }
-        if(d.metas){  metas  = d.metas;  localStorage.setItem(STORAGE_METAS,  JSON.stringify(metas));  }
+        // Bug #15 fix: não sobrescreve dados locais com formato antigo da nuvem
+        if(_cloudFormatoAntigo(d.ativos)){
+          // Nuvem tem formato antigo (1 entrada por ticker), local é mais rico
+          // Migra local para nuvem sem perder dados
+          await _db.collection('carteiras').doc(user.uid).set({ativos, metas}, {merge: true});
+          toast('Formato antigo detectado na nuvem — carteira local mantida e sincronizada. ☁️');
+        } else {
+          // Formato novo (ou nuvem vazia): nuvem tem prioridade
+          if(d.ativos){ ativos = d.ativos; localStorage.setItem(STORAGE_ATIVOS, JSON.stringify(ativos)); }
+          if(d.metas){  metas  = d.metas;  localStorage.setItem(STORAGE_METAS,  JSON.stringify(metas));  }
+        }
       } else {
         // primeiro login: sobe o que está no localStorage para a nuvem
         await _db.collection('carteiras').doc(user.uid).set({ativos, metas});

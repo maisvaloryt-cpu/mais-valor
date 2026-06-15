@@ -371,41 +371,24 @@ function renderNavSlim() {
 
 function renderNav() {
   const page = location.pathname.split('/').pop() || 'index.html';
+  const inConsolidador = location.pathname.includes('Consolidador');
 
-  const extPages = ['bdrs.html','etfs.html','reits.html','stocks.html'];
-  const extActive = extPages.includes(page);
+  const ativosNacPages  = ['acoes.html','fiis.html','dividendos.html','criptos.html'];
+  const ativosExtPages  = ['bdrs.html','etfs.html','reits.html','stocks.html'];
+  const ativosAllPages  = [...ativosNacPages, ...ativosExtPages, 'rankings.html'];
+  const ferramentasAllPages = ['simulador.html','comparador.html','analise.html','ferramentas.html'];
 
-  const criptosPos = NAV_LINKS.findIndex(l => l.href === 'criptos.html');
-  const beforeExt = NAV_LINKS.slice(0, criptosPos + 1).map(l => {
-    const isStatus = l.href === 'status.html';
-    const style = isStatus ? 'color:var(--up);font-size:11px' : '';
-    const cls = page === l.href.split('/').pop() ? 'active' : '';
-    return `<a href="${NAV_BASE}${l.href}" class="${cls}" style="${style}">${l.label}</a>`;
-  }).join('');
-  const afterExt = NAV_LINKS.slice(criptosPos + 1).map(l => {
-    const isStatus = l.href === 'status.html';
-    const style = isStatus ? 'color:var(--up);font-size:11px' : '';
-    const cls = page === l.href.split('/').pop() ? 'active' : '';
-    return `<a href="${NAV_BASE}${l.href}" class="${cls}" style="${style}">${l.label}</a>`;
-  }).join('');
+  const ativosActive      = ativosAllPages.includes(page);
+  const ferramentasActive = ferramentasAllPages.includes(page);
+  const homeActive        = page === 'index.html' && !inConsolidador;
+  const watchActive       = page === 'watchlist.html';
+  const carteiraActive    = inConsolidador;
+  const statusActive      = page === 'status.html';
 
-  // Exterior trigger — sem dropdown inline, dropdown vai no body via JS
-  const exteriorHtml = `<span id="mv-ext-btn" class="${extActive ? 'active' : ''}" style="cursor:pointer;font-size:13px;font-weight:600;color:var(--text2);padding:4px 2px;transition:color .15s;white-space:nowrap;${extActive?'color:var(--text)':''}">Exterior ▾</span>`;
-
-  const extMobileLinks = `
-    <a href="${NAV_BASE}bdrs.html" class="${page==='bdrs.html'?'active':''}" onclick="toggleMobileMenu()">🇧🇷 BDRs</a>
-    <a href="${NAV_BASE}etfs.html" class="${page==='etfs.html'?'active':''}" onclick="toggleMobileMenu()">📊 ETFs</a>
-    <a href="${NAV_BASE}reits.html" class="${page==='reits.html'?'active':''}" onclick="toggleMobileMenu()">🏢 REITs</a>
-    <a href="${NAV_BASE}stocks.html" class="${page==='stocks.html'?'active':''}" onclick="toggleMobileMenu()">🇺🇸 Stocks</a>`;
-
-  const mobileLinksHtml = (arr) => arr.map(l => {
-    const isStatus = l.href === 'status.html';
-    const cls = page === l.href.split('/').pop() ? 'active' : '';
-    const style = isStatus ? 'color:var(--up)' : '';
-    return `<a href="${NAV_BASE}${l.href}" class="${cls}" style="${style}" onclick="toggleMobileMenu()">${l.label}</a>`;
-  }).join('');
-
-  const mobileLinks = mobileLinksHtml(NAV_LINKS.slice(0, criptosPos + 1)) + extMobileLinks + mobileLinksHtml(NAV_LINKS.slice(criptosPos + 1));
+  const dropBtnStyle = (active) =>
+    `cursor:pointer;font-size:13px;font-weight:600;color:${active?'var(--gold,#F5A623)':'var(--text2,#8A8884)'};` +
+    `padding:0 10px;height:48px;display:inline-flex;align-items:center;white-space:nowrap;` +
+    `border-bottom:2px solid ${active?'var(--gold,#F5A623)':'transparent'};transition:color .15s,border-color .15s;user-select:none`;
 
   document.getElementById('nav-placeholder').innerHTML = `
   <style>
@@ -413,26 +396,27 @@ function renderNav() {
   #nav-hamburger:hover{background:var(--bg3)}
   #nav-mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg,#0E0E11);z-index:500;flex-direction:column;padding:20px 24px;overflow-y:auto;animation:slideDown .2s ease}
   #nav-mobile-menu.open{display:flex}
-  #nav-mobile-menu .mob-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+  #nav-mobile-menu .mob-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
   #nav-mobile-menu .mob-close{background:transparent;border:1px solid var(--border);color:var(--text);font-size:20px;cursor:pointer;padding:6px 12px;border-radius:8px;font-family:var(--font-body,sans-serif)}
-  #nav-mobile-menu a{display:block;padding:14px 0;font-size:18px;font-weight:700;color:var(--text2);border-bottom:1px solid var(--border);text-decoration:none;transition:color .15s}
+  #nav-mobile-menu a{display:block;padding:11px 0 11px 8px;font-size:16px;font-weight:600;color:var(--text2);border-bottom:1px solid var(--border);text-decoration:none;transition:color .15s}
   #nav-mobile-menu a:hover,#nav-mobile-menu a.active{color:var(--gold,#D4A017)}
-  #nav-mobile-menu a:last-child{border-bottom:none}
-  @media (max-width:900px){.nav-links{display:none!important}#nav-ext-btn-wrap{display:none!important}#nav-hamburger{display:flex!important;align-items:center;justify-content:center}}
+  .mob-group-label{font-size:10px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--text3,#555);padding:18px 0 4px;border-bottom:none!important}
+  .mob-group-sub{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold,#D4A017);opacity:.65;padding:10px 0 2px;border-bottom:none!important}
+  @media (max-width:900px){.nav-links{display:none!important}#nav-hamburger{display:flex!important;align-items:center;justify-content:center}}
   @media (max-width:600px){.nav-search-wrap{display:none!important}}
-  #mv-ext-floatdrop{
-    display:none;
-    position:fixed;
+  .mv-floatdrop{
+    display:none;position:fixed;
     background:var(--bg2,#1a1a1f);
     border:1px solid var(--border3,rgba(255,255,255,0.12));
-    border-radius:10px;
-    padding:6px;
-    min-width:150px;
-    z-index:99999;
-    box-shadow:0 8px 32px rgba(0,0,0,0.5);
+    border-radius:12px;padding:8px;min-width:170px;
+    z-index:99999;box-shadow:0 12px 40px rgba(0,0,0,0.6);
   }
-  #mv-ext-floatdrop a{display:block;padding:9px 14px;border-radius:7px;font-size:13px;font-weight:600;color:var(--text2,#aaa);white-space:nowrap;text-decoration:none;transition:background .12s,color .12s}
-  #mv-ext-floatdrop a:hover,#mv-ext-floatdrop a.active{background:var(--bg3,#252529);color:var(--text,#fff)}
+  .mv-floatdrop a{display:block;padding:8px 12px;border-radius:7px;font-size:13px;font-weight:600;color:var(--text2,#aaa);white-space:nowrap;text-decoration:none;transition:background .12s,color .12s}
+  .mv-floatdrop a:hover{background:var(--bg3,#252529);color:var(--text,#fff)}
+  .mv-floatdrop a.active{color:var(--gold,#F5A623)}
+  .mv-floatdrop a.active:hover{background:var(--bg3,#252529)}
+  .mv-drop-label{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--text3,#555);padding:6px 12px 3px}
+  .mv-drop-div{height:1px;background:var(--border,rgba(255,255,255,0.07));margin:6px 0}
   </style>
 
   <div id="nav-mobile-menu">
@@ -444,7 +428,29 @@ function renderNav() {
       <button class="mob-close" onclick="toggleMobileMenu()">✕</button>
     </div>
     <div id="nav-auth-area-mobile" style="padding:12px 0 16px;border-bottom:1px solid var(--border);margin-bottom:4px"></div>
-    ${mobileLinks}
+    <a href="${NAV_BASE}index.html" class="${homeActive?'active':''}" onclick="toggleMobileMenu()">🏠 Home</a>
+    <div class="mob-group-label">Ativos</div>
+    <div class="mob-group-sub">Nacional</div>
+    <a href="${NAV_BASE}acoes.html" class="${page==='acoes.html'?'active':''}" onclick="toggleMobileMenu()">📈 Ações</a>
+    <a href="${NAV_BASE}fiis.html" class="${page==='fiis.html'?'active':''}" onclick="toggleMobileMenu()">🏢 FIIs</a>
+    <a href="${NAV_BASE}dividendos.html" class="${page==='dividendos.html'?'active':''}" onclick="toggleMobileMenu()">💰 Dividendos</a>
+    <a href="${NAV_BASE}criptos.html" class="${page==='criptos.html'?'active':''}" onclick="toggleMobileMenu()">₿ Criptos</a>
+    <div class="mob-group-sub">Exterior</div>
+    <a href="${NAV_BASE}bdrs.html" class="${page==='bdrs.html'?'active':''}" onclick="toggleMobileMenu()">🇧🇷 BDRs</a>
+    <a href="${NAV_BASE}etfs.html" class="${page==='etfs.html'?'active':''}" onclick="toggleMobileMenu()">📊 ETFs</a>
+    <a href="${NAV_BASE}reits.html" class="${page==='reits.html'?'active':''}" onclick="toggleMobileMenu()">🏢 REITs</a>
+    <a href="${NAV_BASE}stocks.html" class="${page==='stocks.html'?'active':''}" onclick="toggleMobileMenu()">🇺🇸 Stocks</a>
+    <a href="${NAV_BASE}rankings.html" class="${page==='rankings.html'?'active':''}" onclick="toggleMobileMenu()">🏆 Rankings</a>
+    <div class="mob-group-label">Ferramentas</div>
+    <a href="${NAV_BASE}simulador.html" class="${page==='simulador.html'?'active':''}" onclick="toggleMobileMenu()">🧮 Simulador</a>
+    <a href="${NAV_BASE}Calculadora_maisvalor/index.html" onclick="toggleMobileMenu()">✦ Calculadora</a>
+    <a href="${NAV_BASE}comparador.html" class="${page==='comparador.html'?'active':''}" onclick="toggleMobileMenu()">⚖️ Comparador</a>
+    <a href="${NAV_BASE}analise.html" class="${page==='analise.html'?'active':''}" onclick="toggleMobileMenu()">✦ Análise IA</a>
+    <a href="${NAV_BASE}ferramentas.html" class="${page==='ferramentas.html'?'active':''}" onclick="toggleMobileMenu()">🔧 Outras</a>
+    <div class="mob-group-label">Conta</div>
+    <a href="${NAV_BASE}watchlist.html" class="${watchActive?'active':''}" onclick="toggleMobileMenu()">★ Watchlist</a>
+    <a href="${NAV_BASE}Consolidador/index.html" class="${carteiraActive?'active':''}" onclick="toggleMobileMenu()">📊 Carteira</a>
+    <a href="${NAV_BASE}status.html" class="${statusActive?'active':''}" onclick="toggleMobileMenu()" style="color:var(--up)">● Status</a>
   </div>
 
   <nav>
@@ -452,7 +458,14 @@ function renderNav() {
       ${LOGO_SVG_HTML}
       <span>Mais <em>Valor</em></span>
     </a>
-    <div class="nav-links">${beforeExt}${exteriorHtml}${afterExt}</div>
+    <div class="nav-links">
+      <a href="${NAV_BASE}index.html" class="${homeActive?'active':''}">Home</a>
+      <span id="mv-ativos-btn" style="${dropBtnStyle(ativosActive)}">Ativos ▾</span>
+      <span id="mv-ferramentas-btn" style="${dropBtnStyle(ferramentasActive)}">Ferramentas ▾</span>
+      <a href="${NAV_BASE}watchlist.html" class="${watchActive?'active':''}">★ Watchlist</a>
+      <a href="${NAV_BASE}Consolidador/index.html" class="${carteiraActive?'active':''}">Carteira</a>
+      <a href="${NAV_BASE}status.html" class="${statusActive?'active':''}" style="color:var(--up);font-size:11px">● Status</a>
+    </div>
     <div class="nav-right">
       <div class="nav-search-wrap">
         <span class="nav-search-icon">⌕</span>
@@ -541,38 +554,64 @@ function renderNav() {
 
   applyTheme(getTheme());
 
-  // ── Exterior dropdown — appendado no body, escapa de qualquer overflow:hidden ──
-  const drop = document.createElement('div');
-  drop.id = 'mv-ext-floatdrop';
-  drop.innerHTML = `
+  // ── Dropdown: Ativos ─────────────────────────────────────────────
+  const ativosDrop = document.createElement('div');
+  ativosDrop.id = 'mv-ativos-floatdrop';
+  ativosDrop.className = 'mv-floatdrop';
+  ativosDrop.innerHTML = `
+    <div class="mv-drop-label">Nacional</div>
+    <a href="${NAV_BASE}acoes.html" class="${page==='acoes.html'?'active':''}">📈 Ações</a>
+    <a href="${NAV_BASE}fiis.html" class="${page==='fiis.html'?'active':''}">🏢 FIIs</a>
+    <a href="${NAV_BASE}dividendos.html" class="${page==='dividendos.html'?'active':''}">💰 Dividendos</a>
+    <a href="${NAV_BASE}criptos.html" class="${page==='criptos.html'?'active':''}">₿ Criptos</a>
+    <div class="mv-drop-div"></div>
+    <div class="mv-drop-label">Exterior</div>
     <a href="${NAV_BASE}bdrs.html" class="${page==='bdrs.html'?'active':''}">🇧🇷 BDRs</a>
     <a href="${NAV_BASE}etfs.html" class="${page==='etfs.html'?'active':''}">📊 ETFs</a>
     <a href="${NAV_BASE}reits.html" class="${page==='reits.html'?'active':''}">🏢 REITs</a>
-    <a href="${NAV_BASE}stocks.html" class="${page==='stocks.html'?'active':''}">🇺🇸 Stocks</a>`;
-  document.body.appendChild(drop);
+    <a href="${NAV_BASE}stocks.html" class="${page==='stocks.html'?'active':''}">🇺🇸 Stocks</a>
+    <div class="mv-drop-div"></div>
+    <a href="${NAV_BASE}rankings.html" class="${page==='rankings.html'?'active':''}">🏆 Rankings</a>`;
+  document.body.appendChild(ativosDrop);
 
-  let dropTimer;
-  function showDrop() {
-    clearTimeout(dropTimer);
-    const btn = document.getElementById('mv-ext-btn');
-    if (!btn) return;
-    const r = btn.getBoundingClientRect();
-    drop.style.display = 'block';
-    drop.style.top  = (r.bottom + 6) + 'px';
-    drop.style.left = r.left + 'px';
-  }
-  function hideDrop() {
-    dropTimer = setTimeout(() => { drop.style.display = 'none'; }, 120);
+  // ── Dropdown: Ferramentas ────────────────────────────────────────
+  const ferramentasDrop = document.createElement('div');
+  ferramentasDrop.id = 'mv-ferramentas-floatdrop';
+  ferramentasDrop.className = 'mv-floatdrop';
+  ferramentasDrop.innerHTML = `
+    <a href="${NAV_BASE}simulador.html" class="${page==='simulador.html'?'active':''}">🧮 Simulador</a>
+    <a href="${NAV_BASE}Calculadora_maisvalor/index.html">✦ Calculadora</a>
+    <a href="${NAV_BASE}comparador.html" class="${page==='comparador.html'?'active':''}">⚖️ Comparador</a>
+    <a href="${NAV_BASE}analise.html" class="${page==='analise.html'?'active':''}">✦ Análise IA</a>
+    <div class="mv-drop-div"></div>
+    <a href="${NAV_BASE}ferramentas.html" class="${page==='ferramentas.html'?'active':''}">🔧 Outras ferramentas</a>`;
+  document.body.appendChild(ferramentasDrop);
+
+  // ── Lógica genérica de hover para os dropdowns ───────────────────
+  function setupDropHover(btnId, dropEl) {
+    let timer;
+    const show = () => {
+      clearTimeout(timer);
+      const btn = document.getElementById(btnId);
+      if (!btn) return;
+      const r = btn.getBoundingClientRect();
+      dropEl.style.display = 'block';
+      dropEl.style.top  = (r.bottom + 6) + 'px';
+      dropEl.style.left = r.left + 'px';
+    };
+    const hide = () => { timer = setTimeout(() => { dropEl.style.display = 'none'; }, 120); };
+    document.addEventListener('mouseover', (e) => {
+      if (e.target.closest('#' + btnId)) show();
+      else if (e.target.closest('#' + dropEl.id)) clearTimeout(timer);
+    });
+    document.addEventListener('mouseout', (e) => {
+      const to = e.relatedTarget;
+      if (!to || (!to.closest('#' + btnId) && !to.closest('#' + dropEl.id))) hide();
+    });
   }
 
-  document.addEventListener('mouseover', (e) => {
-    if (e.target.closest('#mv-ext-btn')) showDrop();
-    else if (e.target.closest('#mv-ext-floatdrop')) clearTimeout(dropTimer);
-  });
-  document.addEventListener('mouseout', (e) => {
-    const to = e.relatedTarget;
-    if (!to || (!to.closest('#mv-ext-btn') && !to.closest('#mv-ext-floatdrop'))) hideDrop();
-  });
+  setupDropHover('mv-ativos-btn',      ativosDrop);
+  setupDropHover('mv-ferramentas-btn', ferramentasDrop);
 
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.nav-search-wrap')) {
