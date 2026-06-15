@@ -1,9 +1,9 @@
 {
-  "gerado_em": "12/06/2026 03:46",
+  "gerado_em": "14/06/2026 22:12",
   "historico_mensal": {
-    "total": 817,
-    "ok": 798,
-    "poucos_dados": 19,
+    "total": 1325,
+    "ok": 1305,
+    "poucos_dados": 20,
     "lista_poucos": [
       {
         "ticker": "ADSH11",
@@ -28,6 +28,10 @@
       {
         "ticker": "CYRE4",
         "pontos": 6
+      },
+      {
+        "ticker": "FDXF",
+        "pontos": 4
       },
       {
         "ticker": "FIXX11",
@@ -85,28 +89,33 @@
   },
   "historico_diario": {
     "total": 769,
-    "atualizados": 767,
-    "desatualizados": 2,
+    "atualizados": 766,
+    "desatualizados": 3,
     "lista_desatualizados": [
       {
         "ticker": "HGPO11",
         "ultimo": "2026-06-08",
-        "dias_atras": 4
+        "dias_atras": 6
       },
       {
         "ticker": "RBRF11",
         "ultimo": "2026-06-08",
+        "dias_atras": 6
+      },
+      {
+        "ticker": "SPG211",
+        "ultimo": "2026-06-10",
         "dias_atras": 4
       }
     ]
   },
   "cotacoes": {
-    "atualizado_em": "11/06/2026 02:53",
+    "atualizado_em": "14/06/2026 21:55",
     "total_acoes": 398,
     "total_fiis": 370,
     "fallbacks": 3,
     "tickers_fallback": [
-      "ESPA3",
+      "BRIM11",
       "HGPO11",
       "SPG211"
     ]
@@ -118,17 +127,17 @@
     "atualizado_fiis": "08/06/2026 06:15"
   },
   "criptos": {
-    "atualizado_em": "12/06/2026 04:27 UTC",
+    "atualizado_em": "14/06/2026 22:20 UTC",
     "total_moedas": 100,
     "com_dados": 100,
     "sem_dados": 0,
     "tickers_sem_dados": [],
-    "historico_ok": 100,
+    "historico_ok": 105,
     "historico_falhou": 0,
     "historico_falhou_lista": []
   },
   "resumo": {
-    "acoes_com_historico": 798,
+    "acoes_com_historico": 1305,
     "fiis_com_historico": 364,
     "cotacoes_atuais": 768,
     "indicadores_fundamentus": 783,
