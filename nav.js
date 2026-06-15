@@ -468,6 +468,7 @@ function renderNav() {
     </div>
   </nav>
 
+  ${document.documentElement.dataset.indices === 'true' ? `
   <div class="ticker-bar">
     <div class="ticker-track" id="ticker-track">
       <div class="ticker-item"><span class="ticker-name" style="animation:pulse 1s ease-in-out infinite">Carregando...</span></div>
@@ -535,7 +536,7 @@ function renderNav() {
       <div class="idx-val" id="idx-petroleo">—</div>
       <div class="idx-chg" id="idx-petroleo-chg">—</div>
     </div>
-  </div>`;
+  </div>` : ''}`;
 
   applyTheme(getTheme());
 

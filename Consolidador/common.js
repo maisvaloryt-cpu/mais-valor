@@ -38,7 +38,7 @@ function loadAtivos(){
   }catch(e){}
   return JSON.parse(JSON.stringify(DEFAULT_ATIVOS));
 }
-function saveAtivos(){ localStorage.setItem(STORAGE_ATIVOS, JSON.stringify(ativos)); }
+function saveAtivos(){ localStorage.setItem(STORAGE_ATIVOS, JSON.stringify(ativos)); if(typeof syncFirestore==='function')syncFirestore(); }
 
 function loadMetas(){
   try{
@@ -47,7 +47,7 @@ function loadMetas(){
   }catch(e){}
   return JSON.parse(JSON.stringify(DEFAULT_METAS));
 }
-function saveMetas(){ localStorage.setItem(STORAGE_METAS, JSON.stringify(metas)); }
+function saveMetas(){ localStorage.setItem(STORAGE_METAS, JSON.stringify(metas)); if(typeof syncFirestore==='function')syncFirestore(); }
 
 let ativos=loadAtivos();
 let metas=loadMetas();
@@ -478,6 +478,7 @@ function renderHeaderAndNav(active){
   const headerActions=document.getElementById('header-actions');
   if(headerActions){
     headerActions.innerHTML=`
+      <div id="auth-area" style="display:flex;align-items:center;gap:8px"></div>
       <button class="btn" onclick="infoB3()"><i class="ti ti-building-bank" aria-hidden="true"></i> Integração B3</button>
       <button class="btn" onclick="openImport()"><i class="ti ti-file-spreadsheet" aria-hidden="true"></i> Importar Excel</button>
       <input type="file" id="csv-input" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleCSVImport(this)">
