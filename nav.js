@@ -386,9 +386,11 @@ function renderNav() {
   const statusActive      = page === 'status.html';
 
   const dropBtnStyle = (active) =>
-    `cursor:pointer;font-size:13px;font-weight:600;color:${active?'var(--gold,#F5A623)':'var(--text2,#8A8884)'};` +
-    `padding:0 10px;height:48px;display:inline-flex;align-items:center;white-space:nowrap;` +
-    `border-bottom:2px solid ${active?'var(--gold,#F5A623)':'transparent'};transition:color .15s,border-color .15s;user-select:none`;
+    `cursor:pointer;font-size:12.5px;font-weight:600;letter-spacing:0.2px;white-space:nowrap;` +
+    `padding:5px 10px;border-radius:7px;transition:var(--transition,all .15s);user-select:none;` +
+    (active
+      ? 'color:var(--gold,#F5A623);background:var(--bg4,rgba(245,166,35,0.08));box-shadow:inset 0 0 0 1px rgba(245,166,35,0.2)'
+      : 'color:var(--text2,#8A8884);background:transparent');
 
   document.getElementById('nav-placeholder').innerHTML = `
   <style>
