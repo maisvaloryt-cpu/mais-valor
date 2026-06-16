@@ -489,16 +489,19 @@ html, body {
     display: none !important;
   }
 
-  /* ── LINHA 2: Busca + Login ──────────────────────────────────── */
+  /* nav-bottom-row vira o agrupador das linhas 2 e 3: permite quebra */
   .nav-bottom-row {
     order: 2 !important;
     display: flex !important;
     flex-direction: row !important;
+    flex-wrap: wrap !important;
     align-items: center !important;
     width: 100% !important;
     gap: 8px !important;
     padding: 0 !important;
   }
+
+  /* ── LINHA 2: Busca + Login (mesma fileira) ──────────────────── */
   .nav-bottom-row .nav-search-wrap {
     order: 1 !important;
     flex: 1 1 auto !important;
@@ -513,12 +516,13 @@ html, body {
     flex-shrink: 0 !important;
   }
 
-  /* ── LINHA 3: Abas com rolagem lateral se não couberem ───────── */
+  /* ── LINHA 3: Abas — flex-basis 100% força nova fileira ──────── */
   .nav-links {
     order: 3 !important;
+    flex: 0 0 100% !important;
+    width: 100% !important;
     display: flex !important;
     flex-direction: row !important;
-    width: 100% !important;
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;

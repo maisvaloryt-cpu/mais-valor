@@ -640,11 +640,16 @@ function renderNav() {
 
   loadIndicesNav();
 
-  // Mobile: move o login (#nav-auth-area) para a linha da busca
+  // Mobile: move o login (#nav-auth-area) para a linha da busca,
+  // posicionado antes das abas (.nav-links) para ficar na linha 2.
   if (window.matchMedia('(max-width:768px)').matches) {
     const authArea = document.getElementById('nav-auth-area');
     const bottomRow = document.querySelector('.nav-bottom-row');
-    if (authArea && bottomRow) bottomRow.appendChild(authArea);
+    const navLinks = bottomRow ? bottomRow.querySelector('.nav-links') : null;
+    if (authArea && bottomRow) {
+      if (navLinks) bottomRow.insertBefore(authArea, navLinks);
+      else bottomRow.appendChild(authArea);
+    }
   }
 }
 
