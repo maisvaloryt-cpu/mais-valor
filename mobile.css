@@ -463,11 +463,17 @@ html, body {
 
   /* Logo e título responsivos: escalam com a tela */
   .nav-logo svg, .nav-logo img {
-    width: clamp(36px, 10vw, 175px) !important;
-    height: clamp(36px, 10vw, 175px) !important;
+    width: clamp(28px, 7vw, 44px) !important;
+    height: clamp(28px, 7vw, 44px) !important;
   }
   .nav-logo span {
-    font-size: clamp(36px, 10vw, 175px) !important;
-    line-height: clamp(36px, 10vw, 175px) !important;
+    font-size: clamp(28px, 7vw, 44px) !important;
+    line-height: clamp(28px, 7vw, 44px) !important;
+  }
+
+  /* Mais espaço entre linha do logo e linha das abas */
+  nav {
+    gap: 10px !important;
+    padding-bottom: 10px !important;
   }
 }
