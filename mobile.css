@@ -442,38 +442,70 @@ html, body {
 }
 
 /* ══════════════════════════════════════════════════════════════ */
-/*  LOGO SVG NO NAV — injetada via nav.js                         */
-/*  Garante que a logo fique visível e responsiva no mobile       */
+/*  NAV MOBILE — logo compacta + tabs em linha + search/login    */
 /* ══════════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-  /* Nav container gerado pelo nav.js */
-  .navbar,
-  .nav-bar,
+  /* Nav container */
   nav {
-    padding-left: 12px !important;
-    padding-right: 12px !important;
+    padding: 6px 12px 4px !important;
+    gap: 2px !important;
   }
 
-  /* Logo sempre visível */
+  /* Logo compacta */
   .nav-logo,
   .logo-wrap,
   .site-logo {
     flex-shrink: 0 !important;
   }
-
-  /* Logo e título responsivos: escalam com a tela */
-  .nav-logo svg, .nav-logo img {
-    width: clamp(28px, 7vw, 44px) !important;
-    height: clamp(28px, 7vw, 44px) !important;
+  .nav-logo svg,
+  .nav-logo img {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 8px !important;
   }
   .nav-logo span {
-    font-size: clamp(28px, 7vw, 44px) !important;
-    line-height: clamp(28px, 7vw, 44px) !important;
+    font-size: 20px !important;
+    line-height: 36px !important;
   }
 
-  /* Mais espaço entre linha do logo e linha das abas */
-  nav {
-    gap: 10px !important;
-    padding-bottom: 10px !important;
+  /* Tabs: uma linha, distribuídas na largura total */
+  .nav-links {
+    overflow: hidden !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+    padding: 2px 0 !important;
+  }
+  .nav-links a,
+  .nav-links > span {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    font-size: 9px !important;
+    padding: 4px 1px !important;
+    text-align: center !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 6px !important;
+    height: 30px !important;
+  }
+
+  /* Search + Login visíveis abaixo das tabs */
+  .nav-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 4px 0 !important;
+    border-top: 1px solid var(--border, rgba(255,255,255,0.06));
+  }
+  .nav-right .nav-search-wrap {
+    flex: 1 !important;
+    display: block !important;
+    max-width: unset !important;
+  }
+  #nav-hamburger {
+    display: none !important;
   }
 }
