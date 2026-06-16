@@ -110,8 +110,8 @@ nav {
 }
 .nav-links::-webkit-scrollbar { display: none; }
 .nav-links a {
-  font-size: 12.5px; font-weight: 600;
-  color: var(--text2); padding: 4px 10px;
+  font-size: 15px; font-weight: 600;
+  color: var(--text2); padding: 5px 12px;
   border-radius: 7px;
   transition: var(--transition);
   white-space: nowrap;
