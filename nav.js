@@ -457,7 +457,6 @@ function renderNav() {
   </div>
 
   <nav>
-    <div class="nav-center-group">
     <a class="nav-logo" href="${NAV_BASE}index.html">
       ${LOGO_SVG_HTML}
       <span>Mais <em>Valor</em></span>
@@ -470,7 +469,6 @@ function renderNav() {
       <a href="${NAV_BASE}Consolidador/index.html" class="${carteiraActive?'active':''}">Carteira</a>
       <a href="${NAV_BASE}status.html" class="${statusActive?'active':''}" style="color:var(--up);font-size:11px">● Status</a>
     </div>
-    </div><!-- /nav-center-group -->
     <div class="nav-right">
       <div class="nav-search-wrap">
         <span class="nav-search-icon">⌕</span>
