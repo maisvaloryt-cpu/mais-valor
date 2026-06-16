@@ -454,12 +454,6 @@ html, body {
     padding-right: 12px !important;
   }
 
-  /* Links do menu: ocultar texto, manter ícones se houver */
-  .nav-links,
-  .nav-menu {
-    display: none !important; /* hamburguer deve ser implementado no nav.js */
-  }
-
   /* Logo sempre visível */
   .nav-logo,
   .logo-wrap,

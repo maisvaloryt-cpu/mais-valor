@@ -406,8 +406,7 @@ function renderNav() {
   #nav-mobile-menu a:hover,#nav-mobile-menu a.active{color:var(--gold,#D4A017)}
   .mob-group-label{font-size:10px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--text3,#555);padding:18px 0 4px;border-bottom:none!important}
   .mob-group-sub{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold,#D4A017);opacity:.65;padding:10px 0 2px;border-bottom:none!important}
-  @media (max-width:900px){.nav-links{display:none!important}#nav-hamburger{display:flex!important;align-items:center;justify-content:center}}
-  @media (max-width:600px){.nav-search-wrap{display:none!important}}
+  @media (max-width:900px){.nav-links{display:flex!important;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}.nav-links::-webkit-scrollbar{display:none}#nav-hamburger{display:none!important}}
   .mv-floatdrop{
     display:none;position:fixed;
     background:var(--bg2,#1a1a1f);
