@@ -105,14 +105,16 @@ html, body {
     white-space: nowrap;
   }
 
-  /* ── Tabela: scroll horizontal ──────────────────────────────── */
+  /* ── Tabela: cabe na largura da tela (sem scroll lateral) ───── */
   .table-wrap {
-    overflow-x: auto;
+    overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     border-radius: var(--radius-lg, 12px);
   }
   .data-table {
-    min-width: 560px;
+    min-width: 0;
+    width: 100%;
+    table-layout: auto;
   }
   /* Colunas menos importantes: ocultar no mobile */
   .data-table th.r:nth-child(n+5),
@@ -129,6 +131,16 @@ html, body {
   .data-table th:nth-child(4),
   .data-table td:nth-child(4) {
     display: table-cell;
+  }
+  /* Coluna Ativo absorve o espaço; numéricas só o necessário */
+  .data-table td:nth-child(1),
+  .data-table th:nth-child(1) {
+    width: auto;
+  }
+  .data-table td.r,
+  .data-table th.r {
+    width: 1%;
+    white-space: nowrap;
   }
 
   /* ── Chart Panel ────────────────────────────────────────────── */
@@ -511,6 +523,16 @@ html, body {
     display: flex !important;
     min-width: 0 !important;
     max-width: unset !important;
+  }
+  /* Remove o atalho "/" no mobile (vazava da caixa) */
+  .nav-search-shortcut {
+    display: none !important;
+  }
+  /* Sem o "/", o input usa a largura toda — placeholder não corta */
+  .nav-search {
+    width: 100% !important;
+    padding-right: 12px !important;
+    box-sizing: border-box !important;
   }
   /* Login movido (via nav.js) para a linha da busca */
   .nav-bottom-row #nav-auth-area {
