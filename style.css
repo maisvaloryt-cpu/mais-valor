@@ -124,7 +124,9 @@ nav {
   box-shadow: inset 0 0 0 1px rgba(245,166,35,0.2);
 }
 
-.nav-right { position: absolute; right: 2rem; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.nav-top-row { display: flex; align-items: center; gap: 1rem; }
+.nav-bottom-row { display: flex; align-items: center; gap: 6px; }
+.nav-right { display: none; }
 
 /* Theme toggle button */
 .theme-toggle {

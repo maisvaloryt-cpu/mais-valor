@@ -457,19 +457,24 @@ function renderNav() {
   </div>
 
   <nav>
-    <a class="nav-logo" href="${NAV_BASE}index.html">
-      ${LOGO_SVG_HTML}
-      <span>Mais <em>Valor</em></span>
-    </a>
-    <div class="nav-links">
-      <a href="${NAV_BASE}index.html" class="${homeActive?'active':''}">Home</a>
-      <span id="mv-ativos-btn" style="${dropBtnStyle(ativosActive)}">Ativos ▾</span>
-      <span id="mv-ferramentas-btn" style="${dropBtnStyle(ferramentasActive)}">Ferramentas ▾</span>
-      <a href="${NAV_BASE}watchlist.html" class="${watchActive?'active':''}">★ Watchlist</a>
-      <a href="${NAV_BASE}Consolidador/index.html" class="${carteiraActive?'active':''}">Carteira</a>
-      <a href="${NAV_BASE}status.html" class="${statusActive?'active':''}" style="color:var(--up);font-size:11px">● Status</a>
+    <div class="nav-top-row">
+      <a class="nav-logo" href="${NAV_BASE}index.html">
+        ${LOGO_SVG_HTML}
+        <span>Mais <em>Valor</em></span>
+      </a>
+      <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Alternar tema">☀️</button>
+      <div id="nav-auth-area" style="position:relative;display:flex;align-items:center;gap:6px;flex-shrink:0"></div>
+      <button id="nav-hamburger" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
     </div>
-    <div class="nav-right">
+    <div class="nav-bottom-row">
+      <div class="nav-links">
+        <a href="${NAV_BASE}index.html" class="${homeActive?'active':''}">Home</a>
+        <span id="mv-ativos-btn" style="${dropBtnStyle(ativosActive)}">Ativos ▾</span>
+        <span id="mv-ferramentas-btn" style="${dropBtnStyle(ferramentasActive)}">Ferramentas ▾</span>
+        <a href="${NAV_BASE}watchlist.html" class="${watchActive?'active':''}">★ Watchlist</a>
+        <a href="${NAV_BASE}Consolidador/index.html" class="${carteiraActive?'active':''}">Carteira</a>
+        <a href="${NAV_BASE}status.html" class="${statusActive?'active':''}" style="color:var(--up);font-size:11px">● Status</a>
+      </div>
       <div class="nav-search-wrap">
         <span class="nav-search-icon">⌕</span>
         <input class="nav-search" type="text" placeholder="Buscar ativo... " id="nav-search-input"
@@ -479,9 +484,6 @@ function renderNav() {
         <span class="nav-search-shortcut">/</span>
         <div id="nav-search-results"></div>
       </div>
-      <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Alternar tema">☀️</button>
-      <div id="nav-auth-area" style="position:relative;display:flex;align-items:center;gap:6px;flex-shrink:0"></div>
-      <button id="nav-hamburger" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
     </div>
   </nav>
 
