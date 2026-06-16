@@ -841,7 +841,6 @@ function renderFooter() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (window.NAV_SLIM) { renderNavSlim(); return; }
   renderNav();
   renderFooter();
   navUpdateTotal();
