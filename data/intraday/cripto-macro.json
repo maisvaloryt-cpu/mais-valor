@@ -1,5 +1,5 @@
 {
-  "updated_at": "16/06/2026 15:44",
+  "updated_at": "16/06/2026 16:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,8 +1128,8 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 169939.52,
-      "changePct": -0.0028000000000000004,
+      "price": 169545.78,
+      "changePct": -0.0051,
       "high": 170415.52,
       "low": 169121.31
     },
@@ -1138,10 +1138,10 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3823.58,
-      "changePct": -0.0025,
+      "price": 3823.8,
+      "changePct": -0.0024,
       "high": 3839.27,
-      "low": 3823.02
+      "low": 3822.88
     },
     {
       "ticker": "INDEXBVMF:SMLL",
@@ -1158,8 +1158,8 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 11992.49,
-      "changePct": -0.0033,
+      "price": 11976.42,
+      "changePct": -0.0046,
       "high": 12032.51,
       "low": 11925.17
     },
@@ -1198,18 +1198,18 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 26526.88,
-      "changePct": -0.0059,
+      "price": 26449.6,
+      "changePct": -0.0088,
       "high": 26788.62,
-      "low": 26471.91
+      "low": 26439.95
     },
     {
       "ticker": "INDEXDJX:.DJI",
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 52077.43,
-      "changePct": 0.0079,
+      "price": 52029.25,
+      "changePct": 0.0069,
       "high": 52190.29,
       "low": 51712.63
     },
@@ -1218,8 +1218,8 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2957.74,
-      "changePct": -0.0025,
+      "price": 2953.48,
+      "changePct": -0.0039000000000000003,
       "high": 2984.81,
       "low": 2949.11
     },
