@@ -442,88 +442,92 @@ html, body {
 }
 
 /* ══════════════════════════════════════════════════════════════ */
-/*  NAV MOBILE — logo compacta + tabs em linha + search/login    */
+/*  NAV MOBILE — 3 linhas: logo / login+busca / abas             */
 /* ══════════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-  /* Nav container */
+
+  /* Container: coluna forçada */
   nav {
-    padding: 6px 12px 4px !important;
-    gap: 2px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 8px 12px !important;
+    gap: 6px !important;
   }
 
-  /* Logo compacta */
-  .nav-logo,
-  .logo-wrap,
-  .site-logo {
-    flex-shrink: 0 !important;
+  /* ── LINHA 1: Logo + nome (30% maior que ícone) ─────────────── */
+  .nav-logo {
+    order: 1 !important;
+    width: 100% !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 9px !important;
   }
   .nav-logo svg,
   .nav-logo img {
-    width: 36px !important;
-    height: 36px !important;
-    border-radius: 8px !important;
+    width: 47px !important;
+    height: 47px !important;
+    border-radius: 10px !important;
+    flex-shrink: 0 !important;
   }
   .nav-logo span {
-    font-size: 20px !important;
-    line-height: 36px !important;
+    font-size: 26px !important;
+    line-height: 47px !important;
+    letter-spacing: 0.3px !important;
   }
 
-  /* Ordem das 3 linhas: 1=logo, 2=search/login, 3=tabs */
-  .nav-logo  { order: 1; }
-  .nav-right { order: 2; }
-  .nav-links { order: 3; }
+  /* ── LINHA 2: Login + Busca ──────────────────────────────────── */
+  .nav-right {
+    order: 2 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    width: 100% !important;
+    gap: 8px !important;
+    padding: 0 !important;
+  }
+  /* Login primeiro, busca ao lado */
+  #nav-auth-area {
+    position: static !important;
+    flex-shrink: 0 !important;
+    order: 0 !important;
+  }
+  .nav-right .nav-search-wrap {
+    flex: 1 !important;
+    display: flex !important;
+    order: 1 !important;
+    max-width: unset !important;
+  }
+  #nav-hamburger {
+    display: none !important;
+  }
 
-  /* Tabs: uma linha, distribuídas na largura total */
+  /* ── LINHA 3: Abas em uma linha, largura total ───────────────── */
   .nav-links {
-    overflow: hidden !important;
+    order: 3 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100% !important;
     justify-content: space-between !important;
     flex-wrap: nowrap !important;
+    overflow: hidden !important;
     padding: 2px 0 !important;
-    border-top: 1px solid var(--border, rgba(255,255,255,0.06)) !important;
   }
   .nav-links a,
   .nav-links > span {
     flex: 1 1 0 !important;
     min-width: 0 !important;
     font-size: 9px !important;
-    padding: 4px 1px !important;
+    padding: 5px 1px !important;
     text-align: center !important;
+    white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    white-space: nowrap !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    border-radius: 6px !important;
-    height: 30px !important;
-  }
-
-  /* Cada linha ocupa largura total */
-  nav > .nav-logo,
-  nav > .nav-right,
-  nav > .nav-links {
-    flex-basis: 100% !important;
-    width: 100% !important;
-  }
-
-  /* Search + Login visíveis (linha 2) */
-  .nav-right {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    padding: 4px 0 !important;
-  }
-  .nav-right .nav-search-wrap {
-    flex: 1 !important;
-    display: block !important;
-    max-width: unset !important;
-  }
-  /* Tira o position:absolute do auth-area para ficar no fluxo do nav-right */
-  #nav-auth-area {
-    position: static !important;
-    flex-shrink: 0 !important;
-  }
-  #nav-hamburger {
-    display: none !important;
+    border-radius: 5px !important;
+    height: auto !important;
   }
 }
