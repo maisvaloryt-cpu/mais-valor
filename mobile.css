@@ -468,12 +468,18 @@ html, body {
     line-height: 36px !important;
   }
 
+  /* Ordem das 3 linhas: 1=logo, 2=search/login, 3=tabs */
+  .nav-logo  { order: 1; }
+  .nav-right { order: 2; }
+  .nav-links { order: 3; }
+
   /* Tabs: uma linha, distribuídas na largura total */
   .nav-links {
     overflow: hidden !important;
     justify-content: space-between !important;
     flex-wrap: nowrap !important;
     padding: 2px 0 !important;
+    border-top: 1px solid var(--border, rgba(255,255,255,0.06)) !important;
   }
   .nav-links a,
   .nav-links > span {
@@ -492,13 +498,12 @@ html, body {
     height: 30px !important;
   }
 
-  /* Search + Login visíveis abaixo das tabs */
+  /* Search + Login visíveis (linha 2) */
   .nav-right {
     display: flex !important;
     align-items: center !important;
     gap: 8px !important;
     padding: 4px 0 !important;
-    border-top: 1px solid var(--border, rgba(255,255,255,0.06));
   }
   .nav-right .nav-search-wrap {
     flex: 1 !important;
