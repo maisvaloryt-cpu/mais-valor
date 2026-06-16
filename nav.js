@@ -459,8 +459,8 @@ function renderNav() {
   <nav>
     <div class="nav-top-row">
       <a class="nav-logo" href="${NAV_BASE}index.html">
-        ${LOGO_SVG_HTML}
-        <span>Mais <em>Valor</em></span>
+        ${LOGO_SVG_HTML.replace('style="display:block', 'style="display:block;width:125px;height:125px')}
+        <span style="font-size:125px;line-height:125px;font-family:var(--font-display);font-weight:400;letter-spacing:0.5px;color:var(--text,#ECEAE4)">Mais <em style="color:var(--gold,#F5A623);font-style:italic">Valor</em></span>
       </a>
       <div id="nav-auth-area"></div>
       <button id="nav-hamburger" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
