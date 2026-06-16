@@ -338,14 +338,14 @@ function renderNavSlim() {
     backdrop-filter:blur(20px);
     border-bottom:1px solid var(--border,rgba(255,255,255,0.06));
     padding:0 2rem;
-    display:flex;align-items:center;gap:1.5rem;
+    display:flex;align-items:center;gap:0;
     animation:slideDown 0.35s ease both;
     overflow-x:auto;
   }
   [data-theme="light"] .nav-slim{background:rgba(245,245,240,0.95);}
   .nav-slim-logo{
     display:flex;align-items:center;gap:8px;
-    flex-shrink:0;text-decoration:none;padding:14px 0;
+    flex-shrink:0;text-decoration:none;padding:14px 0;padding-right:4px;
     font-size:18px;font-weight:800;color:var(--text,#ECEAE4);
     border-bottom:none!important;
   }
@@ -362,9 +362,11 @@ function renderNavSlim() {
   .nav-slim a.active{color:var(--gold,#F5A623);border-bottom-color:var(--gold,#F5A623);}
   </style>
   <div class="nav-slim">
-    <a class="nav-slim-logo" href="${NAV_BASE}index.html">${LOGO_SVG_HTML}<span>Mais <em>Valor</em></span></a>
-    <div class="nav-slim-links">${links}</div>
-    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Alternar tema" style="flex-shrink:0;background:transparent;border:none;cursor:pointer;font-size:16px;padding:4px 8px;color:var(--text2)">☀️</button>
+    <div style="display:flex;align-items:center;flex:1;min-width:0">
+      <a class="nav-slim-logo" href="${NAV_BASE}index.html">${LOGO_SVG_HTML}<span>Mais <em>Valor</em></span></a>
+      <div class="nav-slim-links">${links}</div>
+    </div>
+    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Alternar tema" style="flex-shrink:0;background:transparent;border:none;cursor:pointer;font-size:16px;padding:4px 8px;margin-left:1rem;color:var(--text2)">☀️</button>
   </div>`;
   applyTheme(getTheme());
 }
