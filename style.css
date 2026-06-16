@@ -94,13 +94,13 @@ nav {
   display: flex; align-items: center; gap: 9px;
   flex-shrink: 0; text-decoration: none;
 }
-.nav-logo img, .nav-logo svg { width: 83px; height: 83px; object-fit: contain; border-radius: 14px; flex-shrink: 0; }
+.nav-logo img, .nav-logo svg { width: 125px; height: 125px; object-fit: contain; border-radius: 18px; flex-shrink: 0; }
 .nav-logo span {
   font-family: var(--font-display);
-  font-size: 83px; font-weight: 400;
+  font-size: 125px; font-weight: 400;
   letter-spacing: 0.5px;
   color: var(--text);
-  line-height: 83px;
+  line-height: 125px;
 }
 .nav-logo span em { color: var(--gold); font-style: italic; }
 
