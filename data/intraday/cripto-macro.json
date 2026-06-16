@@ -1,5 +1,5 @@
 {
-  "updated_at": "16/06/2026 14:44",
+  "updated_at": "16/06/2026 15:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,8 +1128,8 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 169933.02,
-      "changePct": -0.0028000000000000004,
+      "price": 169825.86,
+      "changePct": -0.0034999999999999996,
       "high": 170415.52,
       "low": 169121.31
     },
@@ -1138,10 +1138,10 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3824.59,
-      "changePct": -0.0022,
+      "price": 3824.15,
+      "changePct": -0.0023,
       "high": 3839.27,
-      "low": 3824.21
+      "low": 3823.09
     },
     {
       "ticker": "INDEXBVMF:SMLL",
@@ -1158,8 +1158,8 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 11996.19,
-      "changePct": -0.003,
+      "price": 11989.42,
+      "changePct": -0.0034999999999999996,
       "high": 12032.51,
       "low": 11925.17
     },
@@ -1198,8 +1198,8 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 26509.87,
-      "changePct": -0.006500000000000001,
+      "price": 26544.7,
+      "changePct": -0.0052,
       "high": 26788.62,
       "low": 26471.91
     },
@@ -1208,8 +1208,8 @@
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 52145.75,
-      "changePct": 0.0092,
+      "price": 52081.12,
+      "changePct": 0.0079,
       "high": 52190.29,
       "low": 51712.63
     },
@@ -1218,8 +1218,8 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2956.08,
-      "changePct": -0.003,
+      "price": 2958.1,
+      "changePct": -0.0024,
       "high": 2984.81,
       "low": 2949.11
     },
