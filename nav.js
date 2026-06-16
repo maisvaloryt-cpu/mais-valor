@@ -462,8 +462,7 @@ function renderNav() {
         ${LOGO_SVG_HTML}
         <span>Mais <em>Valor</em></span>
       </a>
-      <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Alternar tema">☀️</button>
-      <div id="nav-auth-area" style="position:relative;display:flex;align-items:center;gap:6px;flex-shrink:0"></div>
+      <div id="nav-auth-area"></div>
       <button id="nav-hamburger" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
     </div>
     <div class="nav-bottom-row">
