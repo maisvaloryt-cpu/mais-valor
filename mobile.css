@@ -455,10 +455,19 @@ html, body {
     gap: 6px !important;
   }
 
-  /* ── LINHA 1: Logo + nome (30% maior que ícone) ─────────────── */
-  .nav-logo {
+  /* ── LINHA 1: Logo + nome ────────────────────────────────────── */
+  .nav-top-row {
     order: 1 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
     width: 100% !important;
+    gap: 9px !important;
+    padding: 0 !important;
+  }
+  .nav-logo {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
     padding: 0 !important;
     display: flex !important;
     align-items: center !important;
@@ -476,9 +485,12 @@ html, body {
     line-height: 47px !important;
     letter-spacing: 0.3px !important;
   }
+  #nav-hamburger {
+    display: none !important;
+  }
 
-  /* ── LINHA 2: Login + Busca ──────────────────────────────────── */
-  .nav-right {
+  /* ── LINHA 2: Busca + Login ──────────────────────────────────── */
+  .nav-bottom-row {
     order: 2 !important;
     display: flex !important;
     flex-direction: row !important;
@@ -487,47 +499,49 @@ html, body {
     gap: 8px !important;
     padding: 0 !important;
   }
-  /* Login primeiro, busca ao lado */
-  #nav-auth-area {
-    position: static !important;
-    flex-shrink: 0 !important;
-    order: 0 !important;
-  }
-  .nav-right .nav-search-wrap {
-    flex: 1 !important;
-    display: flex !important;
+  .nav-bottom-row .nav-search-wrap {
     order: 1 !important;
+    flex: 1 1 auto !important;
+    display: flex !important;
+    min-width: 0 !important;
     max-width: unset !important;
   }
-  #nav-hamburger {
-    display: none !important;
+  /* Login movido (via nav.js) para a linha da busca */
+  .nav-bottom-row #nav-auth-area {
+    order: 2 !important;
+    position: static !important;
+    flex-shrink: 0 !important;
   }
 
-  /* ── LINHA 3: Abas em uma linha, largura total ───────────────── */
+  /* ── LINHA 3: Abas com rolagem lateral se não couberem ───────── */
   .nav-links {
     order: 3 !important;
     display: flex !important;
     flex-direction: row !important;
     width: 100% !important;
-    justify-content: space-between !important;
     flex-wrap: nowrap !important;
-    overflow: hidden !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    gap: 2px !important;
     padding: 2px 0 !important;
+  }
+  .nav-links::-webkit-scrollbar {
+    display: none !important;
   }
   .nav-links a,
   .nav-links > span {
-    flex: 1 1 0 !important;
+    flex: 0 0 auto !important;
     min-width: 0 !important;
-    font-size: 9px !important;
-    padding: 5px 1px !important;
+    font-size: 11px !important;
+    padding: 6px 9px !important;
     text-align: center !important;
     white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    border-radius: 5px !important;
+    border-radius: 6px !important;
     height: auto !important;
   }
 }

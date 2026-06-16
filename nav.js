@@ -639,6 +639,13 @@ function renderNav() {
   });
 
   loadIndicesNav();
+
+  // Mobile: move o login (#nav-auth-area) para a linha da busca
+  if (window.matchMedia('(max-width:768px)').matches) {
+    const authArea = document.getElementById('nav-auth-area');
+    const bottomRow = document.querySelector('.nav-bottom-row');
+    if (authArea && bottomRow) bottomRow.appendChild(authArea);
+  }
 }
 
 function navUpdateTotal() {
