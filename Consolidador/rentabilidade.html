@@ -33,7 +33,7 @@
       <div class="card-title">Rentabilidade por Ativo</div>
       <div class="tbl-wrap">
       <table class="tbl">
-        <thead><tr><th>Ticker</th><th>Classe</th><th class="r">Preço Médio</th><th class="r">Cotação Atual</th><th class="r">Ganho Capital</th><th class="r">Proventos</th><th class="r">Rentabilidade %</th><th class="r">Rent. Total</th></tr></thead>
+        <thead><tr><th>Ticker</th><th>Classe</th><th class="r">Preço Médio</th><th class="r">Cotação Atual</th><th class="r">Ganho Capital</th><th class="r">Proventos</th><th class="r">Rentabilidade %</th><th class="r">Rent. Total</th><th class="r">CAGR a.a.</th></tr></thead>
         <tbody id="tbody-rent"></tbody>
       </table>
       </div>
@@ -81,7 +81,8 @@ function renderRentabilidade(){
     <td class="r ${a.res>=0?'positive':'negative'}">${a.res>=0?'+':''}${fmtR(a.res)}</td>
     <td class="r positive">${fmtR(a.proventos)}</td>
     <td class="r"><span class="pill ${a.rentTotal>=0?'pill-up':'pill-dn'}">${a.rentTotal>=0?'▲':'▼'} ${fmt(Math.abs(a.rentTotal))}%</span></td>
-    <td class="r ${a.rentTotal>=0?'positive':'negative'}">${fmtP(a.rentTotal)}</td></tr>
+    <td class="r ${a.rentTotal>=0?'positive':'negative'}">${fmtP(a.rentTotal)}</td>
+    <td class="r ${a.cagr>=0?'positive':'negative'}">${fmtP(a.cagr)}</td></tr>
   `).join('');
 }
 

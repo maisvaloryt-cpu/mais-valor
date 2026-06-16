@@ -96,8 +96,25 @@ function renderMetricsResumo(){
 
 function renderEvolucao(nMeses=24){
   const evol=calcEvolucaoPatrimonio(nMeses).filter(m=>m.vt>0||m.custo>0);
+  const ctx=document.getElementById('chartEvol').getContext('2d');
   if(charts.evol)charts.evol.destroy();
-  charts.evol=new Chart(document.getElementById('chartEvol').getContext('2d'),{
+  // [BUG-P3 FIX] Estado vazio — sem lançamentos ainda
+  if(evol.length===0){
+    ctx.canvas.style.display='none';
+    const parent=ctx.canvas.parentElement;
+    if(!parent.querySelector('.evol-empty')){
+      const emp=document.createElement('div');
+      emp.className='evol-empty';
+      emp.style.cssText='display:flex;align-items:center;justify-content:center;height:100%;color:var(--color-text-secondary);font-size:12px;text-align:center;padding:1rem';
+      emp.textContent='Nenhum dado de evolução ainda. Adicione lançamentos com datas para ver o gráfico.';
+      parent.appendChild(emp);
+    }
+    return;
+  }
+  ctx.canvas.style.display='';
+  const emp=ctx.canvas.parentElement.querySelector('.evol-empty');
+  if(emp)emp.remove();
+  charts.evol=new Chart(ctx,{
     type:'line',
     data:{
       labels:evol.map(m=>m.label),
@@ -197,7 +214,7 @@ function renderGrupos(){
               <td class="r">${fmtR(a.pm)}</td>
               <td class="r">${fmtR(a.cotacao)}</td>
               <td class="r"><span class="pill ${a.res>=0?'pill-up':'pill-dn'}">${a.res>=0?'▲':'▼'} ${fmt(Math.abs(a.resPct))}%</span></td>
-              <td class="r ${a.resPct>=0?'positive':'negative'}">${fmtP(a.resPct)}</td>
+              <td class="r ${a.rentTotal>=0?'positive':'negative'}">${fmtP(a.rentTotal)}</td>
               <td class="r">${fmtR(a.vt)}</td>
               <td class="r"><span class="nota" style="background:${NOTA_COLOR(a.nota||0)}">${a.nota||'-'}</span></td>
               <td class="r">${total?((a.vt/total)*100).toFixed(1):0}% / ${a.ideal||0}%</td>

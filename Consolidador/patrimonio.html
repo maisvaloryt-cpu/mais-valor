@@ -97,8 +97,25 @@ function renderPatrimonio(){
 
 function renderEvolucaoPatri(nMeses){
   const evol=calcEvolucaoPatrimonio(nMeses).filter(m=>m.vt>0||m.custo>0);
+  const ctx=document.getElementById('chartPatri').getContext('2d');
   if(charts.patri)charts.patri.destroy();
-  charts.patri=new Chart(document.getElementById('chartPatri').getContext('2d'),{
+  // [BUG-C FIX] Estado vazio quando não há lançamentos com datas
+  if(evol.length===0){
+    ctx.canvas.style.display='none';
+    const parent=ctx.canvas.parentElement;
+    if(!parent.querySelector('.patri-empty')){
+      const emp=document.createElement('div');
+      emp.className='patri-empty';
+      emp.style.cssText='display:flex;align-items:center;justify-content:center;height:100%;color:var(--color-text-secondary);font-size:12px;text-align:center;padding:1rem';
+      emp.textContent='Nenhum dado de evolução ainda. Adicione lançamentos com datas para ver o gráfico.';
+      parent.appendChild(emp);
+    }
+    return;
+  }
+  ctx.canvas.style.display='';
+  const emp=ctx.canvas.parentElement.querySelector('.patri-empty');
+  if(emp)emp.remove();
+  charts.patri=new Chart(ctx,{
     type:'line',
     data:{
       labels:evol.map(m=>m.label),

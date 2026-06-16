@@ -3,7 +3,10 @@
 const CLASS_COLORS={'B3':'#185FA5','FII':'#3B6D11','Crypto':'#BA7517','RF':'#534AB7','ETF':'#0F6E56','Exterior':'#993C1D','BDR':'#72243E'};
 const CLASS_LABEL={'B3':'Ações B3','FII':'FIIs','Crypto':'Criptos','RF':'Renda Fixa','ETF':'ETFs','Exterior':'Exterior','BDR':'BDRs'};
 const CLASS_BADGE={'B3':'badge-b3','FII':'badge-fii','Crypto':'badge-crypto','RF':'badge-rf','ETF':'badge-etf','Exterior':'badge-ext','BDR':'badge-bdr'};
-const IRPF_CODE={'B3':'03','FII':'73','Crypto':'08','RF':'45','ETF':'03','Exterior':'03','BDR':'04'};
+const IRPF_CODE={'B3':'03','FII':'73','Crypto':'08','RF':'45','ETF':'03','Exterior':'03','BDR':'04'}; // legado
+// [BUG-F1 FIX] Grupo e Código IRPF corretos conforme PGFN (declaração 2024)
+const IRPF_GRUPO={'B3':'03','FII':'07','Crypto':'08','RF':'04','ETF':'07','Exterior':'03','BDR':'03'};
+const IRPF_CODIGO={'B3':'01','FII':'03','Crypto':'01','RF':'01','ETF':'09','Exterior':'01','BDR':'04'};
 const NOTA_COLOR=n=>n>=8?'#1D9E75':n>=5?'#BA7517':'#E24B4A';
 
 /* ---- UNITs B3: ações que terminam em 11 (não são FIIs nem ETFs) ---- */
@@ -76,7 +79,9 @@ function loadAtivos(){
   }catch(e){}
   return JSON.parse(JSON.stringify(DEFAULT_ATIVOS));
 }
-function saveAtivos(){ localStorage.setItem(_keyAtivos(carteiraAtual), JSON.stringify(ativos)); if(typeof syncFirestore==='function')syncFirestore(); }
+// [BUG-D2 FIX] Debounce no syncFirestore — evita múltiplas escritas em operações em lote (import, etc.)
+let _syncTimer=null;
+function saveAtivos(){ localStorage.setItem(_keyAtivos(carteiraAtual), JSON.stringify(ativos)); if(typeof syncFirestore==='function'){clearTimeout(_syncTimer);_syncTimer=setTimeout(syncFirestore,1500);} }
 
 function loadMetas(){
   try{
@@ -92,7 +97,8 @@ let metas=loadMetas();
 let charts={};
 
 /* ---- formatação ---- */
-const fmt=(v,d=2)=>(v||0).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+// [BUG-P2 FIX] Trata NaN e null corretamente — (v||0) mascarava NaN como zero, ocultando bugs
+const fmt=(v,d=2)=>(isNaN(v)||v==null?0:v).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
 const fmtR=v=>'R$ '+fmt(v);
 const fmtP=(v,plus=true)=>(plus&&v>=0?'+':'')+fmt(v)+'%';
 
@@ -100,6 +106,9 @@ const fmtP=(v,plus=true)=>(plus&&v>=0?'+':'')+fmt(v)+'%';
 
 let COTACOES={};            // ticker → preço atual (carregado do site a cada página)
 const DIVIDENDOS_CACHE={};  // ticker → [{date, value}]  (carregado do site a cada página)
+// [BUG-D1 FIX] Taxas de câmbio: moeda → multiplicador para BRL (USD/BRL carregado de indices.json)
+const TAXAS_CAMBIO={'BRL':1};
+function getRate(moeda){if(!moeda||moeda==='BRL')return 1;return TAXAS_CAMBIO[moeda]||1;}
 
 /* -- preços atuais ----------------------------------------------------------- */
 async function atualizarCotacoes(){
@@ -119,6 +128,17 @@ async function atualizarCotacoes(){
     add(ifJson.fiis);
     add(iiJson.stocks); add(iiJson.bdrs);
     add(icJson.macro);
+    // [BUG-D1 FIX] Tenta carregar taxa USD/BRL dos índices do site
+    try{
+      const rIdx=await fetch(base+'indices.json?t='+Date.now());
+      if(rIdx.ok){
+        const jIdx=await rIdx.json();
+        const usdbrl=jIdx?.USDBRL||jIdx?.['USD/BRL']||jIdx?.dolar||
+          (Array.isArray(jIdx)?jIdx.find(x=>x?.ticker==='USDBRL')?.price:null);
+        if(usdbrl&&usdbrl>0)TAXAS_CAMBIO['USD']=usdbrl;
+      }
+    }catch(e){}
+    if(!TAXAS_CAMBIO['USD']&&COTACOES['USDBRL'])TAXAS_CAMBIO['USD']=COTACOES['USDBRL'];
   }catch(e){console.warn('atualizarCotacoes:',e);}
 }
 
@@ -162,18 +182,21 @@ function calcEvolucaoPatrimonio(nMeses=24){
     meses.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'));
   }
   return meses.map(ym=>{
-    // posições líquidas considerando apenas lançamentos até este mês
-    const txAte=ativos.filter(a=>!a.data||a.data.slice(0,7)<=ym);
+    // [BUG-D3 FIX] Ignora lançamentos sem data — evita que apareçam em todos os meses
+    const txAte=ativos.filter(a=>a.data&&a.data.slice(0,7)<=ym);
     const posicoes=calcPosicoes(txAte);
     let vt=0,custo=0;
     posicoes.forEach(a=>{
+      const rate=getRate(a.moeda);
       const hist=HISTORICO_CACHE[a.ticker]||{};
       let price=hist[ym];
       if(!price){
         const anterior=Object.keys(hist).filter(k=>k<=ym).sort();
         if(anterior.length)price=hist[anterior[anterior.length-1]];
       }
-      if(price){vt+=a.qtd*price;custo+=a.qtd*a.pm;}
+      // [BUG-C8 FIX] Custo sempre acumulado; VT só se tiver preço histórico disponível
+      custo+=a.qtd*a.pm;
+      if(price){vt+=a.qtd*price*rate;}
     });
     const [y,m]=ym.split('-');
     const nomes=['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
@@ -215,14 +238,15 @@ function calcProventosAtivo(ticker,dataCompra,_qtd){
   const from=dataCompra||'1900-01-01';
   const cache=DIVIDENDOS_CACHE[ticker]||[];
   if(cache.length>0){
+    // [BUG-P1 FIX] Arredondamento intermediário para evitar acúmulo de erro de ponto flutuante
     return cache
       .filter(d=>d.date>=from)
-      .reduce((s,d)=>s+d.value*getQtdTickerAtDate(ticker,d.date),0);
+      .reduce((s,d)=>s+Math.round(d.value*getQtdTickerAtDate(ticker,d.date)*100)/100,0);
   }
   // Fallback: proventos importados via Excel (só usados se site não tiver dados)
   return ativos
     .filter(a=>a.ticker===ticker&&a.tipo==='Provento'&&a.data&&a.data>=from)
-    .reduce((s,a)=>s+a.qtd*a.pm,0);
+    .reduce((s,a)=>s+Math.round(a.qtd*a.pm*100)/100,0);
 }
 
 function calcProventosUltimos12m(){
@@ -235,12 +259,12 @@ function calcProventosUltimos12m(){
     if(cache.length>0){
       return sum+cache
         .filter(d=>d.date>=cutoffStr)
-        .reduce((s,d)=>s+d.value*getQtdTickerAtDate(ticker,d.date),0);
+        .reduce((s,d)=>s+Math.round(d.value*getQtdTickerAtDate(ticker,d.date)*100)/100,0);
     }
     // Fallback: proventos importados
     return sum+ativos
       .filter(a=>a.ticker===ticker&&a.tipo==='Provento'&&a.data&&a.data>=cutoffStr)
-      .reduce((s,a)=>s+a.qtd*a.pm,0);
+      .reduce((s,a)=>s+Math.round(a.qtd*a.pm*100)/100,0);
   },0);
 }
 
@@ -263,7 +287,8 @@ function getDividendosPorMes(){
         if(!map[ym])return;
         const qtd=getQtdTickerAtDate(ticker,d.date);
         if(qtd<=0)return;
-        const val=d.value*qtd;
+        // [BUG-P1 FIX] Arredondamento intermediário
+        const val=Math.round(d.value*qtd*100)/100;
         map[ym].total+=val;
         map[ym].tickers[ticker]=(map[ym].tickers[ticker]||0)+val;
       });
@@ -272,7 +297,7 @@ function getDividendosPorMes(){
       ativos.filter(a=>a.ticker===ticker&&a.tipo==='Provento'&&a.data).forEach(a=>{
         const ym=a.data.slice(0,7);
         if(!map[ym])return;
-        const val=a.qtd*a.pm;
+        const val=Math.round(a.qtd*a.pm*100)/100;
         if(val<=0)return;
         map[ym].total+=val;
         map[ym].tickers[ticker]=(map[ym].tickers[ticker]||0)+val;
@@ -284,19 +309,49 @@ function getDividendosPorMes(){
     .map(([ym,v])=>({ym,...v}));
 }
 
-/* Calcula ganhos de capital REALIZADOS em vendas efetivadas no ano-calendário */
+/* Calcula proventos recebidos em um ano-calendário específico (para IRPF) */
+function calcProventosAno(ticker,ano){
+  const from=String(ano)+'-01-01';const to=String(ano)+'-12-31';
+  const cache=DIVIDENDOS_CACHE[ticker]||[];
+  if(cache.length>0){
+    return cache.filter(d=>d.date>=from&&d.date<=to)
+      .reduce((s,d)=>s+Math.round(d.value*getQtdTickerAtDate(ticker,d.date)*100)/100,0);
+  }
+  return ativos.filter(a=>a.ticker===ticker&&a.tipo==='Provento'&&a.data&&a.data>=from&&a.data<=to)
+    .reduce((s,a)=>s+Math.round(a.qtd*a.pm*100)/100,0);
+}
+
+/* [BUG-C5 FIX] Calcula ganhos realizados em ordem cronológica (PM sempre correto a cada venda).
+   [BUG-F3 FIX] Criptos com vendas mensais totais < R$35.000 são isentos de IR. */
 function getGanhosRealizados(ano){
   const anoStr=String(ano);
-  const vendas=ativos
-    .filter(a=>a.tipo==='Venda'&&a.data&&a.data.slice(0,4)===anoStr)
-    .sort((a,b)=>a.data.localeCompare(b.data));
-  return vendas.reduce((total,venda)=>{
-    // Reconstrói posição antes da venda para obter o PM correto na data
-    const txAntes=ativos.filter(a=>a.ticker===venda.ticker&&a.data&&a.data<venda.data);
-    const pos=calcPosicoes(txAntes);
-    const pmCompra=pos.find(p=>p.ticker===venda.ticker)?.pm||0;
-    return total+(venda.pm-pmCompra)*venda.qtd;
-  },0);
+  const posMap={};
+  let ganhoTotal=0;
+  const cryptoMes={};
+  ativos.filter(a=>a.data).sort((a,b)=>a.data.localeCompare(b.data)).forEach(a=>{
+    const t=a.ticker;
+    if(!posMap[t])posMap[t]={qtd:0,custo:0,classe:a.classe};
+    if(a.classe)posMap[t].classe=a.classe;
+    const tipo=a.tipo||'Compra';
+    if(tipo==='Compra'){posMap[t].qtd+=a.qtd;posMap[t].custo+=a.qtd*a.pm;}
+    else if(tipo==='Venda'){
+      const pm=posMap[t].qtd>0?posMap[t].custo/posMap[t].qtd:0;
+      const ganho=(a.pm-pm)*a.qtd;
+      const qtdR=Math.max(0,posMap[t].qtd-a.qtd);
+      posMap[t].custo=qtdR*pm;posMap[t].qtd=qtdR;
+      if(a.data.slice(0,4)===anoStr){
+        if(posMap[t].classe==='Crypto'){
+          // [BUG-F3 FIX] Agrupa por mês para checar isenção mensal de R$35k
+          const ym=a.data.slice(0,7);
+          if(!cryptoMes[ym])cryptoMes[ym]={ganho:0,vendas:0};
+          cryptoMes[ym].ganho+=ganho;cryptoMes[ym].vendas+=a.pm*a.qtd;
+        }else{ganhoTotal+=ganho;}
+      }
+    }
+  });
+  // [BUG-F3 FIX] Isenção de cripto: só soma se total de vendas no mês >= R$35.000
+  Object.values(cryptoMes).forEach(m=>{if(m.vendas>=35000)ganhoTotal+=m.ganho;});
+  return parseFloat(ganhoTotal.toFixed(2));
 }
 
 /* Remove um lançamento individual pelo índice no array ativos[] */
@@ -337,8 +392,12 @@ function calcPosicoes(txArray){
     const isBuy=(a.tipo||'Compra')==='Compra';
     const isSell=(a.tipo||'Compra')==='Venda';
     if(isSell){
-      map[t].qtd=Math.max(0,map[t].qtd-a.qtd);
-      map[t]._custo=map[t].qtd*map[t].pm;
+      // [BUG-C1 FIX] Calcula qtd restante ANTES de atualizar, evitando PM incorreto
+      // [BUG-L4 FIX] Loga aviso se venda excede posição (venda a descoberto)
+      if(a.qtd>map[t].qtd+0.0001)console.warn(`Venda a descoberto detectada: ${t} (vendendo ${a.qtd}, posição ${map[t].qtd.toFixed(4)})`);
+      const qtdR=Math.max(0,map[t].qtd-a.qtd);
+      map[t]._custo=qtdR*map[t].pm;
+      map[t].qtd=qtdR;
     }else if(isBuy){
       const newQtd=map[t].qtd+a.qtd;
       map[t]._custo+=a.qtd*a.pm;
@@ -351,16 +410,25 @@ function calcPosicoes(txArray){
   return Object.values(map).filter(a=>a.qtd>0.0001).map(({_custo,...rest})=>rest);
 }
 
-function calcAtivos(){
-  return calcPosicoes().map(a=>{
-    const cotacao=COTACOES[a.ticker]||a.cotacao||0;
-    const vt=a.qtd*cotacao, custo=a.qtd*a.pm;
-    const res=vt-custo, resPct=custo>0?((vt-custo)/custo)*100:0;
+// [BUG-C7 FIX] Parâmetro 'ate' (YYYY-MM-DD) para calcular posição em data específica (ex: IRPF 31/12)
+function calcAtivos(ate=null){
+  const posicoes=ate?calcPosicoes(ativos.filter(a=>a.data&&a.data<=ate)):calcPosicoes();
+  return posicoes.map(a=>{
+    // [BUG-D1 FIX] Aplica taxa de câmbio para ativos em moeda estrangeira
+    const rate=getRate(a.moeda);
+    const cotacao=(COTACOES[a.ticker]||a.cotacao||0)*rate;
+    const vt=a.qtd*cotacao;
+    const custo=a.qtd*a.pm; // pm sempre em BRL conforme rótulo do formulário
+    const res=vt-custo,resPct=custo>0?((vt-custo)/custo)*100:0;
     const proventos=calcProventosAtivo(a.ticker,a.data,a.qtd);
-    const dy=custo>0?(proventos/custo)*100:0;
+    // [BUG-C2 FIX] DY = proventos / valor de mercado (não / custo)
+    const dy=vt>0?(proventos/vt)*100:0;
     const lucroTotal=res+proventos;
     const rentTotal=custo>0?(lucroTotal/custo)*100:0;
-    return{...a,cotacao,vt,custo,res,resPct,proventos,dy,lucroTotal,rentTotal};
+    // [BUG-C4 FIX] CAGR anualizado pela data da primeira compra
+    const anos=a.data?Math.max((Date.now()-new Date(a.data).getTime())/(365.25*24*3600*1000),1/12):1;
+    const cagr=custo>0&&anos>0?(Math.pow(Math.max(0,1+lucroTotal/custo),1/anos)-1)*100:0;
+    return{...a,cotacao,vt,custo,res,resPct,proventos,dy,lucroTotal,rentTotal,cagr,anos:parseFloat(anos.toFixed(1))};
   });
 }
 function getTotals(){
@@ -412,15 +480,26 @@ function infoB3(){
   toast('Essa opção estará disponível em breve.');
 }
 function exportarRelatorioIRPF(){
-  const c=calcAtivos();
+  // [BUG-C7 FIX] Posição em 31/12 do ano-calendário (não posição atual)
+  const anoCalendario=new Date().getFullYear()-1;
+  const c=calcAtivos(anoCalendario+'-12-31');
   const data={
     geradoEm:new Date().toISOString(),
-    bensEDireitos:c.map(a=>({ticker:a.ticker,classe:CLASS_LABEL[a.classe]||a.classe,codigoIRPF:IRPF_CODE[a.classe]||'03',custoAquisicao:a.custo,quantidade:a.qtd,precoMedio:a.pm})),
-    rendimentosIsentos:c.map(a=>({ticker:a.ticker,classe:CLASS_LABEL[a.classe]||a.classe,dyAnual:a.dy,proventoEstAnual:a.vt*(a.dy/100),tributacao:(a.classe==='FII'||a.classe==='B3')?'Isento':'Tributável'})),
-    ganhoCapital:c.reduce((s,a)=>s+a.res,0)
+    anoCalendario,
+    // [BUG-F1 FIX] Grupo e Código IRPF corretos por classe
+    bensEDireitos:c.map(a=>({ticker:a.ticker,classe:CLASS_LABEL[a.classe]||a.classe,
+      grupo:IRPF_GRUPO[a.classe]||'03',codigo:IRPF_CODIGO[a.classe]||'01',
+      custoAquisicao:parseFloat(a.custo.toFixed(2)),quantidade:a.qtd,precoMedio:parseFloat(a.pm.toFixed(4))})),
+    // [BUG-F4 FIX] Proventos reais recebidos (não estimativa DY × VT)
+    rendimentosRecebidos:c.map(a=>({ticker:a.ticker,classe:CLASS_LABEL[a.classe]||a.classe,
+      proventosRecebidos:parseFloat(a.proventos.toFixed(2)),
+      tributacao:a.classe==='FII'?'Isento (Lei 11.033/04)':a.classe==='B3'?'Div:Isento/JCP:15%':
+        a.classe==='ETF'?'15% RF / 15-22,5% RV':a.classe==='Crypto'?'Isento se vendas < R$35k/mês':
+        a.classe==='BDR'?'15-22,5% sobre dividendos':'Tributável'})),
+    ganhoCapitalRealizado:getGanhosRealizados(anoCalendario)
   };
-  downloadFile('relatorio_irpf.json', JSON.stringify(data,null,2), 'application/json');
-  toast('Relatório IRPF exportado.');
+  downloadFile('relatorio_irpf_'+anoCalendario+'.json', JSON.stringify(data,null,2), 'application/json');
+  toast('Relatório IRPF '+anoCalendario+' exportado.');
 }
 function downloadFile(filename, content, mime){
   const blob=new Blob([content],{type:mime});
@@ -461,9 +540,9 @@ function processImportRows(rows){
       moeda:moeda?String(moeda).trim():'BRL',
       comprar:comprar?String(comprar).trim():'Não'
     };
-    // Bug #3 fix: deduplicar por chave composta — evita duplicar ao re-importar o mesmo Excel
-    const key=`${obj.ticker}|${obj.tipo}|${obj.data}|${obj.qtd}|${obj.pm}`;
-    if(ativos.some(a=>`${a.ticker}|${a.tipo}|${a.data}|${a.qtd}|${a.pm}`===key))continue;
+    // [BUG-L2 FIX] Dedup com toFixed(4) para normalizar floats e evitar falsos negativos
+    const key=`${obj.ticker}|${obj.tipo}|${obj.data}|${parseFloat(obj.qtd).toFixed(4)}|${parseFloat(obj.pm).toFixed(4)}`;
+    if(ativos.some(a=>`${a.ticker}|${a.tipo}|${a.data}|${parseFloat(a.qtd).toFixed(4)}|${parseFloat(a.pm).toFixed(4)}`===key))continue;
     ativos.push(obj);
     count++;
   }
@@ -516,7 +595,8 @@ function processB3Rows(rows){
       hi=i;
       r.forEach((h,idx)=>{
         const k=(h||'').toString().toLowerCase().trim();
-        if(k.includes('entrada')||k.includes('sa'))col.tipo=idx; // Entrada/Saída
+        // [BUG-L3 FIX] 'sa' era genérico demais; agora checa 'saída'/'saida'/'entrada' explicitamente
+        if(k.includes('entrada')||k.includes('saida')||k.includes('saída'))col.tipo=idx;
         if(k==='data')col.data=idx;
         if(k.includes('movimenta'))col.mov=idx;
         if(k==='produto')col.produto=idx;
@@ -550,7 +630,12 @@ function processB3Rows(rows){
     const dashIdx=produtoRaw.indexOf(' - ');
     const ticker=(dashIdx>0?produtoRaw.slice(0,dashIdx):produtoRaw.split(/\s/)[0]).trim().toUpperCase();
     const nome=dashIdx>0?produtoRaw.slice(dashIdx+3).trim():'';
-    if(!ticker||!/^[A-Z]{3,6}\d{1,2}$/.test(ticker))continue;
+    // [BUG-L5 FIX] Tesouro Direto tem nomes longos (ex: "Tesouro IPCA+ 2035") — avisa e pula
+    if(!ticker){continue;}
+    if(!/^[A-Z]{3,6}\d{1,2}$/.test(ticker)){
+      if(produtoRaw.toLowerCase().includes('tesouro'))console.warn('[B3] Tesouro Direto ignorado (não é ativo de renda variável): '+produtoRaw);
+      continue;
+    }
 
     // Parse data DD/MM/YYYY → YYYY-MM-DD
     let dataStr='';
@@ -591,9 +676,9 @@ function processB3Rows(rows){
         data:tx.data||new Date().toISOString().slice(0,10),
         nota:0,ideal:0,moeda:'BRL',comprar:'Não'
       };
-      // Dedup: evita duplicar ao re-importar o mesmo extrato
-      const key=`${obj.ticker}|${obj.tipo}|${obj.data}|${obj.qtd}|${obj.pm}`;
-      if(ativos.some(a=>`${a.ticker}|${a.tipo}|${a.data}|${a.qtd}|${a.pm}`===key))continue;
+      // [BUG-L2 FIX] Dedup com toFixed(4) para normalizar floats
+      const key=`${obj.ticker}|${obj.tipo}|${obj.data}|${parseFloat(obj.qtd).toFixed(4)}|${parseFloat(obj.pm).toFixed(4)}`;
+      if(ativos.some(a=>`${a.ticker}|${a.tipo}|${a.data}|${parseFloat(a.qtd).toFixed(4)}|${parseFloat(a.pm).toFixed(4)}`===key))continue;
       ativos.push(obj);
       importados++;
     }
@@ -853,6 +938,12 @@ function addMeta(){
   const classe=document.getElementById('m-classe').value;
   const ideal=parseFloat(document.getElementById('m-ideal').value)||0;
   const idx=metas.findIndex(m=>m.classe===classe);
+  // [BUG-U2 FIX] Avisa se a soma ultrapassar 100%
+  const tempMetas=idx>=0?metas.map((m,i)=>i===idx?{...m,ideal}:m):[...metas,{classe,ideal}];
+  const total=tempMetas.reduce((s,m)=>s+m.ideal,0);
+  if(total>100){
+    if(!confirm(`A soma das metas ficaria em ${total.toFixed(0)}% (acima de 100%). Salvar mesmo assim?`))return;
+  }
   if(idx>=0)metas[idx].ideal=ideal; else metas.push({classe,ideal});
   saveMetas();
   closeModalMeta();
@@ -861,7 +952,9 @@ function addMeta(){
 }
 
 function removeAtivo(ticker){
-  if(!confirm('Remover '+ticker+'?'))return;
+  // [BUG-L1 FIX] Mostra quantidade de lançamentos que serão apagados
+  const count=ativos.filter(a=>a.ticker===ticker).length;
+  if(!confirm(`Remover ${ticker}? Isso apagará ${count} lançamento(s). Essa ação não pode ser desfeita.`))return;
   ativos=ativos.filter(a=>a.ticker!==ticker);
   saveAtivos();
   if(typeof renderAll==='function')renderAll();

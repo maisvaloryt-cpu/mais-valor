@@ -85,9 +85,19 @@ function renderProventos(){
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtR(c.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#888',font:{size:10}}},y:{grid:{color:'rgba(128,128,128,0.08)'},ticks:{color:'#888',font:{size:10},callback:v=>'R$'+v.toLocaleString('pt-BR')}}}}
   });
 
-  // Gráfico por classe — soma dos proventos reais
+  // [BUG-D FIX] Inclui proventos de ativos já vendidos completamente (não só posições abertas)
   const provPorClasse={};
+  // Posições abertas — proventos já calculados em calcAtivos()
   c.forEach(a=>{if(a.proventos>0){provPorClasse[a.classe]=(provPorClasse[a.classe]||0)+a.proventos;}});
+  // Posições fechadas — tickers sem posição atual mas que tiveram proventos
+  const tickersAbertos=new Set(c.map(a=>a.ticker));
+  [...new Set(ativos.map(a=>a.ticker))].filter(t=>!tickersAbertos.has(t)).forEach(ticker=>{
+    const firstBuy=ativos.filter(a=>a.ticker===ticker&&(a.tipo||'Compra')==='Compra')
+      .sort((a,b)=>(a.data||'').localeCompare(b.data||''))[0];
+    const classe=ativos.find(a=>a.ticker===ticker)?.classe||'B3';
+    const prov=calcProventosAtivo(ticker,firstBuy?.data,0);
+    if(prov>0)provPorClasse[classe]=(provPorClasse[classe]||0)+prov;
+  });
   const clsKeys=Object.keys(provPorClasse);
   if(charts.provCls)charts.provCls.destroy();
   charts.provCls=new Chart(document.getElementById('chartProvClasse').getContext('2d'),{

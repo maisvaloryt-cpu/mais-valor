@@ -43,7 +43,7 @@
       <div class="card-title">Rendimentos Isentos (Proventos)</div>
       <div class="tbl-wrap">
       <table class="tbl">
-        <thead><tr><th>Ticker</th><th>Classe</th><th class="r">DY Est. Anual</th><th class="r">Provento Est. Anual</th><th>Tributação</th></tr></thead>
+        <thead><tr><th>Ticker</th><th>Classe</th><th class="r">Proventos Recebidos (Ano)</th><th>Tributação</th></tr></thead>
         <tbody id="tbody-irpf2"></tbody>
       </table>
       </div>
@@ -63,32 +63,39 @@ renderHeaderAndNav('irpf');
 injectModals();
 
 function renderIRPF(){
-  // Bug #10 fix: ano dinâmico (ano-calendário = ano anterior ao atual)
+  // [BUG-C7 FIX] Posição em 31/12 do ano-calendário (não posição atual)
   const anoCalendario=new Date().getFullYear()-1;
   document.getElementById('tag-ano-irpf').textContent='Ano-Calendário '+anoCalendario;
   document.getElementById('titulo-bens').textContent='Bens e Direitos — Posição em 31/12/'+anoCalendario;
-  const c=calcAtivos();
+  const c=calcAtivos(anoCalendario+'-12-31');
   const custo=c.reduce((s,a)=>s+a.custo,0);
-  const proventosTotal=c.reduce((s,a)=>s+a.proventos,0);
-  // Bug #11 fix: ganho realizado = soma de (preço venda − PM) × qtd das vendas do ano
+  // [BUG-F4 FIX] Proventos reais do ano-calendário (não all-time)
+  const proventosAno=c.reduce((s,a)=>s+calcProventosAno(a.ticker,anoCalendario),0);
   const ganhoRealizado=getGanhosRealizados(anoCalendario);
   document.getElementById('metrics-irpf').innerHTML=`
-    <div class="mcard"><div class="mcard-label">Total Bens e Direitos</div><div class="mcard-value">${fmtR(custo)}</div><div class="mcard-sub">Custo de aquisição declarado</div></div>
-    <div class="mcard"><div class="mcard-label">Rendimentos Recebidos</div><div class="mcard-value positive">${fmtR(proventosTotal)}</div><div class="mcard-sub">Proventos desde a data de compra</div></div>
+    <div class="mcard"><div class="mcard-label">Total Bens e Direitos</div><div class="mcard-value">${fmtR(custo)}</div><div class="mcard-sub">Custo de aquisição em 31/12/${anoCalendario}</div></div>
+    <div class="mcard"><div class="mcard-label">Rendimentos Recebidos em ${anoCalendario}</div><div class="mcard-value positive">${fmtR(proventosAno)}</div><div class="mcard-sub">Proventos recebidos no ano-calendário</div></div>
     <div class="mcard"><div class="mcard-label">Ganho de Capital Realizado</div><div class="mcard-value ${ganhoRealizado>=0?'positive':'negative'}">${ganhoRealizado>=0?'+':''}${fmtR(ganhoRealizado)}</div><div class="mcard-sub">Vendas efetivadas em ${anoCalendario}</div></div>
   `;
+  // [BUG-F1 FIX] Grupo e Código IRPF corretos por classe
   document.getElementById('tbody-irpf').innerHTML=c.map(a=>`
     <tr><td><strong>${a.ticker}</strong></td><td><span class="badge ${CLASS_BADGE[a.classe]||''}">${CLASS_LABEL[a.classe]||a.classe}</span></td>
-    <td>Grupo ${IRPF_CODE[a.classe]||'03'}</td><td class="r">${fmtR(a.custo)}</td><td class="r">${a.qtd.toLocaleString('pt-BR')}</td><td class="r">${fmtR(a.pm)}</td></tr>
+    <td>Grupo ${IRPF_GRUPO[a.classe]||'03'} / Cód. ${IRPF_CODIGO[a.classe]||'01'}</td>
+    <td class="r">${fmtR(a.custo)}</td><td class="r">${a.qtd.toLocaleString('pt-BR')}</td><td class="r">${fmtR(a.pm)}</td></tr>
   `).join('');
+  // [BUG-F2 FIX] Tributação correta por classe (ETF, Crypto, BDR, Exterior)
   document.getElementById('tbody-irpf2').innerHTML=c.map(a=>{
-    // Bug #12 fix: B3 tem tratamento distinto (dividendos isentos, JCP tributado a 15%)
+    const provAno=calcProventosAno(a.ticker,anoCalendario);
     let trib;
-    if(a.classe==='FII') trib='<span style="color:#1D9E75;font-weight:500">Isento</span>';
+    if(a.classe==='FII') trib='<span style="color:#1D9E75;font-weight:500">Isento (Lei 11.033/04)</span>';
     else if(a.classe==='B3') trib='<span style="color:#888;font-weight:500">Div: Isento / JCP: 15%</span>';
+    else if(a.classe==='ETF') trib='<span style="color:#BA7517;font-weight:500">15% RF / 15-22,5% RV</span>';
+    else if(a.classe==='Crypto') trib='<span style="color:#BA7517;font-weight:500">Isento (vendas &lt; R$35k/mês)</span>';
+    else if(a.classe==='BDR') trib='<span style="color:#BA7517;font-weight:500">15-22,5% sobre dividendos</span>';
+    else if(a.classe==='Exterior') trib='<span style="color:#BA7517;font-weight:500">Tributável (Lei 14.754/23)</span>';
     else trib='<span style="color:#BA7517;font-weight:500">Tributável</span>';
     return`<tr><td><strong>${a.ticker}</strong></td><td><span class="badge ${CLASS_BADGE[a.classe]||''}">${CLASS_LABEL[a.classe]||a.classe}</span></td>
-    <td class="r">${fmt(a.dy)}%</td><td class="r positive">${fmtR(a.proventos)}</td><td>${trib}</td></tr>`;
+    <td class="r positive">${fmtR(provAno)}</td><td>${trib}</td></tr>`;
   }).join('');
 }
 

@@ -31,7 +31,7 @@
         <div style="position:relative;height:180px"><canvas id="chartConc" role="img" aria-label="Top 5 ativos por concentração"></canvas></div>
       </div>
       <div class="card">
-        <div class="card-title">Correlação por Classe</div>
+        <div class="card-title">Alocação por Classe</div>
         <div style="position:relative;height:180px"><canvas id="chartCorr" role="img" aria-label="Diversificação por classe"></canvas></div>
       </div>
     </div>
@@ -69,15 +69,16 @@ function renderAnalise(){
   `;
   const top5=c.slice(0,5);
   if(charts.conc)charts.conc.destroy();
+  // [BUG-A FIX] Guard total>0 para evitar NaN nos gráficos com carteira vazia
   charts.conc=new Chart(document.getElementById('chartConc').getContext('2d'),{
-    type:'bar',data:{labels:top5.map(a=>a.ticker),datasets:[{label:'% Carteira',data:top5.map(a=>parseFloat(((a.vt/total)*100).toFixed(1))),backgroundColor:['#185FA5','#3B6D11','#BA7517','#534AB7','#0F6E56'],borderRadius:4}]},
+    type:'bar',data:{labels:top5.map(a=>a.ticker),datasets:[{label:'% Carteira',data:top5.map(a=>total>0?parseFloat(((a.vt/total)*100).toFixed(1)):0),backgroundColor:['#185FA5','#3B6D11','#BA7517','#534AB7','#0F6E56'],borderRadius:4}]},
     options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.raw+'%'}}},scales:{x:{grid:{color:'rgba(128,128,128,0.08)'},ticks:{color:'#888',font:{size:10},callback:v=>v+'%'}},y:{grid:{display:false},ticks:{color:'#888',font:{size:11}}}}}
   });
   const bc=byClasse(c);
   const clsKeys=Object.keys(bc);
   if(charts.corr)charts.corr.destroy();
   charts.corr=new Chart(document.getElementById('chartCorr').getContext('2d'),{
-    type:'polarArea',data:{labels:clsKeys.map(k=>CLASS_LABEL[k]||k),datasets:[{data:clsKeys.map(k=>parseFloat(((bc[k]/total)*100).toFixed(1))),backgroundColor:clsKeys.map(k=>CLASS_COLORS[k]+'99'),borderWidth:0}]},
+    type:'polarArea',data:{labels:clsKeys.map(k=>CLASS_LABEL[k]||k),datasets:[{data:clsKeys.map(k=>total>0?parseFloat(((bc[k]/total)*100).toFixed(1)):0),backgroundColor:clsKeys.map(k=>CLASS_COLORS[k]+'99'),borderWidth:0}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'right',labels:{font:{size:10},color:'#888',boxWidth:10}}}}
   });
   const rebalTb=document.getElementById('tbody-rebal');
@@ -88,7 +89,9 @@ function renderAnalise(){
     if(diff>3){acao='Reduzir / Não aportar';cor='#E24B4A'}
     else if(diff<-3){acao='Aumentar aporte';cor='#BA7517'}
     else{acao='Manter';cor='#1D9E75'}
-    return`<tr><td><strong>${CLASS_LABEL[m.classe]||m.classe}</strong></td><td class="r">${fmt(atual)}%</td><td class="r">${m.ideal}%</td><td class="r" style="color:${diff>=0?'#E24B4A':'#BA7517'}">${diff>=0?'+':''}${fmt(diff)}%</td><td class="r" style="color:${cor};font-weight:500">${acao}</td></tr>`;
+    // [BUG-B FIX] Zona neutra de ±2pp — consistente com metas.html
+    const corDiff=diff>2?'#E24B4A':diff<-2?'#BA7517':'#1D9E75';
+    return`<tr><td><strong>${CLASS_LABEL[m.classe]||m.classe}</strong></td><td class="r">${fmt(atual)}%</td><td class="r">${m.ideal}%</td><td class="r" style="color:${corDiff};font-weight:500">${diff>=0?'+':''}${fmt(diff)}%</td><td class="r" style="color:${cor};font-weight:500">${acao}</td></tr>`;
   }).join('');
 }
 
