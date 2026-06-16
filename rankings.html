@@ -276,7 +276,9 @@ function renderSidebar(){
 
 async function init(){
   await loadData();
-  render('dy-acoes', null);
+  const tab = new URLSearchParams(location.search).get('tab') || 'dy-acoes';
+  const btn = [...document.querySelectorAll('.tab')].find(b => b.getAttribute('onclick')?.includes(`'${tab}'`));
+  render(tab, btn || null);
   renderSidebar();
 }
 init();

@@ -155,21 +155,21 @@
       <div class="card">
         <div class="section-header" style="margin-bottom:.75rem">
           <div class="section-title">Maiores Altas</div>
-          <a class="section-link" href="rankings.html">ver →</a>
+          <a class="section-link" href="rankings.html?tab=altas">ver →</a>
         </div>
         <div id="top-gainers"></div>
       </div>
       <div class="card">
         <div class="section-header" style="margin-bottom:.75rem">
           <div class="section-title">Maiores Baixas</div>
-          <a class="section-link" href="rankings.html">ver →</a>
+          <a class="section-link" href="rankings.html?tab=baixas">ver →</a>
         </div>
         <div id="top-losers"></div>
       </div>
       <div class="card">
         <div class="section-header" style="margin-bottom:.75rem">
           <div class="section-title">Ranking DY</div>
-          <a class="section-link" href="rankings.html">ver →</a>
+          <a class="section-link" href="rankings.html?tab=dy-acoes">ver →</a>
         </div>
         <div id="dy-ranking"></div>
       </div>
@@ -382,7 +382,7 @@ function renderSidebar() {
     }));
   }
   document.getElementById('div-agenda').innerHTML = agenda.map(d => `
-    <div class="agenda-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}'">
+    <div class="agenda-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${d.t}${d.tipo&&d.tipo.toLowerCase()==='rendimento'?'&tipo=fii':''}'">
       <div style="display:flex;align-items:center;gap:6px">
         ${logoHtml(d.t,22)}
         <div><div class="agenda-ticker">${d.t}</div><div class="agenda-type">${d.tipo}</div></div>
@@ -484,7 +484,11 @@ function goToCarousel(i) { showCarousel(i); }
 function resetCarouselTimer() {
   if (carouselTimer) clearInterval(carouselTimer);
   if (carouselItems.length <= 1) return;
-  carouselTimer = setInterval(() => showCarousel(carouselIdx + 1, false), CAROUSEL_INTERVAL);
+  carouselTimer = setInterval(() => {
+    const canvas = document.getElementById('mainChart');
+    if (canvas?._chartIsActive?.()) return; // pin ou range ativo — não pula
+    showCarousel(carouselIdx + 1, false);
+  }, CAROUSEL_INTERVAL);
 }
 
 function pauseCarousel() {

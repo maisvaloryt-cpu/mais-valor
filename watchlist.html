@@ -19,9 +19,20 @@
 <div id="nav-placeholder"></div>
 <div class="page-hero fade-in">
   <h1>MINHA <em>WATCHLIST</em></h1>
-  <p>Seus ativos favoritos em um só lugar. Dados salvos localmente no seu navegador.</p>
+  <p>Seus ativos favoritos em um só lugar. Faça login para sincronizar entre dispositivos.</p>
 </div>
 <div class="container">
+  <div id="login-msg" class="empty-state" style="display:none">
+    <div class="empty-state-icon">🔒</div>
+    <h2>Faça login para ver seus favoritos</h2>
+    <p>Seus ativos favoritos ficam salvos na nuvem e sincronizados em todos os dispositivos.</p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button onclick="navLoginGoogle()" class="banner-btn" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;border:none">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Entrar com Google
+      </button>
+    </div>
+  </div>
   <div id="empty-msg" class="empty-state" style="display:none">
     <div class="empty-state-icon">☆</div>
     <h2>Nenhum ativo favorito ainda</h2>
@@ -94,7 +105,16 @@ window.MV_LOGO_SVG = '<svg viewBox="0 0 530 530" xmlns="http://www.w3.org/2000/s
 <script>
 // ── Watchlist ─────────────────────────────────────────────────────
 function getWatchlist(){ try{ return JSON.parse(localStorage.getItem('mv_watchlist')||'[]'); }catch{ return []; } }
-function removeFromWatchlist(t){ localStorage.setItem('mv_watchlist',JSON.stringify(getWatchlist().filter(x=>x!==t))); renderWatchlist(); }
+
+async function removeFromWatchlist(t){
+  const w=getWatchlist().filter(x=>x!==t);
+  try{localStorage.setItem('mv_watchlist',JSON.stringify(w));}catch{}
+  if(typeof firebase!=='undefined'){
+    const user=firebase.auth().currentUser;
+    if(user) try{ await firebase.firestore().collection('watchlists').doc(user.uid).set({tickers:w},{merge:true}); }catch(e){console.warn('wl rm:',e);}
+  }
+  renderWatchlist();
+}
 
 let thSortDirW = {};
 function thSort(col) {
@@ -230,7 +250,41 @@ function renderWatchlist(){
   renderAlerts();
 }
 
-async function init(){ await loadData(); renderWatchlist(); }
+function _showWlState(loggedIn){
+  const loginMsg=document.getElementById('login-msg');
+  const emptyMsg=document.getElementById('empty-msg');
+  const content=document.getElementById('watchlist-content');
+  if(!loggedIn){
+    loginMsg.style.display='';
+    emptyMsg.style.display='none';
+    if(content) content.style.display='none';
+    return false;
+  }
+  loginMsg.style.display='none';
+  return true;
+}
+
+async function init(){
+  await loadData();
+  if(typeof firebase!=='undefined'){
+    firebase.auth().onAuthStateChanged(async user=>{
+      if(!_showWlState(!!user)) return;
+      if(user){
+        try{
+          const doc=await firebase.firestore().collection('watchlists').doc(user.uid).get();
+          if(doc.exists){
+            const tickers=doc.data().tickers||[];
+            try{localStorage.setItem('mv_watchlist',JSON.stringify(tickers));}catch{}
+          }
+        }catch(e){console.warn('wl load:',e);}
+      }
+      renderWatchlist();
+    });
+  } else {
+    // Firebase não carregou — mostra estado de login
+    _showWlState(false);
+  }
+}
 init();
 </script>
 </body></html>

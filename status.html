@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="mobile.css">
 <style>
 .status-hero { padding: 1.5rem 2rem; background: var(--bg2); border-bottom: 1px solid var(--border); }
-.status-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 1rem; margin-bottom: 1.5rem; }
+.status-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
 .status-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; }
 .status-card.ok { border-color: rgba(34,200,122,0.3); background: rgba(34,200,122,0.05); }
 .status-card.warn { border-color: rgba(245,166,35,0.3); background: rgba(245,166,35,0.05); }
@@ -78,6 +78,46 @@
     </div>
   </div>
 
+  <!-- EXTERIOR: BDRs / ETFs / Stocks US -->
+  <div class="section-grid" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:1.5rem">
+    <div class="card">
+      <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">🇧🇷 BDRs</div></div>
+      <div id="bdrs-detail"></div>
+    </div>
+    <div class="card">
+      <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">📊 ETFs</div></div>
+      <div id="etfs-detail"></div>
+    </div>
+    <div class="card">
+      <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">🇺🇸 Stocks US</div></div>
+      <div id="stocks-detail"></div>
+    </div>
+  </div>
+
+  <!-- ÍNDICES / BCB / DIVIDENDOS / INTRADAY -->
+  <div class="section-grid" style="grid-template-columns:1fr 1fr;margin-bottom:1.5rem">
+    <div>
+      <div class="card" style="margin-bottom:1rem">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">📉 Índices de Mercado</div></div>
+        <div id="indices-detail"></div>
+      </div>
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">🏦 BCB / Macro</div></div>
+        <div id="bcb-detail"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:1rem">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">💰 Dividendos</div></div>
+        <div id="dividendos-detail"></div>
+      </div>
+      <div class="card">
+        <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">⚡ Intraday</div></div>
+        <div id="intraday-detail"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- PROBLEMAS ENCONTRADOS -->
   <div class="card" id="problems-card" style="display:none;margin-bottom:1.5rem">
     <div class="section-header" style="margin-bottom:.75rem"><div class="section-title">⚠️ Atenção</div></div>
@@ -126,11 +166,31 @@ window.MV_LOGO_SVG = '<svg viewBox="0 0 530 530" xmlns="http://www.w3.org/2000/s
 </script>
 <script src="nav.js"></script>
 <script>
+async function safeFetch(url) {
+  try { const r = await fetch(url + '?t=' + Date.now()); return r.ok ? await r.json() : null; }
+  catch(e) { return null; }
+}
+
 async function loadStatus() {
   try {
     const resp = await fetch('data/relatorio.json?t=' + Date.now());
     if (!resp.ok) throw new Error('relatorio.json não encontrado');
     const r = await resp.json();
+
+    // Busca paralela dos novos arquivos
+    const [bdrs, etfs, stocksUs, dividendos, indices, bcb,
+           intAcoes, intFiis, intCripto, intIntl] = await Promise.all([
+      safeFetch('data/bdrs.json'),
+      safeFetch('data/etfs.json'),
+      safeFetch('data/stocks_us.json'),
+      safeFetch('data/dividendos.json'),
+      safeFetch('data/indices.json'),
+      safeFetch('data/bcb.json'),
+      safeFetch('data/intraday/acoes-br.json'),
+      safeFetch('data/intraday/fiis.json'),
+      safeFetch('data/intraday/cripto-macro.json'),
+      safeFetch('data/intraday/internacional.json'),
+    ]);
 
     document.getElementById('gerado-em').textContent = r.gerado_em || '—';
 
@@ -147,6 +207,13 @@ async function loadStatus() {
     const statusOk = pctHist >= 90;
 
     // CARDS PRINCIPAIS
+    const bdrsOk = bdrs && (bdrs.com_preco||0) > 0;
+    const etfsOk = etfs && (etfs.com_preco||0) > 0;
+    const stocksOk = stocksUs && (stocksUs.total||0) > 0;
+    const divOk = dividendos && (dividendos.total||0) > 0;
+    const idxOk = indices && indices.updated_at;
+    const bcbOk = bcb && bcb.updated_at;
+
     document.getElementById('main-cards').innerHTML = `
       <div class="status-card ${statusOk?'ok':'warn'}">
         <div class="status-icon">${statusOk?'✅':'⚠️'}</div>
@@ -178,6 +245,42 @@ async function loadStatus() {
         <div class="status-label">Criptomoedas</div>
         <div class="status-val">${cripto.total_moedas||0}</div>
         <div class="status-sub">${cripto.com_dados||0} com cotação · ${cripto.sem_dados||0} sem dados</div>
+      </div>
+      <div class="status-card ${bdrsOk?'ok':'warn'}">
+        <div class="status-icon">🇧🇷</div>
+        <div class="status-label">BDRs</div>
+        <div class="status-val">${bdrs?bdrs.com_preco||0:'—'}</div>
+        <div class="status-sub">${bdrs?(bdrs.total||0)+' total · '+(bdrs.sem_preco||0)+' sem preço':'sem dados'}</div>
+      </div>
+      <div class="status-card ${etfsOk?'ok':'warn'}">
+        <div class="status-icon">📊</div>
+        <div class="status-label">ETFs</div>
+        <div class="status-val">${etfs?etfs.com_preco||0:'—'}</div>
+        <div class="status-sub">${etfs?(etfs.total||0)+' total · '+(etfs.sem_preco||0)+' sem preço':'sem dados'}</div>
+      </div>
+      <div class="status-card ${stocksOk?'ok':'warn'}">
+        <div class="status-icon">🇺🇸</div>
+        <div class="status-label">Stocks US</div>
+        <div class="status-val">${stocksUs?stocksUs.com_preco||stocksUs.total||0:'—'}</div>
+        <div class="status-sub">${stocksUs?(stocksUs.total||0)+' total · '+(stocksUs.sem_preco||0)+' sem preço':'sem dados'}</div>
+      </div>
+      <div class="status-card ${divOk?'ok':'warn'}">
+        <div class="status-icon">💰</div>
+        <div class="status-label">Dividendos</div>
+        <div class="status-val">${dividendos?dividendos.total||0:'—'}</div>
+        <div class="status-sub">${dividendos?'atualizado: '+(dividendos.updated_at||'—'):'sem dados'}</div>
+      </div>
+      <div class="status-card ${idxOk?'ok':'warn'}">
+        <div class="status-icon">📉</div>
+        <div class="status-label">Índices</div>
+        <div class="status-val" style="font-size:16px">${idxOk?'OK':'—'}</div>
+        <div class="status-sub">${indices?'atualizado: '+(indices.updated_at||'—'):'sem dados'}</div>
+      </div>
+      <div class="status-card ${bcbOk?'ok':'warn'}">
+        <div class="status-icon">🏦</div>
+        <div class="status-label">BCB / Macro</div>
+        <div class="status-val" style="font-size:16px">${bcbOk?'OK':'—'}</div>
+        <div class="status-sub">${bcb?'CDI '+(bcb.cdi?.anual||'—')+'% a.a.':'sem dados'}</div>
       </div>
     `;
 
@@ -238,6 +341,70 @@ async function loadStatus() {
       `;
     }
 
+    // BDRs
+    document.getElementById('bdrs-detail').innerHTML = bdrs ? `
+      <div class="detail-row"><span>Última atualização</span><span style="font-size:12px;color:var(--gold);font-family:'DM Mono',monospace">${bdrs.updated_at||'—'}</span></div>
+      <div class="detail-row"><span>Total de BDRs</span><span class="badge badge-ok">${bdrs.total||0}</span></div>
+      <div class="detail-row"><span>Com cotação</span><span class="badge badge-ok">${bdrs.com_preco||0}</span></div>
+      <div class="detail-row"><span>Sem cotação</span><span class="badge ${(bdrs.sem_preco||0)>0?'badge-warn':'badge-ok'}">${bdrs.sem_preco||0}</span></div>
+    ` : `<div class="detail-row"><span style="color:var(--dn)">❌ Arquivo não encontrado</span></div>`;
+
+    // ETFs
+    document.getElementById('etfs-detail').innerHTML = etfs ? `
+      <div class="detail-row"><span>Última atualização</span><span style="font-size:12px;color:var(--gold);font-family:'DM Mono',monospace">${etfs.updated_at||'—'}</span></div>
+      <div class="detail-row"><span>Total de ETFs</span><span class="badge badge-ok">${etfs.total||0}</span></div>
+      <div class="detail-row"><span>Com cotação</span><span class="badge badge-ok">${etfs.com_preco||0}</span></div>
+      <div class="detail-row"><span>Sem cotação</span><span class="badge ${(etfs.sem_preco||0)>0?'badge-warn':'badge-ok'}">${etfs.sem_preco||0}</span></div>
+    ` : `<div class="detail-row"><span style="color:var(--dn)">❌ Arquivo não encontrado</span></div>`;
+
+    // Stocks US
+    document.getElementById('stocks-detail').innerHTML = stocksUs ? `
+      <div class="detail-row"><span>Última atualização</span><span style="font-size:12px;color:var(--gold);font-family:'DM Mono',monospace">${stocksUs.updated_at||'—'}</span></div>
+      <div class="detail-row"><span>Total de Stocks</span><span class="badge badge-ok">${stocksUs.total||0}</span></div>
+      <div class="detail-row"><span>Com cotação</span><span class="badge badge-ok">${stocksUs.com_preco||stocksUs.total||0}</span></div>
+      <div class="detail-row"><span>Sem cotação</span><span class="badge ${(stocksUs.sem_preco||0)>0?'badge-warn':'badge-ok'}">${stocksUs.sem_preco||0}</span></div>
+    ` : `<div class="detail-row"><span style="color:var(--dn)">❌ Arquivo não encontrado</span></div>`;
+
+    // Índices
+    const idxMap = {ibov:'IBOV',ifix:'IFIX',small:'SMLL',idiv:'IDIV',sp500:'S&P 500',nasdaq:'NASDAQ',dow:'Dow Jones',russell:'Russell 2000'};
+    document.getElementById('indices-detail').innerHTML = indices ? `
+      <div class="detail-row"><span>Última atualização</span><span style="font-size:12px;color:var(--gold);font-family:'DM Mono',monospace">${indices.updated_at||'—'}</span></div>
+      ${Object.entries(idxMap).filter(([k])=>indices[k]).map(([k,label])=>{
+        const idx=indices[k]; const chg=idx.chg||0;
+        return `<div class="detail-row"><span>${label}</span><span class="${chg>=0?'badge badge-ok':'badge badge-err'}">${chg>=0?'+':''}${chg.toFixed(2)}%</span></div>`;
+      }).join('')}
+    ` : `<div class="detail-row"><span style="color:var(--dn)">❌ Arquivo não encontrado</span></div>`;
+
+    // BCB
+    document.getElementById('bcb-detail').innerHTML = bcb ? `
+      <div class="detail-row"><span>Última atualização</span><span style="font-size:12px;color:var(--gold);font-family:'DM Mono',monospace">${bcb.updated_at||'—'}</span></div>
+      <div class="detail-row"><span>CDI anual</span><span class="badge badge-ok">${bcb.cdi?.anual||'—'}% a.a.</span></div>
+      <div class="detail-row"><span>Selic</span><span class="badge badge-ok">${bcb.selic?.diario||'—'}% a.a.</span></div>
+      <div class="detail-row"><span>IPCA</span><span class="badge badge-ok">${bcb.ipca?.anual||bcb.ipca?.valor||'—'}${bcb.ipca?'%':''}</span></div>
+      <div class="detail-row"><span>Poupança</span><span class="badge badge-ok">${bcb.poupanca?.anual||bcb.poupanca?.valor||'—'}${bcb.poupanca?'% a.a.':''}</span></div>
+    ` : `<div class="detail-row"><span style="color:var(--dn)">❌ Arquivo não encontrado</span></div>`;
+
+    // Dividendos
+    document.getElementById('dividendos-detail').innerHTML = dividendos ? `
+      <div class="detail-row"><span>Última atualização</span><span style="font-size:12px;color:var(--gold);font-family:'DM Mono',monospace">${dividendos.updated_at||'—'}</span></div>
+      <div class="detail-row"><span>Total de registros</span><span class="badge badge-ok">${dividendos.total||0}</span></div>
+    ` : `<div class="detail-row"><span style="color:var(--dn)">❌ Arquivo não encontrado</span></div>`;
+
+    // Intraday
+    const intFiles = [
+      {label:'Ações BR', data: intAcoes, countKey:'acoes'},
+      {label:'FIIs', data: intFiis, countKey:'fiis'},
+      {label:'Cripto/Macro', data: intCripto, countKey:'cripto'},
+      {label:'Internacional', data: intIntl, countKey:'stocks'},
+    ];
+    document.getElementById('intraday-detail').innerHTML = intFiles.map(f=>`
+      <div class="detail-row">
+        <span>${f.label}</span>
+        ${f.data
+          ? `<span class="badge badge-ok">${f.data.updated_at||'OK'} · ${(f.data[f.countKey]||[]).length} ativos</span>`
+          : `<span class="badge badge-err">sem dados</span>`}
+      </div>`).join('');
+
     // PROBLEMAS
     const problemas = [];
     if(pctHist < 90) problemas.push(`Histórico mensal incompleto: ${totalHist}/${metaHist} ativos`);
@@ -246,6 +413,13 @@ async function loadStatus() {
     if((diario.desatualizados||0) > 10) problemas.push(`${diario.desatualizados} ativos sem cotação recente`);
     if((cripto.sem_dados||0) > 0) problemas.push(`${cripto.sem_dados} criptomoeda(s) sem cotação`);
     if((cripto.historico_falhou||0) > 0) problemas.push(`${cripto.historico_falhou} cripto(s) com histórico incompleto`);
+    if(!bdrs) problemas.push('bdrs.json não encontrado');
+    else if((bdrs.sem_preco||0) > (bdrs.com_preco||0)) problemas.push(`BDRs: maioria sem cotação (${bdrs.sem_preco} sem / ${bdrs.com_preco} com)`);
+    if(!etfs) problemas.push('etfs.json não encontrado');
+    if(!stocksUs) problemas.push('stocks_us.json não encontrado');
+    if(!dividendos) problemas.push('dividendos.json não encontrado');
+    if(!indices) problemas.push('indices.json não encontrado');
+    if(!bcb) problemas.push('bcb.json não encontrado');
 
     if(problemas.length > 0) {
       document.getElementById('problems-card').style.display = '';

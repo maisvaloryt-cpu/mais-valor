@@ -218,6 +218,17 @@ function addChartOverlay(chart, canvas, labels, data, color, unit) {
   });
 
   chart._overlayCanvas = overlay;
+
+  // Expõe estado ativo para o carrossel consultar
+  canvas._chartIsActive = () => pinIdx !== null || lockedRange !== null;
+
+  // Mobile: pausa carrossel no toque, retoma só quando não há análise ativa
+  canvas.addEventListener('touchstart', () => {
+    if (typeof pauseCarousel === 'function') pauseCarousel();
+  }, { passive: true });
+  canvas.addEventListener('touchend', () => {
+    if (typeof resumeCarousel === 'function' && !canvas._chartIsActive()) resumeCarousel();
+  }, { passive: true });
 }
 
 // ── createChart: cria o gráfico + aplica overlay ──────────────────────────

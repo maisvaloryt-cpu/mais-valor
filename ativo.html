@@ -218,18 +218,79 @@ function switchTab(id,el){
 
 // Watchlist
 function getWatchlist(){try{return JSON.parse(localStorage.getItem('mv_watchlist')||'[]');}catch{return[];}}
-function saveWatchlist(w){try{localStorage.setItem('mv_watchlist',JSON.stringify(w));}catch{}}
-function toggleWatchlist(){
+
+function _wlFirestoreRef(){
+  if(typeof firebase==='undefined') return null;
+  const user=firebase.auth().currentUser;
+  if(!user) return null;
+  return firebase.firestore().collection('watchlists').doc(user.uid);
+}
+
+async function saveWatchlist(w){
+  try{localStorage.setItem('mv_watchlist',JSON.stringify(w));}catch{}
+  const ref=_wlFirestoreRef();
+  if(ref) try{ await ref.set({tickers:w},{merge:true}); }catch(e){console.warn('wl save:',e);}
+}
+
+function _showLoginToast(){
+  let t=document.getElementById('wl-login-toast');
+  if(!t){
+    t=document.createElement('div');
+    t.id='wl-login-toast';
+    t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:12px;font-size:13px;color:var(--text1);z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.4);white-space:nowrap';
+    t.innerHTML=`<span>⭐ Faça login para favoritar ativos</span>
+      <button onclick="navLoginGoogle()" style="padding:5px 14px;border-radius:8px;background:var(--gold);color:#000;border:none;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--font-body)">Entrar com Google</button>
+      <button onclick="this.closest('#wl-login-toast').remove()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;line-height:1">×</button>`;
+    document.body.appendChild(t);
+  }
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.remove(),5000);
+}
+
+async function toggleWatchlist(){
+  if(typeof firebase==='undefined'||!firebase.auth().currentUser){
+    _showLoginToast(); return;
+  }
   let w=getWatchlist();
   const btn=document.getElementById('watchlist-btn');
   if(w.includes(TICKER)){w=w.filter(t=>t!==TICKER);btn.textContent='☆ Favoritar';btn.classList.remove('saved');}
   else{w.push(TICKER);btn.textContent='★ Favoritado';btn.classList.add('saved');}
-  saveWatchlist(w);
+  await saveWatchlist(w);
 }
-function initWatchlist(){
-  const w=getWatchlist();
+
+function _updateWlBtn(w){
   const btn=document.getElementById('watchlist-btn');
+  if(!btn) return;
   if(w.includes(TICKER)){btn.textContent='★ Favoritado';btn.classList.add('saved');}
+  else{btn.textContent='☆ Favoritar';btn.classList.remove('saved');}
+}
+
+function initWatchlist(){
+  _updateWlBtn(getWatchlist());
+  // Sincroniza com Firestore quando auth estiver pronto
+  if(typeof firebase!=='undefined'){
+    firebase.auth().onAuthStateChanged(async user=>{
+      if(user){
+        try{
+          const ref=firebase.firestore().collection('watchlists').doc(user.uid);
+          const doc=await ref.get();
+          if(doc.exists){
+            const tickers=doc.data().tickers||[];
+            try{localStorage.setItem('mv_watchlist',JSON.stringify(tickers));}catch{}
+            _updateWlBtn(tickers);
+          } else {
+            // primeiro login: sobe o localStorage para a nuvem
+            const local=getWatchlist();
+            if(local.length) await ref.set({tickers:local},{merge:true});
+          }
+        }catch(e){console.warn('wl sync:',e);}
+      } else {
+        // deslogou: limpa cache local e reseta botão
+        try{localStorage.removeItem('mv_watchlist');}catch{}
+        _updateWlBtn([]);
+      }
+    });
+  }
 }
 
 function renderHero(d){
@@ -599,8 +660,15 @@ function renderAnalise(){
 
 async function init(){
   await loadData();
-  const all=TIPO==='fii'?FIIS:ACOES;
-  ativo=all.find(a=>a.t===TICKER)||all[0];
+  // Auto-detecta tipo: se não veio na URL, testa nas duas listas
+  let all=TIPO==='fii'?FIIS:ACOES;
+  ativo=all.find(a=>a.t===TICKER);
+  if(!ativo){
+    // Ticker não encontrado no tipo da URL — tenta na outra lista
+    const alt=TIPO==='fii'?ACOES:FIIS;
+    ativo=alt.find(a=>a.t===TICKER);
+    if(ativo) all=alt;
+  }
   if(!ativo){document.getElementById('ativo-nome').textContent='Ativo não encontrado';return;}
   renderHero(ativo);
   renderIndicadores(ativo);
