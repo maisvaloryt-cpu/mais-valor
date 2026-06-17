@@ -88,13 +88,22 @@ html, body {
   }
 
   /* ── Ranking Bar ────────────────────────────────────────────── */
+  /* Fica dentro do .table-wrap (que rola): fixa à esquerda e usa a
+     largura da tela, com rolagem própria dos botões — assim não é
+     cortada pela rolagem horizontal da tabela. */
   .ranking-bar {
     flex-direction: column !important;
     align-items: flex-start !important;
     gap: 8px !important;
+    position: sticky !important;
+    left: 0 !important;
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+    box-sizing: border-box !important;
   }
   .ranking-btns {
     width: 100%;
+    max-width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     flex-wrap: nowrap !important;
