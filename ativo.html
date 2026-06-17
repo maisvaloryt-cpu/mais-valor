@@ -216,8 +216,9 @@ function switchTab(id,el){
   if(id==='indicadores') renderIndVsSetor();
 }
 
-// Watchlist
-function getWatchlist(){try{return JSON.parse(localStorage.getItem('mv_watchlist')||'[]');}catch{return[];}}
+// Watchlist — guardado só na nuvem (Firestore), nada no navegador
+let _wlTickers=[];
+function getWatchlist(){return _wlTickers;}
 
 function _wlFirestoreRef(){
   if(typeof firebase==='undefined') return null;
@@ -227,7 +228,7 @@ function _wlFirestoreRef(){
 }
 
 async function saveWatchlist(w){
-  try{localStorage.setItem('mv_watchlist',JSON.stringify(w));}catch{}
+  _wlTickers=w;
   const ref=_wlFirestoreRef();
   if(ref) try{ await ref.set({tickers:w},{merge:true}); }catch(e){console.warn('wl save:',e);}
 }
@@ -251,7 +252,7 @@ async function toggleWatchlist(){
   if(typeof firebase==='undefined'||!firebase.auth().currentUser){
     _showLoginToast(); return;
   }
-  let w=getWatchlist();
+  let w=getWatchlist().slice();
   const btn=document.getElementById('watchlist-btn');
   if(w.includes(TICKER)){w=w.filter(t=>t!==TICKER);btn.textContent='☆ Favoritar';btn.classList.remove('saved');}
   else{w.push(TICKER);btn.textContent='★ Favoritado';btn.classList.add('saved');}
@@ -266,29 +267,21 @@ function _updateWlBtn(w){
 }
 
 function initWatchlist(){
-  _updateWlBtn(getWatchlist());
-  // Sincroniza com Firestore quando auth estiver pronto
+  _updateWlBtn(_wlTickers); // estado neutro até a nuvem responder
+  // Busca o estado real direto da nuvem quando o login for confirmado
   if(typeof firebase!=='undefined'){
     firebase.auth().onAuthStateChanged(async user=>{
       if(user){
         try{
           const ref=firebase.firestore().collection('watchlists').doc(user.uid);
           const doc=await ref.get();
-          if(doc.exists){
-            const tickers=doc.data().tickers||[];
-            try{localStorage.setItem('mv_watchlist',JSON.stringify(tickers));}catch{}
-            _updateWlBtn(tickers);
-          } else {
-            // primeiro login: sobe o localStorage para a nuvem
-            const local=getWatchlist();
-            if(local.length) await ref.set({tickers:local},{merge:true});
-          }
-        }catch(e){console.warn('wl sync:',e);}
+          _wlTickers=doc.exists?(doc.data().tickers||[]):[];
+        }catch(e){console.warn('wl sync:',e); _wlTickers=[];}
       } else {
-        // deslogou: limpa cache local e reseta botão
-        try{localStorage.removeItem('mv_watchlist');}catch{}
-        _updateWlBtn([]);
+        // deslogou: nada fica guardado no navegador
+        _wlTickers=[];
       }
+      _updateWlBtn(_wlTickers);
     });
   }
 }

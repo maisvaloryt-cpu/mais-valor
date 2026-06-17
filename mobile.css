@@ -524,6 +524,7 @@ html, body {
     font-size: 49px !important;
     line-height: 61px !important;
     letter-spacing: 0.3px !important;
+    white-space: nowrap !important;
   }
   #nav-hamburger {
     display: none !important;
