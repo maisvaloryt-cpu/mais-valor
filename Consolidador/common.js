@@ -360,19 +360,19 @@ function _mvApplyGate(){
   const app=document.querySelector('.app');
   const loading=document.getElementById('mv-gate-loading');
   const login=document.getElementById('mv-gate-login');
+  if(loading)loading.style.display='none';
   if(!window.mvAuthResolved){
-    if(loading)loading.style.display='flex';
+    // ainda verificando login: mantém o app visível (título e abas fixos no topo).
+    // Os dados chegam depois e preenchem as áreas — sem "Carregando" e sem o título saltar.
     if(login)login.style.display='none';
-    if(app)app.style.display='none';
+    if(app)app.style.display='';
     return;
   }
   if(!window.mvLoggedIn){
-    if(loading)loading.style.display='none';
     if(login)login.style.display='flex';
     if(app)app.style.display='none';
     return;
   }
-  if(loading)loading.style.display='none';
   if(login)login.style.display='none';
   if(app)app.style.display='';
   if(typeof renderCarteiraSwitcher==='function')renderCarteiraSwitcher();
