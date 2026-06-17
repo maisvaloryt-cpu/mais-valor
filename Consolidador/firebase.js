@@ -22,18 +22,37 @@ function logoutUser(){
   _auth.signOut().then(() => toast('Saiu da conta.'));
 }
 
+/* Guarda em memória os dados de TODAS as carteiras do usuário (vindos da nuvem).
+   Formato: { [carteiraId]: { ativos, metas, nome } } */
+let _dadosCarteiras = {};
+
 /* ---- salva ativos + metas da carteira ATIVA, e a lista de carteiras, no Firestore ---- */
 async function syncFirestore(){
   const user = _auth.currentUser;
   if(!user) return;
   try{
     const cInfo = carteiras.find(c=>c.id===carteiraAtual);
+    const nome = cInfo?cInfo.nome:'';
+    _dadosCarteiras[carteiraAtual] = { ativos, metas, nome };
     await _db.collection('carteiras').doc(user.uid).set({
       listaCarteiras: carteiras,
       carteiraAtual,
-      dados: { [carteiraAtual]: { ativos, metas, nome: cInfo?cInfo.nome:'' } }
+      dados: { [carteiraAtual]: { ativos, metas, nome } }
     }, {merge: true});
   }catch(e){ console.warn('syncFirestore:', e); }
+}
+
+/* ---- remove de vez uma carteira excluída no documento da nuvem ---- */
+async function excluirCarteiraNuvem(id){
+  const user = _auth.currentUser;
+  if(!user) return;
+  try{
+    await _db.collection('carteiras').doc(user.uid).update({
+      ['dados.'+id]: firebase.firestore.FieldValue.delete(),
+      listaCarteiras: carteiras,
+      carteiraAtual
+    });
+  }catch(e){ console.warn('excluirCarteiraNuvem:', e); }
 }
 
 /* ---- renderiza botão de login ou avatar do usuário no header ---- */
@@ -63,72 +82,73 @@ function renderAuthUI(user){
   }
 }
 
-/* ---- detecta se um array de ativos é formato antigo (uma entrada por ticker) ---- */
-function _cloudFormatoAntigo(cloudAtivos){
-  if(!cloudAtivos||!cloudAtivos.length) return false;
-  // Formato antigo: todos os tickers únicos E nenhum tem tipo='Venda'
-  const tickers = cloudAtivos.map(a=>a.ticker);
-  const todosUnicos = tickers.length === new Set(tickers).size;
-  const semVenda = !cloudAtivos.some(a=>a.tipo==='Venda');
-  // Local tem lançamentos duplicados ou vendas → é o formato novo
-  const localTemDups = (()=>{ const t=ativos.map(a=>a.ticker); return t.length!==new Set(t).size; })();
-  const localTemVenda = ativos.some(a=>a.tipo==='Venda');
-  return todosUnicos && semVenda && (localTemDups || localTemVenda);
+/* ---- limpa todos os dados da carteira da memória (chamado no logout) ---- */
+function _limparDadosCarteira(){
+  carteiras = [];
+  carteiraAtual = null;
+  ativos = [];
+  metas = [];
+  _dadosCarteiras = {};
 }
 
-/* ---- observador de autenticação ---- */
+/* ---- cria a carteira padrão vazia em memória (primeiro acesso do usuário) ---- */
+function _criarCarteiraPadraoVazia(){
+  const id = 'default';
+  carteiras = [{id, nome:'Carteira Principal'}];
+  carteiraAtual = id;
+  ativos = [];
+  metas = JSON.parse(JSON.stringify(DEFAULT_METAS));
+  _dadosCarteiras = { [id]: { ativos, metas, nome:'Carteira Principal' } };
+}
+
+/* ---- observador de autenticação: agora é a ÚNICA fonte de dados da carteira.
+   Não existe mais localStorage no meio do caminho — tudo vem direto do Firestore
+   para a memória, e some da memória no logout. ---- */
 _auth.onAuthStateChanged(async user => {
   if(user){
     try{
       const doc = await _db.collection('carteiras').doc(user.uid).get();
       if(doc.exists){
         const d = doc.data();
-        if(d.dados){
-          // Formato novo (multi-carteira): mescla a lista de carteiras da nuvem com a local
-          if(Array.isArray(d.listaCarteiras) && d.listaCarteiras.length){
-            d.listaCarteiras.forEach(cc=>{
-              const local = carteiras.find(c=>c.id===cc.id);
-              if(local) local.nome = cc.nome;
-              else carteiras.push({id: cc.id, nome: cc.nome});
-            });
-            try{ localStorage.setItem(STORAGE_CARTEIRAS, JSON.stringify(carteiras)); }catch(e){}
-            if(!carteiras.some(c=>c.id===carteiraAtual)){
-              carteiraAtual = carteiras[0].id;
-              try{ localStorage.setItem(STORAGE_CARTEIRA_ATUAL, carteiraAtual); }catch(e){}
-            }
-          }
-          // Baixa os dados de cada carteira presente na nuvem
-          Object.entries(d.dados).forEach(([id, val])=>{
-            if(val && val.ativos!==undefined) localStorage.setItem(_keyAtivos(id), JSON.stringify(val.ativos));
-            if(val && val.metas!==undefined)  localStorage.setItem(_keyMetas(id),  JSON.stringify(val.metas));
-          });
-          ativos = loadAtivos();
-          metas  = loadMetas();
+        if(d.dados && Object.keys(d.dados).length){
+          // Formato novo (multi-carteira): tudo vem da nuvem
+          _dadosCarteiras = d.dados;
+          carteiras = (Array.isArray(d.listaCarteiras) && d.listaCarteiras.length)
+            ? d.listaCarteiras
+            : Object.keys(d.dados).map(id=>({id, nome: (d.dados[id]&&d.dados[id].nome)||id}));
+          carteiraAtual = (d.carteiraAtual && carteiras.some(c=>c.id===d.carteiraAtual))
+            ? d.carteiraAtual : carteiras[0].id;
+          const cAtual = _dadosCarteiras[carteiraAtual] || {};
+          ativos = cAtual.ativos || [];
+          metas  = cAtual.metas  || JSON.parse(JSON.stringify(DEFAULT_METAS));
         } else if(d.ativos){
-          // Formato antigo (uma única carteira salva direto na raiz do documento)
-          // Bug #15 fix: não sobrescreve dados locais com formato antigo da nuvem
-          if(_cloudFormatoAntigo(d.ativos)){
-            // Nuvem tem formato antigo (1 entrada por ticker), local é mais rico
-            // Migra local para nuvem (já no formato novo) sem perder dados
-            await syncFirestore();
-            toast('Formato antigo detectado na nuvem — carteira local mantida e sincronizada. ☁️');
-          } else {
-            ativos = d.ativos; localStorage.setItem(_keyAtivos(carteiraAtual), JSON.stringify(ativos));
-            if(d.metas){ metas = d.metas; localStorage.setItem(_keyMetas(carteiraAtual), JSON.stringify(metas)); }
-            await syncFirestore(); // migra o documento para o novo formato multi-carteira
-          }
+          // Formato bem antigo (uma única carteira salva direto na raiz do documento) — migra
+          _criarCarteiraPadraoVazia();
+          ativos = d.ativos;
+          if(d.metas) metas = d.metas;
+          _dadosCarteiras[carteiraAtual] = { ativos, metas, nome:'Carteira Principal' };
+          await syncFirestore(); // grava já no formato novo multi-carteira
+          toast('Formato antigo detectado na nuvem — carteira migrada. ☁️');
         } else {
-          // documento existe mas vazio: sobe os dados locais
-          await syncFirestore();
+          // documento existe mas está vazio
+          _criarCarteiraPadraoVazia();
         }
       } else {
-        // primeiro login: sobe o que está no localStorage para a nuvem
+        // primeiro login do usuário: nunca salvou nada na nuvem ainda
+        _criarCarteiraPadraoVazia();
         await syncFirestore();
-        toast('Carteira sincronizada com a nuvem! ☁️');
+        toast('Carteira criada na nuvem! ☁️');
       }
-    }catch(e){ console.warn('onAuthStateChanged:', e); }
-    if(typeof renderCarteiraSwitcher === 'function') renderCarteiraSwitcher();
-    if(typeof renderAll === 'function') renderAll();
+    }catch(e){
+      console.warn('onAuthStateChanged:', e);
+      _criarCarteiraPadraoVazia();
+    }
+    window.mvLoggedIn = true;
+  } else {
+    _limparDadosCarteira();
+    window.mvLoggedIn = false;
   }
+  window.mvAuthResolved = true;
   renderAuthUI(user);
+  if(typeof _mvApplyGate === 'function') _mvApplyGate();
 });

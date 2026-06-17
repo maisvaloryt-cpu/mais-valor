@@ -25,76 +25,26 @@ function classificarB3(ticker,nome){
   return 'B3';
 }
 
-const STORAGE_ATIVOS='consolidador_ativos_v2';
-const STORAGE_METAS='consolidador_metas_v2';
-
 const DEFAULT_ATIVOS=[];
 
 const DEFAULT_METAS=[
   {classe:'B3',ideal:30},{classe:'FII',ideal:25},{classe:'RF',ideal:20},{classe:'Crypto',ideal:10},{classe:'Exterior',ideal:10},{classe:'ETF',ideal:5}
 ];
 
-/* ===================== MÚLTIPLAS CARTEIRAS ===================== */
-const STORAGE_CARTEIRAS='consolidador_carteiras_v1';
-const STORAGE_CARTEIRA_ATUAL='consolidador_carteira_atual_v1';
+/* ===================== MÚLTIPLAS CARTEIRAS — TUDO SÓ NA NUVEM (FIRESTORE) =====================
+   Não existe mais leitura/escrita em localStorage aqui. Enquanto o login não resolve,
+   essas variáveis ficam vazias. firebase.js é quem preenche tudo após o login
+   (veja onAuthStateChanged) e quem limpa tudo no logout. */
+let carteiras=[];
+let carteiraAtual=null;
+let ativos=[];
+let metas=[];
+let charts={};
 
-function _keyAtivos(id){ return STORAGE_ATIVOS+'__'+id; }
-function _keyMetas(id){ return STORAGE_METAS+'__'+id; }
-
-/* Inicializa a lista de carteiras. Se for a primeira vez (ou versão antiga,
-   de antes da existência de múltiplas carteiras), cria a "Carteira Principal"
-   e migra os dados antigos (chaves sem sufixo) para ela, sem perder nada. */
-function initCarteiras(){
-  let lista=[];
-  try{
-    const raw=localStorage.getItem(STORAGE_CARTEIRAS);
-    if(raw)lista=JSON.parse(raw);
-  }catch(e){}
-  if(!Array.isArray(lista)||!lista.length){
-    const id='default';
-    lista=[{id,nome:'Carteira Principal'}];
-    try{
-      const oldAtivos=localStorage.getItem(STORAGE_ATIVOS);
-      const oldMetas=localStorage.getItem(STORAGE_METAS);
-      if(oldAtivos!==null && localStorage.getItem(_keyAtivos(id))===null) localStorage.setItem(_keyAtivos(id),oldAtivos);
-      if(oldMetas!==null && localStorage.getItem(_keyMetas(id))===null) localStorage.setItem(_keyMetas(id),oldMetas);
-    }catch(e){}
-    try{ localStorage.setItem(STORAGE_CARTEIRAS,JSON.stringify(lista)); }catch(e){}
-  }
-  let atual;
-  try{ atual=localStorage.getItem(STORAGE_CARTEIRA_ATUAL); }catch(e){}
-  if(!atual || !lista.some(c=>c.id===atual)) atual=lista[0].id;
-  try{ localStorage.setItem(STORAGE_CARTEIRA_ATUAL,atual); }catch(e){}
-  return {lista, atual};
-}
-
-const _carteirasInit=initCarteiras();
-let carteiras=_carteirasInit.lista;
-let carteiraAtual=_carteirasInit.atual;
-
-function loadAtivos(){
-  try{
-    const raw=localStorage.getItem(_keyAtivos(carteiraAtual));
-    if(raw)return JSON.parse(raw);
-  }catch(e){}
-  return JSON.parse(JSON.stringify(DEFAULT_ATIVOS));
-}
 // [BUG-D2 FIX] Debounce no syncFirestore — evita múltiplas escritas em operações em lote (import, etc.)
 let _syncTimer=null;
-function saveAtivos(){ localStorage.setItem(_keyAtivos(carteiraAtual), JSON.stringify(ativos)); if(typeof syncFirestore==='function'){clearTimeout(_syncTimer);_syncTimer=setTimeout(syncFirestore,1500);} }
-
-function loadMetas(){
-  try{
-    const raw=localStorage.getItem(_keyMetas(carteiraAtual));
-    if(raw)return JSON.parse(raw);
-  }catch(e){}
-  return JSON.parse(JSON.stringify(DEFAULT_METAS));
-}
-function saveMetas(){ localStorage.setItem(_keyMetas(carteiraAtual), JSON.stringify(metas)); if(typeof syncFirestore==='function')syncFirestore(); }
-
-let ativos=loadAtivos();
-let metas=loadMetas();
-let charts={};
+function saveAtivos(){ if(typeof syncFirestore==='function'){clearTimeout(_syncTimer);_syncTimer=setTimeout(syncFirestore,1500);} }
+function saveMetas(){ if(typeof syncFirestore==='function')syncFirestore(); }
 
 /* ---- formatação ---- */
 // [BUG-P2 FIX] Trata NaN e null corretamente — (v||0) mascarava NaN como zero, ocultando bugs
@@ -363,12 +313,71 @@ function removeAtivoIdx(idx){
   toast('Lançamento removido.');
 }
 
-/* -- init assíncrono: carrega cotações + dividendos + histórico e re-renderiza */
+/* -- init assíncrono: carrega cotações + dividendos + histórico e re-renderiza.
+   Não é mais chamado direto no window 'load' — só roda depois que o login
+   resolver e os dados da carteira vierem da nuvem (veja mvGate() mais abaixo). */
 async function initConsolidador(){
   await Promise.all([atualizarCotacoes(),loadAllDividendos(),loadAllHistorico()]);
   if(typeof renderAll==='function')renderAll();
 }
-window.addEventListener('load',()=>initConsolidador());
+
+/* ===================== GATE DE LOGIN (a carteira só aparece depois de logar) =====================
+   Cria (se ainda não existir) duas telas por cima da página: uma de "Carregando..."
+   e uma pedindo login. Mostra a certa de acordo com o estado de autenticação,
+   e só chama a função de render quando o usuário estiver logado e os dados
+   já tiverem vindo do Firestore. */
+window.mvAuthResolved=false;
+window.mvLoggedIn=false;
+let _mvPendingInit=null;
+
+function _mvEnsureGateEls(){
+  if(document.getElementById('mv-gate-loading'))return;
+  const loading=document.createElement('div');
+  loading.id='mv-gate-loading';
+  loading.style.cssText='display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--color-text-secondary);font-size:14px;gap:8px';
+  loading.innerHTML='<i class="ti ti-loader-2" aria-hidden="true"></i> Carregando...';
+  const login=document.createElement('div');
+  login.id='mv-gate-login';
+  login.style.cssText='display:none;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:14px;text-align:center;color:var(--color-text-secondary);font-size:14px';
+  login.innerHTML=`<div>Faça login para ver sua carteira.</div>
+    <button class="btn btn-primary" style="padding:8px 16px;font-size:13px" onclick="loginGoogle()">
+      <i class="ti ti-brand-google" aria-hidden="true"></i> Entrar com Google
+    </button>`;
+  document.body.insertBefore(login,document.body.firstChild);
+  document.body.insertBefore(loading,document.body.firstChild);
+}
+
+/* Cada página chama mvGate(initConsolidador) no lugar de renderAll() direto,
+   no final do seu <script>. */
+function mvGate(initFn){
+  _mvPendingInit=initFn;
+  _mvApplyGate();
+}
+
+/* firebase.js chama isso sempre que o estado de login muda. */
+function _mvApplyGate(){
+  _mvEnsureGateEls();
+  const app=document.querySelector('.app');
+  const loading=document.getElementById('mv-gate-loading');
+  const login=document.getElementById('mv-gate-login');
+  if(!window.mvAuthResolved){
+    if(loading)loading.style.display='flex';
+    if(login)login.style.display='none';
+    if(app)app.style.display='none';
+    return;
+  }
+  if(!window.mvLoggedIn){
+    if(loading)loading.style.display='none';
+    if(login)login.style.display='flex';
+    if(app)app.style.display='none';
+    return;
+  }
+  if(loading)loading.style.display='none';
+  if(login)login.style.display='none';
+  if(app)app.style.display='';
+  if(typeof renderCarteiraSwitcher==='function')renderCarteiraSwitcher();
+  if(typeof _mvPendingInit==='function')_mvPendingInit();
+}
 
 /* ---- cálculos ---- */
 
@@ -695,13 +704,13 @@ function escapeHtml(s){
   return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-/* Troca a carteira ativa, recarrega os dados e re-renderiza a página */
+/* Troca a carteira ativa, recarrega os dados (já vieram da nuvem no login) e re-renderiza a página */
 function trocarCarteira(id){
   if(id===carteiraAtual||!carteiras.some(c=>c.id===id))return;
   carteiraAtual=id;
-  try{ localStorage.setItem(STORAGE_CARTEIRA_ATUAL,carteiraAtual); }catch(e){}
-  ativos=loadAtivos();
-  metas=loadMetas();
+  const dados=(typeof _dadosCarteiras==='object'&&_dadosCarteiras[id])?_dadosCarteiras[id]:{};
+  ativos=dados.ativos?JSON.parse(JSON.stringify(dados.ativos)):JSON.parse(JSON.stringify(DEFAULT_ATIVOS));
+  metas=dados.metas?JSON.parse(JSON.stringify(dados.metas)):JSON.parse(JSON.stringify(DEFAULT_METAS));
   if(typeof syncFirestore==='function')syncFirestore();
   renderCarteiraSwitcher();
   if(typeof initConsolidador==='function'){ initConsolidador(); } // recarrega cotações/proventos e re-renderiza
@@ -715,11 +724,7 @@ function criarCarteira(nome){
   if(!nome)return;
   const id='c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
   carteiras.push({id,nome});
-  try{
-    localStorage.setItem(STORAGE_CARTEIRAS,JSON.stringify(carteiras));
-    localStorage.setItem(_keyAtivos(id),JSON.stringify(DEFAULT_ATIVOS));
-    localStorage.setItem(_keyMetas(id),JSON.stringify(DEFAULT_METAS));
-  }catch(e){}
+  if(typeof _dadosCarteiras==='object')_dadosCarteiras[id]={ativos:JSON.parse(JSON.stringify(DEFAULT_ATIVOS)),metas:JSON.parse(JSON.stringify(DEFAULT_METAS)),nome};
   trocarCarteira(id);
   toast('Carteira "'+nome+'" criada.');
 }
@@ -731,7 +736,7 @@ function renomearCarteira(id,novoNome){
   const c=carteiras.find(c=>c.id===id);
   if(!c)return;
   c.nome=novoNome;
-  try{ localStorage.setItem(STORAGE_CARTEIRAS,JSON.stringify(carteiras)); }catch(e){}
+  if(typeof _dadosCarteiras==='object'&&_dadosCarteiras[id])_dadosCarteiras[id].nome=novoNome;
   renderCarteiraSwitcher();
   if(typeof syncFirestore==='function')syncFirestore();
   toast('Carteira renomeada.');
@@ -744,17 +749,14 @@ function excluirCarteira(id){
   if(!c)return;
   if(!confirm('Excluir a carteira "'+c.nome+'"? Todos os lançamentos e metas dela serão perdidos. Essa ação não pode ser desfeita.'))return;
   carteiras=carteiras.filter(x=>x.id!==id);
-  try{
-    localStorage.removeItem(_keyAtivos(id));
-    localStorage.removeItem(_keyMetas(id));
-    localStorage.setItem(STORAGE_CARTEIRAS,JSON.stringify(carteiras));
-  }catch(e){}
+  if(typeof _dadosCarteiras==='object')delete _dadosCarteiras[id];
   if(carteiraAtual===id){
     trocarCarteira(carteiras[0].id);
   }
   renderGerenciarCarteiras();
   renderCarteiraSwitcher();
-  if(typeof syncFirestore==='function')syncFirestore();
+  if(typeof excluirCarteiraNuvem==='function')excluirCarteiraNuvem(id);
+  else if(typeof syncFirestore==='function')syncFirestore();
   toast('Carteira excluída.');
 }
 
