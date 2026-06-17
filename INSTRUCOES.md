@@ -8,9 +8,9 @@
 | `site/style.css` | Classe `.stale` (amarelo) para dados desatualizados |
 | `site/nav.js` | Ticker bar com stale em IBOV, IFIX, Câmbio |
 | `site/*.html` | Todas as páginas com suporte a stale |
-| `scripts/fetch_indices.py` | Salva `lastValid` no indices.json |
-| `scripts/fetch_bcb.py` | Salva `lastValid` no bcb.json |
-| `scripts/fetch_data.py` | Fallback com lastValid nas cotações |
+| `fetch_indices.py` | Salva `lastValid` no indices.json |
+| `fetch_bcb.py` | Salva `lastValid` no bcb.json |
+| `fetch_data.py` | Fallback com lastValid nas cotações |
 | `.github/workflows/update.yml` | Workflow com modo `setup` |
 | `AppScript_CotacoesGitHub.js` | Script para o Google Sheets |
 
@@ -34,9 +34,6 @@ site/dividendos.html  → dividendos.html  (raiz do repo)
 site/criptos.html     → criptos.html     (raiz do repo)
 site/ativo.html       → ativo.html       (raiz do repo)
 site/status.html      → status.html      (raiz do repo)
-scripts/fetch_indices.py → fetch_indices.py (raiz do repo)
-scripts/fetch_bcb.py     → fetch_bcb.py     (raiz do repo)
-scripts/fetch_data.py    → fetch_data.py    (raiz do repo)
 .github/workflows/update.yml → .github/workflows/update.yml
 ```
 

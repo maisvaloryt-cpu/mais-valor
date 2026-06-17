@@ -55,6 +55,7 @@ const fmtP=(v,plus=true)=>(plus&&v>=0?'+':'')+fmt(v)+'%';
 /* ===================== BANCO DE DADOS DO SITE (em memória) ===================== */
 
 let COTACOES={};            // ticker → preço atual (carregado do site a cada página)
+let BCB={};                 // taxas do Banco Central (CDI/Selic/IPCA), carregado de data/bcb.json
 const DIVIDENDOS_CACHE={};  // ticker → [{date, value}]  (carregado do site a cada página)
 // [BUG-D1 FIX] Taxas de câmbio: moeda → multiplicador para BRL (USD/BRL carregado de indices.json)
 const TAXAS_CAMBIO={'BRL':1};
@@ -89,6 +90,11 @@ async function atualizarCotacoes(){
       }
     }catch(e){}
     if(!TAXAS_CAMBIO['USD']&&COTACOES['USDBRL'])TAXAS_CAMBIO['USD']=COTACOES['USDBRL'];
+    // Taxas do Banco Central (CDI diário) para corrigir a Renda Fixa
+    try{
+      const rBcb=await fetch(base+'bcb.json?t='+Date.now());
+      if(rBcb.ok)BCB=await rBcb.json();
+    }catch(e){}
   }catch(e){console.warn('atualizarCotacoes:',e);}
 }
 
@@ -392,11 +398,12 @@ function calcPosicoes(txArray){
     if(!map[t]){
       map[t]={ticker:t,classe:a.classe,qtd:0,pm:0,_custo:0,
         cotacao:a.cotacao||0,dy:a.dy||0,data:'',
-        nota:0,ideal:0,moeda:a.moeda||'BRL',comprar:'Não'};
+        nota:0,ideal:0,moeda:a.moeda||'BRL',comprar:'Não',rf:a.rf||null};
     }
     if(a.nota)map[t].nota=a.nota;
     if(a.ideal)map[t].ideal=a.ideal;
     if(a.comprar&&a.comprar!=='Não')map[t].comprar=a.comprar;
+    if(a.rf)map[t].rf=a.rf;
     if(a.classe)map[t].classe=a.classe;
     if(a.moeda)map[t].moeda=a.moeda;
     // Bug #2 fix: Provento não altera posição (não é Compra nem Venda)
@@ -421,13 +428,98 @@ function calcPosicoes(txArray){
   return Object.values(map).filter(a=>a.qtd>0.0001).map(({_custo,...rest})=>rest);
 }
 
+/* ---- Feriados nacionais (para não contar como dia útil na Renda Fixa) ----
+   Fixos + móveis (Carnaval, Sexta-feira Santa, Corpus Christi) calculados pela Páscoa. */
+const _feriadosCache={};
+function feriadosBR(ano){
+  if(_feriadosCache[ano])return _feriadosCache[ano];
+  // Páscoa — algoritmo de Meeus/Butcher
+  const a=ano%19,b=Math.floor(ano/100),c=ano%100,d=Math.floor(b/4),e=b%4,
+        f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,
+        i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),
+        mes=Math.floor((h+l-7*m+114)/31),dia=((h+l-7*m+114)%31)+1;
+  const pascoa=new Date(Date.UTC(ano,mes-1,dia));
+  const movel=(off)=>{const x=new Date(pascoa);x.setUTCDate(x.getUTCDate()+off);return x.toISOString().slice(0,10);};
+  const p=n=>String(n).padStart(2,'0');
+  const set=new Set([
+    `${ano}-01-01`,  // Confraternização
+    `${ano}-04-21`,  // Tiradentes
+    `${ano}-05-01`,  // Dia do Trabalho
+    `${ano}-09-07`,  // Independência
+    `${ano}-10-12`,  // N. Sra. Aparecida
+    `${ano}-11-02`,  // Finados
+    `${ano}-11-15`,  // Proclamação da República
+    `${ano}-12-25`,  // Natal
+    movel(-48),      // Carnaval (segunda)
+    movel(-47),      // Carnaval (terça)
+    movel(-2),       // Sexta-feira Santa
+    movel(60),       // Corpus Christi
+  ]);
+  _feriadosCache[ano]=set;
+  return set;
+}
+function ehFeriadoUTC(dt){
+  return feriadosBR(dt.getUTCFullYear()).has(dt.toISOString().slice(0,10));
+}
+
+/* ---- Renda Fixa: correção em dias úteis (exclui fins de semana e feriados) ----
+   Conta dias úteis entre a data da aplicação e a data 'ate' (ou hoje). */
+function diasUteisRF(de,ate){
+  if(!de)return 0;
+  const d1=new Date(de+'T00:00:00Z');
+  const d2=ate?new Date(ate+'T00:00:00Z'):new Date();
+  if(isNaN(d1)||d2<=d1)return 0;
+  let dias=0;const cur=new Date(d1);
+  while(cur<d2){
+    cur.setUTCDate(cur.getUTCDate()+1);
+    const wd=cur.getUTCDay();
+    if(wd!==0&&wd!==6&&!ehFeriadoUTC(cur))dias++;
+  }
+  return dias;
+}
+/* Fator de correção que multiplica o valor aplicado.
+   CDI: rende (CDI diário × taxa%) por dia útil. Selic/IPCA/Prefixado: taxa anual → dia útil (base 252).
+   Proteção: se a taxa do bcb.json vier inválida/quebrada, não corrige (fator 1). */
+function fatorRF(rf,dataAplic,ate){
+  if(!rf)return 1;
+  const idx=rf.indexador,taxa=parseFloat(rf.taxa)||0;
+  const dias=diasUteisRF(dataAplic,ate);
+  if(dias<=0)return 1;
+  // Converte uma taxa anual (% a.a.) em fator acumulado por dias úteis, ignorando dados absurdos.
+  const porAnual=(anual)=>{
+    if(!isFinite(anual)||anual<=0||anual>100)return 1;
+    const taxaDia=Math.pow(1+anual/100,1/252)-1;
+    return Math.pow(1+taxaDia,dias);
+  };
+  if(idx==='CDI'){
+    const cdiDia=parseFloat(BCB?.cdi?.diario)||0;     // % ao dia útil
+    if(cdiDia<=0)return 1;
+    const taxaDia=(cdiDia/100)*(taxa/100);            // ex.: 0,0534% × 1,13
+    return Math.pow(1+taxaDia,dias);
+  }
+  if(idx==='Selic'){
+    const selicAnual=parseFloat(BCB?.selic?.anual)||0; // Selic anualizada (% a.a.)
+    return porAnual(selicAnual+taxa);                  // Selic + spread
+  }
+  if(idx==='IPCA'){
+    const ipca12=parseFloat(BCB?.ipca?.acumulado_12m)||0;
+    if(ipca12<=0)return 1;                             // sem IPCA no bcb.json → não corrige ainda
+    return porAnual(ipca12+taxa);                      // IPCA + spread
+  }
+  if(idx==='Prefixado')return porAnual(taxa);          // taxa anual fixa
+  return 1;
+}
+
 // [BUG-C7 FIX] Parâmetro 'ate' (YYYY-MM-DD) para calcular posição em data específica (ex: IRPF 31/12)
 function calcAtivos(ate=null){
   const posicoes=ate?calcPosicoes(ativos.filter(a=>a.data&&a.data<=ate)):calcPosicoes();
   return posicoes.map(a=>{
     // [BUG-D1 FIX] Aplica taxa de câmbio para ativos em moeda estrangeira
     const rate=getRate(a.moeda);
-    const cotacao=(COTACOES[a.ticker]||a.cotacao||0)*rate;
+    // Renda Fixa: valor corrigido pelo CDI/Prefixado em dias úteis. Demais: cotação de mercado.
+    const cotacao=a.classe==='RF'
+      ?a.pm*fatorRF(a.rf,a.data,ate)
+      :(COTACOES[a.ticker]||a.cotacao||0)*rate;
     const vt=a.qtd*cotacao;
     const custo=a.qtd*a.pm; // pm sempre em BRL conforme rótulo do formulário
     const res=vt-custo,resPct=custo>0?((vt-custo)/custo)*100:0;
@@ -939,6 +1031,19 @@ function injectModals(){
       <div class="grp-rf form-group" style="grid-column:1/-1;display:flex;align-items:center;gap:8px">
         <input id="rf-liquidez" type="checkbox" style="width:auto;cursor:pointer"><label for="rf-liquidez" style="margin:0;cursor:pointer">Liquidez diária</label>
       </div>
+
+      <!-- Bloco Venda de Renda Fixa: escolher título + valor a resgatar + IR -->
+      <div id="rf-venda-box" style="grid-column:1/-1;display:none">
+        <div id="rf-venda-lista"></div>
+        <div id="rf-venda-form" style="display:none;margin-top:10px">
+          <div class="form-group"><label>Título selecionado</label><input id="rf-venda-titulo" type="text" readonly></div>
+          <div class="modal-grid">
+            <div class="form-group"><label>Data da venda</label><input id="rf-venda-data" type="date"></div>
+            <div class="form-group"><label>Valor a resgatar (R$)</label><input id="rf-venda-valor" type="number" step="0.01" placeholder="0,00" oninput="atualizarResumoVendaRF()"></div>
+          </div>
+          <div id="rf-venda-resumo" style="margin-top:8px;font-size:13px;line-height:1.7;color:var(--color-text-secondary)"></div>
+        </div>
+      </div>
     </div>
     <div class="modal-actions">
       <button class="btn" onclick="closeModal()">Cancelar</button>
@@ -992,21 +1097,141 @@ function openModal(){
 }
 function closeModal(){
   document.getElementById('modal').style.display='none';
-  ['f-ticker','f-qtd','f-pm','f-custos','rf-emissor','rf-taxa','rf-valor','rf-venc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
+  ['f-ticker','f-qtd','f-pm','f-custos','rf-emissor','rf-taxa','rf-valor','rf-venc','rf-venda-valor','rf-venda-titulo'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
   const liq=document.getElementById('rf-liquidez');if(liq)liq.checked=false;
+  _rfVendaSel=null;
+  const vf=document.getElementById('rf-venda-form');if(vf)vf.style.display='none';
 }
 
 /* Alterna botão Compra/Venda */
 function setTipoTx(t){
   document.getElementById('f-tipo').value=t;
   ['Compra','Venda'].forEach(x=>{document.getElementById('seg-'+x).classList.toggle('active',x===t)});
+  updateModalMode();
 }
 
-/* Mostra os campos certos conforme o Tipo de ativo */
-function onClasseChange(){
-  const rf=document.getElementById('f-classe').value==='RF';
-  document.querySelectorAll('#modal .grp-rf').forEach(el=>{el.style.display=rf?'':'none'});
+function onClasseChange(){updateModalMode();}
+
+/* Mostra os campos certos conforme Tipo de ativo + Compra/Venda.
+   Só na Venda de Renda Fixa aparece a tela de escolher o título. */
+function updateModalMode(){
+  const classe=document.getElementById('f-classe').value;
+  const tipo=document.getElementById('f-tipo').value;
+  const rf=(classe==='RF');
+  const vendaRF=(rf&&tipo==='Venda');
+  document.querySelectorAll('#modal .grp-rf').forEach(el=>{el.style.display=(rf&&!vendaRF)?'':'none'});
   document.querySelectorAll('#modal .grp-equity').forEach(el=>{el.style.display=rf?'none':''});
+  const box=document.getElementById('rf-venda-box');
+  if(box)box.style.display=vendaRF?'':'none';
+  if(vendaRF)montarListaVendaRF();
+}
+
+/* ---- Venda de Renda Fixa ---- */
+let _rfVendaLista=[],_rfVendaSel=null;
+const RF_ISENTO=['LCI','LCA','CRI','CRA']; // isentos de IR
+
+function diasCorridos(de,ate){
+  if(!de)return 0;
+  const d1=new Date(de+'T00:00:00');
+  const d2=ate?new Date(ate+'T00:00:00'):new Date();
+  return Math.max(0,Math.round((d2-d1)/(24*3600*1000)));
+}
+/* Tabela regressiva de IR para Renda Fixa (sobre o rendimento) */
+function aliquotaRF(dias){
+  if(dias<=180)return 0.225;
+  if(dias<=360)return 0.20;
+  if(dias<=720)return 0.175;
+  return 0.15;
+}
+
+/* Posições de RF que ainda tenho em carteira (com saldo corrigido) */
+function getPosicoesRF(){
+  return calcAtivos().filter(a=>a.classe==='RF'&&a.qtd>0.000001);
+}
+
+/* Monta a listinha de títulos de RF para escolher qual vender */
+function montarListaVendaRF(){
+  _rfVendaLista=getPosicoesRF();_rfVendaSel=null;
+  const lista=document.getElementById('rf-venda-lista');
+  const form=document.getElementById('rf-venda-form');
+  if(form)form.style.display='none';
+  if(!lista)return;
+  if(!_rfVendaLista.length){
+    lista.innerHTML='<div class="empty" style="padding:12px">Você não tem títulos de Renda Fixa em carteira para vender.</div>';
+    return;
+  }
+  lista.innerHTML='<div style="font-weight:600;margin-bottom:8px">Selecione o título para vender</div>'+
+    _rfVendaLista.map((a,i)=>{
+      const sub=a.rf?`${a.rf.indexador||''} ${a.rf.taxa||''}`.trim():'';
+      return `<label style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 10px;border:1px solid var(--border3, rgba(255,255,255,0.12));border-radius:var(--border-radius-md);margin-bottom:6px;cursor:pointer">
+        <span style="display:flex;align-items:center;gap:8px">
+          <input type="radio" name="rf-venda-pick" value="${i}" style="width:auto;cursor:pointer" onchange="_rfVendaSel=${i}">
+          <span>${escapeHtml(a.ticker)}${sub?` <small style="color:var(--color-text-secondary)">— ${escapeHtml(sub)}</small>`:''}</span>
+        </span>
+        <strong>R$ ${fmt(a.vt)}</strong>
+      </label>`;
+    }).join('')+
+    '<button type="button" class="btn btn-primary btn-sm" style="margin-top:4px" onclick="confirmarSelecaoRF()"><i class="ti ti-check" aria-hidden="true"></i> Confirmar seleção</button>';
+}
+
+/* Depois de escolher o título, abre o formulário de valor + IR já preenchido */
+function confirmarSelecaoRF(){
+  if(_rfVendaSel===null||!_rfVendaLista[_rfVendaSel]){alert('Selecione um título para vender.');return}
+  const pos=_rfVendaLista[_rfVendaSel];
+  document.getElementById('rf-venda-titulo').value=pos.ticker;
+  document.getElementById('rf-venda-data').value=new Date().toISOString().slice(0,10);
+  document.getElementById('rf-venda-valor').value=pos.vt.toFixed(2);
+  document.getElementById('rf-venda-form').style.display='';
+  atualizarResumoVendaRF();
+}
+
+/* Calcula rendimento e IR da parte vendida */
+function calcVendaRFInfo(pos,valor,dataVenda){
+  const principalUnit=pos.pm, precoUnit=pos.cotacao;
+  const qtd=precoUnit>0?valor/precoUnit:0;
+  const custo=qtd*principalUnit;
+  const rend=valor-custo;
+  const titulo=pos.rf&&pos.rf.titulo?pos.rf.titulo:'';
+  const isento=RF_ISENTO.includes(titulo);
+  const dias=diasCorridos(pos.data,dataVenda);
+  const aliq=aliquotaRF(dias);
+  const ir=isento?0:Math.max(0,rend)*aliq;
+  return {qtd,rend,isento,dias,aliq,ir,liquido:valor-ir};
+}
+
+/* Atualiza o resumo (rendimento, IR, líquido) enquanto o usuário digita o valor */
+function atualizarResumoVendaRF(){
+  if(_rfVendaSel===null)return;
+  const pos=_rfVendaLista[_rfVendaSel];
+  const valor=parseFloat(document.getElementById('rf-venda-valor').value)||0;
+  const dataVenda=document.getElementById('rf-venda-data').value;
+  const r=document.getElementById('rf-venda-resumo');
+  if(!r)return;
+  if(valor<=0){r.innerHTML='Informe o valor a resgatar.';return}
+  const info=calcVendaRFInfo(pos,valor,dataVenda);
+  const irTxt=info.isento
+    ?'Isento de IR (LCI/LCA/CRI/CRA)'
+    :`IR (${(info.aliq*100).toFixed(1).replace('.',',')}% • ${info.dias} dias): <strong>R$ ${fmt(info.ir)}</strong>`;
+  r.innerHTML=`Rendimento na parte vendida: <strong>R$ ${fmt(info.rend)}</strong><br>${irTxt}<br>Valor líquido a receber: <strong style="color:var(--text, #ECEAE4)">R$ ${fmt(info.liquido)}</strong>`;
+}
+
+/* Grava a venda de RF como uma fração do título (permite venda parcial) */
+function finalizarVendaRF(){
+  if(_rfVendaSel===null||!_rfVendaLista[_rfVendaSel]){alert('Selecione um título e clique em "Confirmar seleção".');return}
+  const pos=_rfVendaLista[_rfVendaSel];
+  const valor=parseFloat(document.getElementById('rf-venda-valor').value)||0;
+  const dataVenda=document.getElementById('rf-venda-data').value||new Date().toISOString().slice(0,10);
+  if(valor<=0){alert('Informe o valor a resgatar.');return}
+  if(valor>pos.vt+0.01){alert(`Valor maior que o saldo do título (R$ ${fmt(pos.vt)}).`);return}
+  const precoUnit=pos.cotacao;
+  const qtdVendida=precoUnit>0?valor/precoUnit:0;
+  const obj={ticker:pos.ticker,classe:'RF',tipo:'Venda',qtd:qtdVendida,pm:precoUnit,cotacao:precoUnit,
+    data:dataVenda,nota:0,ideal:0,moeda:'BRL',comprar:'Não',rf:pos.rf};
+  ativos.push(obj);
+  saveAtivos();
+  closeModal();
+  initConsolidador();
+  toast('Venda de Renda Fixa registrada.');
 }
 
 /* Ajusta o rótulo da taxa conforme o indexador */
@@ -1022,6 +1247,8 @@ function closeModalMeta(){document.getElementById('modal-meta').style.display='n
 function addAtivo(){
   const classe=document.getElementById('f-classe').value;
   const tipo=document.getElementById('f-tipo').value;
+  // Venda de Renda Fixa tem fluxo próprio (escolher título + valor + IR)
+  if(tipo==='Venda'&&classe==='RF'){return finalizarVendaRF();}
   let obj;
   // Nota / % Ideal / Comprar são definidos depois, na carteira (Resumo).
   if(classe==='RF'){
