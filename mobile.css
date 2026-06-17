@@ -70,6 +70,22 @@ html, body {
     max-width: 100% !important;
     box-sizing: border-box;
   }
+  /* Cotações em destaque: filtro ocupa ~metade, abas cabem ao lado */
+  #filter-input {
+    width: 50% !important;
+    flex: 1 1 50% !important;
+    min-width: 0 !important;
+  }
+  /* A fileira filtro+abas não quebra nem corta */
+  .section-header > div:has(> #filter-input) {
+    flex-wrap: nowrap !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+  .section-header .tabs {
+    flex: 0 0 auto !important;
+    margin-bottom: 0 !important;
+  }
 
   /* ── Ranking Bar ────────────────────────────────────────────── */
   .ranking-bar {
