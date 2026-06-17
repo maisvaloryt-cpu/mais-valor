@@ -402,6 +402,54 @@ body { padding: 0 0 2rem; }
 }
 .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.1rem; }
 
+/* ── Toggle Compra/Venda (segmentado) ── */
+.seg-toggle {
+  display: flex;
+  gap: 4px;
+  background: var(--bg3, #141418);
+  border: 1px solid var(--border3, rgba(255,255,255,0.12));
+  padding: 4px;
+  border-radius: 10px;
+  margin-bottom: 1.1rem;
+}
+.seg-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text2, #8A8884);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: background .15s, color .15s;
+}
+.seg-btn:hover { color: var(--text, #ECEAE4); }
+.seg-btn.active {
+  background: var(--gold, #F5A623);
+  color: #000;
+}
+
+/* ── Inputs editáveis na tabela (Nota / % Ideal / Comprar) ── */
+.cell-edit {
+  width: 58px;
+  font-size: 12px;
+  padding: 3px 6px;
+  text-align: right;
+  border: 1px solid var(--border3, rgba(255,255,255,0.12));
+  border-radius: 6px;
+  background: var(--bg3, #141418);
+  color: var(--text, #ECEAE4);
+  font-family: var(--font-sans);
+}
+.cell-edit:focus { outline: none; border-color: var(--gold, #F5A623); }
+select.cell-edit { width: 72px; text-align: left; cursor: pointer; }
+
 /* ── Misc ── */
 .tag-irpf { background: rgba(186,117,23,0.2); color: var(--gold, #F5A623); font-size: 10px; padding: 1px 7px; border-radius: 8px; font-weight: 600; }
 .section-title {

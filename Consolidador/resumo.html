@@ -216,10 +216,10 @@ function renderGrupos(){
               <td class="r"><span class="pill ${a.res>=0?'pill-up':'pill-dn'}">${a.res>=0?'▲':'▼'} ${fmt(Math.abs(a.resPct))}%</span></td>
               <td class="r ${a.rentTotal>=0?'positive':'negative'}">${fmtP(a.rentTotal)}</td>
               <td class="r">${fmtR(a.vt)}</td>
-              <td class="r"><span class="nota" style="background:${NOTA_COLOR(a.nota||0)}">${a.nota||'-'}</span></td>
-              <td class="r">${total?((a.vt/total)*100).toFixed(1):0}% / ${a.ideal||0}%</td>
-              <td class="r">${a.ideal||0}%</td>
-              <td class="r ${a.comprar==='Sim'?'comprar-sim':'comprar-nao'}">${a.comprar==='Sim'?'✓ Sim':'✕ Não'}</td>
+              <td class="r"><input class="cell-edit" type="number" min="0" max="10" value="${a.nota||''}" placeholder="-" title="Nota (0–10)" onchange="setMetaAtivo('${a.ticker}','nota',this.value)"></td>
+              <td class="r">${total?((a.vt/total)*100).toFixed(1):0}%</td>
+              <td class="r"><input class="cell-edit" type="number" min="0" step="0.1" value="${a.ideal||''}" placeholder="-" title="% Ideal na carteira" onchange="setMetaAtivo('${a.ticker}','ideal',this.value)"></td>
+              <td class="r"><select class="cell-edit ${a.comprar==='Sim'?'comprar-sim':'comprar-nao'}" title="Comprar mais?" onchange="setMetaAtivo('${a.ticker}','comprar',this.value)"><option value="Não" ${a.comprar!=='Sim'?'selected':''}>✕ Não</option><option value="Sim" ${a.comprar==='Sim'?'selected':''}>✓ Sim</option></select></td>
               <td><button class="btn btn-sm" onclick="removeAtivo('${a.ticker}')"><i class="ti ti-trash" aria-hidden="true"></i></button></td>
             </tr>`).join('')}
           </tbody>

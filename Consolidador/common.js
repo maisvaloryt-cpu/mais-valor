@@ -897,34 +897,52 @@ function injectModals(){
 <div class="modal-bg" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <h2><i class="ti ti-plus" aria-hidden="true" style="margin-right:6px"></i>Adicionar Lançamento</h2>
+
+    <div class="seg-toggle">
+      <button type="button" id="seg-Compra" class="seg-btn active" onclick="setTipoTx('Compra')"><i class="ti ti-shopping-cart" aria-hidden="true"></i> Compra</button>
+      <button type="button" id="seg-Venda" class="seg-btn" onclick="setTipoTx('Venda')"><i class="ti ti-cash" aria-hidden="true"></i> Venda</button>
+    </div>
+    <input type="hidden" id="f-tipo" value="Compra">
+
     <div class="modal-grid">
-      <div class="form-group"><label>Ticker / Nome</label><input id="f-ticker" type="text" placeholder="PETR4, BTC, AAPL..."></div>
-      <div class="form-group"><label>Classe</label>
-        <select id="f-classe">
+      <div class="form-group" style="grid-column:1/-1"><label>Tipo de ativo</label>
+        <select id="f-classe" onchange="onClasseChange()">
           <option value="B3">Ações B3</option><option value="FII">FIIs</option>
-          <option value="Crypto">Criptomoedas</option><option value="RF">Renda Fixa</option>
-          <option value="ETF">ETFs</option><option value="Exterior">Exterior</option><option value="BDR">BDRs</option>
+          <option value="ETF">ETFs</option><option value="Crypto">Criptomoedas</option>
+          <option value="BDR">BDRs</option><option value="Exterior">Exterior</option>
+          <option value="RF">Renda Fixa (CDB/LCI/LCA/LC...)</option>
         </select>
       </div>
-      <div class="form-group"><label>Tipo</label>
-        <select id="f-tipo"><option value="Compra">Compra</option><option value="Venda">Venda</option><option value="Provento">Provento</option></select>
+
+      <!-- Bloco Ações / variável -->
+      <div class="grp-equity form-group"><label>Ativo</label><input id="f-ticker" type="text" placeholder="PETR4, BTC, AAPL..."></div>
+      <div class="grp-equity form-group"><label>Data da transação</label><input id="f-data" type="date"></div>
+      <div class="grp-equity form-group"><label>Quantidade</label><input id="f-qtd" type="number" placeholder="100" min="0"></div>
+      <div class="grp-equity form-group"><label>Preço em R$</label><input id="f-pm" type="number" placeholder="28,50" step="0.01"></div>
+      <div class="grp-equity form-group"><label>Outros custos (R$) <small style="color:var(--color-text-secondary)">(opcional)</small></label><input id="f-custos" type="number" placeholder="0,00" step="0.01"></div>
+
+      <!-- Bloco Renda Fixa -->
+      <div class="grp-rf form-group"><label>Emissor</label><input id="rf-emissor" type="text" placeholder="Ex: Banco Inter, Nubank..."></div>
+      <div class="grp-rf form-group"><label>Tipo de título</label>
+        <select id="rf-titulo"><option>CDB</option><option>LCI</option><option>LCA</option><option>LC</option><option>Tesouro Direto</option><option>Debênture</option><option>CRI</option><option>CRA</option><option>Outro</option></select>
       </div>
-      <div class="form-group"><label>Data</label><input id="f-data" type="date"></div>
-      <div class="form-group"><label>Quantidade</label><input id="f-qtd" type="number" placeholder="100" min="0"></div>
-      <div class="form-group"><label>Preço Médio (R$)</label><input id="f-pm" type="number" placeholder="28.50" step="0.01"></div>
-      <div class="form-group"><label>Cotação Atual (R$) <small style="color:var(--color-text-secondary)">(auto)</small></label><input id="f-cotacao" type="number" placeholder="Preenchido pelo site" step="0.01"></div>
-      <div class="form-group"><label>Nota (0–10)</label><input id="f-nota" type="number" placeholder="8" min="0" max="10"></div>
-      <div class="form-group"><label>% Ideal na Carteira</label><input id="f-ideal" type="number" placeholder="5" step="0.1"></div>
-      <div class="form-group"><label>Moeda</label>
-        <select id="f-moeda"><option value="BRL">R$ BRL</option><option value="USD">$ USD</option></select>
+      <div class="grp-rf form-group"><label>Indexador</label>
+        <select id="rf-indexador" onchange="onIndexadorChange()"><option value="CDI">CDI</option><option value="IPCA">IPCA+</option><option value="Prefixado">Prefixado</option><option value="Selic">Selic</option></select>
       </div>
-      <div class="form-group"><label>Comprar mais?</label>
-        <select id="f-comprar"><option value="Sim">Sim</option><option value="Não">Não</option></select>
+      <div class="grp-rf form-group"><label id="rf-taxa-label">Taxa do CDI (%)</label><input id="rf-taxa" type="number" placeholder="0,00" step="0.01"></div>
+      <div class="grp-rf form-group"><label>Forma</label>
+        <select id="rf-forma"><option>Pós-fixado</option><option>Prefixado</option><option>Híbrido</option></select>
+      </div>
+      <div class="grp-rf form-group"><label>Valor aplicado (R$)</label><input id="rf-valor" type="number" placeholder="0,00" step="0.01"></div>
+      <div class="grp-rf form-group"><label>Data da transação</label><input id="rf-data" type="date"></div>
+      <div class="grp-rf form-group"><label>Data de vencimento</label><input id="rf-venc" type="date"></div>
+      <div class="grp-rf form-group" style="grid-column:1/-1;display:flex;align-items:center;gap:8px">
+        <input id="rf-liquidez" type="checkbox" style="width:auto;cursor:pointer"><label for="rf-liquidez" style="margin:0;cursor:pointer">Liquidez diária</label>
       </div>
     </div>
     <div class="modal-actions">
       <button class="btn" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-primary" onclick="addAtivo()"><i class="ti ti-check" aria-hidden="true"></i> Salvar</button>
+      <button class="btn btn-primary" onclick="addAtivo()"><i class="ti ti-check" aria-hidden="true"></i> Adicionar Lançamento</button>
     </div>
   </div>
 </div>
@@ -963,31 +981,89 @@ function injectModals(){
   document.body.appendChild(wrap);
 }
 
-function openModal(){injectModals();document.getElementById('modal').style.display='flex';document.getElementById('f-data').value=new Date().toISOString().slice(0,10)}
-function closeModal(){document.getElementById('modal').style.display='none';['f-ticker','f-qtd','f-pm','f-cotacao','f-nota','f-ideal'].forEach(id=>{document.getElementById(id).value=''})}
+function openModal(){
+  injectModals();
+  document.getElementById('modal').style.display='flex';
+  const hoje=new Date().toISOString().slice(0,10);
+  document.getElementById('f-data').value=hoje;
+  document.getElementById('rf-data').value=hoje;
+  setTipoTx('Compra');
+  onClasseChange();
+}
+function closeModal(){
+  document.getElementById('modal').style.display='none';
+  ['f-ticker','f-qtd','f-pm','f-custos','rf-emissor','rf-taxa','rf-valor','rf-venc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
+  const liq=document.getElementById('rf-liquidez');if(liq)liq.checked=false;
+}
+
+/* Alterna botão Compra/Venda */
+function setTipoTx(t){
+  document.getElementById('f-tipo').value=t;
+  ['Compra','Venda'].forEach(x=>{document.getElementById('seg-'+x).classList.toggle('active',x===t)});
+}
+
+/* Mostra os campos certos conforme o Tipo de ativo */
+function onClasseChange(){
+  const rf=document.getElementById('f-classe').value==='RF';
+  document.querySelectorAll('#modal .grp-rf').forEach(el=>{el.style.display=rf?'':'none'});
+  document.querySelectorAll('#modal .grp-equity').forEach(el=>{el.style.display=rf?'none':''});
+}
+
+/* Ajusta o rótulo da taxa conforme o indexador */
+function onIndexadorChange(){
+  const idx=document.getElementById('rf-indexador').value;
+  const lbl={CDI:'Taxa do CDI (%)',IPCA:'Taxa + IPCA (% a.a.)',Prefixado:'Taxa prefixada (% a.a.)',Selic:'Taxa + Selic (%)'}[idx]||'Taxa (%)';
+  document.getElementById('rf-taxa-label').textContent=lbl;
+}
 function openModalMeta(){injectModals();document.getElementById('modal-meta').style.display='flex'}
 function closeModalMeta(){document.getElementById('modal-meta').style.display='none'}
+/* modal redesign v2 — campos dinâmicos RF/Ações */
 
 function addAtivo(){
-  const ticker=document.getElementById('f-ticker').value.trim().toUpperCase();
   const classe=document.getElementById('f-classe').value;
   const tipo=document.getElementById('f-tipo').value;
-  const qtd=parseFloat(document.getElementById('f-qtd').value)||0;
-  const pm=parseFloat(document.getElementById('f-pm').value)||0;
-  const cotacao=parseFloat(document.getElementById('f-cotacao').value)||0; // fallback se site não tiver
-  const data=document.getElementById('f-data').value;
-  const nota=parseInt(document.getElementById('f-nota').value)||0;
-  const ideal=parseFloat(document.getElementById('f-ideal').value)||0;
-  const moeda=document.getElementById('f-moeda').value;
-  const comprar=document.getElementById('f-comprar').value;
-  if(!ticker||!qtd||!pm){alert('Preencha Ticker, Quantidade e Preço Médio.');return}
+  let obj;
+  // Nota / % Ideal / Comprar são definidos depois, na carteira (Resumo).
+  if(classe==='RF'){
+    const emissor=document.getElementById('rf-emissor').value.trim();
+    const titulo=document.getElementById('rf-titulo').value;
+    const indexador=document.getElementById('rf-indexador').value;
+    const taxa=parseFloat(document.getElementById('rf-taxa').value)||0;
+    const forma=document.getElementById('rf-forma').value;
+    const valor=parseFloat(document.getElementById('rf-valor').value)||0;
+    const data=document.getElementById('rf-data').value;
+    const venc=document.getElementById('rf-venc').value;
+    const liquidez=document.getElementById('rf-liquidez').checked;
+    if(!emissor||!valor){alert('Preencha Emissor e Valor aplicado.');return}
+    const ticker=`${titulo} ${emissor}`.toUpperCase();
+    // qtd=1 e pm=valor → total = valor aplicado (mantém o formato dos demais consumidores)
+    obj={ticker,classe:'RF',tipo,qtd:1,pm:valor,cotacao:valor,data,nota:0,ideal:0,moeda:'BRL',comprar:'Não',
+         rf:{emissor,titulo,indexador,taxa,forma,valor,venc,liquidez}};
+  }else{
+    const ticker=document.getElementById('f-ticker').value.trim().toUpperCase();
+    const qtd=parseFloat(document.getElementById('f-qtd').value)||0;
+    const preco=parseFloat(document.getElementById('f-pm').value)||0;
+    const custos=parseFloat(document.getElementById('f-custos').value)||0;
+    const data=document.getElementById('f-data').value;
+    if(!ticker||!qtd||!preco){alert('Preencha Ativo, Quantidade e Preço.');return}
+    // Outros custos entram no preço médio (custo de aquisição all-in)
+    const pm=preco+(qtd>0?custos/qtd:0);
+    obj={ticker,classe,tipo,qtd,pm,cotacao:0,data,nota:0,ideal:0,moeda:'BRL',comprar:'Não',custos};
+  }
   // Bug #1 fix: sempre push — novo modelo de transações (não sobrescreve lançamentos anteriores)
-  const obj={ticker,classe,tipo,qtd,pm,cotacao,data,nota,ideal,moeda,comprar};
   ativos.push(obj);
   saveAtivos();
   closeModal();
   initConsolidador(); // recarrega cotação e proventos do site
   toast('Lançamento salvo.');
+}
+
+/* Define Nota / % Ideal / Comprar depois, na carteira (grava em todos os lançamentos do ticker) */
+function setMetaAtivo(ticker,campo,valor){
+  const v=campo==='comprar'?valor:(parseFloat(valor)||0);
+  let mexeu=false;
+  ativos.forEach(a=>{if(a.ticker===ticker){a[campo]=v;mexeu=true}});
+  if(mexeu){saveAtivos();if(typeof renderAll==='function')renderAll();}
 }
 
 function addMeta(){
