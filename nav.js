@@ -816,7 +816,7 @@ function renderNavAuth(user) {
 }
 
 function _setupNavAuth() {
-  if (typeof firebase === 'undefined') return;
+  if (typeof firebase === 'undefined' || typeof firebase.auth !== 'function') return;
   if (!firebase.apps.length) firebase.initializeApp(_NAV_FB_CONFIG);
   firebase.auth().onAuthStateChanged(renderNavAuth);
 }

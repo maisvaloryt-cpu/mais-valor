@@ -135,6 +135,19 @@ html, body {
     width: 100% !important;
     max-width: 100% !important;
   }
+
+  /* ── Cards de métrica do Consolidador: número grande não pode
+     quebrar linha e deformar o card em telas pequenas ──────────── */
+  .metrics {
+    gap: 8px !important;
+  }
+  .mcard {
+    padding: 12px 14px !important;
+  }
+  .mcard-value {
+    font-size: clamp(15px, 4.5vw, 19px) !important;
+    white-space: nowrap;
+  }
   .tab {
     flex-shrink: 0;
     white-space: nowrap;
