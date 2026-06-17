@@ -492,14 +492,14 @@ html, body {
   }
   .nav-logo svg,
   .nav-logo img {
-    width: 47px !important;
-    height: 47px !important;
-    border-radius: 10px !important;
+    width: 61px !important;
+    height: 61px !important;
+    border-radius: 13px !important;
     flex-shrink: 0 !important;
   }
   .nav-logo span {
-    font-size: 38px !important;
-    line-height: 47px !important;
+    font-size: 49px !important;
+    line-height: 61px !important;
     letter-spacing: 0.3px !important;
   }
   #nav-hamburger {
