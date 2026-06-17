@@ -125,6 +125,16 @@ html, body {
     padding-bottom: 2px;
   }
   .tabs::-webkit-scrollbar { display: none; }
+
+  /* ── Abas do Consolidador (ferramenta): forçar largura travada na tela
+     para o overflow-x:auto acima funcionar. Sem isso, a regra
+     "width: fit-content" do style.css faz a barra crescer além da tela,
+     e como o body tem overflow-x:hidden, as abas extras ficam escondidas
+     e sem rolagem. ────────────────────────────────────────────────── */
+  .app .tabs {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
   .tab {
     flex-shrink: 0;
     white-space: nowrap;
