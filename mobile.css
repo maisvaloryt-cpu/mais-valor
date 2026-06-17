@@ -121,41 +121,32 @@ html, body {
     white-space: nowrap;
   }
 
-  /* ── Tabela: cabe na largura da tela (sem scroll lateral) ───── */
+  /* ══ TABELAS (todas, incl. home): colunas completas + rolagem lateral ══ */
   .table-wrap {
-    overflow-x: hidden;
+    overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     border-radius: var(--radius-lg, 12px);
   }
+  .table-wrap::-webkit-scrollbar { height: 0; }
   .data-table {
-    min-width: 0;
-    width: 100%;
+    width: auto;
+    min-width: 100%;
     table-layout: auto;
   }
-  /* Colunas menos importantes: ocultar no mobile */
-  .data-table th.r:nth-child(n+5),
-  .data-table td.r:nth-child(n+5) {
-    display: none;
-  }
-  /* Mantém sempre: ativo, preço, variação, DY */
-  .data-table th:nth-child(1),
-  .data-table td:nth-child(1),
-  .data-table th:nth-child(2),
-  .data-table td:nth-child(2),
-  .data-table th:nth-child(3),
-  .data-table td:nth-child(3),
-  .data-table th:nth-child(4),
-  .data-table td:nth-child(4) {
-    display: table-cell;
-  }
-  /* Coluna Ativo absorve o espaço; numéricas só o necessário */
-  .data-table td:nth-child(1),
-  .data-table th:nth-child(1) {
-    width: auto;
+  /* Reduz espaço vazio: numéricas usam só o necessário, sem quebrar linha */
+  .data-table th,
+  .data-table td {
+    white-space: nowrap;
   }
   .data-table td.r,
   .data-table th.r {
     width: 1%;
+  }
+  /* Coluna Ativo (1ª) fica compacta para não esticar a tabela */
+  .data-table .asset-name {
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
   }
 
@@ -370,20 +361,6 @@ html, body {
   /* ── Comparador score ───────────────────────────────────────── */
   .cmp-select {
     padding: 12px !important;
-  }
-
-  /* ── Rankings: esconde mais colunas em tela minúscula ────────── */
-  .data-table th:nth-child(n+4),
-  .data-table td:nth-child(n+4) {
-    display: none;
-  }
-  .data-table th:nth-child(1),
-  .data-table td:nth-child(1),
-  .data-table th:nth-child(2),
-  .data-table td:nth-child(2),
-  .data-table th:nth-child(3),
-  .data-table td:nth-child(3) {
-    display: table-cell;
   }
 
   /* ── Nav do Simulador ───────────────────────────────────────── */
