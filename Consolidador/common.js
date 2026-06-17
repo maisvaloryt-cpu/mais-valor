@@ -835,6 +835,58 @@ function renderHeaderAndNav(active){
   if(tabsEl){
     tabsEl.innerHTML=NAV_TABS.map(t=>`<a class="tab ${t.id===active?'active':''}" href="${t.href}"><i class="ti ${t.icon}" aria-hidden="true"></i> ${t.label}</a>`).join('');
   }
+  mvInitSpaTabs();
+}
+
+/* ===================== TROCA DE ABAS SEM RECARREGAR (SPA leve) =====================
+   Ao clicar numa aba, em vez de recarregar a página inteira, busca só o conteúdo
+   (#tab-*) e o script daquela página e troca apenas a parte abaixo dos menus.
+   A barra de navegação, o cabeçalho e as abas continuam fixos no lugar.
+   Os dados já estão na memória, então não há novo carregamento. */
+let _mvSpaReady=false;
+function mvInitSpaTabs(){
+  if(_mvSpaReady)return;
+  _mvSpaReady=true;
+  document.addEventListener('click',e=>{
+    const a=e.target.closest?e.target.closest('.tabs .tab'):null;
+    if(!a)return;
+    // deixa o navegador agir normalmente em abrir-em-nova-aba / clique do meio
+    if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button!==0)return;
+    const href=a.getAttribute('href');
+    if(!href||!/\.html$/.test(href))return;
+    e.preventDefault();
+    if(a.classList.contains('active'))return;
+    mvLoadTab(href,true);
+  });
+  window.addEventListener('popstate',()=>{
+    const f=(location.pathname.split('/').pop()||'resumo.html');
+    mvLoadTab(f,false);
+  });
+}
+
+async function mvLoadTab(href,push){
+  let html;
+  try{
+    const res=await fetch(href,{cache:'no-cache'});
+    html=await res.text();
+  }catch(err){ location.href=href; return; } // se falhar, navega do jeito antigo
+  const doc=new DOMParser().parseFromString(html,'text/html');
+  const novo=doc.querySelector('.app [id^="tab-"]');
+  const atual=document.querySelector('.app [id^="tab-"]');
+  if(!novo||!atual){ location.href=href; return; }
+  atual.replaceWith(novo);
+  if(doc.title)document.title=doc.title;
+  // roda o script da página (define o renderAll e desenha) — sem refazer o fetch dos dados
+  const scr=[...doc.querySelectorAll('script:not([src])')].find(s=>/function\s+renderAll/.test(s.textContent));
+  if(scr){
+    const code=scr.textContent.replace(/mvGate\s*\(\s*initConsolidador\s*\)\s*;?/,'if(typeof renderAll==="function")renderAll();');
+    const el=document.createElement('script');
+    el.textContent=code;
+    document.body.appendChild(el);
+    el.remove();
+  }
+  if(push)history.pushState({},'',href);
+  window.scrollTo(0,0);
 }
 
 /* ---- modais (lançamento e meta) ---- */
