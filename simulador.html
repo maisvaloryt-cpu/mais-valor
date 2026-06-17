@@ -645,6 +645,10 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
 .btn-confirmar-etapa:disabled { opacity: .35; cursor: not-allowed; border-color: var(--sim-border2); color: var(--sim-text3); background: transparent; }
 .btn-aplicar-classes.show { display: block; }
 </style>
+<!-- Áreas ocultas usadas só para o nav.js inicializar o Firebase/login -->
+<div id="nav-placeholder" style="display:none"></div>
+<div id="footer-placeholder" style="display:none"></div>
+
 <!-- Logo embutido — link para home -->
 <div style="position:fixed;top:0;left:0;right:0;height:72px;background:var(--bg,#0E0E11);border-bottom:1px solid var(--border,#222);display:flex;align-items:center;padding:0 24px;gap:20px;z-index:200;">
   <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;">
@@ -668,6 +672,7 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
     <span style="font-size:14px;font-weight:700;color:#fff;font-family:var(--font-body,sans-serif);letter-spacing:.01em;">Simulador de Carteiras — Backtest</span>
     <span style="font-size:11px;color:#4E4D4A;font-family:var(--font-body,sans-serif);">Ferramenta criada pelo canal Mais Valor</span>
   </div>
+  <div id="sim-auth-area" style="margin-left:auto;flex-shrink:0;"></div>
 </div>
 <div style="height:72px"></div>
 
@@ -943,6 +948,39 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
   <div class="loader-text">Calculando simulação...</div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="nav.js"></script>
+<script>
+// ── Login (opcional) — só serve para ligar a rede de segurança do F5 na nuvem.
+// O Simulador funciona normalmente sem login; sem login, só não há recuperação após F5.
+let _simUser = null;
+let _simAuthReadyResolve;
+const _simAuthReady = new Promise(r => { _simAuthReadyResolve = r; });
+
+function _renderSimAuthUI(user) {
+  const el = document.getElementById('sim-auth-area');
+  if (!el) return;
+  el.innerHTML = user
+    ? `<div style="display:flex;align-items:center;gap:10px;">
+         <span style="font-size:12px;color:var(--sim-text2,#8A8884);">${user.displayName || user.email || 'Logado'}</span>
+         <button onclick="navLogout()" style="background:transparent;border:1px solid var(--border,#222);color:#fff;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;">Sair</button>
+       </div>`
+    : `<button onclick="navLoginGoogle()" style="background:var(--sim-accent,#D4A017);border:none;color:#000;font-weight:700;border-radius:6px;padding:7px 14px;font-size:12px;cursor:pointer;">Entrar com Google</button>`;
+}
+
+if (typeof firebase !== 'undefined') {
+  if (!firebase.apps.length) firebase.initializeApp(_NAV_FB_CONFIG);
+  firebase.auth().onAuthStateChanged(user => {
+    _simUser = user;
+    _renderSimAuthUI(user);
+    _simAuthReadyResolve();
+  });
+} else {
+  _simAuthReadyResolve();
+}
+</script>
 <script>
 // ╔══════════════════════════════════════════════════════════════╗
 // ║  LEI PÉTREA — SIMULADOR MAIS VALOR                          ║
@@ -3617,7 +3655,7 @@ function importarSims() {
 
 function clearAll() {
   simulations = []; activeSimIdx = 0; viewMode = 'single'; editingSimIdx = null;
-  localStorage.removeItem(LS_KEY);
+  if (_simUser) firebase.firestore().collection('simDrafts').doc(_simUser.uid).delete().catch(()=>{});
   document.getElementById('emptyState').style.display = 'flex';
   document.getElementById('resultsArea').style.display = 'none';
   document.getElementById('singleView').style.display  = 'none';
@@ -4354,18 +4392,19 @@ async function initDynamicTickers() {
 // Inicializa tickers dinâmicos e só então renderiza a sidebar
 
 // ══════════════════════════════════════════════════════════════
-// PERSISTÊNCIA — localStorage
+// PERSISTÊNCIA — Firestore (só funciona logado; sem login não há rede
+// de segurança, mas o Simulador continua funcionando normalmente).
 // Salva: parâmetros do formulário, state (classes/config/divMode)
 //        e simulações completas (sem dados de preço — só config+result)
 // ══════════════════════════════════════════════════════════════
-const LS_KEY = 'maisvalor_sim_v1';
+const LS_TTL_MS = 30 * 60 * 1000; // 30 minutos
 // Cache temporário: serve só como rede de segurança contra F5 / queda rápida de
 // internet. Expira 30 min após a ÚLTIMA interação (cada salvarEstado renova o
 // relógio, criando uma janela deslizante). Ao expirar, o cache é descartado na
 // próxima abertura da página — nada é apagado da tela enquanto a aba está aberta.
-const LS_TTL_MS = 30 * 60 * 1000; // 30 minutos
 
 function salvarEstado() {
+  if (!_simUser) return; // sem login: sem rede de segurança de F5
   try {
     const dados = {
       form: {
@@ -4397,27 +4436,26 @@ function salvarEstado() {
       activeSimIdx, viewMode, editingSimIdx,
       savedAt: Date.now(), // renova a janela de 30 min a cada interação
     };
-    localStorage.setItem(LS_KEY, JSON.stringify(dados));
+    firebase.firestore().collection('simDrafts').doc(_simUser.uid).set(dados)
+      .catch(e => console.warn('Cache temporário não pôde ser salvo:', e && e.message));
   } catch(e) {
-    // Falha ao salvar (ex.: quota do navegador cheia). Não quebra a aplicação —
-    // a simulação na tela continua intacta; apenas a rede de segurança de F5
-    // não estará disponível desta vez. Avisa o usuário para exportar.
     console.warn('Cache temporário não pôde ser salvo:', e && e.message);
-    showPopup('⚠ Cache indisponível — use "Exportar" para salvar suas simulações.');
   }
 }
 
-function restaurarEstado() {
+async function restaurarEstado() {
+  if (!_simUser) return false; // sem login: nada para restaurar
   try {
-    const raw = localStorage.getItem(LS_KEY);
-    if (!raw) return false;
-    const dados = JSON.parse(raw);
+    const ref = firebase.firestore().collection('simDrafts').doc(_simUser.uid);
+    const doc = await ref.get();
+    if (!doc.exists) return false;
+    const dados = doc.data();
 
     // Cache expirado? (passou mais de 30 min desde a última interação)
     // Se sim, descarta e começa do zero — a rede de segurança só vale para
     // recargas rápidas (F5 acidental, queda breve de internet).
     if (!dados.savedAt || (Date.now() - dados.savedAt) > LS_TTL_MS) {
-      localStorage.removeItem(LS_KEY);
+      ref.delete().catch(()=>{});
       return false;
     }
 
@@ -4483,7 +4521,7 @@ let _idleTimer = null;
 function agendarExpiracaoCache() {
   if (_idleTimer) clearTimeout(_idleTimer);
   _idleTimer = setTimeout(() => {
-    try { localStorage.removeItem(LS_KEY); } catch(e) {}
+    if (_simUser) firebase.firestore().collection('simDrafts').doc(_simUser.uid).delete().catch(()=>{});
   }, LS_TTL_MS);
 }
 // Cada salvamento de estado é uma interação → reinicia o relógio de inatividade.
@@ -4493,8 +4531,8 @@ salvarEstado = function() {
   agendarExpiracaoCache();
 };
 
-initDynamicTickers().then(() => {
-  const temEstado = restaurarEstado();
+Promise.all([initDynamicTickers(), _simAuthReady]).then(async () => {
+  const temEstado = await restaurarEstado();
   renderSidebar();
   state.classesSel.forEach(sel => atualizarBotaoAdd(sel.id));
 

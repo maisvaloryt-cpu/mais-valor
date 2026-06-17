@@ -343,8 +343,10 @@ function _mvEnsureGateEls(){
     <button class="btn btn-primary" style="padding:8px 16px;font-size:13px" onclick="loginGoogle()">
       <i class="ti ti-brand-google" aria-hidden="true"></i> Entrar com Google
     </button>`;
-  document.body.insertBefore(login,document.body.firstChild);
-  document.body.insertBefore(loading,document.body.firstChild);
+  // Insere logo antes da .app (depois da navegação), para não empurrar a barra/título do site.
+  const appEl=document.querySelector('.app');
+  document.body.insertBefore(login,appEl);
+  document.body.insertBefore(loading,appEl);
 }
 
 /* Cada página chama mvGate(initConsolidador) no lugar de renderAll() direto,
