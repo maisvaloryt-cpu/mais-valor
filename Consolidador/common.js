@@ -828,6 +828,16 @@ function processB3Rows(rows){
     }
   }
 
+  // [BUG-RF1 FIX] Resgata Renda Fixa de importações anteriores que ficou sem indexador/taxa
+  // (ex: CDB "pulado" no modal, ou importado num arquivo B3 diferente). Sem isso, esses
+  // ativos nunca mais reapareciam para completar os dados, mesmo importando outros extratos.
+  const _rfJaNaFila=new Set(pendingRF.map(p=>p.ativoRef));
+  ativos.forEach(a=>{
+    if(a.classe==='RF'&&a.tipo==='Compra'&&!a.rf&&!_rfJaNaFila.has(a)){
+      pendingRF.push({ativoRef:a,ticker:a.ticker,nome:a.ticker,valor:a.pm,data:a.data,rfSubtipo:null});
+    }
+  });
+
   saveAtivos();
   if(pendingRF.length){
     toast(`B3: ${importados} lançamento(s) importado(s). Completando dados da Renda Fixa…`);
@@ -966,6 +976,7 @@ function renderHeaderAndNav(active){
     headerActions.innerHTML=`
       <div class="carteira-switcher" id="carteira-switcher"></div>
       <button class="btn" onclick="infoB3()"><i class="ti ti-building-bank" aria-hidden="true"></i> Integração B3</button>
+      <button class="btn" onclick="abrirPendenciasRF()" title="Verificar Renda Fixa sem indexador/taxa"><i class="ti ti-alert-triangle" aria-hidden="true"></i> RF pendente</button>
       <button class="btn" onclick="openImport()"><i class="ti ti-file-spreadsheet" aria-hidden="true"></i> Importar Excel</button>
       <input type="file" id="csv-input" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleCSVImport(this)">
       <button class="btn btn-primary" onclick="openModal()"><i class="ti ti-edit" aria-hidden="true"></i> Modo Manual</button>
@@ -1034,6 +1045,15 @@ async function mvLoadTab(href,push){
 /* ===================== MODAL DE COMPLEMENTO DE RENDA FIXA (pós-import B3) =====================
    Exibido sequencialmente para cada CDB/LCI/LCA/Tesouro importado que não tem indexador/taxa/vencimento.
    O usuário preenche os dados e eles são gravados no objeto ativo já salvo em ativos[]. */
+
+/* [BUG-RF1 FIX] Verifica a qualquer momento (não só no import) se há Renda Fixa sem
+   indexador/taxa/vencimento e abre o modal de complemento para elas. */
+function abrirPendenciasRF(){
+  const pend=ativos.filter(a=>a.classe==='RF'&&a.tipo==='Compra'&&!a.rf)
+    .map(a=>({ativoRef:a,ticker:a.ticker,nome:a.ticker,valor:a.pm,data:a.data,rfSubtipo:null}));
+  if(!pend.length){toast('Nenhuma Renda Fixa pendente de dados.');return;}
+  openModalRFComplement(pend,()=>{saveAtivos();initConsolidador();});
+}
 
 function openModalRFComplement(pendingList, onDone){
   injectModals();
