@@ -180,13 +180,24 @@ async function loadAllDividendos(){
 /* Retorna a qtd líquida de um ticker em uma data específica */
 function getQtdTickerAtDate(ticker,dateStr){
   let qtd=0;
-  // Bug #4 fix: guard data vazia ('' <= qualquer string em JS → incluiria lançamentos sem data)
-  ativos.filter(a=>a.ticker===ticker&&a.data&&a.data<=dateStr).forEach(a=>{
-    const tipo=a.tipo||'Compra';
-    if(tipo==='Venda')qtd=Math.max(0,qtd-a.qtd);
-    else if(tipo==='Compra')qtd+=a.qtd;
-    // Provento: não altera quantidade
-  });
+  // [BUG-RF3 FIX] Ordena por data (Compra antes de Venda no mesmo dia) antes de processar.
+  // Sem isso, a ordem dependia da ordem de IMPORTAÇÃO dos arquivos B3: se a planilha com a
+  // venda (mais recente) fosse importada antes da planilha com a compra (mais antiga), a venda
+  // era processada com qtd ainda em 0 (ficava travada em 0) e a compra posterior fazia o ativo
+  // parecer ainda detido em datas futuras — gerando provento fantasma para algo já vendido.
+  ativos.filter(a=>a.ticker===ticker&&a.data&&a.data<=dateStr)
+    .slice()
+    .sort((a,b)=>{
+      if(a.data!==b.data)return a.data<b.data?-1:1;
+      const oa=a.tipo==='Venda'?1:0, ob=b.tipo==='Venda'?1:0;
+      return oa-ob;
+    })
+    .forEach(a=>{
+      const tipo=a.tipo||'Compra';
+      if(tipo==='Venda')qtd=Math.max(0,qtd-a.qtd);
+      else if(tipo==='Compra')qtd+=a.qtd;
+      // Provento: não altera quantidade
+    });
   return qtd;
 }
 
