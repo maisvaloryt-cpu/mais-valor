@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consolidador de Carteira — Aporte</title>
+<link rel="stylesheet" href="common.css">
+<link rel="icon" type="image/png" href="../favicon.png">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../mobile.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
+<script>window.NAV_BASE_PATH = "../"; window.NAV_SLIM = true;</script>
+</head>
+<body>
+<div id="nav-placeholder"></div>
+<h2 class="sr-only">Consolidador de Carteira — Aporte: onde investir e meta da carteira</h2>
+
+<div class="app">
+  <div class="header">
+    <h1><i class="ti ti-chart-pie" aria-hidden="true" style="color:var(--blue)"></i>Consolidador de Carteira</h1>
+    <div class="header-actions" id="header-actions"></div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div id="tab-aporte">
+    <div class="charts-row">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-cash" aria-hidden="true" style="color:var(--blue)"></i>Quanto vou aportar</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:15px;color:var(--color-text-secondary)">R$</span>
+          <input id="ap-input" type="number" min="0" step="50" placeholder="0,00" class="cell-edit" style="width:160px;font-size:16px;text-align:right" oninput="apSetAporte(this.value)">
+        </div>
+        <div id="ap-resumo" style="font-size:12px;color:var(--color-text-secondary);margin-top:10px"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-target" aria-hidden="true" style="color:var(--blue)"></i>Meta da carteira (% ideal por classe)</div>
+        <div id="ap-meta-editor"></div>
+        <div id="ap-meta-total" style="margin-top:8px;font-size:12px"></div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="card">
+        <div class="card-title">Sua carteira (hoje)</div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="position:relative;width:150px;height:150px;flex-shrink:0"><canvas id="ap-pizza-atual" role="img" aria-label="Sua carteira atual por classe"></canvas></div>
+          <div id="ap-legenda-atual" style="flex:1;display:flex;flex-direction:column;gap:5px"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Carteira ideal (sua meta)</div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="position:relative;width:150px;height:150px;flex-shrink:0"><canvas id="ap-pizza-ideal" role="img" aria-label="Carteira ideal por classe"></canvas></div>
+          <div id="ap-legenda-ideal" style="flex:1;display:flex;flex-direction:column;gap:5px"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title"><i class="ti ti-arrow-big-down-lines" aria-hidden="true"></i>Onde aportar</div>
+    <div id="ap-tabela"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="common.js"></script>
+<script src="firebase.js"></script>
+<script>
+renderHeaderAndNav('aporte');
+injectModals();
+
+var aporteAtual=0; // var (não let): o script da página roda de novo na troca de abas
+
+// Classes possíveis (mesma ordem do app); o editor de meta lista todas.
+var AP_CLASSES=['B3','FII','ETF','BDR','Crypto','Exterior','RF'];
+
+function apSetAporte(v){ aporteAtual=Math.max(0,parseFloat(v)||0); apRenderTabela(); apRenderResumo(); }
+
+function apIdealMap(){ const m={}; metas.forEach(x=>m[x.classe]=x.ideal); return m; }
+
+/* Editar a meta por classe (atualiza dados + recalcula sem reconstruir os inputs, pra não perder o foco) */
+function apSetMeta(classe,valor){
+  const v=Math.max(0,parseFloat(valor)||0);
+  const idx=metas.findIndex(m=>m.classe===classe);
+  if(idx>=0)metas[idx].ideal=v; else metas.push({classe,ideal:v});
+  saveMetas();
+  apRenderTotal(); apRenderCharts(); apRenderTabela(); apRenderResumo();
+}
+
+function apRenderEditor(){
+  const im=apIdealMap();
+  document.getElementById('ap-meta-editor').innerHTML=AP_CLASSES.map(cl=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <span style="width:10px;height:10px;border-radius:50%;background:${CLASS_COLORS[cl]||'#888'};flex-shrink:0"></span>
+      <span style="flex:1;font-size:13px;color:var(--color-text-primary)">${CLASS_LABEL[cl]||cl}</span>
+      <input class="cell-edit" type="number" min="0" max="100" step="1" value="${im[cl]||''}" placeholder="0" style="width:70px;text-align:right" oninput="apSetMeta('${cl}',this.value)">
+      <span style="font-size:12px;color:var(--color-text-secondary)">%</span>
+    </div>`).join('');
+  apRenderTotal();
+}
+
+function apRenderTotal(){
+  const total=AP_CLASSES.reduce((s,cl)=>s+(apIdealMap()[cl]||0),0);
+  const ok=Math.abs(total-100)<0.5;
+  document.getElementById('ap-meta-total').innerHTML=
+    `Total: <strong style="color:${ok?'#1D9E75':'#BA7517'}">${total.toFixed(0)}%</strong>`+
+    (ok?' ✓':' — o ideal é somar 100%.');
+}
+
+function apPizza(canvasId,labels,vals,colors){
+  const el=document.getElementById(canvasId);
+  if(!el)return;
+  if(charts[canvasId])charts[canvasId].destroy();
+  const soma=vals.reduce((s,v)=>s+v,0);
+  charts[canvasId]=new Chart(el.getContext('2d'),{
+    type:'doughnut',
+    data:{labels,datasets:[{data:vals,backgroundColor:colors,borderWidth:0,hoverOffset:3}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'66%',plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:c=>' '+c.label+': '+(soma?((c.raw/soma)*100).toFixed(1):0)+'%'}}}}
+  });
+}
+
+function apRenderCharts(){
+  const c=calcAtivos();
+  const total=c.reduce((s,a)=>s+a.vt,0);
+  const im=apIdealMap();
+  // Sua carteira (atual) — só classes com valor
+  const bc=byClasse(c);
+  const clsAtual=Object.keys(bc).filter(k=>bc[k]>0);
+  apPizza('ap-pizza-atual',
+    clsAtual.map(k=>CLASS_LABEL[k]||k),
+    clsAtual.map(k=>+bc[k].toFixed(2)),
+    clsAtual.map(k=>CLASS_COLORS[k]||'#888'));
+  document.getElementById('ap-legenda-atual').innerHTML=clsAtual.length?clsAtual.map(k=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span style="width:9px;height:9px;border-radius:50%;background:${CLASS_COLORS[k]||'#888'}"></span>${CLASS_LABEL[k]||k}</span>
+      <span style="font-size:11px;font-weight:500;color:var(--color-text-primary)">${total?((bc[k]/total)*100).toFixed(1):0}%</span>
+    </div>`).join(''):'<div style="font-size:12px;color:var(--color-text-secondary)">Sem ativos ainda.</div>';
+  // Carteira ideal (meta) — só classes com ideal > 0
+  const clsIdeal=AP_CLASSES.filter(k=>(im[k]||0)>0);
+  apPizza('ap-pizza-ideal',
+    clsIdeal.map(k=>CLASS_LABEL[k]||k),
+    clsIdeal.map(k=>im[k]),
+    clsIdeal.map(k=>CLASS_COLORS[k]||'#888'));
+  document.getElementById('ap-legenda-ideal').innerHTML=clsIdeal.length?clsIdeal.map(k=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span style="width:9px;height:9px;border-radius:50%;background:${CLASS_COLORS[k]||'#888'}"></span>${CLASS_LABEL[k]||k}</span>
+      <span style="font-size:11px;font-weight:500;color:var(--color-text-primary)">${im[k]}%</span>
+    </div>`).join(''):'<div style="font-size:12px;color:var(--color-text-secondary)">Defina sua meta ao lado.</div>';
+}
+
+function apRenderResumo(){
+  const el=document.getElementById('ap-resumo');
+  if(!el)return;
+  if(aporteAtual<=0){ el.textContent='Digite um valor para ver onde investir.'; return; }
+  const c=calcAtivos();
+  const total=c.reduce((s,a)=>s+a.vt,0);
+  const sug=calcSugestaoAporte(c,total,aporteAtual);
+  const n=c.filter(a=>sug.aporteAtivo[a.ticker]>0.005).length;
+  el.innerHTML=`Aporte de <strong>${fmtR(aporteAtual)}</strong> dividido em <strong>${n}</strong> ativo(s). Novo patrimônio: <strong>${fmtR(total+aporteAtual)}</strong>.`;
+}
+
+function apRenderTabela(){
+  const c=calcAtivos();
+  const total=c.reduce((s,a)=>s+a.vt,0);
+  const el=document.getElementById('ap-tabela');
+  if(aporteAtual<=0){
+    el.innerHTML='<div class="empty">Digite quanto vai aportar lá em cima para ver quanto investir em cada ativo.</div>';
+    return;
+  }
+  const sug=calcSugestaoAporte(c,total,aporteAtual);
+  const linhas=c.map(a=>({a,ap:sug.aporteAtivo[a.ticker]||0,alvo:sug.alvoPct[a.ticker]||0}))
+    .filter(x=>x.ap>0.005)
+    .sort((x,y)=>y.ap-x.ap);
+  if(!linhas.length){
+    el.innerHTML='<div class="empty">Nenhum ativo recebeu aporte. Defina a meta por classe e dê notas aos ativos.</div>';
+    return;
+  }
+  const maxAp=linhas[0].ap;
+  el.innerHTML=`<div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>Ativo</th><th>Classe</th><th class="r">Nota</th><th class="r">% alvo</th><th class="r">Aporte sugerido</th><th class="r">% do aporte</th></tr></thead>
+    <tbody>
+      ${linhas.map(({a,ap,alvo})=>`<tr>
+        <td><strong>${a.ticker}</strong></td>
+        <td><span style="display:inline-flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:${CLASS_COLORS[a.classe]||'#888'}"></span>${CLASS_LABEL[a.classe]||a.classe}</span></td>
+        <td class="r">${a.nota||'-'}</td>
+        <td class="r">${alvo>0?alvo.toFixed(1)+'%':'-'}</td>
+        <td class="r"><div style="display:flex;align-items:center;justify-content:flex-end;gap:8px">
+          <span style="flex:1;max-width:120px;height:6px;border-radius:3px;background:rgba(128,128,128,0.15);overflow:hidden"><span style="display:block;height:100%;width:${(ap/maxAp*100).toFixed(0)}%;background:#1D9E75"></span></span>
+          <strong style="color:#1D9E75">${fmtR(ap)}</strong></div></td>
+        <td class="r">${(ap/aporteAtual*100).toFixed(1)}%</td>
+      </tr>`).join('')}
+    </tbody>
+    <tfoot><tr><td colspan="4" style="text-align:right;font-weight:600">Total</td><td class="r"><strong>${fmtR(linhas.reduce((s,x)=>s+x.ap,0))}</strong></td><td class="r">100%</td></tr></tfoot>
+  </table></div>`;
+}
+
+function renderAll(){
+  apRenderEditor();
+  apRenderCharts();
+  apRenderTabela();
+  apRenderResumo();
+}
+
+mvGate(initConsolidador);
+</script>
+<script src="../nav.js"></script>
+</body>
+</html>

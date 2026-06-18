@@ -584,6 +584,39 @@ function byClasse(c){
   return m;
 }
 
+/* ---- Sugestão de aporte (usada na aba Aporte e nas colunas % Ideal / Comprar? do Resumo) ----
+   2 níveis: a classe puxa pro % ideal (metas), depois a nota (peso suave = raiz da nota)
+   divide dentro da classe.
+   - alvoPct[ticker]  : % alvo do ativo na carteira inteira (ideal da classe × peso da nota)
+   - comprar[ticker]  : 'Sim' se o ativo está abaixo do alvo, senão 'Não'
+   - aporteAtivo[tic] : R$ sugerido do aporte para o ativo                                  */
+function calcSugestaoAporte(c,totalAtual,aporte){
+  const idealMap={}; metas.forEach(m=>idealMap[m.classe]=m.ideal);
+  const pesoNota=n=>n>0?Math.sqrt(n):0;
+  const classes=[...new Set(c.map(a=>a.classe))];
+  const somaPesoClasse={}, qtdClasse={};
+  c.forEach(a=>{somaPesoClasse[a.classe]=(somaPesoClasse[a.classe]||0)+pesoNota(a.nota);qtdClasse[a.classe]=(qtdClasse[a.classe]||0)+1;});
+  const shareNota=a=>{const sp=somaPesoClasse[a.classe]||0;return sp>0?pesoNota(a.nota)/sp:(qtdClasse[a.classe]?1/qtdClasse[a.classe]:0);};
+  const alvoPct={}, comprar={};
+  c.forEach(a=>{
+    alvoPct[a.ticker]=(idealMap[a.classe]||0)*shareNota(a);
+    const atualPct=totalAtual>0?(a.vt/totalAtual)*100:0;
+    comprar[a.ticker]=atualPct<alvoPct[a.ticker]-0.05?'Sim':'Não';
+  });
+  const aporteAtivo={}; c.forEach(a=>aporteAtivo[a.ticker]=0);
+  if(aporte>0){
+    const novoTotal=totalAtual+aporte;
+    const bc=byClasse(c);
+    const deficit={}; let somaDef=0;
+    classes.forEach(cl=>{const d=Math.max(0,novoTotal*((idealMap[cl]||0)/100)-(bc[cl]||0));deficit[cl]=d;somaDef+=d;});
+    const somaIdeal=classes.reduce((s,cl)=>s+(idealMap[cl]||0),0);
+    const aporteClasse={};
+    classes.forEach(cl=>{aporteClasse[cl]=somaDef>0?aporte*deficit[cl]/somaDef:(somaIdeal>0?aporte*((idealMap[cl]||0)/somaIdeal):0);});
+    c.forEach(a=>{aporteAtivo[a.ticker]=(aporteClasse[a.classe]||0)*shareNota(a);});
+  }
+  return {alvoPct,comprar,aporteAtivo,temAporte:aporte>0};
+}
+
 /* ---- toast ---- */
 function toast(msg){
   let el=document.getElementById('toast');
@@ -982,6 +1015,7 @@ function adicionarCarteiraModal(){
 /* ---- navegação ---- */
 const NAV_TABS=[
   {id:'resumo',label:'Resumo',icon:'ti-layout-dashboard',href:'resumo.html'},
+  {id:'aporte',label:'Aporte',icon:'ti-cash',href:'aporte.html'},
   {id:'proventos',label:'Proventos',icon:'ti-coin',href:'proventos.html'},
   {id:'patrimonio',label:'Patrimônio',icon:'ti-trending-up',href:'patrimonio.html'},
   {id:'rentabilidade',label:'Rentabilidade',icon:'ti-percent',href:'rentabilidade.html'},

@@ -46,15 +46,6 @@
         </div>
       </div>
     </div>
-    <div class="card" id="aporte-card" style="margin-bottom:14px">
-      <div class="card-title"><i class="ti ti-cash" aria-hidden="true" style="color:var(--blue)"></i>Aporte — onde investir agora</div>
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <label for="aporte-input" style="font-size:12px;color:var(--color-text-secondary)">Quanto vou aportar:</label>
-        <span style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--color-text-secondary)">R$</span>
-          <input id="aporte-input" type="number" min="0" step="50" placeholder="0,00" class="cell-edit" style="width:130px;text-align:right" oninput="setAporte(this.value)"></span>
-        <span id="aporte-resumo" style="font-size:12px;color:var(--color-text-secondary)"></span>
-      </div>
-    </div>
     <div class="section-title"><i class="ti ti-stack" aria-hidden="true"></i>Meus Ativos <span id="total-count" style="font-size:12px;color:var(--color-text-secondary);font-weight:400"></span></div>
     <div id="grupos-ativos"></div>
   </div>
@@ -183,55 +174,13 @@ function renderPizza(mode='classe'){
   `).join('');
 }
 
-var aporteAtual=0; // var (não let): o script da página é re-executado na troca de abas e let daria "already declared"
-function setAporte(v){ aporteAtual=Math.max(0,parseFloat(v)||0); renderGrupos(); }
-
-/* Sugestão de aporte em 2 níveis: a classe puxa pro % ideal (aba Metas), depois a nota
-   (peso suave = raiz da nota) divide dentro da classe.
-   - alvoPct[ticker]  : % alvo do ativo na carteira inteira (ideal da classe × peso da nota)
-   - comprar[ticker]  : 'Sim' se o ativo está abaixo do alvo, senão 'Não'
-   - aporteAtivo[tic] : R$ sugerido do aporte para o ativo                                  */
-function calcSugestaoAporte(c,totalAtual,aporte){
-  const idealMap={}; metas.forEach(m=>idealMap[m.classe]=m.ideal);
-  const pesoNota=n=>n>0?Math.sqrt(n):0;
-  const classes=[...new Set(c.map(a=>a.classe))];
-  const somaPesoClasse={}, qtdClasse={};
-  c.forEach(a=>{somaPesoClasse[a.classe]=(somaPesoClasse[a.classe]||0)+pesoNota(a.nota);qtdClasse[a.classe]=(qtdClasse[a.classe]||0)+1;});
-  const shareNota=a=>{const sp=somaPesoClasse[a.classe]||0;return sp>0?pesoNota(a.nota)/sp:(qtdClasse[a.classe]?1/qtdClasse[a.classe]:0);};
-  // alvo % de cada ativo na carteira + decisão Comprar?
-  const alvoPct={}, comprar={};
-  c.forEach(a=>{
-    alvoPct[a.ticker]=(idealMap[a.classe]||0)*shareNota(a);
-    const atualPct=totalAtual>0?(a.vt/totalAtual)*100:0;
-    comprar[a.ticker]=atualPct<alvoPct[a.ticker]-0.05?'Sim':'Não';
-  });
-  // distribuição do aporte
-  const aporteAtivo={}; c.forEach(a=>aporteAtivo[a.ticker]=0);
-  if(aporte>0){
-    const novoTotal=totalAtual+aporte;
-    const bc=byClasse(c);
-    const deficit={}; let somaDef=0;
-    classes.forEach(cl=>{const d=Math.max(0,novoTotal*((idealMap[cl]||0)/100)-(bc[cl]||0));deficit[cl]=d;somaDef+=d;});
-    const somaIdeal=classes.reduce((s,cl)=>s+(idealMap[cl]||0),0);
-    const aporteClasse={};
-    classes.forEach(cl=>{aporteClasse[cl]=somaDef>0?aporte*deficit[cl]/somaDef:(somaIdeal>0?aporte*((idealMap[cl]||0)/somaIdeal):0);});
-    c.forEach(a=>{aporteAtivo[a.ticker]=(aporteClasse[a.classe]||0)*shareNota(a);});
-  }
-  return {alvoPct,comprar,aporteAtivo,temAporte:aporte>0};
-}
-
 function renderGrupos(){
   const c=calcAtivos();
   const total=c.reduce((s,a)=>s+a.vt,0);
   const totalAtivos=c.length;
   document.getElementById('total-count').textContent='('+totalAtivos+')';
   const idealMap={}; metas.forEach(m=>idealMap[m.classe]=m.ideal);
-  const sug=calcSugestaoAporte(c,total,aporteAtual);
-  const resumoEl=document.getElementById('aporte-resumo');
-  if(resumoEl){
-    const nRec=c.filter(a=>sug.aporteAtivo[a.ticker]>0.005).length;
-    resumoEl.textContent=sug.temAporte?`Sugerido em ${nRec} ativo(s) — divisão por classe + nota (veja a coluna "Aporte").`:'Digite um valor para ver onde investir.';
-  }
+  const sug=calcSugestaoAporte(c,total,0); // aporte=0 aqui: só precisamos de % alvo e Comprar?. O valor do aporte vive na aba Aporte.
   const grupos={};
   c.forEach(a=>{if(!grupos[a.classe])grupos[a.classe]=[];grupos[a.classe].push(a)});
   let html='';
@@ -262,12 +211,11 @@ function renderGrupos(){
       <div id="g-${cls}">
         <div class="tbl-wrap">
         <table class="tbl">
-          <thead><tr><th>Ativo</th><th class="r">Quant.</th><th class="r">Preço Médio</th><th class="r">Preço Atual</th><th class="r">Variação</th><th class="r">Rentabilidade</th><th class="r">Saldo</th><th class="r">Nota</th><th class="r">% Carteira</th><th class="r">% Ideal</th><th class="r">Comprar?</th><th class="r">Aporte</th><th></th></tr></thead>
+          <thead><tr><th>Ativo</th><th class="r">Quant.</th><th class="r">Preço Médio</th><th class="r">Preço Atual</th><th class="r">Variação</th><th class="r">Rentabilidade</th><th class="r">Saldo</th><th class="r">Nota</th><th class="r">% Carteira</th><th class="r">% Ideal</th><th class="r">Comprar?</th><th></th></tr></thead>
           <tbody>
             ${items.map(a=>{
               const alvo=sug.alvoPct[a.ticker]||0;
               const comp=sug.comprar[a.ticker];
-              const ap=sug.aporteAtivo[a.ticker]||0;
               return `<tr>
               <td><strong>${a.ticker}</strong></td>
               <td class="r">${a.qtd.toLocaleString('pt-BR')}</td>
@@ -280,7 +228,6 @@ function renderGrupos(){
               <td class="r">${total?((a.vt/total)*100).toFixed(1):0}%</td>
               <td class="r" title="% alvo automático: ideal da classe × peso da nota">${alvo>0?alvo.toFixed(1)+'%':'-'}</td>
               <td class="r"><span class="pill ${comp==='Sim'?'pill-up':'pill-dn'}" title="Automático: abaixo do % alvo = Sim">${comp==='Sim'?'✓ Sim':'✕ Não'}</span></td>
-              <td class="r">${sug.temAporte&&ap>0.005?'<strong style="color:#1D9E75">'+fmtR(ap)+'</strong>':'-'}</td>
               <td><button class="btn btn-sm" onclick="removeAtivo('${a.ticker}')"><i class="ti ti-trash" aria-hidden="true"></i></button></td>
             </tr>`;}).join('')}
           </tbody>
