@@ -722,8 +722,11 @@ function processB3Rows(rows){
     // Normaliza "Credito"/"Crédito"/"Debito"/"Débito"
     const tipoNorm=String(r[col.tipo]||'').trim().toLowerCase()
       .normalize('NFD').replace(/[̀-ͯ]/g,'');
-    const isBuy=tipoNorm==='debito';   // dinheiro saiu → comprou
-    const isSell=tipoNorm==='credito'; // dinheiro entrou → vendeu
+    // B3 usa Entrada/Saída do ponto de vista do ATIVO (não do dinheiro):
+    // Crédito = ativo entrou na carteira = COMPRA
+    // Débito  = ativo saiu da carteira   = VENDA
+    const isBuy=tipoNorm==='credito';  // ativo entrou → comprou
+    const isSell=tipoNorm==='debito';  // ativo saiu   → vendeu
     if(!isBuy&&!isSell)continue;
 
     const produtoRaw=String(r[col.produto]||'').trim();
