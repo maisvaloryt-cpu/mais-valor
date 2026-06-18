@@ -717,7 +717,11 @@ function processB3Rows(rows){
     const r=rows[i];
     if(!r||r.length<4)continue;
     const mov=String(r[col.mov]||'').trim();
-    if(!mov.toLowerCase().includes('liquid'))continue;
+    const movLow=mov.toLowerCase();
+    // Aceita: "Transferência - Liquidação" (ações/FIIs), "COMPRA / VENDA" (CDB/RF), "Compra", "Venda"
+    const isLiquid=movLow.includes('liquid');
+    const isCompraVenda=movLow.includes('compra')||movLow.includes('venda');
+    if(!isLiquid&&!isCompraVenda)continue;
 
     // Normaliza "Credito"/"Crédito"/"Debito"/"Débito"
     const tipoNorm=String(r[col.tipo]||'').trim().toLowerCase()
@@ -725,21 +729,46 @@ function processB3Rows(rows){
     // B3 usa Entrada/Saída do ponto de vista do ATIVO (não do dinheiro):
     // Crédito = ativo entrou na carteira = COMPRA
     // Débito  = ativo saiu da carteira   = VENDA
-    const isBuy=tipoNorm==='credito';  // ativo entrou → comprou
-    const isSell=tipoNorm==='debito';  // ativo saiu   → vendeu
+    // Para "Compra"/"Venda" explícitos no campo Movimentação, usa esse campo diretamente
+    let isBuy,isSell;
+    if(movLow==='compra'||movLow==='venda'){
+      isBuy=movLow==='compra';
+      isSell=movLow==='venda';
+    }else{
+      isBuy=tipoNorm==='credito';   // ativo entrou → comprou
+      isSell=tipoNorm==='debito';   // ativo saiu   → vendeu
+    }
     if(!isBuy&&!isSell)continue;
 
     const produtoRaw=String(r[col.produto]||'').trim();
     if(!produtoRaw)continue;
 
-    // "TICKER4 - Nome completo"
-    const dashIdx=produtoRaw.indexOf(' - ');
-    const ticker=(dashIdx>0?produtoRaw.slice(0,dashIdx):produtoRaw.split(/\s/)[0]).trim().toUpperCase();
-    const nome=dashIdx>0?produtoRaw.slice(dashIdx+3).trim():'';
-    // [BUG-L5 FIX] Tesouro Direto tem nomes longos (ex: "Tesouro IPCA+ 2035") — avisa e pula
+    // "TICKER4 - Nome completo" → extrai ticker e nome
+    // CDB vem como "CDB - CDB82478KE6 - BANCO ORIGINAL S/A"
+    //   → ticker = "CDB_CDB82478KE6", nome = "BANCO ORIGINAL S/A"
+    let ticker,nome;
+    const isCDB=/^(CDB|LCI|LCA|LFT|RDB|LC)\s*-\s*/i.test(produtoRaw);
+    if(isCDB){
+      // Partes: ["CDB", "CDB82478KE6", "BANCO ORIGINAL S/A"]
+      const partes=produtoRaw.split(/\s*-\s*/);
+      const tipo=partes[0].trim().toUpperCase();          // CDB
+      const codigo=(partes[1]||'').trim().toUpperCase();  // CDB82478KE6
+      ticker=codigo||tipo;                                 // usa o código como ticker único
+      nome=partes.slice(2).join(' - ').trim()||tipo;      // "BANCO ORIGINAL S/A"
+    }else{
+      const dashIdx=produtoRaw.indexOf(' - ');
+      ticker=(dashIdx>0?produtoRaw.slice(0,dashIdx):produtoRaw.split(/\s/)[0]).trim().toUpperCase();
+      nome=dashIdx>0?produtoRaw.slice(dashIdx+3).trim():'';
+    }
     if(!ticker){continue;}
-    if(!/^[A-Z]{3,6}\d{1,2}$/.test(ticker)){
-      if(produtoRaw.toLowerCase().includes('tesouro'))console.warn('[B3] Tesouro Direto ignorado (não é ativo de renda variável): '+produtoRaw);
+    // Tesouro Direto: nome completo vira ticker (ex: "Tesouro IPCA+ 2029"), classe RF
+    const isTesouro=/^TESOURO\s/i.test(produtoRaw);
+    if(isTesouro){
+      ticker=produtoRaw.trim();  // nome completo como identificador único
+      nome=produtoRaw.trim();
+    }
+    // Aceita: tickers de ações (BBAS3), ETFs (NASD11), CDB/LCI por código, Tesouro por nome completo
+    if(!isCDB&&!isTesouro&&!/^[A-Z]{3,6}\d{1,2}$/.test(ticker)){
       continue;
     }
 
@@ -758,16 +787,17 @@ function processB3Rows(rows){
     const preco=parseFloat(String(r[col.preco]||'0').replace(',','.'))||0;
     if(qtd<=0)continue;
 
-    if(!ops[ticker])ops[ticker]={nome,txs:[]};
+    if(!ops[ticker])ops[ticker]={nome,txs:[],rfTipo:(isCDB||isTesouro)?'RF':null,isRF:isCDB||isTesouro};
     if(nome&&!ops[ticker].nome)ops[ticker].nome=nome;
     ops[ticker].txs.push({data:dataStr,side:isBuy?'buy':'sell',qtd,preco});
   }
 
   let importados=0;
+  const pendingRF=[]; // CDBs/RF que precisam de dados complementares
 
-  for(const [ticker,{nome,txs}] of Object.entries(ops)){
+  for(const [ticker,{nome,txs,rfTipo,isRF}] of Object.entries(ops)){
     txs.sort((a,b)=>a.data.localeCompare(b.data));
-    const classe=classificarB3(ticker,nome);
+    const classe=rfTipo||classificarB3(ticker,nome);
 
     // Bug #8 fix: salva cada transação individual (igual ao processImportRows)
     // calcPosicoes() cuida do PM ponderado e qtd líquida
@@ -787,12 +817,25 @@ function processB3Rows(rows){
       if(ativos.some(a=>`${a.ticker}|${a.tipo}|${a.data}|${parseFloat(a.qtd).toFixed(4)}|${parseFloat(a.pm).toFixed(4)}`===key))continue;
       ativos.push(obj);
       importados++;
+      // RF importado via B3 não tem indexador/taxa/vencimento — coleta para perguntar depois
+      if(isRF&&tipo==='Compra'){
+        pendingRF.push({ativoRef:obj,ticker,nome,valor:tx.qtd*tx.preco,data:tx.data});
+      }
     }
   }
 
   saveAtivos();
-  toast(`B3: ${importados} lançamento(s) importado(s).`);
-  initConsolidador(); // recarrega cotações + dividendos e re-renderiza
+  saveAtivos();
+  if(pendingRF.length){
+    toast(`B3: ${importados} lançamento(s) importado(s). Completando dados da Renda Fixa…`);
+    openModalRFComplement(pendingRF,()=>{
+      saveAtivos();
+      initConsolidador();
+    });
+  }else{
+    toast(`B3: ${importados} lançamento(s) importado(s).`);
+    initConsolidador(); // recarrega cotações + dividendos e re-renderiza
+  }
 }
 
 /* ===================== GERENCIAMENTO DE CARTEIRAS ===================== */
@@ -985,6 +1028,110 @@ async function mvLoadTab(href,push){
 }
 
 /* ---- modais (lançamento e meta) ---- */
+/* ===================== MODAL DE COMPLEMENTO DE RENDA FIXA (pós-import B3) =====================
+   Exibido sequencialmente para cada CDB/LCI/LCA/Tesouro importado que não tem indexador/taxa/vencimento.
+   O usuário preenche os dados e eles são gravados no objeto ativo já salvo em ativos[]. */
+
+function openModalRFComplement(pendingList, onDone){
+  injectModals();
+  let idx=0;
+
+  function showNext(){
+    if(idx>=pendingList.length){ onDone(); return; }
+    const item=pendingList[idx];
+    const isTesouro=/^Tesouro\s/i.test(item.ticker);
+    const titulo=isTesouro?'Tesouro Direto':'CDB / LCI / LCA';
+    const nomeExib=item.nome||item.ticker;
+    const valorExib=item.valor?'R$ '+item.valor.toLocaleString('pt-BR',{minimumFractionDigits:2}):'';
+
+    // Remove modal anterior se existir
+    const old=document.getElementById('modal-rf-complement');
+    if(old)old.remove();
+
+    const el=document.createElement('div');
+    el.id='modal-rf-complement';
+    el.className='modal-bg';
+    el.style.zIndex='1100';
+    el.innerHTML=`
+<div class="modal" style="width:min(480px,96vw)">
+  <h2 style="display:flex;align-items:center;gap:8px">
+    <i class="ti ti-building-bank" style="color:var(--gold)"></i>
+    Completar dados — ${titulo}
+    <span style="margin-left:auto;font-size:11px;color:var(--color-text-secondary);font-weight:400">${idx+1} de ${pendingList.length}</span>
+  </h2>
+  <div style="background:var(--bg3,#141418);border:1px solid var(--border,rgba(255,255,255,0.06));border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;line-height:1.6">
+    <div style="color:var(--text,#ECEAE4);font-weight:600">${nomeExib}</div>
+    <div style="color:var(--color-text-secondary)">${item.data?item.data.split('-').reverse().join('/'):''}${valorExib?' · '+valorExib:''}</div>
+  </div>
+  <div class="modal-grid">
+    ${!isTesouro?`<div class="form-group"><label>Emissor</label><input id="rfc-emissor" type="text" placeholder="Ex: Banco Inter, Nubank…" value="${nomeExib}"></div>`:''}
+    <div class="form-group"><label>Indexador</label>
+      <select id="rfc-indexador" onchange="
+        const t=this.value;
+        document.getElementById('rfc-taxa-label').textContent=t==='CDI'?'% do CDI':t==='Prefixado'?'Taxa a.a. (%)':'Spread a.a. (%)';
+        document.getElementById('rfc-taxa').placeholder=t==='CDI'?'Ex: 110':'Ex: 6.5';
+      ">
+        <option value="CDI">CDI</option>
+        <option value="IPCA">IPCA+</option>
+        <option value="Prefixado">Prefixado</option>
+        <option value="Selic">Selic</option>
+      </select>
+    </div>
+    <div class="form-group"><label id="rfc-taxa-label">% do CDI</label>
+      <input id="rfc-taxa" type="number" placeholder="Ex: 110" step="0.01" min="0">
+    </div>
+    <div class="form-group"><label>Vencimento</label>
+      <input id="rfc-venc" type="date">
+    </div>
+    <div class="form-group" style="display:flex;align-items:center;gap:8px;padding-top:20px">
+      <input id="rfc-liquidez" type="checkbox" style="width:auto;cursor:pointer">
+      <label for="rfc-liquidez" style="margin:0;cursor:pointer;font-size:12px;color:var(--text,#ECEAE4)">Liquidez diária</label>
+    </div>
+  </div>
+  <div class="modal-actions" style="margin-top:1rem">
+    <button class="btn" onclick="_rfcSkip()">Pular</button>
+    <button class="btn btn-primary" onclick="_rfcSave()"><i class="ti ti-check"></i> Salvar e continuar</button>
+  </div>
+</div>`;
+    document.body.appendChild(el);
+
+    // Foco no primeiro campo
+    setTimeout(()=>{ const f=document.getElementById('rfc-emissor')||document.getElementById('rfc-indexador'); if(f)f.focus(); },100);
+  }
+
+  window._rfcSave=function(){
+    const item=pendingList[idx];
+    const indexador=document.getElementById('rfc-indexador')?.value||'CDI';
+    const taxa=parseFloat(document.getElementById('rfc-taxa')?.value)||0;
+    const venc=document.getElementById('rfc-venc')?.value||'';
+    const liquidez=document.getElementById('rfc-liquidez')?.checked||false;
+    const emissor=document.getElementById('rfc-emissor')?.value||item.nome||'';
+    const isTesouro=/^Tesouro\s/i.test(item.ticker);
+
+    // Aplica ao ativo já salvo em ativos[]
+    const ativo=item.ativoRef;
+    ativo.rf={
+      titulo:isTesouro?'Tesouro Direto':'CDB',
+      emissor,indexador,taxa,
+      vencimento:venc,
+      liquidez
+    };
+    if(venc)ativo.vencimento=venc;
+
+    document.getElementById('modal-rf-complement')?.remove();
+    idx++;
+    showNext();
+  };
+
+  window._rfcSkip=function(){
+    document.getElementById('modal-rf-complement')?.remove();
+    idx++;
+    showNext();
+  };
+
+  showNext();
+}
+
 function injectModals(){
   if(document.getElementById('modal'))return;
   const wrap=document.createElement('div');
