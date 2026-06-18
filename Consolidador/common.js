@@ -747,7 +747,7 @@ function processB3Rows(rows){
     // CDB vem como "CDB - CDB82478KE6 - BANCO ORIGINAL S/A"
     //   → ticker = "CDB_CDB82478KE6", nome = "BANCO ORIGINAL S/A"
     let ticker,nome;
-    const isCDB=/^(CDB|LCI|LCA|LFT|RDB|LC)\s*-\s*/i.test(produtoRaw);
+    const isCDB=/^(CDB|LCI|LCA|LFT|RDB|LC|CRI|CRA|DEB)\s*-\s*/i.test(produtoRaw);
     if(isCDB){
       // Partes: ["CDB", "CDB82478KE6", "BANCO ORIGINAL S/A"]
       const partes=produtoRaw.split(/\s*-\s*/);
@@ -787,7 +787,7 @@ function processB3Rows(rows){
     const preco=parseFloat(String(r[col.preco]||'0').replace(',','.'))||0;
     if(qtd<=0)continue;
 
-    if(!ops[ticker])ops[ticker]={nome,txs:[],rfTipo:(isCDB||isTesouro)?'RF':null,isRF:isCDB||isTesouro};
+    if(!ops[ticker])ops[ticker]={nome,txs:[],rfTipo:(isCDB||isTesouro)?'RF':null,isRF:isCDB||isTesouro,rfSubtipo:isCDB?produtoRaw.split(/\s*-\s*/)[0].trim().toUpperCase():isTesouro?'Tesouro Direto':null};
     if(nome&&!ops[ticker].nome)ops[ticker].nome=nome;
     ops[ticker].txs.push({data:dataStr,side:isBuy?'buy':'sell',qtd,preco});
   }
@@ -795,7 +795,7 @@ function processB3Rows(rows){
   let importados=0;
   const pendingRF=[]; // CDBs/RF que precisam de dados complementares
 
-  for(const [ticker,{nome,txs,rfTipo,isRF}] of Object.entries(ops)){
+  for(const [ticker,{nome,txs,rfTipo,isRF,rfSubtipo}] of Object.entries(ops)){
     txs.sort((a,b)=>a.data.localeCompare(b.data));
     const classe=rfTipo||classificarB3(ticker,nome);
 
@@ -819,7 +819,7 @@ function processB3Rows(rows){
       importados++;
       // RF importado via B3 não tem indexador/taxa/vencimento — coleta para perguntar depois
       if(isRF&&tipo==='Compra'){
-        pendingRF.push({ativoRef:obj,ticker,nome,valor:tx.qtd*tx.preco,data:tx.data});
+        pendingRF.push({ativoRef:obj,ticker,nome,valor:tx.qtd*tx.preco,data:tx.data,rfSubtipo});
       }
     }
   }
@@ -1040,7 +1040,8 @@ function openModalRFComplement(pendingList, onDone){
     if(idx>=pendingList.length){ onDone(); return; }
     const item=pendingList[idx];
     const isTesouro=/^Tesouro\s/i.test(item.ticker);
-    const titulo=isTesouro?'Tesouro Direto':'CDB / LCI / LCA';
+    const subtipo=item.rfSubtipo||'CDB';
+    const titulo=isTesouro?'Tesouro Direto':subtipo;
     const nomeExib=item.nome||item.ticker;
     const valorExib=item.valor?'R$ '+item.valor.toLocaleString('pt-BR',{minimumFractionDigits:2}):'';
 
@@ -1111,7 +1112,7 @@ function openModalRFComplement(pendingList, onDone){
     // Aplica ao ativo já salvo em ativos[]
     const ativo=item.ativoRef;
     ativo.rf={
-      titulo:isTesouro?'Tesouro Direto':'CDB',
+      titulo:isTesouro?'Tesouro Direto':subtipo,
       emissor,indexador,taxa,
       vencimento:venc,
       liquidez
