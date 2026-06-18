@@ -803,11 +803,15 @@ function processB3Rows(rows){
     // calcPosicoes() cuida do PM ponderado e qtd líquida
     for(const tx of txs){
       const tipo=tx.side==='buy'?'Compra':'Venda';
+      // RF (CDB/LCI/Tesouro etc): normaliza para qtd=1, pm=valorTotal
+      // Assim fatorRF(rf, data) multiplica pm corretamente (igual ao lançamento manual)
+      const qtdFinal  = isRF ? 1                                        : Math.round(tx.qtd*10000)/10000;
+      const pmFinal   = isRF ? parseFloat((tx.qtd*tx.preco).toFixed(2)) : parseFloat(tx.preco.toFixed(4));
       const obj={
         ticker,classe,tipo,
-        qtd:Math.round(tx.qtd*10000)/10000,
-        pm:parseFloat(tx.preco.toFixed(4)),
-        cotacao:parseFloat(tx.preco.toFixed(4)),
+        qtd:qtdFinal,
+        pm:pmFinal,
+        cotacao:pmFinal,
         dy:0,
         data:tx.data||new Date().toISOString().slice(0,10),
         nota:0,ideal:0,moeda:'BRL',comprar:'Não'
@@ -824,7 +828,6 @@ function processB3Rows(rows){
     }
   }
 
-  saveAtivos();
   saveAtivos();
   if(pendingRF.length){
     toast(`B3: ${importados} lançamento(s) importado(s). Completando dados da Renda Fixa…`);
@@ -1045,6 +1048,9 @@ function openModalRFComplement(pendingList, onDone){
     const nomeExib=item.nome||item.ticker;
     const valorExib=item.valor?'R$ '+item.valor.toLocaleString('pt-BR',{minimumFractionDigits:2}):'';
 
+    // Guarda contexto do item atual para os handlers (fecha escopo corretamente)
+    window._rfcCtx={item,isTesouro,subtipo};
+
     // Remove modal anterior se existir
     const old=document.getElementById('modal-rf-complement');
     if(old)old.remove();
@@ -1095,21 +1101,19 @@ function openModalRFComplement(pendingList, onDone){
   </div>
 </div>`;
     document.body.appendChild(el);
-
-    // Foco no primeiro campo
     setTimeout(()=>{ const f=document.getElementById('rfc-emissor')||document.getElementById('rfc-indexador'); if(f)f.focus(); },100);
   }
 
   window._rfcSave=function(){
-    const item=pendingList[idx];
+    // Lê contexto salvo em window._rfcCtx para evitar problema de escopo
+    const {item,isTesouro,subtipo}=window._rfcCtx||{};
+    if(!item)return;
     const indexador=document.getElementById('rfc-indexador')?.value||'CDI';
     const taxa=parseFloat(document.getElementById('rfc-taxa')?.value)||0;
     const venc=document.getElementById('rfc-venc')?.value||'';
     const liquidez=document.getElementById('rfc-liquidez')?.checked||false;
     const emissor=document.getElementById('rfc-emissor')?.value||item.nome||'';
-    const isTesouro=/^Tesouro\s/i.test(item.ticker);
 
-    // Aplica ao ativo já salvo em ativos[]
     const ativo=item.ativoRef;
     ativo.rf={
       titulo:isTesouro?'Tesouro Direto':subtipo,
