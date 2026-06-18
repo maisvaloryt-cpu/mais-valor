@@ -183,7 +183,7 @@ function renderPizza(mode='classe'){
   `).join('');
 }
 
-let aporteAtual=0;
+var aporteAtual=0; // var (não let): o script da página é re-executado na troca de abas e let daria "already declared"
 function setAporte(v){ aporteAtual=Math.max(0,parseFloat(v)||0); renderGrupos(); }
 
 /* Sugestão de aporte em 2 níveis: a classe puxa pro % ideal (aba Metas), depois a nota
