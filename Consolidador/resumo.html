@@ -46,6 +46,15 @@
         </div>
       </div>
     </div>
+    <div class="card" id="aporte-card" style="margin-bottom:14px">
+      <div class="card-title"><i class="ti ti-cash" aria-hidden="true" style="color:var(--blue)"></i>Aporte — onde investir agora</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <label for="aporte-input" style="font-size:12px;color:var(--color-text-secondary)">Quanto vou aportar:</label>
+        <span style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--color-text-secondary)">R$</span>
+          <input id="aporte-input" type="number" min="0" step="50" placeholder="0,00" class="cell-edit" style="width:130px;text-align:right" oninput="setAporte(this.value)"></span>
+        <span id="aporte-resumo" style="font-size:12px;color:var(--color-text-secondary)"></span>
+      </div>
+    </div>
     <div class="section-title"><i class="ti ti-stack" aria-hidden="true"></i>Meus Ativos <span id="total-count" style="font-size:12px;color:var(--color-text-secondary);font-weight:400"></span></div>
     <div id="grupos-ativos"></div>
   </div>
@@ -174,11 +183,55 @@ function renderPizza(mode='classe'){
   `).join('');
 }
 
+let aporteAtual=0;
+function setAporte(v){ aporteAtual=Math.max(0,parseFloat(v)||0); renderGrupos(); }
+
+/* Sugestão de aporte em 2 níveis: a classe puxa pro % ideal (aba Metas), depois a nota
+   (peso suave = raiz da nota) divide dentro da classe.
+   - alvoPct[ticker]  : % alvo do ativo na carteira inteira (ideal da classe × peso da nota)
+   - comprar[ticker]  : 'Sim' se o ativo está abaixo do alvo, senão 'Não'
+   - aporteAtivo[tic] : R$ sugerido do aporte para o ativo                                  */
+function calcSugestaoAporte(c,totalAtual,aporte){
+  const idealMap={}; metas.forEach(m=>idealMap[m.classe]=m.ideal);
+  const pesoNota=n=>n>0?Math.sqrt(n):0;
+  const classes=[...new Set(c.map(a=>a.classe))];
+  const somaPesoClasse={}, qtdClasse={};
+  c.forEach(a=>{somaPesoClasse[a.classe]=(somaPesoClasse[a.classe]||0)+pesoNota(a.nota);qtdClasse[a.classe]=(qtdClasse[a.classe]||0)+1;});
+  const shareNota=a=>{const sp=somaPesoClasse[a.classe]||0;return sp>0?pesoNota(a.nota)/sp:(qtdClasse[a.classe]?1/qtdClasse[a.classe]:0);};
+  // alvo % de cada ativo na carteira + decisão Comprar?
+  const alvoPct={}, comprar={};
+  c.forEach(a=>{
+    alvoPct[a.ticker]=(idealMap[a.classe]||0)*shareNota(a);
+    const atualPct=totalAtual>0?(a.vt/totalAtual)*100:0;
+    comprar[a.ticker]=atualPct<alvoPct[a.ticker]-0.05?'Sim':'Não';
+  });
+  // distribuição do aporte
+  const aporteAtivo={}; c.forEach(a=>aporteAtivo[a.ticker]=0);
+  if(aporte>0){
+    const novoTotal=totalAtual+aporte;
+    const bc=byClasse(c);
+    const deficit={}; let somaDef=0;
+    classes.forEach(cl=>{const d=Math.max(0,novoTotal*((idealMap[cl]||0)/100)-(bc[cl]||0));deficit[cl]=d;somaDef+=d;});
+    const somaIdeal=classes.reduce((s,cl)=>s+(idealMap[cl]||0),0);
+    const aporteClasse={};
+    classes.forEach(cl=>{aporteClasse[cl]=somaDef>0?aporte*deficit[cl]/somaDef:(somaIdeal>0?aporte*((idealMap[cl]||0)/somaIdeal):0);});
+    c.forEach(a=>{aporteAtivo[a.ticker]=(aporteClasse[a.classe]||0)*shareNota(a);});
+  }
+  return {alvoPct,comprar,aporteAtivo,temAporte:aporte>0};
+}
+
 function renderGrupos(){
   const c=calcAtivos();
   const total=c.reduce((s,a)=>s+a.vt,0);
   const totalAtivos=c.length;
   document.getElementById('total-count').textContent='('+totalAtivos+')';
+  const idealMap={}; metas.forEach(m=>idealMap[m.classe]=m.ideal);
+  const sug=calcSugestaoAporte(c,total,aporteAtual);
+  const resumoEl=document.getElementById('aporte-resumo');
+  if(resumoEl){
+    const nRec=c.filter(a=>sug.aporteAtivo[a.ticker]>0.005).length;
+    resumoEl.textContent=sug.temAporte?`Sugerido em ${nRec} ativo(s) — divisão por classe + nota (veja a coluna "Aporte").`:'Digite um valor para ver onde investir.';
+  }
   const grupos={};
   c.forEach(a=>{if(!grupos[a.classe])grupos[a.classe]=[];grupos[a.classe].push(a)});
   let html='';
@@ -189,7 +242,10 @@ function renderGrupos(){
     // Bug #7 fix: rentabilidade inclui proventos (não é igual à variação de capital)
     const gProv=items.reduce((s,a)=>s+a.proventos,0);
     const gRent=gCusto>0?((gVt-gCusto+gProv)/gCusto)*100:0;
-    const pctCart=total>0?((gVt/total)*100).toFixed(1):0;
+    const pctCart=total>0?((gVt/total)*100):0;
+    const idealCls=idealMap[cls]||0;
+    const diffCls=pctCart-idealCls;
+    const corCls=idealCls<=0?'var(--color-text-primary)':(diffCls>2?'#E24B4A':diffCls<-2?'#BA7517':'#1D9E75');
     html+=`<div class="grupo">
       <div class="grupo-header" onclick="toggleGrupo('g-${cls}',this)">
         <div class="grupo-icon" style="background:${CLASS_COLORS[cls]}22;color:${CLASS_COLORS[cls]}">${(CLASS_LABEL[cls]||cls).slice(0,2)}</div>
@@ -199,16 +255,20 @@ function renderGrupos(){
           <div class="grupo-stat"><div class="gs-label">Valor total</div><div class="gs-value">${fmtR(gVt)}</div></div>
           <div class="grupo-stat"><div class="gs-label">Variação</div><div class="gs-value ${gVar>=0?'positive':'negative'}">${fmtP(gVar)}</div></div>
           <div class="grupo-stat"><div class="gs-label">Rentabilidade</div><div class="gs-value ${gRent>=0?'positive':'negative'}">${fmtP(gRent)}</div></div>
-          <div class="grupo-stat"><div class="gs-label">% carteira</div><div class="gs-value">${pctCart}%</div></div>
+          <div class="grupo-stat"><div class="gs-label">% carteira / ideal</div><div class="gs-value" style="color:${corCls}">${pctCart.toFixed(1)}% / ${idealCls}%</div></div>
         </div>
         <i class="ti ti-chevron-down chevron open" aria-hidden="true"></i>
       </div>
       <div id="g-${cls}">
         <div class="tbl-wrap">
         <table class="tbl">
-          <thead><tr><th>Ativo</th><th class="r">Quant.</th><th class="r">Preço Médio</th><th class="r">Preço Atual</th><th class="r">Variação</th><th class="r">Rentabilidade</th><th class="r">Saldo</th><th class="r">Nota</th><th class="r">% Carteira</th><th class="r">% Ideal</th><th class="r">Comprar?</th><th></th></tr></thead>
+          <thead><tr><th>Ativo</th><th class="r">Quant.</th><th class="r">Preço Médio</th><th class="r">Preço Atual</th><th class="r">Variação</th><th class="r">Rentabilidade</th><th class="r">Saldo</th><th class="r">Nota</th><th class="r">% Carteira</th><th class="r">% Ideal</th><th class="r">Comprar?</th><th class="r">Aporte</th><th></th></tr></thead>
           <tbody>
-            ${items.map(a=>`<tr>
+            ${items.map(a=>{
+              const alvo=sug.alvoPct[a.ticker]||0;
+              const comp=sug.comprar[a.ticker];
+              const ap=sug.aporteAtivo[a.ticker]||0;
+              return `<tr>
               <td><strong>${a.ticker}</strong></td>
               <td class="r">${a.qtd.toLocaleString('pt-BR')}</td>
               <td class="r">${fmtR(a.pm)}</td>
@@ -218,10 +278,11 @@ function renderGrupos(){
               <td class="r">${fmtR(a.vt)}</td>
               <td class="r"><input class="cell-edit" type="number" min="0" max="10" value="${a.nota||''}" placeholder="-" title="Nota (0–10)" onchange="setMetaAtivo('${a.ticker}','nota',this.value)"></td>
               <td class="r">${total?((a.vt/total)*100).toFixed(1):0}%</td>
-              <td class="r"><input class="cell-edit" type="number" min="0" step="0.1" value="${a.ideal||''}" placeholder="-" title="% Ideal na carteira" onchange="setMetaAtivo('${a.ticker}','ideal',this.value)"></td>
-              <td class="r"><select class="cell-edit ${a.comprar==='Sim'?'comprar-sim':'comprar-nao'}" title="Comprar mais?" onchange="setMetaAtivo('${a.ticker}','comprar',this.value)"><option value="Não" ${a.comprar!=='Sim'?'selected':''}>✕ Não</option><option value="Sim" ${a.comprar==='Sim'?'selected':''}>✓ Sim</option></select></td>
+              <td class="r" title="% alvo automático: ideal da classe × peso da nota">${alvo>0?alvo.toFixed(1)+'%':'-'}</td>
+              <td class="r"><span class="pill ${comp==='Sim'?'pill-up':'pill-dn'}" title="Automático: abaixo do % alvo = Sim">${comp==='Sim'?'✓ Sim':'✕ Não'}</span></td>
+              <td class="r">${sug.temAporte&&ap>0.005?'<strong style="color:#1D9E75">'+fmtR(ap)+'</strong>':'-'}</td>
               <td><button class="btn btn-sm" onclick="removeAtivo('${a.ticker}')"><i class="ti ti-trash" aria-hidden="true"></i></button></td>
-            </tr>`).join('')}
+            </tr>`;}).join('')}
           </tbody>
         </table>
         </div>
