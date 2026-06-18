@@ -391,7 +391,17 @@ function _mvApplyGate(){
 
 /* Agrega lançamentos em posições líquidas por ticker (PM ponderado, qtd líquida) */
 function calcPosicoes(txArray){
-  const arr=txArray||ativos;
+  // [BUG-RF2 FIX] Ordena por data (e Compra antes de Venda no mesmo dia) antes de processar.
+  // Sem isso, a ordem dependia de qual arquivo B3 foi importado primeiro: se uma planilha com
+  // vendas mais recentes era importada antes da planilha com as compras mais antigas, a venda
+  // era processada com posição ainda em 0 (virava "venda a descoberto" e era ignorada), e a
+  // compra posterior fazia o ativo parecer que nunca tinha sido vendido.
+  const arr=(txArray||ativos).slice().sort((a,b)=>{
+    const da=a.data||'',db=b.data||'';
+    if(da!==db)return da<db?-1:1;
+    const oa=a.tipo==='Venda'?1:0, ob=b.tipo==='Venda'?1:0;
+    return oa-ob;
+  });
   const map={};
   arr.forEach(a=>{
     const t=a.ticker;
