@@ -637,7 +637,9 @@ function calcSugestaoAporte(c,totalAtual,aporte){
     comprar[a.ticker]=atualPct<alvoPct[a.ticker]-0.05?'Sim':'Não';
   });
   const aporteAtivo={}; c.forEach(a=>aporteAtivo[a.ticker]=0);
+  const qtdComprar={};   // cotas inteiras a comprar (ativos de cota: ações/FIIs/ETFs/BDRs/Stocks)
   const reservaClasse={};
+  let sobra=0;           // troco que não fecha uma cota e não cabe em fracionário
   if(aporte>0){
     const novoTotal=totalAtual+aporte;
     const bc=byClasse(c);
@@ -646,11 +648,48 @@ function calcSugestaoAporte(c,totalAtual,aporte){
     const somaIdeal=classes.reduce((s,cl)=>s+(idealMap[cl]||0),0);
     const aporteClasse={};
     classes.forEach(cl=>{aporteClasse[cl]=somaDef>0?aporte*deficit[cl]/somaDef:(somaIdeal>0?aporte*((idealMap[cl]||0)/somaIdeal):0);});
-    // Classes da meta SEM ativo: a fatia fica reservada (sugestão de adicionar a classe).
-    classes.forEach(cl=>{ if(!temAtivo[cl]&&aporteClasse[cl]>0.005)reservaClasse[cl]=aporteClasse[cl]; });
-    c.forEach(a=>{aporteAtivo[a.ticker]=(aporteClasse[a.classe]||0)*shareNota(a);});
+    // Fracionários: aceitam qualquer valor (não precisam comprar cota inteira).
+    const FRAC=new Set(['RF','TD','Crypto','FUNDO']);
+    classes.forEach(cl=>{
+      const budget=aporteClasse[cl];
+      if(budget<=0.005)return;
+      if(!temAtivo[cl]){ reservaClasse[cl]=budget; return; } // classe da meta sem ativo → reserva
+      const ativosCl=c.filter(a=>a.classe===cl);
+      if(FRAC.has(cl)){
+        // fracionário: divide o orçamento da classe pela nota (valor contínuo)
+        const sp=ativosCl.reduce((s,a)=>s+pesoNota(notaDe(a)),0);
+        ativosCl.forEach(a=>{aporteAtivo[a.ticker]+=sp>0?budget*pesoNota(notaDe(a))/sp:budget/ativosCl.length;});
+        return;
+      }
+      // cota inteira: compra 1 cota do ativo mais defasado (maior gap relativo) que caiba no orçamento
+      const sim={}; ativosCl.forEach(a=>sim[a.ticker]=a.vt);
+      const alvo={}; ativosCl.forEach(a=>alvo[a.ticker]=(alvoPct[a.ticker]||0)/100*novoTotal);
+      let rest=budget,guarda=0;
+      while(rest>0.005&&guarda++<100000){
+        let best=null,bestRel=-1;
+        for(const a of ativosCl){
+          const p=a.cotacao||0, gap=alvo[a.ticker]-sim[a.ticker];
+          if(gap<=0.005||p<=0||p>rest+0.005)continue;
+          const rel=alvo[a.ticker]>0?gap/alvo[a.ticker]:0;
+          if(rel>bestRel){bestRel=rel;best=a;}
+        }
+        if(!best)break;
+        const p=best.cotacao; sim[best.ticker]+=p; rest-=p;
+        aporteAtivo[best.ticker]+=p;
+        qtdComprar[best.ticker]=(qtdComprar[best.ticker]||0)+1;
+      }
+      sobra+=rest>0.005?rest:0; // não coube outra cota nessa classe
+    });
+    // Troco sobrando vai pros fracionários que ainda estão abaixo do alvo (ex.: CDB aceita qualquer valor)
+    if(sobra>0.005){
+      const fr=c.filter(a=>FRAC.has(a.classe))
+        .map(a=>({a,gap:(alvoPct[a.ticker]||0)/100*novoTotal-(a.vt+(aporteAtivo[a.ticker]||0))}))
+        .filter(x=>x.gap>0.005);
+      const sg=fr.reduce((s,x)=>s+x.gap,0);
+      if(sg>0){let u=0;fr.forEach(x=>{const give=Math.min(x.gap,sobra*x.gap/sg);aporteAtivo[x.a.ticker]+=give;u+=give;});sobra-=u;}
+    }
   }
-  return {alvoPct,comprar,aporteAtivo,reservaClasse,temAporte:aporte>0};
+  return {alvoPct,comprar,aporteAtivo,qtdComprar,reservaClasse,sobra,temAporte:aporte>0};
 }
 
 /* ---- toast ---- */

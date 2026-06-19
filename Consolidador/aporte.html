@@ -173,37 +173,46 @@ function apRenderTabela(){
     return;
   }
   const sug=calcSugestaoAporte(c,total,aporteAtual);
-  const linhas=c.map(a=>({a,ap:sug.aporteAtivo[a.ticker]||0,alvo:sug.alvoPct[a.ticker]||0}))
+  const FRAC=new Set(['RF','TD','Crypto','FUNDO']); // fracionários: sem cota inteira
+  const linhas=c.map(a=>({a,ap:sug.aporteAtivo[a.ticker]||0,alvo:sug.alvoPct[a.ticker]||0,qtd:sug.qtdComprar[a.ticker]||0}))
     .filter(x=>x.ap>0.005)
     .sort((x,y)=>y.ap-x.ap);
   // Classes da meta sem ativo: dinheiro reservado + sugestão de adicionar a classe.
   const reservas=Object.entries(sug.reservaClasse||{}).map(([cl,v])=>({cl,v})).sort((a,b)=>b.v-a.v);
+  const sobra=sug.sobra||0;
   if(!linhas.length&&!reservas.length){
     el.innerHTML='<div class="empty">Nenhum ativo recebeu aporte. Defina a meta por classe e dê notas aos ativos.</div>';
     return;
   }
   const maxAp=Math.max(linhas.length?linhas[0].ap:0,...reservas.map(r=>r.v),1);
-  const totalDist=linhas.reduce((s,x)=>s+x.ap,0)+reservas.reduce((s,r)=>s+r.v,0);
+  const totalDist=linhas.reduce((s,x)=>s+x.ap,0)+reservas.reduce((s,r)=>s+r.v,0)+sobra;
   el.innerHTML=`<div class="tbl-wrap"><table class="tbl">
-    <thead><tr><th>Ativo</th><th>Classe</th><th class="r">Nota</th><th class="r">% alvo</th><th class="r">Aporte sugerido</th><th class="r">% do aporte</th></tr></thead>
+    <thead><tr><th>Ativo</th><th>Classe</th><th class="r">Nota</th><th class="r">% alvo</th><th class="r">Preço atual</th><th class="r">Qtd</th><th class="r">Aporte sugerido</th><th class="r">% do aporte</th></tr></thead>
     <tbody>
-      ${linhas.map(({a,ap,alvo})=>`<tr>
+      ${linhas.map(({a,ap,alvo,qtd})=>{const frac=FRAC.has(a.classe);return `<tr>
         <td><strong>${a.ticker}</strong></td>
         <td><span style="display:inline-flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:${CLASS_COLORS[a.classe]||'#888'}"></span>${CLASS_LABEL[a.classe]||a.classe}</span></td>
         <td class="r">${a.nota||1}</td>
         <td class="r">${alvo>0?alvo.toFixed(1)+'%':'-'}</td>
+        <td class="r">${frac?'—':fmtR(a.cotacao||0)}</td>
+        <td class="r">${frac?'—':'<strong>'+(qtd||0)+'</strong>'}</td>
         <td class="r"><div style="display:flex;align-items:center;justify-content:flex-end;gap:8px">
-          <span style="flex:1;max-width:120px;height:6px;border-radius:3px;background:rgba(128,128,128,0.15);overflow:hidden"><span style="display:block;height:100%;width:${(ap/maxAp*100).toFixed(0)}%;background:#1D9E75"></span></span>
+          <span style="flex:1;max-width:110px;height:6px;border-radius:3px;background:rgba(128,128,128,0.15);overflow:hidden"><span style="display:block;height:100%;width:${(ap/maxAp*100).toFixed(0)}%;background:#1D9E75"></span></span>
           <strong style="color:#1D9E75">${fmtR(ap)}</strong></div></td>
         <td class="r">${(ap/aporteAtual*100).toFixed(1)}%</td>
-      </tr>`).join('')}
+      </tr>`;}).join('')}
       ${reservas.map(({cl,v})=>`<tr style="background:rgba(255,204,0,0.05)">
-        <td colspan="4"><span style="display:inline-flex;align-items:center;gap:6px"><i class="ti ti-plus" aria-hidden="true" style="color:#FFCC00"></i><span>Adicione <strong>${CLASS_LABEL[cl]||cl}</strong> na sua carteira para alcançar a meta</span></span></td>
+        <td colspan="6"><span style="display:inline-flex;align-items:center;gap:6px"><i class="ti ti-plus" aria-hidden="true" style="color:#FFCC00"></i><span>Adicione <strong>${CLASS_LABEL[cl]||cl}</strong> na sua carteira para alcançar a meta</span></span></td>
         <td class="r"><strong style="color:#FFCC00">${fmtR(v)}</strong></td>
         <td class="r">${(v/aporteAtual*100).toFixed(1)}%</td>
       </tr>`).join('')}
+      ${sobra>0.005?`<tr style="opacity:.7">
+        <td colspan="6"><span style="display:inline-flex;align-items:center;gap:6px"><i class="ti ti-coin" aria-hidden="true"></i><span>Troco que não fechou uma cota (classes já no alvo)</span></span></td>
+        <td class="r"><strong>${fmtR(sobra)}</strong></td>
+        <td class="r">${(sobra/aporteAtual*100).toFixed(1)}%</td>
+      </tr>`:''}
     </tbody>
-    <tfoot><tr><td colspan="4" style="text-align:right;font-weight:600">Total</td><td class="r"><strong>${fmtR(totalDist)}</strong></td><td class="r">100%</td></tr></tfoot>
+    <tfoot><tr><td colspan="6" style="text-align:right;font-weight:600">Total</td><td class="r"><strong>${fmtR(totalDist)}</strong></td><td class="r">100%</td></tr></tfoot>
   </table></div>`;
 }
 
