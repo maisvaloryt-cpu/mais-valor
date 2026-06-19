@@ -114,16 +114,32 @@ function renderEvolucao(nMeses=24){
   ctx.canvas.style.display='';
   const emp=ctx.canvas.parentElement.querySelector('.evol-empty');
   if(emp)emp.remove();
+  // Barras mensais empilhadas: base = aportes acumulados (azul); resultado por cima:
+  // verde (lucro, acima dos aportes) ou vermelho (prejuízo, descendo do topo dos aportes).
   charts.evol=new Chart(ctx,{
-    type:'line',
+    type:'bar',
     data:{
       labels:evol.map(m=>m.label),
       datasets:[
-        {label:'Patrimônio',data:evol.map(m=>m.vt),borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.08)',fill:true,tension:0.3,pointRadius:2,pointBackgroundColor:'#1D9E75'},
-        {label:'Custo',data:evol.map(m=>m.custo),borderColor:'#888',borderDash:[4,4],backgroundColor:'transparent',tension:0.3,pointRadius:0}
+        {label:'Aportes',data:evol.map(m=>Math.min(m.custo,m.vt)),backgroundColor:'#185FA5',stack:'p',maxBarThickness:30},
+        {label:'Lucro',data:evol.map(m=>Math.max(0,m.vt-m.custo)),backgroundColor:'#1D9E75',stack:'p',maxBarThickness:30,borderRadius:3},
+        {label:'Prejuízo',data:evol.map(m=>Math.max(0,m.custo-m.vt)),backgroundColor:'#E24B4A',stack:'p',maxBarThickness:30,borderRadius:3}
       ]
     },
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtR(c.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#888',font:{size:10}}},y:{grid:{color:'rgba(128,128,128,0.08)'},ticks:{color:'#888',font:{size:10},callback:v=>'R$'+Math.round(v/1000)+'k'}}}}
+    options:{responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:true,position:'bottom',labels:{boxWidth:10,boxHeight:10,usePointStyle:true,font:{size:10},color:'#888'}},
+        tooltip:{filter:i=>i.datasetIndex===0,callbacks:{
+          title:items=>items[0].label,
+          label:item=>{const m=evol[item.dataIndex];const res=m.vt-m.custo;return [' Patrimônio: '+fmtR(m.vt),' Aportes: '+fmtR(m.custo),(res>=0?' Lucro: ':' Prejuízo: ')+fmtR(Math.abs(res))];}
+        }}
+      },
+      scales:{
+        x:{stacked:true,grid:{display:false},ticks:{color:'#888',font:{size:10}}},
+        y:{stacked:true,beginAtZero:true,grid:{color:'rgba(128,128,128,0.08)'},ticks:{color:'#888',font:{size:10},callback:v=>'R$'+Math.round(v/1000)+'k'}}
+      }
+    }
   });
 }
 
