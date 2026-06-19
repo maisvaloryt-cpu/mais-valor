@@ -121,9 +121,9 @@ function renderEvolucao(nMeses=24){
     data:{
       labels:evol.map(m=>m.label),
       datasets:[
-        {label:'Aportes',data:evol.map(m=>Math.min(m.custo,m.vt)),backgroundColor:'#185FA5',stack:'p',maxBarThickness:30},
-        {label:'Lucro',data:evol.map(m=>Math.max(0,m.vt-m.custo)),backgroundColor:'#1D9E75',stack:'p',maxBarThickness:30,borderRadius:3},
-        {label:'Prejuízo',data:evol.map(m=>Math.max(0,m.custo-m.vt)),backgroundColor:'#E24B4A',stack:'p',maxBarThickness:30,borderRadius:3}
+        {label:'Aportes',data:evol.map(m=>m.custo),backgroundColor:'#17C3B2',stack:'p',maxBarThickness:30},
+        {label:'Lucro',data:evol.map(m=>Math.max(0,m.vt-m.custo)),backgroundColor:'#FFCC00',stack:'p',maxBarThickness:30,borderRadius:3},
+        {label:'Prejuízo',data:evol.map(m=>-Math.max(0,m.custo-m.vt)),backgroundColor:'#E24B4A',stack:'p',maxBarThickness:30,borderRadius:3}
       ]
     },
     options:{responsive:true,maintainAspectRatio:false,

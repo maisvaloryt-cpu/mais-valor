@@ -150,9 +150,11 @@ function calcEvolucaoPatrimonio(nMeses=24){
         const anterior=Object.keys(hist).filter(k=>k<=ym).sort();
         if(anterior.length)price=hist[anterior[anterior.length-1]];
       }
-      // [BUG-C8 FIX] Custo sempre acumulado; VT só se tiver preço histórico disponível
+      // Garante cotação sempre: sem histórico, usa a cotação atual; se nem essa, o preço médio (empate).
+      // Evita "prejuízo falso" quando falta histórico — custo e valor de mercado entram juntos.
+      if(!price)price=a.cotacao||a.pm;
       custo+=a.qtd*a.pm;
-      if(price){vt+=a.qtd*price*rate;}
+      vt+=a.qtd*price*rate;
     });
     const [y,m]=ym.split('-');
     const nomes=['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
