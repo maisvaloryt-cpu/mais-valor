@@ -141,20 +141,32 @@ function calcEvolucaoPatrimonio(nMeses=24){
     // [BUG-D3 FIX] Ignora lançamentos sem data — evita que apareçam em todos os meses
     const txAte=ativos.filter(a=>a.data&&a.data.slice(0,7)<=ym);
     const posicoes=calcPosicoes(txAte);
+    // Data de referência do mês = último dia do mês (limitado a hoje), para corrigir RF e escolher cotação.
+    const [yy,mm]=ym.split('-').map(Number);
+    const fimMes=new Date(Date.UTC(yy,mm,0)).toISOString().slice(0,10);
+    const hojeStr=new Date().toISOString().slice(0,10);
+    const ateData=fimMes>hojeStr?hojeStr:fimMes;
     let vt=0,custo=0;
     posicoes.forEach(a=>{
       const rate=getRate(a.moeda);
-      const hist=HISTORICO_CACHE[a.ticker]||{};
-      let price=hist[ym];
-      if(!price){
-        const anterior=Object.keys(hist).filter(k=>k<=ym).sort();
-        if(anterior.length)price=hist[anterior[anterior.length-1]];
-      }
-      // Garante cotação sempre: sem histórico, usa a cotação atual; se nem essa, o preço médio (empate).
-      // Evita "prejuízo falso" quando falta histórico — custo e valor de mercado entram juntos.
-      if(!price)price=a.cotacao||a.pm;
       custo+=a.qtd*a.pm;
-      vt+=a.qtd*price*rate;
+      // Valor de mercado do mês — mesma lógica do calcAtivos, para o lucro/prejuízo refletir SÓ preço/correção:
+      let valorUnit;
+      if(a.classe==='RF'){
+        // Renda Fixa: valor corrigido (CDI/prefixado) até o fim do mês — nunca "prejuízo falso".
+        valorUnit=a.pm*fatorRF(a.rf,a.data,ateData);
+      }else{
+        const hist=HISTORICO_CACHE[a.ticker]||{};
+        let price=hist[ym];
+        if(!price){
+          const anterior=Object.keys(hist).filter(k=>k<=ym).sort();
+          if(anterior.length)price=hist[anterior[anterior.length-1]];
+        }
+        // Sem histórico: usa a cotação atual; se nem essa existir, o preço médio (empate, sem prejuízo falso).
+        if(!price)price=COTACOES[a.ticker]||a.cotacao||a.pm;
+        valorUnit=price*rate;
+      }
+      vt+=a.qtd*valorUnit;
     });
     const [y,m]=ym.split('-');
     const nomes=['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
