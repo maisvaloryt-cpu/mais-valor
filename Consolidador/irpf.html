@@ -93,6 +93,9 @@ function renderIRPF(){
     else if(a.classe==='Crypto') trib='<span style="color:#BA7517;font-weight:500">Isento (vendas &lt; R$35k/mês)</span>';
     else if(a.classe==='BDR') trib='<span style="color:#BA7517;font-weight:500">15-22,5% sobre dividendos</span>';
     else if(a.classe==='Exterior') trib='<span style="color:#BA7517;font-weight:500">Tributável (Lei 14.754/23)</span>';
+    else if(a.classe==='RF'||a.classe==='TD') trib='<span style="color:#BA7517;font-weight:500">15-22,5% sobre o rendimento (tabela regressiva)</span>';
+    else if(a.classe==='ETFINT'||a.classe==='REIT') trib='<span style="color:#BA7517;font-weight:500">Tributável (Lei 14.754/23)</span>';
+    else if(a.classe==='FUNDO') trib='<span style="color:#BA7517;font-weight:500">15-22,5% / come-cotas</span>';
     else trib='<span style="color:#BA7517;font-weight:500">Tributável</span>';
     return`<tr><td><strong>${a.ticker}</strong></td><td><span class="badge ${CLASS_BADGE[a.classe]||''}">${CLASS_LABEL[a.classe]||a.classe}</span></td>
     <td class="r positive">${fmtR(provAno)}</td><td>${trib}</td></tr>`;

@@ -1,12 +1,12 @@
 /* ===================== CONSOLIDADOR DE CARTEIRA - NÚCLEO COMPARTILHADO ===================== */
 
-const CLASS_COLORS={'B3':'#185FA5','FII':'#3B6D11','Crypto':'#BA7517','RF':'#534AB7','ETF':'#0F6E56','Exterior':'#993C1D','BDR':'#72243E'};
-const CLASS_LABEL={'B3':'Ações B3','FII':'FIIs','Crypto':'Criptos','RF':'Renda Fixa','ETF':'ETFs','Exterior':'Exterior','BDR':'BDRs'};
-const CLASS_BADGE={'B3':'badge-b3','FII':'badge-fii','Crypto':'badge-crypto','RF':'badge-rf','ETF':'badge-etf','Exterior':'badge-ext','BDR':'badge-bdr'};
-const IRPF_CODE={'B3':'03','FII':'73','Crypto':'08','RF':'45','ETF':'03','Exterior':'03','BDR':'04'}; // legado
+const CLASS_COLORS={'B3':'#185FA5','FII':'#3B6D11','Crypto':'#BA7517','RF':'#534AB7','ETF':'#0F6E56','Exterior':'#993C1D','BDR':'#72243E','TD':'#2F6F8F','ETFINT':'#0E8F7E','REIT':'#7A9A2E','FUNDO':'#6C5CE7','OUTRO':'#8A8884'};
+const CLASS_LABEL={'B3':'Ações','FII':'FIIs','Crypto':'Criptomoedas','RF':'Renda Fixa','ETF':'ETFs','Exterior':'Stocks','BDR':'BDRs','TD':'Tesouro Direto','ETFINT':'ETFs Internacionais','REIT':'Reits','FUNDO':'Fundos de Investimentos','OUTRO':'Outros'};
+const CLASS_BADGE={'B3':'badge-b3','FII':'badge-fii','Crypto':'badge-crypto','RF':'badge-rf','ETF':'badge-etf','Exterior':'badge-ext','BDR':'badge-bdr','TD':'badge-rf','ETFINT':'badge-etf','REIT':'badge-fii','FUNDO':'badge-crypto','OUTRO':'badge-ext'};
+const IRPF_CODE={'B3':'03','FII':'73','Crypto':'08','RF':'45','ETF':'03','Exterior':'03','BDR':'04','TD':'45','ETFINT':'03','REIT':'03','FUNDO':'07','OUTRO':'99'}; // legado
 // [BUG-F1 FIX] Grupo e Código IRPF corretos conforme PGFN (declaração 2024)
-const IRPF_GRUPO={'B3':'03','FII':'07','Crypto':'08','RF':'04','ETF':'07','Exterior':'03','BDR':'03'};
-const IRPF_CODIGO={'B3':'01','FII':'03','Crypto':'01','RF':'01','ETF':'09','Exterior':'01','BDR':'04'};
+const IRPF_GRUPO={'B3':'03','FII':'07','Crypto':'08','RF':'04','ETF':'07','Exterior':'03','BDR':'03','TD':'04','ETFINT':'03','REIT':'03','FUNDO':'07','OUTRO':'99'};
+const IRPF_CODIGO={'B3':'01','FII':'03','Crypto':'01','RF':'01','ETF':'09','Exterior':'01','BDR':'04','TD':'02','ETFINT':'01','REIT':'01','FUNDO':'99','OUTRO':'99'};
 const NOTA_COLOR=n=>n>=8?'#1D9E75':n>=5?'#BA7517':'#E24B4A';
 
 /* ---- UNITs B3: ações que terminam em 11 (não são FIIs nem ETFs) ---- */
@@ -16,7 +16,8 @@ function classificarB3(ticker,nome){
   const t=ticker.toUpperCase().trim();
   const n=(nome||'').toUpperCase();
   if(t.endsWith('34'))return 'BDR';
-  if(/TESOURO|CDB\b|LCI\b|LCA\b|LFT\b|NTN-/i.test(n))return 'RF';
+  if(/TESOURO/i.test(n))return 'TD';
+  if(/CDB\b|LCI\b|LCA\b|LFT\b|NTN-|DEB[ÊE]NTURE|\bCRI\b|\bCRA\b|\bLC\b/i.test(n))return 'RF';
   if(t.endsWith('11')){
     if(UNITS_SUFIXO_11.has(t))return 'B3';
     if(/[ÍI]NDICE|INDEX|\bETF\b/i.test(n))return 'ETF';
@@ -25,10 +26,22 @@ function classificarB3(ticker,nome){
   return 'B3';
 }
 
+// Classes tratadas como Renda Fixa (valor corrigido por taxa, não por cotação de mercado)
+const RF_CLASSES=new Set(['RF','TD']);
+
+// Migra dados antigos para a nova taxonomia (idempotente): Tesouro que estava em "Renda Fixa" vira "Tesouro Direto".
+function migrarClasses(){
+  if(!Array.isArray(ativos))return;
+  ativos.forEach(a=>{
+    const ehTesouro=(a.rf&&a.rf.titulo==='Tesouro Direto')||/^TESOURO\s/i.test(a.ticker||'');
+    if(a.classe==='RF'&&ehTesouro)a.classe='TD';
+  });
+}
+
 const DEFAULT_ATIVOS=[];
 
 const DEFAULT_METAS=[
-  {classe:'B3',ideal:30},{classe:'FII',ideal:25},{classe:'RF',ideal:20},{classe:'Crypto',ideal:10},{classe:'Exterior',ideal:10},{classe:'ETF',ideal:5}
+  {classe:'B3',ideal:30},{classe:'FII',ideal:20},{classe:'ETF',ideal:5},{classe:'BDR',ideal:5},{classe:'RF',ideal:10},{classe:'TD',ideal:10},{classe:'Crypto',ideal:5},{classe:'Exterior',ideal:15}
 ];
 
 /* ===================== MÚLTIPLAS CARTEIRAS — TUDO SÓ NA NUVEM (FIRESTORE) =====================
@@ -152,8 +165,8 @@ function calcEvolucaoPatrimonio(nMeses=24){
       custo+=a.qtd*a.pm;
       // Valor de mercado do mês — mesma lógica do calcAtivos, para o lucro/prejuízo refletir SÓ preço/correção:
       let valorUnit;
-      if(a.classe==='RF'){
-        // Renda Fixa: valor corrigido (CDI/prefixado) até o fim do mês — nunca "prejuízo falso".
+      if(RF_CLASSES.has(a.classe)){
+        // Renda Fixa / Tesouro: valor corrigido (CDI/prefixado) até o fim do mês — nunca "prejuízo falso".
         valorUnit=a.pm*fatorRF(a.rf,a.data,ateData);
       }else{
         const hist=HISTORICO_CACHE[a.ticker]||{};
@@ -416,6 +429,7 @@ function _mvApplyGate(){
 
 /* Agrega lançamentos em posições líquidas por ticker (PM ponderado, qtd líquida) */
 function calcPosicoes(txArray){
+  migrarClasses(); // normaliza dados antigos (Tesouro → Tesouro Direto) — idempotente
   // [BUG-RF2 FIX] Ordena por data (e Compra antes de Venda no mesmo dia) antes de processar.
   // Sem isso, a ordem dependia de qual arquivo B3 foi importado primeiro: se uma planilha com
   // vendas mais recentes era importada antes da planilha com as compras mais antigas, a venda
@@ -552,7 +566,7 @@ function calcAtivos(ate=null){
     // [BUG-D1 FIX] Aplica taxa de câmbio para ativos em moeda estrangeira
     const rate=getRate(a.moeda);
     // Renda Fixa: valor corrigido pelo CDI/Prefixado em dias úteis. Demais: cotação de mercado.
-    const cotacao=a.classe==='RF'
+    const cotacao=RF_CLASSES.has(a.classe)
       ?a.pm*fatorRF(a.rf,a.data,ate)
       :(COTACOES[a.ticker]||a.cotacao||0)*rate;
     const vt=a.qtd*cotacao;
@@ -863,7 +877,7 @@ function processB3Rows(rows){
     const preco=parseFloat(String(r[col.preco]||'0').replace(',','.'))||0;
     if(qtd<=0)continue;
 
-    if(!ops[ticker])ops[ticker]={nome,txs:[],rfTipo:(isCDB||isTesouro)?'RF':null,isRF:isCDB||isTesouro,rfSubtipo:isCDB?produtoRaw.split(/\s*-\s*/)[0].trim().toUpperCase():isTesouro?'Tesouro Direto':null};
+    if(!ops[ticker])ops[ticker]={nome,txs:[],rfTipo:isTesouro?'TD':(isCDB?'RF':null),isRF:isCDB||isTesouro,rfSubtipo:isCDB?produtoRaw.split(/\s*-\s*/)[0].trim().toUpperCase():isTesouro?'Tesouro Direto':null};
     if(nome&&!ops[ticker].nome)ops[ticker].nome=nome;
     ops[ticker].txs.push({data:dataStr,side:isBuy?'buy':'sell',qtd,preco});
   }
@@ -909,7 +923,7 @@ function processB3Rows(rows){
   // ativos nunca mais reapareciam para completar os dados, mesmo importando outros extratos.
   const _rfJaNaFila=new Set(pendingRF.map(p=>p.ativoRef));
   ativos.forEach(a=>{
-    if(a.classe==='RF'&&a.tipo==='Compra'&&!a.rf&&!_rfJaNaFila.has(a)){
+    if(RF_CLASSES.has(a.classe)&&a.tipo==='Compra'&&!a.rf&&!_rfJaNaFila.has(a)){
       pendingRF.push({ativoRef:a,ticker:a.ticker,nome:a.ticker,valor:a.pm,data:a.data,rfSubtipo:null});
     }
   });
@@ -1126,7 +1140,7 @@ async function mvLoadTab(href,push){
 /* [BUG-RF1 FIX] Verifica a qualquer momento (não só no import) se há Renda Fixa sem
    indexador/taxa/vencimento e abre o modal de complemento para elas. */
 function abrirPendenciasRF(){
-  const pend=ativos.filter(a=>a.classe==='RF'&&a.tipo==='Compra'&&!a.rf)
+  const pend=ativos.filter(a=>RF_CLASSES.has(a.classe)&&a.tipo==='Compra'&&!a.rf)
     .map(a=>({ativoRef:a,ticker:a.ticker,nome:a.ticker,valor:a.pm,data:a.data,rfSubtipo:null}));
   if(!pend.length){toast('Nenhuma Renda Fixa pendente de dados.');return;}
   openModalRFComplement(pend,()=>{saveAtivos();initConsolidador();});
@@ -1251,10 +1265,13 @@ function injectModals(){
     <div class="modal-grid">
       <div class="form-group" style="grid-column:1/-1"><label>Tipo de ativo</label>
         <select id="f-classe" onchange="onClasseChange()">
-          <option value="B3">Ações B3</option><option value="FII">FIIs</option>
-          <option value="ETF">ETFs</option><option value="Crypto">Criptomoedas</option>
-          <option value="BDR">BDRs</option><option value="Exterior">Exterior</option>
+          <option value="B3">Ações</option><option value="FII">FIIs</option>
+          <option value="ETF">ETFs</option><option value="BDR">BDRs</option>
+          <option value="Crypto">Criptomoedas</option><option value="Exterior">Stocks</option>
+          <option value="ETFINT">ETFs Internacionais</option><option value="REIT">Reits</option>
+          <option value="FUNDO">Fundos de Investimentos</option><option value="OUTRO">Outros</option>
           <option value="RF">Renda Fixa (CDB/LCI/LCA/LC...)</option>
+          <option value="TD">Tesouro Direto</option>
         </select>
       </div>
 
@@ -1309,9 +1326,12 @@ function injectModals(){
     <div class="modal-grid">
       <div class="form-group"><label>Classe</label>
         <select id="m-classe">
-          <option value="B3">Ações B3</option><option value="FII">FIIs</option>
-          <option value="Crypto">Cripto</option><option value="RF">Renda Fixa</option>
-          <option value="ETF">ETFs</option><option value="Exterior">Exterior</option><option value="BDR">BDRs</option>
+          <option value="B3">Ações</option><option value="FII">FIIs</option>
+          <option value="ETF">ETFs</option><option value="BDR">BDRs</option>
+          <option value="Crypto">Criptomoedas</option><option value="Exterior">Stocks</option>
+          <option value="ETFINT">ETFs Internacionais</option><option value="REIT">Reits</option>
+          <option value="FUNDO">Fundos de Investimentos</option><option value="OUTRO">Outros</option>
+          <option value="RF">Renda Fixa</option><option value="TD">Tesouro Direto</option>
         </select>
       </div>
       <div class="form-group"><label>% Ideal</label><input id="m-ideal" type="number" placeholder="20" min="0" max="100"></div>
@@ -1369,7 +1389,7 @@ function onClasseChange(){updateModalMode();}
 function updateModalMode(){
   const classe=document.getElementById('f-classe').value;
   const tipo=document.getElementById('f-tipo').value;
-  const rf=(classe==='RF');
+  const rf=RF_CLASSES.has(classe);
   const vendaRF=(rf&&tipo==='Venda');
   document.querySelectorAll('#modal .grp-rf').forEach(el=>{el.style.display=(rf&&!vendaRF)?'':'none'});
   document.querySelectorAll('#modal .grp-equity').forEach(el=>{el.style.display=rf?'none':''});
@@ -1398,7 +1418,7 @@ function aliquotaRF(dias){
 
 /* Posições de RF que ainda tenho em carteira (com saldo corrigido) */
 function getPosicoesRF(){
-  return calcAtivos().filter(a=>a.classe==='RF'&&a.qtd>0.000001);
+  return calcAtivos().filter(a=>RF_CLASSES.has(a.classe)&&a.qtd>0.000001);
 }
 
 /* Monta a listinha de títulos de RF para escolher qual vender */
@@ -1477,7 +1497,7 @@ function finalizarVendaRF(){
   if(valor>pos.vt+0.01){alert(`Valor maior que o saldo do título (R$ ${fmt(pos.vt)}).`);return}
   const precoUnit=pos.cotacao;
   const qtdVendida=precoUnit>0?valor/precoUnit:0;
-  const obj={ticker:pos.ticker,classe:'RF',tipo:'Venda',qtd:qtdVendida,pm:precoUnit,cotacao:precoUnit,
+  const obj={ticker:pos.ticker,classe:pos.classe||'RF',tipo:'Venda',qtd:qtdVendida,pm:precoUnit,cotacao:precoUnit,
     data:dataVenda,nota:0,ideal:0,moeda:'BRL',comprar:'Não',rf:pos.rf};
   ativos.push(obj);
   saveAtivos();
@@ -1499,11 +1519,11 @@ function closeModalMeta(){document.getElementById('modal-meta').style.display='n
 function addAtivo(){
   const classe=document.getElementById('f-classe').value;
   const tipo=document.getElementById('f-tipo').value;
-  // Venda de Renda Fixa tem fluxo próprio (escolher título + valor + IR)
-  if(tipo==='Venda'&&classe==='RF'){return finalizarVendaRF();}
+  // Venda de Renda Fixa/Tesouro tem fluxo próprio (escolher título + valor + IR)
+  if(tipo==='Venda'&&RF_CLASSES.has(classe)){return finalizarVendaRF();}
   let obj;
   // Nota / % Ideal / Comprar são definidos depois, na carteira (Resumo).
-  if(classe==='RF'){
+  if(RF_CLASSES.has(classe)){
     const emissor=document.getElementById('rf-emissor').value.trim();
     const titulo=document.getElementById('rf-titulo').value;
     const indexador=document.getElementById('rf-indexador').value;
@@ -1516,7 +1536,7 @@ function addAtivo(){
     if(!emissor||!valor){alert('Preencha Emissor e Valor aplicado.');return}
     const ticker=`${titulo} ${emissor}`.toUpperCase();
     // qtd=1 e pm=valor → total = valor aplicado (mantém o formato dos demais consumidores)
-    obj={ticker,classe:'RF',tipo,qtd:1,pm:valor,cotacao:valor,data,nota:0,ideal:0,moeda:'BRL',comprar:'Não',
+    obj={ticker,classe:titulo==='Tesouro Direto'?'TD':classe,tipo,qtd:1,pm:valor,cotacao:valor,data,nota:0,ideal:0,moeda:'BRL',comprar:'Não',
          rf:{emissor,titulo,indexador,taxa,forma,valor,venc,liquidez}};
   }else{
     const ticker=document.getElementById('f-ticker').value.trim().toUpperCase();
