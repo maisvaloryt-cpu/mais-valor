@@ -1,5 +1,5 @@
 {
-  "updated_at": "19/06/2026 13:44",
+  "updated_at": "19/06/2026 14:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,8 +1128,8 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 168220.98,
-      "changePct": -0.0003,
+      "price": 167868.58,
+      "changePct": -0.0024,
       "high": 168691.14,
       "low": 167657.53
     },
@@ -1138,8 +1138,8 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3805.23,
-      "changePct": 0.0014000000000000002,
+      "price": 3803.51,
+      "changePct": 0.001,
       "high": 3806.42,
       "low": 3798.57
     },
@@ -1158,10 +1158,10 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 11977.19,
-      "changePct": -0.0011,
+      "price": 11944.97,
+      "changePct": -0.0038,
       "high": 12016.89,
-      "low": 11949.26
+      "low": 11944.27
     },
     {
       "ticker": "INDEXBVMF:IMAB",
