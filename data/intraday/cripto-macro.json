@@ -1,5 +1,5 @@
 {
-  "updated_at": "18/06/2026 17:44",
+  "updated_at": "19/06/2026 10:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1238,20 +1238,20 @@
       "stale": false,
       "descricao": "FTSE 100 (Reino Unido)",
       "tipo": "Índice Global",
-      "price": 10399.7,
-      "changePct": -0.0104,
-      "high": 10510.16,
-      "low": 10376.59
+      "price": 10371.84,
+      "changePct": -0.0027,
+      "high": 10418.58,
+      "low": 10352.9
     },
     {
       "ticker": "INDEXDB:DAX",
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 25026.8,
-      "changePct": 0.0037,
-      "high": 25059.37,
-      "low": 24840.27
+      "price": 25054.06,
+      "changePct": 0.0011,
+      "high": 25173.02,
+      "low": 24951.54
     },
     {
       "ticker": "INDEXEURO:SX5E",
@@ -1268,10 +1268,10 @@
       "stale": false,
       "descricao": "Nikkei 225 (Japão)",
       "tipo": "Índice Global",
-      "price": 71053.49,
-      "changePct": 0.0165,
-      "high": 71398.58,
-      "low": 70092.94
+      "price": 71250.06,
+      "changePct": 0.0028000000000000004,
+      "high": 71952.99,
+      "low": 70517.98
     },
     {
       "ticker": "INDEXHANGSENG:HSI",
