@@ -607,10 +607,15 @@ function byClasse(c){
 function calcSugestaoAporte(c,totalAtual,aporte){
   const idealMap={}; metas.forEach(m=>idealMap[m.classe]=m.ideal);
   const pesoNota=n=>n>0?Math.sqrt(n):0;
-  const classes=[...new Set(c.map(a=>a.classe))];
+  // Classes consideradas = as que TÊM ativo + as da meta (mesmo sem ativo).
+  // Assim a fatia de uma classe da meta sem ativo (ex.: Cripto) é reservada, não repassada às outras.
+  const classesCarteira=[...new Set(c.map(a=>a.classe))];
+  const temAtivo={}; classesCarteira.forEach(cl=>temAtivo[cl]=true);
+  const classes=[...new Set([...classesCarteira,...Object.keys(idealMap).filter(cl=>idealMap[cl]>0)])];
   const somaPesoClasse={}, qtdClasse={};
-  c.forEach(a=>{somaPesoClasse[a.classe]=(somaPesoClasse[a.classe]||0)+pesoNota(a.nota);qtdClasse[a.classe]=(qtdClasse[a.classe]||0)+1;});
-  const shareNota=a=>{const sp=somaPesoClasse[a.classe]||0;return sp>0?pesoNota(a.nota)/sp:(qtdClasse[a.classe]?1/qtdClasse[a.classe]:0);};
+  const notaDe=a=>a.nota||1; // ativo sem nota = nota 1 (padrão)
+  c.forEach(a=>{somaPesoClasse[a.classe]=(somaPesoClasse[a.classe]||0)+pesoNota(notaDe(a));qtdClasse[a.classe]=(qtdClasse[a.classe]||0)+1;});
+  const shareNota=a=>{const sp=somaPesoClasse[a.classe]||0;return sp>0?pesoNota(notaDe(a))/sp:(qtdClasse[a.classe]?1/qtdClasse[a.classe]:0);};
   const alvoPct={}, comprar={};
   c.forEach(a=>{
     alvoPct[a.ticker]=(idealMap[a.classe]||0)*shareNota(a);
@@ -618,6 +623,7 @@ function calcSugestaoAporte(c,totalAtual,aporte){
     comprar[a.ticker]=atualPct<alvoPct[a.ticker]-0.05?'Sim':'Não';
   });
   const aporteAtivo={}; c.forEach(a=>aporteAtivo[a.ticker]=0);
+  const reservaClasse={};
   if(aporte>0){
     const novoTotal=totalAtual+aporte;
     const bc=byClasse(c);
@@ -626,9 +632,11 @@ function calcSugestaoAporte(c,totalAtual,aporte){
     const somaIdeal=classes.reduce((s,cl)=>s+(idealMap[cl]||0),0);
     const aporteClasse={};
     classes.forEach(cl=>{aporteClasse[cl]=somaDef>0?aporte*deficit[cl]/somaDef:(somaIdeal>0?aporte*((idealMap[cl]||0)/somaIdeal):0);});
+    // Classes da meta SEM ativo: a fatia fica reservada (sugestão de adicionar a classe).
+    classes.forEach(cl=>{ if(!temAtivo[cl]&&aporteClasse[cl]>0.005)reservaClasse[cl]=aporteClasse[cl]; });
     c.forEach(a=>{aporteAtivo[a.ticker]=(aporteClasse[a.classe]||0)*shareNota(a);});
   }
-  return {alvoPct,comprar,aporteAtivo,temAporte:aporte>0};
+  return {alvoPct,comprar,aporteAtivo,reservaClasse,temAporte:aporte>0};
 }
 
 /* ---- toast ---- */
