@@ -35,21 +35,21 @@
 
     <div class="charts-row">
       <div class="card">
-        <div class="card-title">Sua carteira (hoje)</div>
-        <div style="display:flex;align-items:center;gap:12px">
-          <div style="position:relative;width:150px;height:150px;flex-shrink:0"><canvas id="ap-pizza-atual" role="img" aria-label="Sua carteira atual por classe"></canvas></div>
-          <div id="ap-legenda-atual" style="flex:1;display:flex;flex-direction:column;gap:5px"></div>
-        </div>
-      </div>
-      <div class="card">
         <div class="card-title"><i class="ti ti-target" aria-hidden="true" style="color:var(--blue)"></i>Carteira ideal (sua meta)</div>
-        <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px">
-          <div style="position:relative;width:150px;height:150px;flex-shrink:0"><canvas id="ap-pizza-ideal" role="img" aria-label="Carteira ideal por classe"></canvas></div>
-          <div id="ap-legenda-ideal" style="flex:1;display:flex;flex-direction:column;gap:5px"></div>
+        <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:12px">
+          <div style="position:relative;flex:1;min-width:130px;height:210px"><canvas id="ap-pizza-ideal" role="img" aria-label="Carteira ideal por classe"></canvas></div>
+          <div id="ap-legenda-ideal" style="flex-shrink:0;display:flex;flex-direction:column;gap:6px"></div>
         </div>
         <div style="border-top:1px solid var(--border,rgba(255,255,255,0.06));padding-top:10px">
           <div id="ap-meta-add"></div>
           <div id="ap-meta-total" style="margin-top:8px;font-size:12px"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Sua carteira (hoje)</div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="position:relative;flex:1;min-width:130px;height:210px"><canvas id="ap-pizza-atual" role="img" aria-label="Sua carteira atual por classe"></canvas></div>
+          <div id="ap-legenda-atual" style="flex-shrink:0;display:flex;flex-direction:column;gap:6px"></div>
         </div>
       </div>
     </div>
@@ -74,6 +74,8 @@ var aporteAtual=0; // var (não let): o script da página roda de novo na troca 
 
 // Classes possíveis (mesma ordem do app); o editor de meta lista todas.
 var AP_CLASSES=['B3','FII','ETF','BDR','RF','TD','Crypto','Exterior','ETFINT','REIT','FUNDO','OUTRO'];
+var AP_PALETTE=['#E2453C','#FF6B35','#F5A623','#FFCC00','#E8615D','#C9772E','#D4A017','#1D9E75','#0F8E6E','#2E86C1','#3B6D11','#7D5BA6']; // quentes primeiro, frias no fim
+function apColor(cl){var i=AP_CLASSES.indexOf(cl);return i>=0?AP_PALETTE[i%AP_PALETTE.length]:'#888';}
 
 function apSetAporte(v){ aporteAtual=Math.max(0,parseFloat(v)||0); apRenderTabela(); apRenderResumo(); }
 
@@ -94,8 +96,8 @@ function apRenderEditor(){
   const disp=AP_CLASSES.filter(cl=>!metas.some(m=>m.classe===cl));
   const rows=ativas.map(cl=>`
     <div style="display:flex;align-items:center;gap:6px">
-      <span style="width:9px;height:9px;border-radius:50%;background:${CLASS_COLORS[cl]||'#888'};flex-shrink:0"></span>
-      <span style="flex:1;font-size:12px;color:var(--color-text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${CLASS_LABEL[cl]||cl}</span>
+      <span style="width:9px;height:9px;border-radius:50%;background:${apColor(cl)};flex-shrink:0"></span>
+      <span style="min-width:90px;font-size:12px;color:var(--color-text-primary);white-space:nowrap">${CLASS_LABEL[cl]||cl}</span>
       <input class="cell-edit" type="number" min="0" max="100" step="1" value="${im[cl]||''}" placeholder="0" style="width:50px;text-align:right" oninput="apSetMeta('${cl}',this.value)">
       <span style="font-size:11px;color:var(--color-text-secondary)">%</span>
       <button class="btn btn-sm" title="Remover classe" onclick="apRemoveClasse('${cl}')" style="padding:1px 6px;line-height:1">✕</button>
@@ -140,7 +142,7 @@ function apPizza(canvasId,labels,vals,colors){
   charts[canvasId]=new Chart(el.getContext('2d'),{
     type:'doughnut',
     data:{labels,datasets:[{data:vals,backgroundColor:colors,borderWidth:0,hoverOffset:3}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'66%',plugins:{legend:{display:false},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'0%',plugins:{legend:{display:false},
       tooltip:{callbacks:{label:c=>' '+c.label+': '+(soma?((c.raw/soma)*100).toFixed(1):0)+'%'}}}}
   });
 }
@@ -155,18 +157,18 @@ function apRenderCharts(){
   apPizza('ap-pizza-atual',
     clsAtual.map(k=>CLASS_LABEL[k]||k),
     clsAtual.map(k=>+bc[k].toFixed(2)),
-    clsAtual.map(k=>CLASS_COLORS[k]||'#888'));
+    clsAtual.map(k=>apColor(k)));
   document.getElementById('ap-legenda-atual').innerHTML=clsAtual.length?clsAtual.map(k=>`
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-      <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span style="width:9px;height:9px;border-radius:50%;background:${CLASS_COLORS[k]||'#888'}"></span>${CLASS_LABEL[k]||k}</span>
-      <span style="font-size:11px;font-weight:500;color:var(--color-text-primary)">${total?((bc[k]/total)*100).toFixed(1):0}%</span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--color-text-secondary);min-width:96px"><span style="width:9px;height:9px;border-radius:50%;background:${apColor(k)};flex-shrink:0"></span>${CLASS_LABEL[k]||k}</span>
+      <span style="font-size:12px;font-weight:600;color:var(--color-text-primary)">${total?((bc[k]/total)*100).toFixed(1):0}%</span>
     </div>`).join(''):'<div style="font-size:12px;color:var(--color-text-secondary)">Sem ativos ainda.</div>';
   // Carteira ideal (meta) — só classes com ideal > 0
   const clsIdeal=AP_CLASSES.filter(k=>(im[k]||0)>0);
   apPizza('ap-pizza-ideal',
     clsIdeal.map(k=>CLASS_LABEL[k]||k),
     clsIdeal.map(k=>im[k]),
-    clsIdeal.map(k=>CLASS_COLORS[k]||'#888'));
+    clsIdeal.map(k=>apColor(k)));
   // A legenda da carteira ideal é o próprio editor (apRenderEditor) — não sobrescrever aqui.
 }
 
@@ -208,7 +210,7 @@ function apRenderTabela(){
     <tbody>
       ${linhas.map(({a,ap,alvo,qtd})=>{const frac=FRAC.has(a.classe);return `<tr>
         <td><strong title="${a.ticker}">${typeof rotuloAtivo==='function'?rotuloAtivo(a):a.ticker}</strong></td>
-        <td><span style="display:inline-flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:${CLASS_COLORS[a.classe]||'#888'}"></span>${CLASS_LABEL[a.classe]||a.classe}</span></td>
+        <td><span style="display:inline-flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:${apColor(a.classe)}"></span>${CLASS_LABEL[a.classe]||a.classe}</span></td>
         <td class="r">${a.nota||1}</td>
         <td class="r">${alvo>0?alvo.toFixed(1)+'%':'-'}</td>
         <td class="r">${frac?'—':fmtR(a.cotacao||0)}</td>
