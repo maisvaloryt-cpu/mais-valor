@@ -363,6 +363,7 @@ function removeAtivoIdx(idx){
 async function initConsolidador(){
   await Promise.all([atualizarCotacoes(),loadAllDividendos(),loadAllHistorico()]);
   if(typeof renderAll==='function')renderAll();
+  if(typeof atualizarBadgeRF==='function')atualizarBadgeRF();
 }
 
 /* ===================== GATE DE LOGIN (a carteira só aparece depois de logar) =====================
@@ -1105,12 +1106,12 @@ function renderHeaderAndNav(active){
   if(headerActions){
     headerActions.innerHTML=`
       <div class="carteira-switcher" id="carteira-switcher"></div>
-      <button class="btn" onclick="abrirPendenciasRF()" title="Verificar Renda Fixa sem indexador/taxa"><i class="ti ti-alert-triangle" aria-hidden="true"></i> RF pendente</button>
       <button class="btn" onclick="openImport()"><i class="ti ti-file-spreadsheet" aria-hidden="true"></i> Importar Excel</button>
       <input type="file" id="csv-input" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleCSVImport(this)">
-      <button class="btn btn-primary" onclick="openModal()">+ Transação</button>
+      <button class="btn btn-primary" onclick="openModal()" style="position:relative">+ Transação<span id="rf-badge" title="Há Renda Fixa sem dados" style="display:none;position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#e23b3b;color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center;box-shadow:0 0 0 2px var(--bg2,#16161a)">!</span></button>
     `;
     renderCarteiraSwitcher();
+    atualizarBadgeRF();
   }
   const tabsEl=document.getElementById('tabs');
   if(tabsEl){
@@ -1177,8 +1178,34 @@ async function mvLoadTab(href,push){
 
 /* [BUG-RF1 FIX] Verifica a qualquer momento (não só no import) se há Renda Fixa sem
    indexador/taxa/vencimento e abre o modal de complemento para elas. */
+/* Renda Fixa de Compra que entrou sem dados (sem indexador/taxa) */
+function _pendenciasRF(){
+  return (typeof ativos!=='undefined'&&ativos?ativos:[]).filter(a=>RF_CLASSES.has(a.classe)&&a.tipo==='Compra'&&!a.rf);
+}
+
+/* Mostra/esconde a bolinha "!" no botão "+ Transação" */
+function atualizarBadgeRF(){
+  const b=document.getElementById('rf-badge');
+  if(!b)return;
+  b.style.display=_pendenciasRF().length>0?'inline-block':'none';
+}
+
+/* Atualiza a linha de aviso de pendências dentro do modal "+ Transação" */
+function atualizarAvisoRFModal(){
+  const box=document.getElementById('modal-rf-pend');
+  if(!box)return;
+  const n=_pendenciasRF().length;
+  if(n>0){
+    const txt=document.getElementById('modal-rf-pend-txt');
+    if(txt)txt.textContent='⚠ '+n+(n>1?' títulos de Renda Fixa estão':' título de Renda Fixa está')+' sem dados (indexador/taxa).';
+    box.style.display='flex';
+  }else{
+    box.style.display='none';
+  }
+}
+
 function abrirPendenciasRF(){
-  const pend=ativos.filter(a=>RF_CLASSES.has(a.classe)&&a.tipo==='Compra'&&!a.rf)
+  const pend=_pendenciasRF()
     .map(a=>({ativoRef:a,ticker:a.ticker,nome:a.ticker,valor:a.pm,data:a.data,rfSubtipo:null}));
   if(!pend.length){toast('Nenhuma Renda Fixa pendente de dados.');return;}
   openModalRFComplement(pend,()=>{saveAtivos();initConsolidador();});
@@ -1294,6 +1321,11 @@ function injectModals(){
   <div class="modal">
     <h2><i class="ti ti-plus" aria-hidden="true" style="margin-right:6px"></i>Adicionar Lançamento</h2>
 
+    <div id="modal-rf-pend" style="display:none;align-items:center;gap:10px;background:rgba(226,59,59,0.12);border:1px solid rgba(226,59,59,0.4);color:#ff6b6b;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px;line-height:1.4">
+      <span id="modal-rf-pend-txt" style="flex:1"></span>
+      <button type="button" class="btn btn-sm" onclick="closeModal();abrirPendenciasRF()" style="white-space:nowrap">Completar agora</button>
+    </div>
+
     <div class="seg-toggle">
       <button type="button" id="seg-Compra" class="seg-btn active" onclick="setTipoTx('Compra')"><i class="ti ti-shopping-cart" aria-hidden="true"></i> Compra</button>
       <button type="button" id="seg-Venda" class="seg-btn" onclick="setTipoTx('Venda')"><i class="ti ti-cash" aria-hidden="true"></i> Venda</button>
@@ -1404,6 +1436,7 @@ function openModal(){
   document.getElementById('rf-data').value=hoje;
   setTipoTx('Compra');
   onClasseChange();
+  atualizarAvisoRFModal();
 }
 function closeModal(){
   document.getElementById('modal').style.display='none';
