@@ -111,7 +111,7 @@ function renderProventos(){
   const comProv=c.filter(a=>a.vt>0||a.proventos>0).sort((a,b)=>b.proventos-a.proventos);
   tbody.innerHTML=comProv.map(a=>`
     <tr>
-      <td><strong>${a.ticker}</strong></td>
+      <td><strong title="${a.ticker}">${typeof rotuloAtivo==='function'?rotuloAtivo(a):a.ticker}</strong></td>
       <td><span class="badge ${CLASS_BADGE[a.classe]||''}">${CLASS_LABEL[a.classe]||a.classe}</span></td>
       <td class="r">${fmtR(a.vt)}</td>
       <td class="r positive">${fmt(a.dy)}%</td>

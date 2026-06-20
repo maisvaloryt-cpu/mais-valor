@@ -79,7 +79,7 @@ function renderIRPF(){
   `;
   // [BUG-F1 FIX] Grupo e Código IRPF corretos por classe
   document.getElementById('tbody-irpf').innerHTML=c.map(a=>`
-    <tr><td><strong>${a.ticker}</strong></td><td><span class="badge ${CLASS_BADGE[a.classe]||''}">${CLASS_LABEL[a.classe]||a.classe}</span></td>
+    <tr><td><strong title="${a.ticker}">${typeof rotuloAtivo==='function'?rotuloAtivo(a):a.ticker}</strong></td><td><span class="badge ${CLASS_BADGE[a.classe]||''}">${CLASS_LABEL[a.classe]||a.classe}</span></td>
     <td>Grupo ${IRPF_GRUPO[a.classe]||'03'} / Cód. ${IRPF_CODIGO[a.classe]||'01'}</td>
     <td class="r">${fmtR(a.custo)}</td><td class="r">${a.qtd.toLocaleString('pt-BR')}</td><td class="r">${fmtR(a.pm)}</td></tr>
   `).join('');
@@ -97,7 +97,7 @@ function renderIRPF(){
     else if(a.classe==='ETFINT'||a.classe==='REIT') trib='<span style="color:#BA7517;font-weight:500">Tributável (Lei 14.754/23)</span>';
     else if(a.classe==='FUNDO') trib='<span style="color:#BA7517;font-weight:500">15-22,5% / come-cotas</span>';
     else trib='<span style="color:#BA7517;font-weight:500">Tributável</span>';
-    return`<tr><td><strong>${a.ticker}</strong></td><td><span class="badge ${CLASS_BADGE[a.classe]||''}">${CLASS_LABEL[a.classe]||a.classe}</span></td>
+    return`<tr><td><strong title="${a.ticker}">${typeof rotuloAtivo==='function'?rotuloAtivo(a):a.ticker}</strong></td><td><span class="badge ${CLASS_BADGE[a.classe]||''}">${CLASS_LABEL[a.classe]||a.classe}</span></td>
     <td class="r positive">${fmtR(provAno)}</td><td>${trib}</td></tr>`;
   }).join('');
 }

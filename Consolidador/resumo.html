@@ -233,7 +233,7 @@ function renderGrupos(){
               const alvo=sug.alvoPct[a.ticker]||0;
               const comp=sug.comprar[a.ticker];
               return `<tr>
-              <td><strong>${a.ticker}</strong></td>
+              <td><strong title="${a.ticker}">${typeof rotuloAtivo==='function'?rotuloAtivo(a):a.ticker}</strong></td>
               <td class="r">${a.qtd.toLocaleString('pt-BR')}</td>
               <td class="r">${fmtR(a.pm)}</td>
               <td class="r">${fmtR(a.cotacao)}</td>

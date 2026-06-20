@@ -841,6 +841,7 @@ function processB3Rows(rows){
         if(k==='produto')col.produto=idx;
         if(k==='quantidade')col.qtd=idx;
         if(k.includes('pre')&&k.includes('unit'))col.preco=idx;
+        if(k.includes('valor')&&k.includes('opera'))col.valor=idx;
       });
       break;
     }
@@ -921,11 +922,12 @@ function processB3Rows(rows){
 
     const qtd=parseFloat(String(r[col.qtd]||'0').replace(',','.'))||0;
     const preco=parseFloat(String(r[col.preco]||'0').replace(',','.'))||0;
+    const valorOp=col.valor!=null?(parseFloat(String(r[col.valor]||'0').replace(/\s/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.'))||0):0;
     if(qtd<=0)continue;
 
     if(!ops[ticker])ops[ticker]={nome,txs:[],rfTipo:isTesouro?'TD':(isCDB?'RF':null),isRF:isCDB||isTesouro,rfSubtipo:isCDB?produtoRaw.split(/\s*-\s*/)[0].trim().toUpperCase():isTesouro?'Tesouro Direto':null};
     if(nome&&!ops[ticker].nome)ops[ticker].nome=nome;
-    ops[ticker].txs.push({data:dataStr,side:isBuy?'buy':'sell',qtd,preco});
+    ops[ticker].txs.push({data:dataStr,side:isBuy?'buy':'sell',qtd,preco,valor:valorOp});
   }
 
   let importados=0;
@@ -942,7 +944,8 @@ function processB3Rows(rows){
       // RF (CDB/LCI/Tesouro etc): normaliza para qtd=1, pm=valorTotal
       // Assim fatorRF(rf, data) multiplica pm corretamente (igual ao lançamento manual)
       const qtdFinal  = isRF ? 1                                        : Math.round(tx.qtd*10000)/10000;
-      const pmFinal   = isRF ? parseFloat((tx.qtd*tx.preco).toFixed(2)) : parseFloat(tx.preco.toFixed(4));
+      const rfValor=(tx.valor>0?tx.valor:tx.qtd*tx.preco);
+      const pmFinal   = isRF ? parseFloat(rfValor.toFixed(2)) : parseFloat(tx.preco.toFixed(4));
       const obj={
         ticker,classe,tipo,
         qtd:qtdFinal,
@@ -959,7 +962,7 @@ function processB3Rows(rows){
       importados++;
       // RF importado via B3 não tem indexador/taxa/vencimento — coleta para perguntar depois
       if(isRF&&tipo==='Compra'){
-        pendingRF.push({ativoRef:obj,ticker,nome,valor:tx.qtd*tx.preco,data:tx.data,rfSubtipo});
+        pendingRF.push({ativoRef:obj,ticker,nome,valor:(tx.valor>0?tx.valor:tx.qtd*tx.preco),data:tx.data,rfSubtipo});
       }
     }
   }
@@ -1185,8 +1188,41 @@ async function mvLoadTab(href,push){
 /* [BUG-RF1 FIX] Verifica a qualquer momento (não só no import) se há Renda Fixa sem
    indexador/taxa/vencimento e abre o modal de complemento para elas. */
 /* Renda Fixa de Compra que entrou sem dados (sem indexador/taxa) */
+/* Faltam dados na Renda Fixa? CDB precisa de indexador + taxa + vencimento (ou liquidez diária). */
+function rfFaltaDados(a){
+  const rf=a.rf;
+  if(!rf||!rf.indexador)return true;
+  if(a.classe==='RF'){
+    if(!(parseFloat(rf.taxa)>0))return true;
+    const venc=rf.vencimento||rf.venc;
+    if(!venc&&!rf.liquidez)return true;
+  }
+  return false;
+}
+/* Nome amigável da Renda Fixa: "CDB Digimais 118%" em vez do código */
+function _rfEmissorCurto(em){
+  return (em||'').replace(/\b(BANCO|BCO|S\/?A\.?|S\.?A\.?|LTDA|CIA|FINANCEIRA|CR[EÉ]DITO)\b/gi,'')
+    .replace(/[.\-\/]/g,' ').replace(/\s+/g,' ').trim()
+    .toLowerCase().replace(/(^|\s)\S/g,m=>m.toUpperCase());
+}
+function _rfTaxaLabel(rf){
+  const t=parseFloat(rf.taxa)||0;
+  const n=t.toLocaleString('pt-BR',{maximumFractionDigits:2});
+  if(rf.indexador==='CDI')return t?n+'%':'';
+  if(rf.indexador==='IPCA')return 'IPCA+'+n+'%';
+  if(rf.indexador==='Selic')return 'Selic+'+n+'%';
+  if(rf.indexador==='Prefixado')return n+'%';
+  return t?n+'%':'';
+}
+function rotuloAtivo(a){
+  if(RF_CLASSES.has(a.classe)&&a.rf&&a.rf.emissor){
+    const tit=(a.rf.titulo&&a.rf.titulo!=='Tesouro Direto')?a.rf.titulo:(a.classe==='TD'?'Tesouro':'');
+    return [tit,_rfEmissorCurto(a.rf.emissor),_rfTaxaLabel(a.rf)].filter(Boolean).join(' ')||a.ticker;
+  }
+  return a.ticker;
+}
 function _pendenciasRF(){
-  return (typeof ativos!=='undefined'&&ativos?ativos:[]).filter(a=>RF_CLASSES.has(a.classe)&&a.tipo==='Compra'&&!a.rf);
+  return (typeof ativos!=='undefined'&&ativos?ativos:[]).filter(a=>RF_CLASSES.has(a.classe)&&a.tipo==='Compra'&&rfFaltaDados(a));
 }
 
 /* Mostra/esconde a bolinha "!" no botão "+ Transação" */
@@ -1253,6 +1289,7 @@ function openModalRFComplement(pendingList, onDone){
     <div style="color:var(--color-text-secondary)">${item.data?item.data.split('-').reverse().join('/'):''}${valorExib?' · '+valorExib:''}</div>
   </div>
   <div class="modal-grid">
+    <div class="form-group"><label>Valor aplicado (R$)</label><input id="rfc-valor" type="number" step="0.01" min="0" placeholder="0,00" value="${item.valor||''}"></div>
     ${!isTesouro?`<div class="form-group"><label>Emissor</label><input id="rfc-emissor" type="text" placeholder="Ex: Banco Inter, Nubank…" value="${nomeExib}"></div>`:''}
     <div class="form-group"><label>Indexador</label>
       <select id="rfc-indexador" onchange="
@@ -1297,6 +1334,8 @@ function openModalRFComplement(pendingList, onDone){
     const emissor=document.getElementById('rfc-emissor')?.value||item.nome||'';
 
     const ativo=item.ativoRef;
+    const valorAplic=parseFloat(document.getElementById('rfc-valor')?.value)||0;
+    if(valorAplic>0){ativo.pm=valorAplic;ativo.cotacao=valorAplic;}
     ativo.rf={
       titulo:isTesouro?'Tesouro Direto':subtipo,
       emissor,indexador,taxa,

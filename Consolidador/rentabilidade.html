@@ -76,7 +76,7 @@ function renderRentabilidade(){
   });
   const tb=document.getElementById('tbody-rent');
   tb.innerHTML=c.sort((a,b)=>b.rentTotal-a.rentTotal).map(a=>`
-    <tr><td><strong>${a.ticker}</strong></td><td><span class="badge ${CLASS_BADGE[a.classe]||''}">${CLASS_LABEL[a.classe]||a.classe}</span></td>
+    <tr><td><strong title="${a.ticker}">${typeof rotuloAtivo==='function'?rotuloAtivo(a):a.ticker}</strong></td><td><span class="badge ${CLASS_BADGE[a.classe]||''}">${CLASS_LABEL[a.classe]||a.classe}</span></td>
     <td class="r">${fmtR(a.pm)}</td><td class="r">${fmtR(a.cotacao)}</td>
     <td class="r ${a.res>=0?'positive':'negative'}">${a.res>=0?'+':''}${fmtR(a.res)}</td>
     <td class="r positive">${fmtR(a.proventos)}</td>

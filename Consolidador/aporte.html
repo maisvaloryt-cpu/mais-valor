@@ -190,7 +190,7 @@ function apRenderTabela(){
     <thead><tr><th>Ativo</th><th>Classe</th><th class="r">Nota</th><th class="r">% alvo</th><th class="r">Preço atual</th><th class="r">Qtd</th><th class="r">Aporte sugerido</th><th class="r">% do aporte</th></tr></thead>
     <tbody>
       ${linhas.map(({a,ap,alvo,qtd})=>{const frac=FRAC.has(a.classe);return `<tr>
-        <td><strong>${a.ticker}</strong></td>
+        <td><strong title="${a.ticker}">${typeof rotuloAtivo==='function'?rotuloAtivo(a):a.ticker}</strong></td>
         <td><span style="display:inline-flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:${CLASS_COLORS[a.classe]||'#888'}"></span>${CLASS_LABEL[a.classe]||a.classe}</span></td>
         <td class="r">${a.nota||1}</td>
         <td class="r">${alvo>0?alvo.toFixed(1)+'%':'-'}</td>

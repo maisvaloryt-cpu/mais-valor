@@ -96,7 +96,7 @@ function renderLancamentos(){
   document.getElementById('tbody-lanc').innerHTML=filtered.length?filtered.map(a=>`
     <tr>
       <td>${a.data?a.data.split('-').reverse().join('/'):'-'}</td>
-      <td><strong>${a.ticker}</strong></td>
+      <td><strong title="${a.ticker}">${typeof rotuloAtivo==='function'?rotuloAtivo(a):a.ticker}</strong></td>
       <td><span class="badge ${CLASS_BADGE[a.classe]||''}">${CLASS_LABEL[a.classe]||a.classe}</span></td>
       <td>${a.tipo||'Compra'}</td>
       <td class="r">${a.qtd.toLocaleString('pt-BR')}</td>
@@ -114,7 +114,7 @@ function renderLancamentos(){
     document.getElementById('tbody-prov').innerHTML=proventos.map(a=>`
       <tr>
         <td>${a.data?a.data.split('-').reverse().join('/'):'-'}</td>
-        <td><strong>${a.ticker}</strong></td>
+        <td><strong title="${a.ticker}">${typeof rotuloAtivo==='function'?rotuloAtivo(a):a.ticker}</strong></td>
         <td><span class="badge ${CLASS_BADGE[a.classe]||''}">${CLASS_LABEL[a.classe]||a.classe}</span></td>
         <td class="r">${a.qtd.toLocaleString('pt-BR')}</td>
         <td class="r">${fmtR(a.pm)}</td>
