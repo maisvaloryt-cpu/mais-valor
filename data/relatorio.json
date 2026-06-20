@@ -1,5 +1,5 @@
 {
-  "gerado_em": "15/06/2026 22:19",
+  "gerado_em": "19/06/2026 22:21",
   "historico_mensal": {
     "total": 1370,
     "ok": 1350,
@@ -88,36 +88,31 @@
     ]
   },
   "historico_diario": {
-    "total": 769,
-    "atualizados": 765,
-    "desatualizados": 4,
+    "total": 945,
+    "atualizados": 942,
+    "desatualizados": 3,
     "lista_desatualizados": [
       {
         "ticker": "BRIM11",
         "ultimo": "2026-06-11",
-        "dias_atras": 4
+        "dias_atras": 8
       },
       {
         "ticker": "HGPO11",
         "ultimo": "2026-06-08",
-        "dias_atras": 7
-      },
-      {
-        "ticker": "RBRF11",
-        "ultimo": "2026-06-08",
-        "dias_atras": 7
+        "dias_atras": 11
       },
       {
         "ticker": "SPG211",
         "ultimo": "2026-06-10",
-        "dias_atras": 5
+        "dias_atras": 9
       }
     ]
   },
   "cotacoes": {
-    "atualizado_em": "15/06/2026 22:02",
-    "total_acoes": 398,
-    "total_fiis": 370,
+    "atualizado_em": "19/06/2026 21:56",
+    "total_acoes": 459,
+    "total_fiis": 486,
     "fallbacks": 3,
     "tickers_fallback": [
       "BRIM11",
@@ -126,26 +121,26 @@
     ]
   },
   "fundamentus": {
-    "atualizado_em": "08/06/2026 06:15",
-    "total_acoes": 403,
-    "total_fiis": 380,
-    "atualizado_fiis": "08/06/2026 06:15"
+    "atualizado_em": "19/06/2026 21:56",
+    "total_acoes": 994,
+    "total_fiis": 552,
+    "atualizado_fiis": "19/06/2026 21:56"
   },
   "criptos": {
-    "atualizado_em": "15/06/2026 19:59 UTC",
+    "atualizado_em": "19/06/2026 21:54 UTC",
     "total_moedas": 100,
     "com_dados": 100,
     "sem_dados": 0,
     "tickers_sem_dados": [],
-    "historico_ok": 105,
+    "historico_ok": 106,
     "historico_falhou": 0,
     "historico_falhou_lista": []
   },
   "resumo": {
     "acoes_com_historico": 1350,
     "fiis_com_historico": 364,
-    "cotacoes_atuais": 768,
-    "indicadores_fundamentus": 783,
+    "cotacoes_atuais": 945,
+    "indicadores_fundamentus": 1546,
     "criptos_atuais": 100,
     "status_geral": "✅ OK"
   }
