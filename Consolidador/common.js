@@ -17,12 +17,14 @@ function classificarB3(ticker,nome){
   const n=(nome||'').toUpperCase();
   if(t.endsWith('34'))return 'BDR';
   if(/TESOURO/i.test(n))return 'TD';
-  if(/CDB\b|LCI\b|LCA\b|LFT\b|NTN-|DEB[ÊE]NTURE|\bCRI\b|\bCRA\b|\bLC\b/i.test(n))return 'RF';
+  // Ticker terminado em 11 = ativo de bolsa (FII/FIAGRO/ETF/Unit). Decidimos por aqui
+  // ANTES de olhar o nome — senão um FIAGRO de CRA (ex: VGIA11) cairia em "Renda Fixa".
   if(t.endsWith('11')){
     if(UNITS_SUFIXO_11.has(t))return 'B3';
     if(/[ÍI]NDICE|INDEX|\bETF\b/i.test(n))return 'ETF';
     return 'FII';
   }
+  if(/CDB\b|LCI\b|LCA\b|LFT\b|NTN-|DEB[ÊE]NTURE|\bCRI\b|\bCRA\b|\bLC\b/i.test(n))return 'RF';
   return 'B3';
 }
 
@@ -32,10 +34,14 @@ const RF_CLASSES=new Set(['RF','TD']);
 // Migra dados antigos para a nova taxonomia (idempotente): Tesouro que estava em "Renda Fixa" vira "Tesouro Direto".
 function migrarClasses(){
   if(!Array.isArray(ativos))return;
+  let mudou=false;
   ativos.forEach(a=>{
     const ehTesouro=(a.rf&&a.rf.titulo==='Tesouro Direto')||/^TESOURO\s/i.test(a.ticker||'');
-    if(a.classe==='RF'&&ehTesouro)a.classe='TD';
+    if(a.classe==='RF'&&ehTesouro){a.classe='TD';mudou=true;}
+    // FIAGRO/FII de bolsa (ticker termina em 11) salvo como Renda Fixa por causa de "CRA/CRI" no nome
+    if(a.classe==='RF'&&!ehTesouro&&/11$/.test((a.ticker||'').trim())){a.classe='FII';if(a.rf)delete a.rf;mudou=true;}
   });
+  if(mudou&&typeof saveAtivos==='function')saveAtivos();
 }
 
 const DEFAULT_ATIVOS=[];
