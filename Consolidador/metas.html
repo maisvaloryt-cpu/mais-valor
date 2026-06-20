@@ -24,15 +24,7 @@
   <div class="tabs" id="tabs"></div>
 
   <div id="tab-metas">
-    <div class="section-title" style="margin-top:0"><i class="ti ti-adjustments" aria-hidden="true"></i>Rebalanceamento sugerido</div>
-    <div class="card" style="margin-bottom:1.5rem">
-      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:12px">
-        <div><div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:3px">Vou investir agora (R$, opcional)</div>
-          <input id="reb-aporte" type="number" min="0" step="100" value="0" class="cell-edit" style="width:140px;text-align:right" oninput="renderRebalanceamento()"></div>
-      </div>
-      <div id="reb-conteudo"></div>
-    </div>
-
+    <div class="metrics" id="metas-resumo"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
       <div class="section-title" style="margin:0"><i class="ti ti-target" aria-hidden="true"></i>Meus objetivos</div>
       <button class="btn btn-sm btn-primary" onclick="objToggleForm()">+ Novo objetivo</button>
@@ -118,9 +110,9 @@ function objAddSubmit(){
   if(!Array.isArray(objetivos))objetivos=[];
   objetivos.push(o); saveObjetivos();
   document.getElementById('obj-form').style.display='none';
-  renderObjetivos();
+  renderObjetivos(); renderResumoObjetivos();
 }
-function objRemove(id){ objetivos=(objetivos||[]).filter(o=>o.id!==id); saveObjetivos(); renderObjetivos(); }
+function objRemove(id){ objetivos=(objetivos||[]).filter(o=>o.id!==id); saveObjetivos(); renderObjetivos(); renderResumoObjetivos(); }
 function objConclusao(o,atual,falta){
   const ap=o.aporteMensal||0;
   if(!(ap>0)||falta<=0)return '';
@@ -168,45 +160,28 @@ function renderObjetivos(){
     </div>`;
   }).join('');
 }
-/* ---- Rebalanceamento: o que comprar/reduzir para chegar na alocação ideal ---- */
-function renderRebalanceamento(){
-  const el=document.getElementById('reb-conteudo'); if(!el)return;
-  const aporte=Math.max(0,parseFloat(document.getElementById('reb-aporte').value)||0);
-  const c=calcAtivos();
-  const total=c.reduce((s,a)=>s+a.vt,0);
-  const metasValidas=(metas||[]).filter(m=>(m.ideal||0)>0);
-  if(!metasValidas.length){ el.innerHTML='<div class="empty">Defina suas metas por classe na aba <strong>Aporte</strong> para ver o rebalanceamento.</div>'; return; }
-  if(total<=0&&aporte<=0){ el.innerHTML='<div class="empty">Sem patrimônio ainda. Adicione lançamentos ou informe um valor a investir.</div>'; return; }
-  const bc=byClasse(c);
-  const novoTotal=total+aporte;
-  const linhas=metasValidas.map(m=>{
-    const atualR=bc[m.classe]||0;
-    const idealR=novoTotal*(m.ideal/100);
-    const diff=idealR-atualR; // >0 precisa aportar; <0 está acima
-    return {classe:m.classe, ideal:m.ideal, atualR, idealR, diff};
-  }).sort((a,b)=>b.diff-a.diff);
-  // Quando há aporte, distribui o dinheiro só nas classes abaixo da meta (deficit), proporcional ao déficit.
-  let distrib={};
-  if(aporte>0){
-    const deficits=linhas.filter(l=>l.diff>0);
-    const somaDef=deficits.reduce((s,l)=>s+l.diff,0);
-    deficits.forEach(l=>{ distrib[l.classe]=somaDef>0?aporte*l.diff/somaDef:0; });
-  }
-  el.innerHTML=`<div class="tbl-wrap"><table class="tbl">
-    <thead><tr><th>Classe</th><th class="r">Hoje</th><th class="r">Ideal</th><th class="r">Diferença</th>${aporte>0?'<th class="r">Aportar deste valor</th>':'<th class="r">Ação</th>'}</tr></thead>
-    <tbody>${linhas.map(l=>{
-      const cor=l.diff>2?'#BA7517':l.diff<-2?'#E24B4A':'#1D9E75';
-      const acao=l.diff>novoTotal*0.02?'Aumentar':l.diff<-novoTotal*0.02?'Reduzir/segurar':'✓ No alvo';
-      const ultima=aporte>0?`<td class="r"><strong style="color:#1D9E75">${distrib[l.classe]>0?fmtR(distrib[l.classe]):'—'}</strong></td>`:`<td class="r" style="color:${cor};font-weight:500">${acao}</td>`;
-      return `<tr><td><strong>${CLASS_LABEL[l.classe]||l.classe}</strong> <span style="font-size:11px;color:var(--color-text-secondary)">${l.ideal}%</span></td>
-        <td class="r">${fmtR(l.atualR)}</td><td class="r">${fmtR(l.idealR)}</td>
-        <td class="r" style="color:${cor};font-weight:500">${l.diff>=0?'+':''}${fmtR(l.diff)}</td>${ultima}</tr>`;
-    }).join('')}</tbody>
-  </table></div>
-  <div style="font-size:10px;color:var(--color-text-secondary);margin-top:8px">${aporte>0?'O valor a investir foi dividido nas classes que estão abaixo da meta.':'Informe um valor acima para ver a sugestão de divisão do aporte.'}</div>`;
+/* ---- Resumo dos objetivos: visão geral de quanto falta para cada meta ---- */
+function renderResumoObjetivos(){
+  const el=document.getElementById('metas-resumo'); if(!el)return;
+  const arr=objetivos||[];
+  if(!arr.length){ el.innerHTML=''; return; }
+  let somaPct=0, concl=0, maisPerto=null;
+  arr.forEach(o=>{
+    const atual=objAtual(o), alvo=o.alvo||0;
+    const pct=alvo>0?Math.min(100,atual/alvo*100):0;
+    somaPct+=pct;
+    if(pct>=100)concl++;
+    else if(!maisPerto||pct>maisPerto.pct)maisPerto={o,pct};
+  });
+  const media=somaPct/arr.length;
+  el.innerHTML=`
+    <div class="mcard"><div class="mcard-label"><i class="ti ti-flag" aria-hidden="true"></i> Objetivos</div><div class="mcard-value">${arr.length}</div><div class="mcard-sub">${concl} concluído(s)</div></div>
+    <div class="mcard"><div class="mcard-label"><i class="ti ti-progress" aria-hidden="true"></i> Progresso médio</div><div class="mcard-value">${fmt(media)}%</div><div class="progress-bar" style="margin-top:8px"><div class="progress-fill" style="width:${media}%;background:#2E86C1"></div></div></div>
+    <div class="mcard"><div class="mcard-label"><i class="ti ti-target-arrow" aria-hidden="true"></i> Mais perto de concluir</div><div class="mcard-value" style="font-size:15px">${maisPerto?objTitulo(maisPerto.o):'Tudo concluído! 🎉'}</div><div class="mcard-sub">${maisPerto?fmt(maisPerto.pct)+'% atingido':'Parabéns!'}</div></div>
+  `;
 }
 
-function renderAll(){ renderObjetivos(); renderRebalanceamento(); }
+function renderAll(){ renderResumoObjetivos(); renderObjetivos(); }
 
 mvGate(initConsolidador);
 </script>
