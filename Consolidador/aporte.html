@@ -24,20 +24,13 @@
   <div class="tabs" id="tabs"></div>
 
   <div id="tab-aporte">
-    <div class="charts-row">
-      <div class="card">
-        <div class="card-title"><i class="ti ti-cash" aria-hidden="true" style="color:var(--blue)"></i>Quanto vou aportar</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:15px;color:var(--color-text-secondary)">R$</span>
-          <input id="ap-input" type="number" min="0" step="50" placeholder="0,00" class="cell-edit" style="width:160px;font-size:16px;text-align:right" oninput="apSetAporte(this.value)">
-        </div>
-        <div id="ap-resumo" style="font-size:12px;color:var(--color-text-secondary);margin-top:10px"></div>
+    <div class="card" style="margin-bottom:1rem">
+      <div class="card-title"><i class="ti ti-cash" aria-hidden="true" style="color:var(--blue)"></i>Quanto vou aportar</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:15px;color:var(--color-text-secondary)">R$</span>
+        <input id="ap-input" type="number" min="0" step="50" placeholder="0,00" class="cell-edit" style="width:160px;font-size:16px;text-align:right" oninput="apSetAporte(this.value)">
       </div>
-      <div class="card">
-        <div class="card-title"><i class="ti ti-target" aria-hidden="true" style="color:var(--blue)"></i>Meta da carteira (% ideal por classe)</div>
-        <div id="ap-meta-editor"></div>
-        <div id="ap-meta-total" style="margin-top:8px;font-size:12px"></div>
-      </div>
+      <div id="ap-resumo" style="font-size:12px;color:var(--color-text-secondary);margin-top:10px"></div>
     </div>
 
     <div class="charts-row">
@@ -49,10 +42,15 @@
         </div>
       </div>
       <div class="card">
-        <div class="card-title">Carteira ideal (sua meta)</div>
-        <div style="display:flex;align-items:center;gap:12px">
+        <div class="card-title"><i class="ti ti-target" aria-hidden="true" style="color:var(--blue)"></i>Carteira ideal (sua meta)</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
           <div style="position:relative;width:150px;height:150px;flex-shrink:0"><canvas id="ap-pizza-ideal" role="img" aria-label="Carteira ideal por classe"></canvas></div>
           <div id="ap-legenda-ideal" style="flex:1;display:flex;flex-direction:column;gap:5px"></div>
+        </div>
+        <div style="border-top:1px solid var(--border,rgba(255,255,255,0.06));padding-top:10px">
+          <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:8px;font-weight:600">% ideal por classe</div>
+          <div id="ap-meta-editor"></div>
+          <div id="ap-meta-total" style="margin-top:8px;font-size:12px"></div>
         </div>
       </div>
     </div>
@@ -93,18 +91,39 @@ function apSetMeta(classe,valor){
 
 function apRenderEditor(){
   const im=apIdealMap();
-  document.getElementById('ap-meta-editor').innerHTML=AP_CLASSES.map(cl=>`
+  const ativas=AP_CLASSES.filter(cl=>metas.some(m=>m.classe===cl));
+  const disp=AP_CLASSES.filter(cl=>!metas.some(m=>m.classe===cl));
+  const rows=ativas.map(cl=>`
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
       <span style="width:10px;height:10px;border-radius:50%;background:${CLASS_COLORS[cl]||'#888'};flex-shrink:0"></span>
       <span style="flex:1;font-size:13px;color:var(--color-text-primary)">${CLASS_LABEL[cl]||cl}</span>
-      <input class="cell-edit" type="number" min="0" max="100" step="1" value="${im[cl]||''}" placeholder="0" style="width:70px;text-align:right" oninput="apSetMeta('${cl}',this.value)">
+      <input class="cell-edit" type="number" min="0" max="100" step="1" value="${im[cl]||''}" placeholder="0" style="width:64px;text-align:right" oninput="apSetMeta('${cl}',this.value)">
       <span style="font-size:12px;color:var(--color-text-secondary)">%</span>
+      <button class="btn btn-sm" title="Remover classe" onclick="apRemoveClasse('${cl}')" style="padding:2px 8px;line-height:1">✕</button>
     </div>`).join('');
+  const add=disp.length?`
+    <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+      <select id="ap-add-classe" class="cell-edit" style="flex:1;font-size:12px">
+        <option value="">+ Adicionar classe…</option>
+        ${disp.map(cl=>`<option value="${cl}">${CLASS_LABEL[cl]||cl}</option>`).join('')}
+      </select>
+      <button class="btn btn-sm" onclick="apAddClasse(document.getElementById('ap-add-classe').value)" style="padding:2px 10px">+</button>
+    </div>`:'';
+  document.getElementById('ap-meta-editor').innerHTML=rows+add;
   apRenderTotal();
+}
+function apAddClasse(cl){
+  if(!cl||metas.some(m=>m.classe===cl))return;
+  metas.push({classe:cl,ideal:0}); saveMetas();
+  apRenderEditor(); apRenderCharts(); apRenderTabela(); apRenderResumo();
+}
+function apRemoveClasse(cl){
+  metas=metas.filter(m=>m.classe!==cl); saveMetas();
+  apRenderEditor(); apRenderCharts(); apRenderTabela(); apRenderResumo();
 }
 
 function apRenderTotal(){
-  const total=AP_CLASSES.reduce((s,cl)=>s+(apIdealMap()[cl]||0),0);
+  const total=metas.reduce((s,m)=>s+(parseFloat(m.ideal)||0),0);
   const ok=Math.abs(total-100)<0.5;
   document.getElementById('ap-meta-total').innerHTML=
     `Total: <strong style="color:${ok?'#1D9E75':'#BA7517'}">${total.toFixed(0)}%</strong>`+

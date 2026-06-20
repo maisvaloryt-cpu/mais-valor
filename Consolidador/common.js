@@ -34,7 +34,11 @@ function parseNumBR(v){
   let str=String(v==null?'':v).trim();
   if(!str)return 0;
   str=str.replace(/[^\d.,-]/g,'');           // remove R$, espaços, letras
-  if(str.includes(',')) str=str.replace(/\./g,'').replace(',','.'); // BR: ponto=milhar, vírgula=decimal
+  if(str.includes(',')){
+    str=str.replace(/\./g,'').replace(',','.');         // BR: ponto=milhar, vírgula=decimal
+  }else if(/^-?\d{1,3}(\.\d{3})+$/.test(str)){
+    str=str.replace(/\./g,'');                          // só pontos em grupos de 3 = milhar (1.700)
+  }                                                     // senão, ponto é decimal (1.7, 0.78)
   const n=parseFloat(str);
   return isFinite(n)?n:0;
 }
@@ -974,9 +978,9 @@ function processB3Rows(rows){
       if(isRF){
         const ex=ativos.find(a=>a.ticker===obj.ticker&&a.tipo===obj.tipo&&a.data===obj.data&&RF_CLASSES.has(a.classe));
         if(ex){
-          if(!(ex.pm>0)&&obj.pm>0){ex.pm=obj.pm;ex.cotacao=obj.pm;}
-          if(obj.nome&&!ex.nome)ex.nome=obj.nome;
-          if(obj.rfSubtipo&&!ex.rfSubtipo)ex.rfSubtipo=obj.rfSubtipo;
+          if(obj.pm>0){ex.pm=obj.pm;ex.cotacao=obj.pm;} // valor do Excel é a fonte da verdade p/ RF
+          if(obj.nome)ex.nome=obj.nome;
+          if(obj.rfSubtipo)ex.rfSubtipo=obj.rfSubtipo;
           continue;
         }
       }
