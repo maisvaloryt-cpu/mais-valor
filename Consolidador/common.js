@@ -454,12 +454,14 @@ function calcPosicoes(txArray){
     if(!map[t]){
       map[t]={ticker:t,classe:a.classe,qtd:0,pm:0,_custo:0,
         cotacao:a.cotacao||0,dy:a.dy||0,data:'',
-        nota:0,ideal:0,moeda:a.moeda||'BRL',comprar:'Não',rf:a.rf||null};
+        nota:0,ideal:0,moeda:a.moeda||'BRL',comprar:'Não',rf:a.rf||null,nome:a.nome||'',rfSubtipo:a.rfSubtipo||''};
     }
     if(a.nota)map[t].nota=a.nota;
     if(a.ideal)map[t].ideal=a.ideal;
     if(a.comprar&&a.comprar!=='Não')map[t].comprar=a.comprar;
     if(a.rf)map[t].rf=a.rf;
+    if(a.nome)map[t].nome=a.nome;
+    if(a.rfSubtipo)map[t].rfSubtipo=a.rfSubtipo;
     if(a.classe)map[t].classe=a.classe;
     if(a.moeda)map[t].moeda=a.moeda;
     // Bug #2 fix: Provento não altera posição (não é Compra nem Venda)
@@ -953,8 +955,20 @@ function processB3Rows(rows){
         cotacao:pmFinal,
         dy:0,
         data:tx.data||new Date().toISOString().slice(0,10),
-        nota:0,ideal:0,moeda:'BRL',comprar:'Não'
+        nota:0,ideal:0,moeda:'BRL',comprar:'Não',
+        nome:nome||'',rfSubtipo:rfSubtipo||''
       };
+      // RF: se já existe esse título nessa data, atualiza valor/nome em vez de duplicar
+      //     (corrige CDBs antigos que entraram zerados ou sem o nome do banco).
+      if(isRF){
+        const ex=ativos.find(a=>a.ticker===obj.ticker&&a.tipo===obj.tipo&&a.data===obj.data&&RF_CLASSES.has(a.classe));
+        if(ex){
+          if(!(ex.pm>0)&&obj.pm>0){ex.pm=obj.pm;ex.cotacao=obj.pm;}
+          if(obj.nome&&!ex.nome)ex.nome=obj.nome;
+          if(obj.rfSubtipo&&!ex.rfSubtipo)ex.rfSubtipo=obj.rfSubtipo;
+          continue;
+        }
+      }
       // [BUG-L2 FIX] Dedup com toFixed(4) para normalizar floats
       const key=`${obj.ticker}|${obj.tipo}|${obj.data}|${parseFloat(obj.qtd).toFixed(4)}|${parseFloat(obj.pm).toFixed(4)}`;
       if(ativos.some(a=>`${a.ticker}|${a.tipo}|${a.data}|${parseFloat(a.qtd).toFixed(4)}|${parseFloat(a.pm).toFixed(4)}`===key))continue;
@@ -1215,9 +1229,13 @@ function _rfTaxaLabel(rf){
   return t?n+'%':'';
 }
 function rotuloAtivo(a){
-  if(RF_CLASSES.has(a.classe)&&a.rf&&a.rf.emissor){
-    const tit=(a.rf.titulo&&a.rf.titulo!=='Tesouro Direto')?a.rf.titulo:(a.classe==='TD'?'Tesouro':'');
-    return [tit,_rfEmissorCurto(a.rf.emissor),_rfTaxaLabel(a.rf)].filter(Boolean).join(' ')||a.ticker;
+  if(RF_CLASSES.has(a.classe)){
+    const em=_rfEmissorCurto((a.rf&&a.rf.emissor)||a.nome||'');
+    if(em){
+      const tit=(a.rf&&a.rf.titulo&&a.rf.titulo!=='Tesouro Direto')?a.rf.titulo:(a.classe==='TD'?'Tesouro':(a.rfSubtipo||'CDB'));
+      const tx=a.rf?_rfTaxaLabel(a.rf):'';
+      return [tit,em,tx].filter(Boolean).join(' ')||a.ticker;
+    }
   }
   return a.ticker;
 }
@@ -1248,7 +1266,7 @@ function atualizarAvisoRFModal(){
 
 function abrirPendenciasRF(){
   const pend=_pendenciasRF()
-    .map(a=>({ativoRef:a,ticker:a.ticker,nome:a.ticker,valor:a.pm,data:a.data,rfSubtipo:null}));
+    .map(a=>({ativoRef:a,ticker:a.ticker,nome:a.nome||a.ticker,valor:a.pm,data:a.data,rfSubtipo:a.rfSubtipo||null}));
   if(!pend.length){toast('Nenhuma Renda Fixa pendente de dados.');return;}
   openModalRFComplement(pend,()=>{saveAtivos();initConsolidador();});
 }
