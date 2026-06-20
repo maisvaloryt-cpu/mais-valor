@@ -839,3 +839,6 @@ footer em { color: var(--gold); font-style: normal; }
   .page-hero { padding: 1.25rem 1rem; text-align: center; }
   .tabs { margin: 0 auto 1rem auto; }
 }
+
+/* Carteira (Consolidador): esconder o título "Consolidador de Carteira" */
+body.is-consolidador .app .header h1 { display: none; }

@@ -599,4 +599,12 @@ html, body {
     border-radius: 6px !important;
     height: auto !important;
   }
+
+  /* ── Na Carteira (Consolidador), no celular: esconder as abas do site
+     (Home, Ativos, Ferramentas, Watchlist, Carteira) e a barra de busca.
+     O logo e o avatar de login continuam visíveis. ──────────────────── */
+  body.is-consolidador .nav-links,
+  body.is-consolidador .nav-bottom-row .nav-search-wrap {
+    display: none !important;
+  }
 }

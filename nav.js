@@ -374,6 +374,7 @@ function renderNavSlim() {
 function renderNav() {
   const page = location.pathname.split('/').pop() || 'index.html';
   const inConsolidador = location.pathname.includes('Consolidador');
+  document.body.classList.toggle('is-consolidador', inConsolidador);
 
   const ativosNacPages  = ['acoes.html','fiis.html','dividendos.html','criptos.html'];
   const ativosExtPages  = ['bdrs.html','etfs.html','reits.html','stocks.html'];
