@@ -28,6 +28,17 @@ function classificarB3(ticker,nome){
   return 'B3';
 }
 
+/* Lê número de planilha mesmo com "R$", espaços e milhar: "R$ 1.700,00" -> 1700 */
+function parseNumBR(v){
+  if(typeof v==='number')return isFinite(v)?v:0;
+  let str=String(v==null?'':v).trim();
+  if(!str)return 0;
+  str=str.replace(/[^\d.,-]/g,'');           // remove R$, espaços, letras
+  if(str.includes(',')) str=str.replace(/\./g,'').replace(',','.'); // BR: ponto=milhar, vírgula=decimal
+  const n=parseFloat(str);
+  return isFinite(n)?n:0;
+}
+
 // Classes tratadas como Renda Fixa (valor corrigido por taxa, não por cotação de mercado)
 const RF_CLASSES=new Set(['RF','TD']);
 
@@ -922,9 +933,9 @@ function processB3Rows(rows){
       else dataStr=ds.slice(0,10);
     }
 
-    const qtd=parseFloat(String(r[col.qtd]||'0').replace(',','.'))||0;
-    const preco=parseFloat(String(r[col.preco]||'0').replace(',','.'))||0;
-    const valorOp=col.valor!=null?(parseFloat(String(r[col.valor]||'0').replace(/\s/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.'))||0):0;
+    const qtd=parseNumBR(r[col.qtd]);
+    const preco=parseNumBR(r[col.preco]);
+    const valorOp=col.valor!=null?parseNumBR(r[col.valor]):0;
     if(qtd<=0)continue;
 
     if(!ops[ticker])ops[ticker]={nome,txs:[],rfTipo:isTesouro?'TD':(isCDB?'RF':null),isRF:isCDB||isTesouro,rfSubtipo:isCDB?produtoRaw.split(/\s*-\s*/)[0].trim().toUpperCase():isTesouro?'Tesouro Direto':null};
@@ -1229,10 +1240,11 @@ function _rfTaxaLabel(rf){
   return t?n+'%':'';
 }
 function rotuloAtivo(a){
-  if(RF_CLASSES.has(a.classe)){
+  if(a.classe==='TD')return a.ticker; // Tesouro: o ticker já é o nome ("Tesouro IPCA+ 2029")
+  if(a.classe==='RF'){
     const em=_rfEmissorCurto((a.rf&&a.rf.emissor)||a.nome||'');
     if(em){
-      const tit=(a.rf&&a.rf.titulo&&a.rf.titulo!=='Tesouro Direto')?a.rf.titulo:(a.classe==='TD'?'Tesouro':(a.rfSubtipo||'CDB'));
+      const tit=(a.rf&&a.rf.titulo&&a.rf.titulo!=='Tesouro Direto')?a.rf.titulo:(a.rfSubtipo||'CDB');
       const tx=a.rf?_rfTaxaLabel(a.rf):'';
       return [tit,em,tx].filter(Boolean).join(' ')||a.ticker;
     }
