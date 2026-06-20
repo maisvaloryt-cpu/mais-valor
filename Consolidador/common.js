@@ -1050,7 +1050,7 @@ function renderCarteiraSwitcher(){
     <select id="sel-carteira" onchange="trocarCarteira(this.value)" title="Selecionar carteira">
       ${carteiras.map(c=>`<option value="${c.id}" ${c.id===carteiraAtual?'selected':''}>${escapeHtml(c.nome)}</option>`).join('')}
     </select>
-    <button class="btn btn-sm" onclick="openModalCarteiras()" title="Configurar carteiras"><i class="ti ti-settings" aria-hidden="true"></i></button>
+    <button class="btn btn-sm" onclick="openModalCarteiras()" title="Configurar carteiras">⚙</button>
   `;
 }
 
@@ -1108,7 +1108,7 @@ function renderHeaderAndNav(active){
       <button class="btn" onclick="abrirPendenciasRF()" title="Verificar Renda Fixa sem indexador/taxa"><i class="ti ti-alert-triangle" aria-hidden="true"></i> RF pendente</button>
       <button class="btn" onclick="openImport()"><i class="ti ti-file-spreadsheet" aria-hidden="true"></i> Importar Excel</button>
       <input type="file" id="csv-input" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleCSVImport(this)">
-      <button class="btn btn-primary" onclick="openModal()"><i class="ti ti-plus" aria-hidden="true"></i> Transação</button>
+      <button class="btn btn-primary" onclick="openModal()">+ Transação</button>
     `;
     renderCarteiraSwitcher();
   }
