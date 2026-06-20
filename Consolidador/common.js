@@ -73,12 +73,14 @@ let carteiras=[];
 let carteiraAtual=null;
 let ativos=[];
 let metas=[];
+let objetivos=[];
 let charts={};
 
 // [BUG-D2 FIX] Debounce no syncFirestore — evita múltiplas escritas em operações em lote (import, etc.)
 let _syncTimer=null;
 function saveAtivos(){ if(typeof syncFirestore==='function'){clearTimeout(_syncTimer);_syncTimer=setTimeout(syncFirestore,1500);} }
 function saveMetas(){ if(typeof syncFirestore==='function')syncFirestore(); }
+function saveObjetivos(){ if(typeof syncFirestore==='function')syncFirestore(); }
 
 /* ---- formatação ---- */
 // [BUG-P2 FIX] Trata NaN e null corretamente — (v||0) mascarava NaN como zero, ocultando bugs
@@ -1032,6 +1034,7 @@ function trocarCarteira(id){
   const dados=(typeof _dadosCarteiras==='object'&&_dadosCarteiras[id])?_dadosCarteiras[id]:{};
   ativos=dados.ativos?JSON.parse(JSON.stringify(dados.ativos)):JSON.parse(JSON.stringify(DEFAULT_ATIVOS));
   metas=dados.metas?JSON.parse(JSON.stringify(dados.metas)):JSON.parse(JSON.stringify(DEFAULT_METAS));
+  objetivos=dados.objetivos?JSON.parse(JSON.stringify(dados.objetivos)):[];
   if(typeof syncFirestore==='function')syncFirestore();
   renderCarteiraSwitcher();
   if(typeof initConsolidador==='function'){ initConsolidador(); } // recarrega cotações/proventos e re-renderiza
@@ -1045,7 +1048,7 @@ function criarCarteira(nome){
   if(!nome)return;
   const id='c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
   carteiras.push({id,nome});
-  if(typeof _dadosCarteiras==='object')_dadosCarteiras[id]={ativos:JSON.parse(JSON.stringify(DEFAULT_ATIVOS)),metas:JSON.parse(JSON.stringify(DEFAULT_METAS)),nome};
+  if(typeof _dadosCarteiras==='object')_dadosCarteiras[id]={ativos:JSON.parse(JSON.stringify(DEFAULT_ATIVOS)),metas:JSON.parse(JSON.stringify(DEFAULT_METAS)),objetivos:[],nome};
   trocarCarteira(id);
   toast('Carteira "'+nome+'" criada.');
 }

@@ -24,11 +24,12 @@
   <div class="tabs" id="tabs"></div>
 
   <div id="tab-metas">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
-      <div class="section-title" style="margin:0"><i class="ti ti-target" aria-hidden="true"></i>Alocação Ideal vs. Atual</div>
-      <button class="btn btn-sm" onclick="openModalMeta()"><i class="ti ti-plus" aria-hidden="true"></i> Nova Meta</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
+      <div class="section-title" style="margin:0"><i class="ti ti-target" aria-hidden="true"></i>Meus objetivos</div>
+      <button class="btn btn-sm btn-primary" onclick="objToggleForm()">+ Novo objetivo</button>
     </div>
-    <div id="metas-lista"></div>
+    <div id="obj-form" style="display:none"></div>
+    <div id="obj-lista"></div>
   </div>
 </div>
 
@@ -43,33 +44,122 @@
 renderHeaderAndNav('metas');
 injectModals();
 
-function renderMetas(){
-  const c=calcAtivos();
-  const total=c.reduce((s,a)=>s+a.vt,0);
-  const bc=byClasse(c);
-  let html='';
-  metas.forEach(m=>{
-    const atual=total>0?((bc[m.classe]||0)/total)*100:0;
-    const diff=atual-m.ideal;
-    const pct=Math.min(100,m.ideal>0?(atual/m.ideal)*100:0);
-    const cor=diff>2?'#E24B4A':diff<-2?'#BA7517':'#1D9E75';
-    html+=`<div class="meta-card">
-      <div class="meta-header">
-        <div>
-          <div class="meta-title">${CLASS_LABEL[m.classe]||m.classe}</div>
-          <div class="meta-pcts">Atual: <strong>${fmt(atual)}%</strong> &nbsp;·&nbsp; Ideal: <strong>${m.ideal}%</strong> &nbsp;·&nbsp; Diferença: <strong style="color:${cor}">${diff>=0?'+':''}${fmt(diff)}%</strong></div>
+/* ===== Meus Objetivos ===== */
+function objAnoAtual(){ return new Date().getFullYear(); }
+function objYMAtual(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+function objAtual(o){
+  const t=getTotals();
+  if(o.tipo==='patrimonio') return t.total;
+  if(o.tipo==='investido')  return t.custo;
+  if(o.tipo==='prov_ano'){ const ano=String(objAnoAtual()); return getDividendosPorMes().filter(m=>m.ym.startsWith(ano)).reduce((s,m)=>s+m.total,0); }
+  if(o.tipo==='prov_mes'){ const ym=objYMAtual(); const e=getDividendosPorMes().find(m=>m.ym===ym); return e?e.total:0; }
+  if(o.tipo==='ativo'){ const a=calcAtivos().find(x=>x.ticker===(o.ticker||'').toUpperCase()); return a?a.qtd:0; }
+  return 0;
+}
+function objTitulo(o){
+  const base={patrimonio:'Patrimônio total',investido:'Valor investido',prov_ano:'Proventos em '+objAnoAtual(),prov_mes:'Proventos no mês',ativo:(o.ticker||'').toUpperCase()+' (cotas)'}[o.tipo]||'Objetivo';
+  return o.nome?o.nome+' — '+base:base;
+}
+function objIcone(o){ return {patrimonio:'🏦',investido:'📊',prov_ano:'💰',prov_mes:'💰',ativo:'📈'}[o.tipo]||'🎯'; }
+function objFmtVal(o,v){ return o.tipo==='ativo'?(Math.round(v*100)/100).toLocaleString('pt-BR')+' cotas':fmtR(v); }
+
+function objToggleForm(){
+  const f=document.getElementById('obj-form');
+  if(f.style.display==='none'){ objRenderForm(); f.style.display='block'; } else { f.style.display='none'; }
+}
+function objRenderForm(){
+  document.getElementById('obj-form').innerHTML=`
+    <div class="card" style="margin-bottom:1rem">
+      <div class="card-title">Novo objetivo</div>
+      <div class="modal-grid">
+        <div class="form-group" style="grid-column:1/-1"><label>Tipo de objetivo</label>
+          <select id="obj-tipo" onchange="objFormCampos()">
+            <option value="patrimonio">Patrimônio total</option>
+            <option value="investido">Valor investido (aportado)</option>
+            <option value="prov_ano">Proventos no ano</option>
+            <option value="prov_mes">Proventos no mês</option>
+            <option value="ativo">Quantidade de um ativo</option>
+          </select>
         </div>
-        <span style="font-size:12px;color:${cor};font-weight:500">${diff>2?'↑ Acima':diff<-2?'↓ Abaixo':'✓ OK'}</span>
+        <div class="form-group" id="obj-g-ticker" style="display:none"><label>Ativo (ticker)</label><input id="obj-ticker" type="text" placeholder="Ex: PETR4"></div>
+        <div class="form-group"><label id="obj-alvo-label">Valor alvo (R$)</label><input id="obj-alvo" type="number" min="0" step="0.01" placeholder="0"></div>
+        <div class="form-group" id="obj-g-aporte"><label>Aporte mensal previsto (R$, opcional)</label><input id="obj-aporte" type="number" min="0" step="0.01" placeholder="0"></div>
+        <div class="form-group"><label>Nome (opcional)</label><input id="obj-nome" type="text" placeholder="Ex: Aposentadoria"></div>
+      </div>
+      <div class="modal-actions" style="margin-top:10px">
+        <button class="btn" onclick="objToggleForm()">Cancelar</button>
+        <button class="btn btn-primary" onclick="objAddSubmit()">Salvar objetivo</button>
+      </div>
+    </div>`;
+  objFormCampos();
+}
+function objFormCampos(){
+  const t=document.getElementById('obj-tipo').value;
+  document.getElementById('obj-g-ticker').style.display=t==='ativo'?'':'none';
+  document.getElementById('obj-g-aporte').style.display=(t==='patrimonio'||t==='investido')?'':'none';
+  document.getElementById('obj-alvo-label').textContent=t==='ativo'?'Quantidade alvo (cotas)':'Valor alvo (R$)';
+}
+function objAddSubmit(){
+  const tipo=document.getElementById('obj-tipo').value;
+  const alvo=parseFloat(document.getElementById('obj-alvo').value)||0;
+  if(alvo<=0){ alert('Informe um valor alvo maior que zero.'); return; }
+  const o={ id:'o'+Date.now().toString(36), tipo, alvo, nome:(document.getElementById('obj-nome').value||'').trim() };
+  if(tipo==='ativo'){ o.ticker=(document.getElementById('obj-ticker').value||'').trim().toUpperCase(); if(!o.ticker){ alert('Informe o ticker do ativo.'); return; } }
+  if(tipo==='patrimonio'||tipo==='investido'){ o.aporteMensal=parseFloat(document.getElementById('obj-aporte').value)||0; }
+  if(!Array.isArray(objetivos))objetivos=[];
+  objetivos.push(o); saveObjetivos();
+  document.getElementById('obj-form').style.display='none';
+  renderObjetivos();
+}
+function objRemove(id){ objetivos=(objetivos||[]).filter(o=>o.id!==id); saveObjetivos(); renderObjetivos(); }
+function objConclusao(o,atual,falta){
+  const ap=o.aporteMensal||0;
+  if(!(ap>0)||falta<=0)return '';
+  let meses=0, saldo=atual; const alvo=o.alvo||0;
+  if(o.tipo==='patrimonio'){
+    // Juros compostos: proventos reinvestidos (usa o DY da carteira) + aporte mensal
+    const dyA=(getTotals().dyMed)||0;
+    const r=Math.pow(1+dyA/100,1/12)-1;
+    while(saldo<alvo && meses<1200){ saldo=saldo*(1+r)+ap; meses++; }
+  } else {
+    meses=Math.ceil(falta/ap);
+  }
+  if(meses>=1200) return 'mais de 100 anos';
+  const d=new Date(); d.setMonth(d.getMonth()+meses);
+  const mm=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][d.getMonth()];
+  const obs=(o.tipo==='patrimonio'&&((getTotals().dyMed)||0)>0)?' (com proventos reinvestidos)':'';
+  return mm+'/'+d.getFullYear()+' (~'+meses+' meses)'+obs;
+}
+function renderObjetivos(){
+  const lista=document.getElementById('obj-lista'); if(!lista)return;
+  const arr=objetivos||[];
+  if(!arr.length){ lista.innerHTML='<div class="empty">Nenhum objetivo ainda. Clique em “+ Novo objetivo”.</div>'; return; }
+  lista.innerHTML=arr.map(o=>{
+    const atual=objAtual(o); const alvo=o.alvo||0;
+    const pct=alvo>0?Math.min(100,(atual/alvo)*100):0;
+    const falta=Math.max(0,alvo-atual); const done=pct>=100;
+    const cor=done?'#1D9E75':'#2E86C1';
+    const conc=objConclusao(o,atual,falta);
+    return `<div class="card" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px">
+        <div style="font-weight:600;font-size:14px">${objIcone(o)} ${objTitulo(o)}</div>
+        <button class="btn btn-sm" title="Remover" onclick="objRemove('${o.id}')" style="padding:1px 8px;line-height:1">✕</button>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+        <span style="color:${cor};font-weight:600">${fmt(pct)}%</span>
+        ${done?'<span style="color:#1D9E75;font-weight:600">✓ concluído</span>':''}
       </div>
       <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${cor}"></div></div>
+      <div style="display:flex;gap:22px;margin-top:12px;flex-wrap:wrap;font-size:12px">
+        <div><div style="color:var(--color-text-secondary)">Atual</div><strong>${objFmtVal(o,atual)}</strong></div>
+        <div><div style="color:var(--color-text-secondary)">Objetivo</div><strong>${objFmtVal(o,alvo)}</strong></div>
+        <div><div style="color:var(--color-text-secondary)">Faltam</div><strong>${objFmtVal(o,falta)}</strong></div>
+        ${conc?`<div><div style="color:var(--color-text-secondary)">Conclusão estimada</div><strong>${conc}</strong></div>`:''}
+      </div>
     </div>`;
-  });
-  document.getElementById('metas-lista').innerHTML=html||'<div class="empty">Nenhuma meta definida.</div>';
+  }).join('');
 }
-
-function renderAll(){
-  renderMetas();
-}
+function renderAll(){ renderObjetivos(); }
 
 mvGate(initConsolidador);
 </script>

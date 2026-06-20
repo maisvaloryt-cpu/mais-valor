@@ -33,11 +33,11 @@ async function syncFirestore(){
   try{
     const cInfo = carteiras.find(c=>c.id===carteiraAtual);
     const nome = cInfo?cInfo.nome:'';
-    _dadosCarteiras[carteiraAtual] = { ativos, metas, nome };
+    _dadosCarteiras[carteiraAtual] = { ativos, metas, objetivos, nome };
     await _db.collection('carteiras').doc(user.uid).set({
       listaCarteiras: carteiras,
       carteiraAtual,
-      dados: { [carteiraAtual]: { ativos, metas, nome } }
+      dados: { [carteiraAtual]: { ativos, metas, objetivos, nome } }
     }, {merge: true});
   }catch(e){ console.warn('syncFirestore:', e); }
 }
@@ -98,7 +98,8 @@ function _criarCarteiraPadraoVazia(){
   carteiraAtual = id;
   ativos = [];
   metas = JSON.parse(JSON.stringify(DEFAULT_METAS));
-  _dadosCarteiras = { [id]: { ativos, metas, nome:'Carteira Principal' } };
+  objetivos = [];
+  _dadosCarteiras = { [id]: { ativos, metas, objetivos, nome:'Carteira Principal' } };
 }
 
 /* ---- observador de autenticação: agora é a ÚNICA fonte de dados da carteira.
@@ -121,12 +122,14 @@ _auth.onAuthStateChanged(async user => {
           const cAtual = _dadosCarteiras[carteiraAtual] || {};
           ativos = cAtual.ativos || [];
           metas  = cAtual.metas  || JSON.parse(JSON.stringify(DEFAULT_METAS));
+          objetivos = cAtual.objetivos || [];
         } else if(d.ativos){
           // Formato bem antigo (uma única carteira salva direto na raiz do documento) — migra
           _criarCarteiraPadraoVazia();
           ativos = d.ativos;
           if(d.metas) metas = d.metas;
-          _dadosCarteiras[carteiraAtual] = { ativos, metas, nome:'Carteira Principal' };
+          objetivos = [];
+          _dadosCarteiras[carteiraAtual] = { ativos, metas, objetivos, nome:'Carteira Principal' };
           await syncFirestore(); // grava já no formato novo multi-carteira
           toast('Formato antigo detectado na nuvem — carteira migrada. ☁️');
         } else {
