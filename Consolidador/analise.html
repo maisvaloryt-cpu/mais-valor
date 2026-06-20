@@ -25,6 +25,16 @@
 
   <div id="tab-analise">
     <div class="metrics" id="metrics-analise"></div>
+    <div class="charts-row">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-affiliate" aria-hidden="true" style="color:#2E86C1"></i>Risco por Setor</div>
+        <div id="analise-setor"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-stethoscope" aria-hidden="true" style="color:#1D9E75"></i>Saúde da Carteira</div>
+        <div id="analise-saude"></div>
+      </div>
+    </div>
     <div class="analise-grid">
       <div class="card">
         <div class="card-title">Concentração — Top 5 Ativos</div>
@@ -62,8 +72,17 @@ function renderAnalise(){
   const c=calcAtivos().sort((a,b)=>b.vt-a.vt);
   const total=c.reduce((s,a)=>s+a.vt,0);
   const t=getTotals();
+  // Índice de diversificação (HHI) → "número efetivo de ativos" = 1/Σ(peso²)
+  let hhi=0; if(total>0)c.forEach(a=>{const w=a.vt/total;hhi+=w*w;});
+  const efetivos=hhi>0?1/hhi:0;
+  let divTxt,divCor;
+  if(efetivos>=10){divTxt='Bem diversificada';divCor='#1D9E75';}
+  else if(efetivos>=5){divTxt='Diversificação ok';divCor='#2E86C1';}
+  else if(efetivos>=3){divTxt='Pouco diversificada';divCor='#BA7517';}
+  else{divTxt='Muito concentrada';divCor='#E24B4A';}
   document.getElementById('metrics-analise').innerHTML=`
-    <div class="mcard"><div class="mcard-label">Diversificação</div><div class="mcard-value">${new Set(c.map(a=>a.classe)).size} classes</div></div>
+    <div class="mcard"><div class="mcard-label">Diversificação</div><div class="mcard-value">${new Set(c.map(a=>a.classe)).size} classes</div><div class="mcard-sub">${c.length} ativos</div></div>
+    <div class="mcard"><div class="mcard-label">Índice de diversificação</div><div class="mcard-value" style="color:${divCor}">${fmt(efetivos,1)}</div><div class="mcard-sub">${divTxt} (nº efetivo de ativos)</div></div>
     <div class="mcard"><div class="mcard-label">DY Médio (12M)</div><div class="mcard-value positive">${fmt(t.dyMed)}%</div></div>
     <div class="mcard"><div class="mcard-label">Ativo mais concentrado</div><div class="mcard-value">${c[0]?.ticker||'-'} (${total?fmt((c[0]?.vt||0)/total*100):0}%)</div></div>
   `;
@@ -95,8 +114,71 @@ function renderAnalise(){
   }).join('');
 }
 
+/* ---- Risco por setor (busca o setor de cada ativo nos fundamentos) ---- */
+const _setorCache={};
+async function fetchSetor(ticker){
+  if(_setorCache[ticker]!==undefined)return _setorCache[ticker];
+  try{
+    const r=await fetch('../data/fundamentalistas/'+ticker+'.json?t='+Date.now());
+    _setorCache[ticker]=r.ok?((await r.json()).setor||null):null;
+  }catch(e){ _setorCache[ticker]=null; }
+  return _setorCache[ticker];
+}
+async function renderSetor(){
+  const el=document.getElementById('analise-setor'); if(!el)return;
+  const c=calcAtivos();
+  const total=c.reduce((s,a)=>s+a.vt,0);
+  if(total<=0){ el.innerHTML='<div style="font-size:12px;color:var(--color-text-secondary)">Sem ativos ainda.</div>'; return; }
+  await Promise.allSettled(c.map(a=>fetchSetor(a.ticker)));
+  const grupos={};
+  c.forEach(a=>{
+    const setor=_setorCache[a.ticker]||(CLASS_LABEL[a.classe]||'Outros');
+    grupos[setor]=(grupos[setor]||0)+a.vt;
+  });
+  const arr=Object.entries(grupos).map(([s,v])=>({s,v,pct:v/total*100})).sort((a,b)=>b.v-a.v);
+  const max=Math.max(...arr.map(x=>x.pct));
+  el.innerHTML=arr.map(x=>{
+    const cor=x.pct>40?'#E24B4A':x.pct>25?'#BA7517':'#2E86C1';
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <span style="min-width:120px;font-size:11px;color:var(--color-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${x.s}">${x.s}</span>
+      <span style="flex:1;height:7px;border-radius:4px;background:rgba(128,128,128,0.12);overflow:hidden"><span style="display:block;height:100%;width:${(x.pct/max*100).toFixed(0)}%;background:${cor}"></span></span>
+      <span style="font-size:12px;font-weight:600;min-width:46px;text-align:right">${fmt(x.pct)}%</span>
+    </div>`;
+  }).join('')+'<div style="font-size:10px;color:var(--color-text-secondary);margin-top:6px">Cripto, exterior e renda fixa entram pela classe.</div>';
+}
+
+/* ---- Checklist de saúde da carteira ---- */
+function renderSaude(){
+  const el=document.getElementById('analise-saude'); if(!el)return;
+  const c=calcAtivos();
+  const t=getTotals();
+  const total=c.reduce((s,a)=>s+a.vt,0);
+  if(total<=0){ el.innerHTML='<div style="font-size:12px;color:var(--color-text-secondary)">Sem ativos ainda.</div>'; return; }
+  const bc=byClasse(c);
+  const maxAtivoPct=Math.max(...c.map(a=>a.vt/total*100));
+  const maxClassePct=Math.max(...Object.values(bc))/total*100;
+  const nClasses=new Set(c.map(a=>a.classe)).size;
+  const temRF=(bc['RF']||0)+(bc['TD']||0)>0;
+  const checks=[
+    {ok:maxAtivoPct<=20, txt:'Nenhum ativo passa de 20% da carteira', det:`maior tem ${fmt(maxAtivoPct)}%`},
+    {ok:nClasses>=3, txt:'Pelo menos 3 classes diferentes', det:`você tem ${nClasses}`},
+    {ok:maxClassePct<=60, txt:'Nenhuma classe passa de 60%', det:`maior classe ${fmt(maxClassePct)}%`},
+    {ok:temRF, txt:'Tem uma reserva em Renda Fixa/Tesouro', det:temRF?'sim':'nenhuma'},
+    {ok:t.dyMed>0, txt:'A carteira gera dividendos', det:`DY ${fmt(t.dyMed)}%`},
+    {ok:c.length>=5, txt:'Pelo menos 5 ativos', det:`você tem ${c.length}`},
+  ];
+  const okN=checks.filter(x=>x.ok).length;
+  el.innerHTML=`<div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:10px">${okN} de ${checks.length} itens em ordem</div>`+
+    checks.map(x=>`<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:9px">
+      <span style="color:${x.ok?'#1D9E75':'#E24B4A'};font-weight:700;font-size:13px">${x.ok?'✓':'✕'}</span>
+      <span style="font-size:12px"><span style="color:var(--color-text-primary)">${x.txt}</span> <span style="color:var(--color-text-secondary)">— ${x.det}</span></span>
+    </div>`).join('');
+}
+
 function renderAll(){
   renderAnalise();
+  renderSetor();
+  renderSaude();
 }
 
 mvGate(initConsolidador);

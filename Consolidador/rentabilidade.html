@@ -25,6 +25,17 @@
 
   <div id="tab-rentabilidade">
     <div class="metrics" id="metrics-rent"></div>
+    <div class="metrics" id="metrics-alfa"></div>
+    <div class="charts-row">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-medal" aria-hidden="true" style="color:#1D9E75"></i>Top 5 melhores</div>
+        <div id="ranking-top"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-mood-sad" aria-hidden="true" style="color:#E24B4A"></i>Top 5 piores</div>
+        <div id="ranking-bottom"></div>
+      </div>
+    </div>
     <div class="card" style="margin-bottom:1.25rem">
       <div class="card-title">Rentabilidade por Classe (%)</div>
       <div style="position:relative;height:200px"><canvas id="chartRentClasse" role="img" aria-label="Rentabilidade por classe"></canvas></div>
@@ -33,10 +44,11 @@
       <div class="card-title">Rentabilidade por Ativo</div>
       <div class="tbl-wrap">
       <table class="tbl">
-        <thead><tr><th>Ticker</th><th>Classe</th><th class="r">Preço Médio</th><th class="r">Cotação Atual</th><th class="r">Ganho Capital</th><th class="r">Proventos</th><th class="r">Rentabilidade %</th><th class="r">Rent. Total</th><th class="r">CAGR a.a.</th></tr></thead>
+        <thead><tr><th>Ticker</th><th>Classe</th><th class="r">Preço Médio</th><th class="r">Cotação Atual</th><th class="r">Ganho Capital</th><th class="r">Proventos</th><th class="r">Rentabilidade %</th><th class="r">Rent. Total</th><th class="r">CAGR a.a.</th><th class="r">Risco a.a.</th></tr></thead>
         <tbody id="tbody-rent"></tbody>
       </table>
       </div>
+      <div style="font-size:10px;color:var(--color-text-secondary);margin-top:8px">Risco = o quanto o preço balança (volatilidade anual). Quanto maior, mais sobe e desce.</div>
     </div>
   </div>
 </div>
@@ -75,19 +87,85 @@ function renderRentabilidade(){
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+(c.raw>=0?'+':'')+c.raw+'%'}}},scales:{x:{grid:{display:false},ticks:{color:'#888',font:{size:11}}},y:{grid:{color:'rgba(128,128,128,0.08)'},ticks:{color:'#888',font:{size:11},callback:v=>v+'%'}}}}
   });
   const tb=document.getElementById('tbody-rent');
-  tb.innerHTML=c.sort((a,b)=>b.rentTotal-a.rentTotal).map(a=>`
+  tb.innerHTML=c.sort((a,b)=>b.rentTotal-a.rentTotal).map(a=>{
+    const vol=volAtivo(a.ticker);
+    return `
     <tr><td><strong title="${a.ticker}">${typeof rotuloAtivo==='function'?rotuloAtivo(a):a.ticker}</strong></td><td><span class="badge ${CLASS_BADGE[a.classe]||''}">${CLASS_LABEL[a.classe]||a.classe}</span></td>
     <td class="r">${fmtR(a.pm)}</td><td class="r">${fmtR(a.cotacao)}</td>
     <td class="r ${a.res>=0?'positive':'negative'}">${a.res>=0?'+':''}${fmtR(a.res)}</td>
     <td class="r positive">${fmtR(a.proventos)}</td>
     <td class="r"><span class="pill ${a.rentTotal>=0?'pill-up':'pill-dn'}">${a.rentTotal>=0?'▲':'▼'} ${fmt(Math.abs(a.rentTotal))}%</span></td>
     <td class="r ${a.rentTotal>=0?'positive':'negative'}">${fmtP(a.rentTotal)}</td>
-    <td class="r ${a.cagr>=0?'positive':'negative'}">${fmtP(a.cagr)}</td></tr>
-  `).join('');
+    <td class="r ${a.cagr>=0?'positive':'negative'}">${fmtP(a.cagr)}</td>
+    <td class="r" style="color:${vol==null?'var(--color-text-secondary)':vol>40?'#E24B4A':vol>20?'#BA7517':'#1D9E75'}">${vol==null?'—':fmt(vol)+'%'}</td></tr>
+  `;}).join('');
+  renderRankingRent(c);
+}
+
+/* ---- Volatilidade anualizada a partir do histórico mensal ---- */
+function volAtivo(ticker){
+  const hist=HISTORICO_CACHE[ticker];
+  if(!hist)return null;
+  const meses=Object.keys(hist).sort();
+  if(meses.length<4)return null;
+  const rets=[];
+  for(let i=1;i<meses.length;i++){
+    const p0=hist[meses[i-1]], p1=hist[meses[i]];
+    if(p0>0&&p1>0)rets.push(p1/p0-1);
+  }
+  if(rets.length<3)return null;
+  const media=rets.reduce((s,v)=>s+v,0)/rets.length;
+  const variancia=rets.reduce((s,v)=>s+(v-media)**2,0)/rets.length;
+  return Math.sqrt(variancia)*Math.sqrt(12)*100; // % ao ano
+}
+
+/* ---- Ranking visual top 5 melhores e piores ---- */
+function renderRankingRent(c){
+  const elT=document.getElementById('ranking-top'), elB=document.getElementById('ranking-bottom');
+  if(!elT||!elB)return;
+  const ord=c.slice().sort((a,b)=>b.rentTotal-a.rentTotal);
+  const top=ord.slice(0,5), bottom=ord.slice(-5).reverse();
+  const maxAbs=Math.max(1,...ord.map(a=>Math.abs(a.rentTotal)));
+  const linha=(a)=>{
+    const pos=a.rentTotal>=0;
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+      <span style="min-width:64px;font-size:12px;font-weight:600">${a.ticker}</span>
+      <span style="flex:1;height:7px;border-radius:4px;background:rgba(128,128,128,0.12);overflow:hidden"><span style="display:block;height:100%;width:${(Math.abs(a.rentTotal)/maxAbs*100).toFixed(0)}%;background:${pos?'#1D9E75':'#E24B4A'}"></span></span>
+      <span class="${pos?'positive':'negative'}" style="font-size:12px;font-weight:600;min-width:64px;text-align:right">${fmtP(a.rentTotal)}</span>
+    </div>`;
+  };
+  elT.innerHTML=top.length?top.map(linha).join(''):'<div style="font-size:12px;color:var(--color-text-secondary)">Sem ativos.</div>';
+  elB.innerHTML=bottom.length?bottom.map(linha).join(''):'<div style="font-size:12px;color:var(--color-text-secondary)">Sem ativos.</div>';
+}
+
+/* ---- Alfa: carteira vs CDI/IBOV (mesmos aportes simulados) ---- */
+const _benchCacheR={};
+async function renderAlfa(){
+  const el=document.getElementById('metrics-alfa'); if(!el)return;
+  for(const idx of ['IBOV','CDI']){ if(!_benchCacheR[idx]){ try{_benchCacheR[idx]=await fetchHistoricoTicker(idx);}catch(e){_benchCacheR[idx]={};} } }
+  const evol=calcEvolucaoPatrimonio(120).filter(m=>m.vt>0||m.custo>0);
+  if(evol.length<2){ el.innerHTML=''; return; }
+  const finalCart=evol[evol.length-1].vt;
+  const sim=(serie)=>{ let units=0,custoAnt=0,val=0; evol.forEach(m=>{const ap=Math.max(0,m.custo-custoAnt);custoAnt=m.custo;const p=_precoEmR(serie,m.ym);if(p>0)units+=ap/p;val=p>0?units*p:val;}); return val; };
+  const card=(nome,benchVal)=>{
+    if(!(benchVal>0))return '';
+    const diff=finalCart-benchVal;
+    const pct=benchVal>0?diff/benchVal*100:0;
+    const pos=diff>=0;
+    return `<div class="mcard"><div class="mcard-label">Sua carteira vs ${nome}</div><div class="mcard-value ${pos?'positive':'negative'}">${pos?'+':''}${fmt(pct)}%</div><div class="mcard-sub">${pos?'Ganhando':'Perdendo'} ${fmtR(Math.abs(diff))} ${pos?'do':'pro'} ${nome}</div></div>`;
+  };
+  el.innerHTML=card('IBOV',sim(_benchCacheR.IBOV))+card('CDI',sim(_benchCacheR.CDI));
+}
+function _precoEmR(serie,ym){
+  if(!serie)return 0;
+  if(serie[ym])return serie[ym];
+  const ant=Object.keys(serie).filter(k=>k<=ym).sort();
+  return ant.length?serie[ant[ant.length-1]]:0;
 }
 
 function renderAll(){
   renderRentabilidade();
+  renderAlfa();
 }
 
 mvGate(initConsolidador);

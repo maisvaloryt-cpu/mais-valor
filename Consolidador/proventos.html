@@ -35,6 +35,22 @@
         <div style="position:relative;height:190px"><canvas id="chartProvClasse" role="img" aria-label="Proventos por classe"></canvas></div>
       </div>
     </div>
+    <div class="card" style="margin-bottom:1.25rem">
+      <div class="card-title"><i class="ti ti-calendar-month" aria-hidden="true" style="color:#1D9E75"></i>Calendário de Proventos</div>
+      <div id="prov-calendario" style="overflow-x:auto"></div>
+    </div>
+
+    <div class="card" style="margin-bottom:1.25rem">
+      <div class="card-title"><i class="ti ti-snowman" aria-hidden="true" style="color:#2E86C1"></i>Bola de Neve — Renda Passiva Projetada</div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:12px">
+        <div><div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:3px">Aporte por mês (R$)</div>
+          <input id="bn-aporte" type="number" min="0" step="50" value="0" class="cell-edit" style="width:120px;text-align:right" oninput="renderBolaNeve()"></div>
+        <div><div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:3px">Reinvestir proventos?</div>
+          <select id="bn-reinv" class="cell-edit" style="width:120px" onchange="renderBolaNeve()"><option value="1">Sim</option><option value="0">Não</option></select></div>
+      </div>
+      <div id="prov-bolaneve"></div>
+    </div>
+
     <div class="card">
       <div class="card-title">Proventos Recebidos por Ativo</div>
       <div class="tbl-wrap">
@@ -120,8 +136,80 @@ function renderProventos(){
     </tr>`).join('');
 }
 
+/* ---- Calendário de proventos: ano × mês, com intensidade de cor ---- */
+function getDividendosCalendario(){
+  const map={};
+  const tickers=[...new Set(ativos.map(a=>a.ticker))];
+  tickers.forEach(ticker=>{
+    const cache=DIVIDENDOS_CACHE[ticker]||[];
+    if(cache.length>0){
+      cache.forEach(d=>{
+        const qtd=getQtdTickerAtDate(ticker,d.date);
+        if(qtd<=0)return;
+        const y=d.date.slice(0,4), m=parseInt(d.date.slice(5,7));
+        if(!map[y])map[y]=Array(12).fill(0);
+        map[y][m-1]+=Math.round(d.value*qtd*100)/100;
+      });
+    }else{
+      ativos.filter(a=>a.ticker===ticker&&a.tipo==='Provento'&&a.data).forEach(a=>{
+        const y=a.data.slice(0,4), m=parseInt(a.data.slice(5,7));
+        const v=Math.round(a.qtd*a.pm*100)/100;
+        if(v<=0)return;
+        if(!map[y])map[y]=Array(12).fill(0);
+        map[y][m-1]+=v;
+      });
+    }
+  });
+  return map;
+}
+function renderCalendarioProv(){
+  const el=document.getElementById('prov-calendario'); if(!el)return;
+  const cal=getDividendosCalendario();
+  const anos=Object.keys(cal).sort((a,b)=>b-a);
+  if(!anos.length){ el.innerHTML='<div class="empty">Sem proventos registrados ainda.</div>'; return; }
+  const nomes=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  let max=0; anos.forEach(y=>cal[y].forEach(v=>{if(v>max)max=v;}));
+  const cor=v=>{ if(v<=0)return 'transparent'; const a=0.15+0.85*(v/max); return `rgba(29,158,117,${a.toFixed(2)})`; };
+  let html='<table class="tbl" style="font-size:11px"><thead><tr><th>Ano</th>'+nomes.map(n=>`<th class="r">${n}</th>`).join('')+'<th class="r">Total</th></tr></thead><tbody>';
+  anos.forEach(y=>{
+    const totalAno=cal[y].reduce((s,v)=>s+v,0);
+    html+=`<tr><td><strong>${y}</strong></td>`+cal[y].map(v=>`<td class="r" style="background:${cor(v)};color:${v>max*0.55?'#fff':'var(--color-text-primary)'}" title="${fmtR(v)}">${v>0?Math.round(v).toLocaleString('pt-BR'):'·'}</td>`).join('')+`<td class="r"><strong>${fmtR(totalAno)}</strong></td></tr>`;
+  });
+  html+='</tbody></table>';
+  el.innerHTML=html;
+}
+
+/* ---- Bola de neve: projeção de renda passiva reinvestindo proventos ---- */
+function renderBolaNeve(){
+  const el=document.getElementById('prov-bolaneve'); if(!el)return;
+  const t=getTotals();
+  const aporte=Math.max(0,parseFloat(document.getElementById('bn-aporte').value)||0);
+  const reinv=document.getElementById('bn-reinv').value==='1';
+  const dyA=(t.dyMed||0)/100;
+  if(t.total<=0||dyA<=0){ el.innerHTML='<div style="font-size:12px;color:var(--color-text-secondary)">Precisa ter patrimônio e dividendos registrados para projetar.</div>'; return; }
+  const dm=dyA/12; // rendimento de dividendo mensal aproximado
+  const marcos=[1,3,5,10,15,20];
+  let saldo=t.total, linhas=[];
+  let mes=0;
+  marcos.forEach(anoAlvo=>{
+    while(mes<anoAlvo*12){
+      const div=saldo*dm;
+      saldo=saldo+(reinv?div:0)+aporte;
+      mes++;
+    }
+    linhas.push({ano:anoAlvo, patrimonio:saldo, rendaMes:saldo*dm});
+  });
+  el.innerHTML=`<div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>Daqui a</th><th class="r">Patrimônio</th><th class="r">Renda passiva / mês</th><th class="r">Renda passiva / ano</th></tr></thead>
+    <tbody>${linhas.map(l=>`<tr><td><strong>${l.ano} ${l.ano===1?'ano':'anos'}</strong></td><td class="r">${fmtR(l.patrimonio)}</td><td class="r positive">${fmtR(l.rendaMes)}</td><td class="r positive">${fmtR(l.rendaMes*12)}</td></tr>`).join('')}</tbody>
+  </table></div>
+  <div style="font-size:10px;color:var(--color-text-secondary);margin-top:8px">Estimativa simples mantendo o DY atual de ${fmt(t.dyMed)}% a.a.${reinv?' com proventos reinvestidos':''}. Não considera valorização do preço nem mudança de dividendos.</div>`;
+}
+
 function renderAll(){
   renderProventos();
+  renderCalendarioProv();
+  renderBolaNeve();
 }
 
 mvGate(initConsolidador);

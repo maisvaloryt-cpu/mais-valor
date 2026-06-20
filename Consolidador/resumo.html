@@ -25,6 +25,7 @@
 
   <div id="tab-resumo">
     <div class="metrics" id="metrics-resumo"></div>
+    <div id="resumo-extra" style="margin-bottom:1.25rem"></div>
     <div class="charts-row">
       <div class="card">
         <div class="card-title">Evolução Real do Patrimônio
@@ -255,8 +256,125 @@ function renderGrupos(){
   document.getElementById('grupos-ativos').innerHTML=html||'<div class="empty">Nenhum ativo cadastrado. Clique em "+ Adicionar Lançamento".</div>';
 }
 
+/* ---- Termômetro da carteira (0–100), destaques do mês e comparação com CDI ---- */
+function _cdiMensal(){
+  const anual=parseFloat(BCB?.cdi?.anual)||0;
+  return anual>0?Math.pow(1+anual/100,1/12)-1:0;
+}
+// Simula quanto os mesmos aportes renderiam na renda fixa (CDI), mês a mês.
+function calcSaldoCDI(nMeses=120){
+  const evol=calcEvolucaoPatrimonio(nMeses).filter(m=>m.vt>0||m.custo>0);
+  if(!evol.length)return null;
+  const r=_cdiMensal();
+  let saldo=0, custoAnt=0;
+  evol.forEach(m=>{
+    const aporteMes=Math.max(0,m.custo-custoAnt); // entrada de dinheiro novo no mês
+    saldo=saldo*(1+r)+aporteMes;
+    custoAnt=m.custo;
+  });
+  return {saldoCDI:saldo, custo:custoAnt};
+}
+// Variação do último mês de cada ativo (usa preços históricos do site).
+function destaquesDoMes(){
+  const c=calcAtivos();
+  const movimentos=[];
+  c.forEach(a=>{
+    const hist=HISTORICO_CACHE[a.ticker];
+    if(!hist)return;
+    const meses=Object.keys(hist).sort();
+    if(meses.length<2)return;
+    const ult=hist[meses[meses.length-1]], penult=hist[meses[meses.length-2]];
+    if(!ult||!penult)return;
+    movimentos.push({ticker:a.ticker, classe:a.classe, varPct:(ult/penult-1)*100});
+  });
+  if(!movimentos.length)return null;
+  movimentos.sort((x,y)=>y.varPct-x.varPct);
+  return {melhor:movimentos[0], pior:movimentos[movimentos.length-1]};
+}
+function calcTermometro(){
+  const c=calcAtivos();
+  const t=getTotals();
+  const total=c.reduce((s,a)=>s+a.vt,0);
+  if(!c.length||total<=0)return null;
+  // 1) Diversificação (0–40): nº de classes + menor concentração no maior ativo
+  const nClasses=new Set(c.map(a=>a.classe)).size;
+  const maxPct=Math.max(...c.map(a=>a.vt/total*100));
+  const scClasses=Math.min(nClasses,5)/5*20;
+  const scConc=maxPct<=20?20:Math.max(0,20-(maxPct-20));
+  // 2) Lucro (0–30): rentabilidade total com proventos
+  const scLucro=Math.max(0,Math.min(30,15+t.rentTotal/2));
+  // 3) Renda (0–30): dividend yield médio
+  const scRenda=Math.max(0,Math.min(30,t.dyMed*4));
+  const nota=Math.round(scClasses+scConc+scLucro+scRenda);
+  let txt,cor;
+  if(nota<40){txt='Precisa de atenção';cor='#E24B4A';}
+  else if(nota<60){txt='Razoável';cor='#BA7517';}
+  else if(nota<80){txt='Boa';cor='#2E86C1';}
+  else{txt='Excelente';cor='#1D9E75';}
+  return {nota,txt,cor,nClasses,maxPct};
+}
+function renderResumoExtra(){
+  const el=document.getElementById('resumo-extra');
+  if(!el)return;
+  const term=calcTermometro();
+  if(!term){ el.innerHTML=''; return; }
+  const dest=destaquesDoMes();
+  const t=getTotals();
+  const cdi=calcSaldoCDI();
+  // Card termômetro
+  const cardTerm=`<div class="card">
+    <div class="card-title"><i class="ti ti-temperature" aria-hidden="true" style="color:${term.cor}"></i>Termômetro da carteira</div>
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="font-size:30px;font-weight:800;color:${term.cor};line-height:1">${term.nota}<span style="font-size:14px;color:var(--color-text-secondary);font-weight:600">/100</span></div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:${term.cor};margin-bottom:6px">${term.txt}</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${term.nota}%;background:${term.cor}"></div></div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-top:6px">${term.nClasses} classes · maior ativo ${fmt(term.maxPct)}% · DY ${fmt(t.dyMed)}%</div>
+      </div>
+    </div>
+    <div style="font-size:10px;color:var(--color-text-secondary);margin-top:8px">Nota simples juntando diversificação, lucro e dividendos. Serve de guia, não é recomendação.</div>
+  </div>`;
+  // Card destaques do mês
+  const cardDest=dest?`<div class="card">
+    <div class="card-title"><i class="ti ti-flame" aria-hidden="true" style="color:#FF8C00"></i>Destaques do mês</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:12px;color:var(--color-text-secondary)">▲ Maior alta</span>
+        <span><strong>${dest.melhor.ticker}</strong> <span class="positive" style="font-weight:600">${fmtP(dest.melhor.varPct)}</span></span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:12px;color:var(--color-text-secondary)">▼ Maior baixa</span>
+        <span><strong>${dest.pior.ticker}</strong> <span class="negative" style="font-weight:600">${fmtP(dest.pior.varPct)}</span></span>
+      </div>
+    </div>
+    <div style="font-size:10px;color:var(--color-text-secondary);margin-top:10px">Variação do último mês com preço de fechamento.</div>
+  </div>`:'';
+  // Card carteira vs CDI
+  let cardCDI='';
+  if(cdi){
+    const diff=t.total-cdi.saldoCDI;
+    const ganhou=diff>=0;
+    cardCDI=`<div class="card">
+      <div class="card-title"><i class="ti ti-scale" aria-hidden="true" style="color:#534AB7"></i>Sua carteira vs Renda Fixa (CDI)</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--color-text-secondary)">Você tem hoje</span><strong>${fmtR(t.total)}</strong></div>
+        <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--color-text-secondary)">Se fosse só CDI</span><strong>${fmtR(cdi.saldoCDI)}</strong></div>
+        <div style="display:flex;justify-content:space-between;border-top:1px solid var(--color-border-secondary);padding-top:8px">
+          <span style="font-size:12px;color:var(--color-text-secondary)">${ganhou?'Você está ganhando do CDI':'Você está perdendo pro CDI'}</span>
+          <strong class="${ganhou?'positive':'negative'}">${ganhou?'+':''}${fmtR(diff)}</strong></div>
+      </div>
+      <div style="font-size:10px;color:var(--color-text-secondary);margin-top:8px">Simulação: seus mesmos aportes rendendo ${fmt(parseFloat(BCB?.cdi?.anual)||0)}% a.a. (CDI atual).</div>
+    </div>`;
+  }
+  el.style.display='grid';
+  el.style.gridTemplateColumns='repeat(auto-fit,minmax(240px,1fr))';
+  el.style.gap='14px';
+  el.innerHTML=cardTerm+cardDest+cardCDI;
+}
+
 function renderAll(){
   renderMetricsResumo();
+  renderResumoExtra();
   renderEvolucao();
   renderPizza();
   renderGrupos();

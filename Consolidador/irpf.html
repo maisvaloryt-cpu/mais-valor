@@ -30,6 +30,16 @@
       <button class="btn btn-sm" style="margin-left:auto" onclick="exportarRelatorioIRPF()"><i class="ti ti-download" aria-hidden="true"></i> Exportar Relatório ↗</button>
     </div>
     <div class="metrics" id="metrics-irpf"></div>
+    <div class="charts-row">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-receipt-tax" aria-hidden="true" style="color:#BA7517"></i>Imposto estimado (ganho de capital)</div>
+        <div id="irpf-imposto"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-alert-triangle" aria-hidden="true" style="color:#E24B4A"></i>Vendas de Ações por Mês (isenção R$20 mil)</div>
+        <div id="irpf-alerta20k"></div>
+      </div>
+    </div>
     <div class="card">
       <div class="card-title" id="titulo-bens">Bens e Direitos</div>
       <div class="tbl-wrap">
@@ -102,8 +112,78 @@ function renderIRPF(){
   }).join('');
 }
 
+/* ---- Estimativa de imposto sobre ganho de capital realizado no ano ---- */
+function calcImpostoEstimado(ano){
+  const anoStr=String(ano);
+  const posMap={};
+  const acoesMes={};   // ações: isenção até R$20k de vendas/mês
+  const cryptoMes={};  // cripto: isenção até R$35k de vendas/mês
+  let ganhoFII=0, ganhoOutros=0;
+  ativos.filter(a=>a.data).sort((a,b)=>a.data.localeCompare(b.data)).forEach(a=>{
+    const t=a.ticker;
+    if(!posMap[t])posMap[t]={qtd:0,custo:0,classe:a.classe};
+    if(a.classe)posMap[t].classe=a.classe;
+    const tipo=a.tipo||'Compra';
+    if(tipo==='Compra'){posMap[t].qtd+=a.qtd;posMap[t].custo+=a.qtd*a.pm;}
+    else if(tipo==='Venda'){
+      const pm=posMap[t].qtd>0?posMap[t].custo/posMap[t].qtd:0;
+      const ganho=(a.pm-pm)*a.qtd;
+      const valorVenda=a.pm*a.qtd;
+      const qtdR=Math.max(0,posMap[t].qtd-a.qtd);
+      posMap[t].custo=qtdR*pm;posMap[t].qtd=qtdR;
+      if(a.data.slice(0,4)===anoStr){
+        const cl=posMap[t].classe, ym=a.data.slice(0,7);
+        if(cl==='B3'){ if(!acoesMes[ym])acoesMes[ym]={vendas:0,ganho:0}; acoesMes[ym].vendas+=valorVenda; acoesMes[ym].ganho+=ganho; }
+        else if(cl==='Crypto'){ if(!cryptoMes[ym])cryptoMes[ym]={vendas:0,ganho:0}; cryptoMes[ym].vendas+=valorVenda; cryptoMes[ym].ganho+=ganho; }
+        else if(cl==='FII'){ ganhoFII+=ganho; }
+        else { ganhoOutros+=ganho; }
+      }
+    }
+  });
+  let ganhoAcoesTrib=0; Object.values(acoesMes).forEach(m=>{ if(m.vendas>20000&&m.ganho>0)ganhoAcoesTrib+=m.ganho; });
+  let ganhoCryptoTrib=0; Object.values(cryptoMes).forEach(m=>{ if(m.vendas>=35000&&m.ganho>0)ganhoCryptoTrib+=m.ganho; });
+  const impAcoes=ganhoAcoesTrib*0.15;
+  const impFII=Math.max(0,ganhoFII)*0.20;
+  const impCrypto=ganhoCryptoTrib*0.15;
+  const impOutros=Math.max(0,ganhoOutros)*0.15;
+  return {acoesMes, impAcoes, impFII, impCrypto, impOutros, total:impAcoes+impFII+impCrypto+impOutros};
+}
+function renderImpostoIRPF(ano){
+  const el=document.getElementById('irpf-imposto'); if(!el)return;
+  const r=calcImpostoEstimado(ano);
+  const linha=(nome,val,obs)=>`<div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="font-size:12px;color:var(--color-text-secondary)">${nome}${obs?` <span style="font-size:10px">(${obs})</span>`:''}</span><strong>${fmtR(val)}</strong></div>`;
+  el.innerHTML=`
+    ${linha('Ações (15%)',r.impAcoes,'isento até R$20k/mês')}
+    ${linha('FIIs (20%)',r.impFII)}
+    ${linha('Cripto (15%)',r.impCrypto,'isento até R$35k/mês')}
+    ${linha('Demais (15% aprox.)',r.impOutros)}
+    <div style="display:flex;justify-content:space-between;border-top:1px solid var(--color-border-secondary);padding-top:9px;margin-top:4px">
+      <span style="font-size:13px;font-weight:600">Total estimado</span><strong style="font-size:16px;color:#E24B4A">${fmtR(r.total)}</strong></div>
+    <div style="font-size:10px;color:var(--color-text-secondary);margin-top:9px">Estimativa simples sobre lucros de vendas em ${ano}. Não inclui JCP, come-cotas, day-trade nem regras específicas de exterior/fundos. Confirme com seu contador.</div>`;
+}
+function renderAlerta20k(ano){
+  const el=document.getElementById('irpf-alerta20k'); if(!el)return;
+  const r=calcImpostoEstimado(ano);
+  const meses=Object.entries(r.acoesMes).sort((a,b)=>a[0].localeCompare(b[0]));
+  if(!meses.length){ el.innerHTML='<div style="font-size:12px;color:var(--color-text-secondary)">Nenhuma venda de ações em '+ano+'.</div>'; return; }
+  const nomes=['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  el.innerHTML=`<div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>Mês</th><th class="r">Vendas</th><th class="r">Situação</th></tr></thead>
+    <tbody>${meses.map(([ym,m])=>{
+      const passou=m.vendas>20000;
+      const mm=nomes[parseInt(ym.slice(5,7))]+'/'+ym.slice(2,4);
+      return `<tr><td><strong>${mm}</strong></td><td class="r">${fmtR(m.vendas)}</td>
+        <td class="r" style="color:${passou?'#E24B4A':'#1D9E75'};font-weight:600">${passou?'⚠ Tributado':'✓ Isento'}</td></tr>`;
+    }).join('')}</tbody>
+  </table></div>
+  <div style="font-size:10px;color:var(--color-text-secondary);margin-top:8px">Vendas de ações até R$20 mil no mês são isentas de IR sobre o lucro. Acima disso, o lucro do mês é tributado em 15%.</div>`;
+}
+
 function renderAll(){
   renderIRPF();
+  const ano=new Date().getFullYear()-1;
+  renderImpostoIRPF(ano);
+  renderAlerta20k(ano);
 }
 
 mvGate(initConsolidador);

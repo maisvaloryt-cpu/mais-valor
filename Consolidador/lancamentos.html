@@ -25,6 +25,7 @@
 
   <div id="tab-lancamentos">
     <div class="filter-row">
+      <input id="filtro-busca" type="text" placeholder="🔎 Buscar ticker..." oninput="renderLancamentos()" style="flex:1;min-width:140px">
       <select id="filtro-classe" onchange="renderLancamentos()">
         <option value="">Todas as classes</option>
         <option value="B3">Ações B3</option><option value="FII">FIIs</option>
@@ -35,7 +36,11 @@
         <option value="">Todos os tipos</option>
         <option value="Compra">Compra</option><option value="Venda">Venda</option>
       </select>
+      <select id="filtro-ano" onchange="renderLancamentos()">
+        <option value="">Todos os anos</option>
+      </select>
     </div>
+    <div class="metrics" id="metrics-lanc"></div>
     <div class="card">
       <div class="tbl-wrap">
       <table class="tbl">
@@ -75,9 +80,19 @@
 renderHeaderAndNav('lancamentos');
 injectModals();
 
+function popularAnosLanc(){
+  const sel=document.getElementById('filtro-ano');
+  if(!sel||sel.options.length>1)return;
+  const anos=[...new Set(ativos.filter(a=>a.data).map(a=>a.data.slice(0,4)))].sort((a,b)=>b-a);
+  anos.forEach(y=>{ const o=document.createElement('option'); o.value=y; o.textContent=y; sel.appendChild(o); });
+}
+
 function renderLancamentos(){
+  popularAnosLanc();
   const fc=document.getElementById('filtro-classe').value;
   const ft=document.getElementById('filtro-tipo').value;
+  const fa=document.getElementById('filtro-ano').value;
+  const fb=(document.getElementById('filtro-busca').value||'').trim().toUpperCase();
 
   // Bug #9 fix: sort robusto com datas inválidas
   const sortFn=(a,b)=>{
@@ -92,7 +107,16 @@ function renderLancamentos(){
     .map((a,i)=>({...a,_idx:i}))
     .filter(a=>(a.tipo||'Compra')!=='Provento')
     .sort(sortFn);
-  const filtered=mainTx.filter(a=>(!fc||a.classe===fc)&&(!ft||a.tipo===ft));
+  const filtered=mainTx.filter(a=>(!fc||a.classe===fc)&&(!ft||(a.tipo||'Compra')===ft)&&(!fa||(a.data||'').slice(0,4)===fa)&&(!fb||a.ticker.toUpperCase().includes(fb)));
+  // Totais dos lançamentos filtrados
+  let comprado=0,vendido=0;
+  filtered.forEach(a=>{const v=a.qtd*a.pm;if((a.tipo||'Compra')==='Venda')vendido+=v;else comprado+=v;});
+  document.getElementById('metrics-lanc').innerHTML=`
+    <div class="mcard"><div class="mcard-label">Lançamentos</div><div class="mcard-value">${filtered.length}</div></div>
+    <div class="mcard"><div class="mcard-label">Total comprado</div><div class="mcard-value">${fmtR(comprado)}</div></div>
+    <div class="mcard"><div class="mcard-label">Total vendido</div><div class="mcard-value">${fmtR(vendido)}</div></div>
+    <div class="mcard"><div class="mcard-label">Saldo líquido aplicado</div><div class="mcard-value ${comprado-vendido>=0?'':'negative'}">${fmtR(comprado-vendido)}</div></div>
+  `;
   document.getElementById('tbody-lanc').innerHTML=filtered.length?filtered.map(a=>`
     <tr>
       <td>${a.data?a.data.split('-').reverse().join('/'):'-'}</td>
