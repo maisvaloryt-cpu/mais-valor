@@ -842,3 +842,8 @@ footer em { color: var(--gold); font-style: normal; }
 
 /* Carteira (Consolidador): esconder o título "Consolidador de Carteira" */
 body.is-consolidador .app .header h1 { display: none; }
+
+/* Carteira (Consolidador): no desktop também esconder o menu e a busca,
+   igual já acontece no mobile. Sobram só o logo (volta pra Home) e o login. */
+body.is-consolidador .nav-links,
+body.is-consolidador .nav-bottom-row .nav-search-wrap { display: none; }

@@ -350,12 +350,12 @@ async function loadData() {
       ACOES = Object.values(FUNDAMENTUS).map(f => {
         const cot = mergeCot(f.ticker, 'acoes');
         if (!cot || !cot.price) return null;
-        const rawDY = f.dy ? f.dy * 100 : (cot.dividendYield || 0);
+        const rawDY = f.dy ? f.dy : (cot.dividendYield || 0);
         // div12m: dividendos absolutos em R$/ação nos últimos 12 meses
-        // Fundamentus retorna f.dy como decimal (ex: 0.12) sobre o preço base
-        // Usamos cot.price (preço atual) × f.dy para obter o valor absoluto
+        // Fundamentus retorna f.dy já em porcentagem (ex: 4.12 = 4,12%)
+        // Convertemos para fração (f.dy/100) × preço atual para obter o valor absoluto
         // Este campo é a base correta para o cálculo do preço teto de Bazin
-        const div12m = f.dy > 0 ? f.dy * cot.price : 0;
+        const div12m = f.dy > 0 ? (f.dy / 100) * cot.price : 0;
         return {
           t: f.ticker, n: cot.name || f.ticker,
           p: cot.price, v: cot.change || 0,
@@ -406,7 +406,7 @@ async function loadData() {
       FIIS = Object.values(FIIS_FUND).map(f => {
         const cot = mergeCot(f.ticker, 'fiis');
         if (!cot || !cot.price) return null;
-        const rawDY = f.dy ? f.dy * 100 : (cot.dividendYield || 0);
+        const rawDY = f.dy ? f.dy : (cot.dividendYield || 0);
         return {
           t: f.ticker, n: cot.name || f.ticker,
           p: cot.price, v: cot.change || 0,

@@ -61,7 +61,7 @@ body { padding: 0 0 2rem; }
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-right: 4px;
+  margin-right: auto;
 }
 .carteira-switcher select {
   font-size: 12px;
