@@ -1004,9 +1004,14 @@ function processB3Rows(rows){
     }
 
     const qtd=parseNumBR(r[col.qtd]);
-    const preco=parseNumBR(r[col.preco]);
+    let   preco=parseNumBR(r[col.preco]);
     const valorOp=col.valor!=null?parseNumBR(r[col.valor]):0;
     if(qtd<=0)continue;
+    // [FIX preço-milhar] Preço unitário com 3 casas decimais (ex.: 11.238 = R$ 11,238)
+    // pode ser lido errado como milhar (vira R$ 11.238,00) — parseNumBR não consegue
+    // distinguir "11.238" (decimal) de "1.700" (milhar). A coluna "Valor da Operação"
+    // vem confiável, então recalculamos o preço por ela. Afetava CMIG4, GARE11, MXRF11.
+    if(valorOp>0 && qtd>0) preco = valorOp/qtd;
 
     if(!ops[ticker])ops[ticker]={nome,txs:[],rfTipo:isTesouro?'TD':(isCDB?'RF':null),isRF:isCDB||isTesouro,rfSubtipo:isCDB?produtoRaw.split(/\s*-\s*/)[0].trim().toUpperCase():isTesouro?'Tesouro Direto':null};
     if(nome&&!ops[ticker].nome)ops[ticker].nome=nome;
