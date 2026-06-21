@@ -139,7 +139,7 @@
             <th class="r" style="cursor:pointer;user-select:none" onclick="sortTable('p')">Preço<span class="sort-arrow" id="sarr-p" style="margin-left:3px;font-size:10px;color:var(--gold)"></span></th>
             <th class="r" style="cursor:pointer;user-select:none" onclick="sortTable('v')">Hoje<span class="sort-arrow" id="sarr-v" style="margin-left:3px;font-size:10px;color:var(--gold)"></span></th>
             <th class="r" style="cursor:pointer;user-select:none" onclick="sortTable('dy')">DY 12m<span class="sort-arrow" id="sarr-dy" style="margin-left:3px;font-size:10px;color:var(--gold)"></span></th>
-            <th class="r" style="cursor:pointer;user-select:none" onclick="sortTable('pl')">P/L<span class="sort-arrow" id="sarr-pl" style="margin-left:3px;font-size:10px;color:var(--gold)"></span></th>
+            <th class="r" style="cursor:pointer;user-select:none" onclick="sortTable('pl')"><span id="th-pl-label">P/L</span><span class="sort-arrow" id="sarr-pl" style="margin-left:3px;font-size:10px;color:var(--gold)"></span></th>
             <th class="r" style="cursor:pointer;user-select:none" onclick="sortTable('pvp')">P/VP<span class="sort-arrow" id="sarr-pvp" style="margin-left:3px;font-size:10px;color:var(--gold)"></span></th>
             <th class="r" style="cursor:pointer;user-select:none" onclick="sortTable('score')">Score<span class="sort-arrow" id="sarr-score" style="margin-left:3px;font-size:10px;color:var(--gold)"></span></th>
             <th class="r" style="cursor:pointer;user-select:none" onclick="sortTable('volNum')">Volume<span class="sort-arrow" id="sarr-volNum" style="margin-left:3px;font-size:10px;color:var(--gold)"></span></th>
@@ -232,7 +232,7 @@ function renderTable(arr){
       <td class="r">R$&nbsp;${d.p.toFixed(2)}</td>
       <td class="r"><span class="pill ${d.v>=0?'up-pill':'dn-pill'}">${d.v>=0?'+':''}${d.v.toFixed(2)}%</span></td>
       <td class="r gold">${d.dy>0?d.dy.toFixed(1)+'%':'0%'}</td>
-      <td class="r">${d.pl?d.pl.toFixed(1)+'x':'—'}</td>
+      <td class="r">${currentTab==='fiis' ? (d.volNum>0?formatVol(d.volNum):'—') : (d.pl?d.pl.toFixed(1)+'x':'—')}</td>
       <td class="r ${d.pvp&&d.pvp<1?'up':''}">${d.pvp?d.pvp.toFixed(2):'—'}</td>
       <td class="r">${scoreBadge(d)}</td>
       <td class="r" style="color:var(--text3)">${d.vol}</td>`;
@@ -246,7 +246,13 @@ let sortCol = null, sortAsc = false;
 function sortVal(d, col) {
   if (col === 't')     return (d.t || '').toLowerCase();
   if (col === 'score') return (typeof calcScore === 'function' ? (calcScore(d) ?? -1) : -1);
+  if (col === 'pl' && currentTab === 'fiis') return (d.volNum != null ? d.volNum : -Infinity); // FII: ordena por liquidez
   return (d[col] != null ? d[col] : -Infinity);
+}
+// Ajusta o nome da coluna que muda conforme a aba (P/L ↔ Liquidez)
+function updateDynCols(tab) {
+  const lbl = document.getElementById('th-pl-label');
+  if (lbl) lbl.textContent = tab === 'fiis' ? 'Liquidez' : 'P/L';
 }
 function sortTable(col) {
   if (sortCol === col) { sortAsc = !sortAsc; }
@@ -362,6 +368,7 @@ function switchTab(tab, el) {
   currentData = buildTabData(tab);
   sortCol = null; sortAsc = false;
   document.querySelectorAll('.sort-arrow').forEach(s => s.textContent = '');
+  updateDynCols(tab);
   document.querySelectorAll('.tabs .tab').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('filter-input').value = '';
@@ -559,6 +566,7 @@ async function init() {
   } catch(e) {}
   currentData = buildTabData('acoes');
   sortCol = null; sortAsc = false;
+  updateDynCols('acoes');
   sortTable('score');   // tabela já abre ordenada por Score (maior → menor)
   await startCarousel();
   renderSidebar();
