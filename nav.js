@@ -63,6 +63,15 @@ const ATIVO_ICONS = {
   rankings: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z" stroke="#e0b84a" stroke-width="5" stroke-opacity="0.22"/><path d="M7 4h10v4a5 5 0 0 1-10 0V4z" fill="#e0b84a" fill-opacity="0.15" stroke="#e0b84a" stroke-width="1.5"/><path d="M7 5H4.5v1.5A3 3 0 0 0 7 9.5M17 5h2.5v1.5A3 3 0 0 1 17 9.5M9.5 21h5M12 13.5V21" stroke="#e0b84a" stroke-width="1.4"/></svg>`,
 };
 
+// ── Ícones SVG dourados do dropdown Ferramentas (mesmo estilo) ──
+const FERRAMENTA_ICONS = {
+  simulador: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><rect x="4" y="11" width="3.5" height="9" rx="1" fill="#e0b84a" fill-opacity="0.15" stroke="#e0b84a" stroke-width="1.4"/><rect x="10.25" y="7" width="3.5" height="13" rx="1" fill="#e0b84a" fill-opacity="0.15" stroke="#e0b84a" stroke-width="1.4"/><rect x="16.5" y="4" width="3.5" height="16" rx="1" fill="#e0b84a" fill-opacity="0.15" stroke="#e0b84a" stroke-width="1.4"/></svg>`,
+  calculadora: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><rect x="5" y="3" width="14" height="18" rx="2" fill="#e0b84a" fill-opacity="0.13" stroke="#e0b84a" stroke-width="1.4"/><rect x="7.5" y="5.5" width="9" height="3" rx="0.6" stroke="#e0b84a" stroke-width="1.2"/><circle cx="8.5" cy="12" r="0.9" fill="#e0b84a"/><circle cx="12" cy="12" r="0.9" fill="#e0b84a"/><circle cx="15.5" cy="12" r="0.9" fill="#e0b84a"/><circle cx="8.5" cy="15.5" r="0.9" fill="#e0b84a"/><circle cx="12" cy="15.5" r="0.9" fill="#e0b84a"/><circle cx="15.5" cy="15.5" r="0.9" fill="#e0b84a"/></svg>`,
+  comparador: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M12 3v18M5 7h14M8 21h8" stroke="#e0b84a" stroke-width="1.4"/><path d="M5 7l-2.5 6a3 3 0 0 0 5 0L5 7zM19 7l-2.5 6a3 3 0 0 0 5 0L19 7z" fill="#e0b84a" fill-opacity="0.13" stroke="#e0b84a" stroke-width="1.4"/></svg>`,
+  analise: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M12 3l1.8 4.7L18.5 9l-4.7 1.8L12 15.5l-1.8-4.7L5.5 9l4.7-1.3L12 3z" fill="#e0b84a" fill-opacity="0.15" stroke="#e0b84a" stroke-width="1.3"/><path d="M18 15l.7 1.8 1.8.7-1.8.7L18 20l-.7-1.8-1.8-.7 1.8-.7L18 15z" fill="#e0b84a" fill-opacity="0.2" stroke="#e0b84a" stroke-width="1"/></svg>`,
+  outras: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M14.7 6.3a4 4 0 0 0-5.2 5.2L3 18l3 3 6.5-6.5a4 4 0 0 0 5.2-5.2l-2.4 2.4-2.1-.6-.6-2.1 2.4-2.4z" fill="#e0b84a" fill-opacity="0.13" stroke="#e0b84a" stroke-width="1.4"/></svg>`,
+};
+
 // ── Theme toggle ─────────────────────────────────────────────────
 function getTheme() { return localStorage.getItem('mv_theme') || 'dark'; }
 function applyTheme(t) {
@@ -462,11 +471,11 @@ function renderNav() {
     <a href="${NAV_BASE}stocks.html" class="${page==='stocks.html'?'active':''}" onclick="toggleMobileMenu()">${ATIVO_ICONS.stocks} Stocks</a>
     <a href="${NAV_BASE}rankings.html" class="${page==='rankings.html'?'active':''}" onclick="toggleMobileMenu()">${ATIVO_ICONS.rankings} Rankings</a>
     <div class="mob-group-label">Ferramentas</div>
-    <a href="${NAV_BASE}simulador.html" class="${page==='simulador.html'?'active':''}" onclick="toggleMobileMenu()">🧮 Simulador</a>
-    <a href="${NAV_BASE}Calculadora_maisvalor/index.html" onclick="toggleMobileMenu()">✦ Calculadora</a>
-    <a href="${NAV_BASE}comparador.html" class="${page==='comparador.html'?'active':''}" onclick="toggleMobileMenu()">⚖️ Comparador</a>
-    <a href="${NAV_BASE}analise.html" class="${page==='analise.html'?'active':''}" onclick="toggleMobileMenu()">✦ Análise IA</a>
-    <a href="${NAV_BASE}ferramentas.html" class="${page==='ferramentas.html'?'active':''}" onclick="toggleMobileMenu()">🔧 Outras</a>
+    <a href="${NAV_BASE}simulador.html" class="${page==='simulador.html'?'active':''}" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.simulador} Simulador</a>
+    <a href="${NAV_BASE}Calculadora_maisvalor/index.html" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.calculadora} Calculadora</a>
+    <a href="${NAV_BASE}comparador.html" class="${page==='comparador.html'?'active':''}" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.comparador} Comparador</a>
+    <a href="${NAV_BASE}analise.html" class="${page==='analise.html'?'active':''}" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.analise} Análise IA</a>
+    <a href="${NAV_BASE}ferramentas.html" class="${page==='ferramentas.html'?'active':''}" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.outras} Outras</a>
     <div class="mob-group-label">Conta</div>
     <a href="${NAV_BASE}watchlist.html" class="${watchActive?'active':''}" onclick="toggleMobileMenu()">★ Watchlist</a>
     <a href="${NAV_BASE}Consolidador/index.html" class="${carteiraActive?'active':''}" onclick="toggleMobileMenu()">📊 Carteira</a>
@@ -600,12 +609,12 @@ function renderNav() {
   ferramentasDrop.id = 'mv-ferramentas-floatdrop';
   ferramentasDrop.className = 'mv-floatdrop';
   ferramentasDrop.innerHTML = `
-    <a href="${NAV_BASE}simulador.html" class="${page==='simulador.html'?'active':''}">🧮 Simulador</a>
-    <a href="${NAV_BASE}Calculadora_maisvalor/index.html">✦ Calculadora</a>
-    <a href="${NAV_BASE}comparador.html" class="${page==='comparador.html'?'active':''}">⚖️ Comparador</a>
-    <a href="${NAV_BASE}analise.html" class="${page==='analise.html'?'active':''}">✦ Análise IA</a>
+    <a href="${NAV_BASE}simulador.html" class="${page==='simulador.html'?'active':''}">${FERRAMENTA_ICONS.simulador} Simulador</a>
+    <a href="${NAV_BASE}Calculadora_maisvalor/index.html">${FERRAMENTA_ICONS.calculadora} Calculadora</a>
+    <a href="${NAV_BASE}comparador.html" class="${page==='comparador.html'?'active':''}">${FERRAMENTA_ICONS.comparador} Comparador</a>
+    <a href="${NAV_BASE}analise.html" class="${page==='analise.html'?'active':''}">${FERRAMENTA_ICONS.analise} Análise IA</a>
     <div class="mv-drop-div"></div>
-    <a href="${NAV_BASE}ferramentas.html" class="${page==='ferramentas.html'?'active':''}">🔧 Outras ferramentas</a>`;
+    <a href="${NAV_BASE}ferramentas.html" class="${page==='ferramentas.html'?'active':''}">${FERRAMENTA_ICONS.outras} Outras ferramentas</a>`;
   document.body.appendChild(ferramentasDrop);
 
   // ── Lógica genérica de hover para os dropdowns ───────────────────
