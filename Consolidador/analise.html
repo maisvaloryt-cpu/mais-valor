@@ -84,7 +84,7 @@ function renderAnalise(){
     <div class="mcard"><div class="mcard-label">Diversificação</div><div class="mcard-value">${new Set(c.map(a=>a.classe)).size} classes</div><div class="mcard-sub">${c.length} ativos</div></div>
     <div class="mcard"><div class="mcard-label">Índice de diversificação</div><div class="mcard-value" style="color:${divCor}">${fmt(efetivos,1)}</div><div class="mcard-sub">${divTxt} (nº efetivo de ativos)</div></div>
     <div class="mcard"><div class="mcard-label">DY Médio (12M)</div><div class="mcard-value positive">${fmt(t.dyMed)}%</div></div>
-    <div class="mcard"><div class="mcard-label">Ativo mais concentrado</div><div class="mcard-value">${c[0]?.ticker||'-'} (${total?fmt((c[0]?.vt||0)/total*100):0}%)</div></div>
+    <div class="mcard"><div class="mcard-label">Ativo mais concentrado</div><div class="mcard-value" style="display:flex;align-items:center;gap:8px">${c[0]?logoAtivo(c[0],20):''}<span>${c[0]?.ticker||'-'} (${total?fmt((c[0]?.vt||0)/total*100):0}%)</span></div></div>
   `;
   const top5=c.slice(0,5);
   if(charts.conc)charts.conc.destroy();

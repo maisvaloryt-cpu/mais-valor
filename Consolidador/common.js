@@ -1323,20 +1323,21 @@ function _rotuloAtivoTexto(a){
   }
   return a.ticker;
 }
-/* Logo da empresa + nome (usado nas tabelas de ativos). RF/Tesouro/Fundos/Outros
-   não têm logo de empresa → mostra um pontinho na cor da classe. */
-function rotuloAtivo(a){
-  const nome=_rotuloAtivoTexto(a);
+/* Só a logo da empresa (reutilizável em qualquer citação de ativo).
+   RF/Tesouro/Fundos/Outros não têm logo → pontinho na cor da classe. */
+function logoAtivo(a,size=22){
   const semLogo=(a.classe==='RF'||a.classe==='TD'||a.classe==='FUNDO'||a.classe==='OUTRO');
   const cor=(typeof CLASS_COLORS!=='undefined'&&CLASS_COLORS[a.classe])||'#888';
-  let icone;
   if(semLogo){
-    icone=`<span style="width:16px;height:16px;border-radius:50%;background:${cor};flex-shrink:0;display:inline-block"></span>`;
-  }else{
-    const tk=a.classe==='BDR'?a.ticker.replace(/\d+$/,''):a.ticker; // BDR: logo sem o número final (igual ao site)
-    icone=(typeof logoHtml==='function')?logoHtml(tk,22):'';
+    const d=Math.max(10,Math.round(size*0.72));
+    return `<span style="width:${d}px;height:${d}px;border-radius:50%;background:${cor};flex-shrink:0;display:inline-block"></span>`;
   }
-  return `<span style="display:inline-flex;align-items:center;gap:8px">${icone}<span>${nome}</span></span>`;
+  const tk=a.classe==='BDR'?a.ticker.replace(/\d+$/,''):a.ticker; // BDR: logo sem o número final (igual ao site)
+  return (typeof logoHtml==='function')?logoHtml(tk,size):'';
+}
+/* Logo da empresa + nome (usado nas tabelas de ativos). */
+function rotuloAtivo(a){
+  return `<span style="display:inline-flex;align-items:center;gap:8px">${logoAtivo(a,22)}<span>${_rotuloAtivoTexto(a)}</span></span>`;
 }
 function _pendenciasRF(){
   return (typeof ativos!=='undefined'&&ativos?ativos:[]).filter(a=>RF_CLASSES.has(a.classe)&&a.tipo==='Compra'&&rfFaltaDados(a));

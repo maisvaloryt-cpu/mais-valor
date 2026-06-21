@@ -354,11 +354,11 @@ function renderResumoExtra(){
     <div style="display:flex;flex-direction:column;gap:12px">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <span style="font-size:12px;color:var(--color-text-secondary)">▲ Maior alta</span>
-        <span><strong>${dest.melhor.ticker}</strong> <span class="positive" style="font-weight:600">${fmtP(dest.melhor.varPct)}</span></span>
+        <span style="display:inline-flex;align-items:center;gap:6px">${logoAtivo(dest.melhor,18)}<strong>${dest.melhor.ticker}</strong> <span class="positive" style="font-weight:600">${fmtP(dest.melhor.varPct)}</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center">
         <span style="font-size:12px;color:var(--color-text-secondary)">▼ Maior baixa</span>
-        <span><strong>${dest.pior.ticker}</strong> <span class="negative" style="font-weight:600">${fmtP(dest.pior.varPct)}</span></span>
+        <span style="display:inline-flex;align-items:center;gap:6px">${logoAtivo(dest.pior,18)}<strong>${dest.pior.ticker}</strong> <span class="negative" style="font-weight:600">${fmtP(dest.pior.varPct)}</span></span>
       </div>
     </div>
     <div style="font-size:10px;color:var(--color-text-secondary);margin-top:10px">Variação do último mês com preço de fechamento.</div>

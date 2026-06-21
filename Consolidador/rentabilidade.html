@@ -71,8 +71,8 @@ function renderRentabilidade(){
   const pior=c.slice().sort((a,b)=>a.rentTotal-b.rentTotal)[0];
   document.getElementById('metrics-rent').innerHTML=`
     <div class="mcard"><div class="mcard-label">Rentabilidade Total (c/ proventos)</div><div class="mcard-value ${t.rentTotal>=0?'positive':'negative'}">${fmtP(t.rentTotal)}</div><div class="mcard-sub">Só capital: ${fmtP(t.resPct)}</div></div>
-    <div class="mcard"><div class="mcard-label">Melhor Ativo</div><div class="mcard-value positive">${melhor?.ticker||'-'}</div><div class="mcard-sub">${fmtP(melhor?.rentTotal||0)}</div></div>
-    <div class="mcard"><div class="mcard-label">Pior Ativo</div><div class="mcard-value negative">${pior?.ticker||'-'}</div><div class="mcard-sub">${fmtP(pior?.rentTotal||0)}</div></div>
+    <div class="mcard"><div class="mcard-label">Melhor Ativo</div><div class="mcard-value positive" style="display:flex;align-items:center;gap:8px">${melhor?logoAtivo(melhor,22):''}<span>${melhor?.ticker||'-'}</span></div><div class="mcard-sub">${fmtP(melhor?.rentTotal||0)}</div></div>
+    <div class="mcard"><div class="mcard-label">Pior Ativo</div><div class="mcard-value negative" style="display:flex;align-items:center;gap:8px">${pior?logoAtivo(pior,22):''}<span>${pior?.ticker||'-'}</span></div><div class="mcard-sub">${fmtP(pior?.rentTotal||0)}</div></div>
   `;
   const bcc={};
   c.forEach(a=>{if(!bcc[a.classe])bcc[a.classe]={vt:0,custo:0,prov:0};bcc[a.classe].vt+=a.vt;bcc[a.classe].custo+=a.custo;bcc[a.classe].prov+=a.proventos;});
@@ -129,7 +129,7 @@ function renderRankingRent(c){
   const linha=(a)=>{
     const pos=a.rentTotal>=0;
     return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
-      <span style="min-width:64px;font-size:12px;font-weight:600">${a.ticker}</span>
+      <span style="min-width:84px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:6px">${logoAtivo(a,16)}${a.ticker}</span>
       <span style="flex:1;height:7px;border-radius:4px;background:rgba(128,128,128,0.12);overflow:hidden"><span style="display:block;height:100%;width:${(Math.abs(a.rentTotal)/maxAbs*100).toFixed(0)}%;background:${pos?'#1D9E75':'#E24B4A'}"></span></span>
       <span class="${pos?'positive':'negative'}" style="font-size:12px;font-weight:600;min-width:64px;text-align:right">${fmtP(a.rentTotal)}</span>
     </div>`;
