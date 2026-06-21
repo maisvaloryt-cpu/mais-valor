@@ -187,10 +187,18 @@ function renderPizza(mode='classe'){
     data:{labels,datasets:[{data:vals,backgroundColor:colors,borderWidth:0,hoverOffset:3}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtR(c.raw)+' ('+((c.raw/total)*100).toFixed(1)+'%)'}}}}
   });
+  const marcador=(i)=>{
+    if(mode!=='ativo') return `<span style="width:9px;height:9px;border-radius:50%;background:${colors[i]};flex-shrink:0"></span>`;
+    const a=c[i];
+    const semLogo=(a.classe==='RF'||a.classe==='TD'||a.classe==='FUNDO'||a.classe==='OUTRO');
+    if(semLogo) return `<span style="width:13px;height:13px;border-radius:50%;background:${colors[i]};flex-shrink:0;display:inline-block"></span>`;
+    const tk=a.classe==='BDR'?a.ticker.replace(/\d+$/,''):a.ticker;
+    return `<span style="display:inline-flex;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 1.5px ${colors[i]}">${typeof logoHtml==='function'?logoHtml(tk,15):''}</span>`;
+  };
   document.getElementById('legendPizza').innerHTML=labels.map((l,i)=>`
     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-      <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)">
-        <span style="width:9px;height:9px;border-radius:50%;background:${colors[i]};flex-shrink:0"></span>${l}
+      <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--color-text-secondary)">
+        ${marcador(i)}${l}
       </span>
       <span style="font-size:11px;font-weight:500;color:var(--color-text-primary)">${total?((vals[i]/total)*100).toFixed(1):0}%</span>
     </div>
