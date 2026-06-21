@@ -80,6 +80,14 @@
 renderHeaderAndNav('lancamentos');
 injectModals();
 
+// Se veio do Resumo com ?ticker=XXX, já preenche a busca por esse ativo.
+(function aplicarFiltroDaURL(){
+  try{
+    const t=new URLSearchParams(location.search).get('ticker');
+    if(t){const inp=document.getElementById('filtro-busca');if(inp)inp.value=t;}
+  }catch(e){}
+})();
+
 function popularAnosLanc(){
   const sel=document.getElementById('filtro-ano');
   if(!sel||sel.options.length>1)return;

@@ -401,6 +401,28 @@ function openRowMenu(ev, idx){
 }
 function closeRowMenu(){ const m=document.getElementById('row-menu'); if(m)m.remove(); }
 
+/* Menu "⋮" para a tela de Resumo, onde cada linha é a POSIÇÃO somada de um
+   ticker (não um lançamento). Editar leva à aba Lançamentos já filtrada nesse
+   ativo (lá o editar individual funciona certo); Remover apaga todos os
+   lançamentos do ativo. */
+function openRowMenuTicker(ev, ticker){
+  ev.stopPropagation();
+  closeRowMenu();
+  const btn=ev.currentTarget;
+  const t=String(ticker).replace(/'/g,"\\'");
+  const m=document.createElement('div');
+  m.id='row-menu';
+  m.className='row-menu';
+  m.innerHTML=`
+    <button type="button" onclick="closeRowMenu();location.href='lancamentos.html?ticker='+encodeURIComponent('${t}')"><i class="ti ti-pencil" aria-hidden="true"></i> Editar transações</button>
+    <button type="button" class="danger" onclick="closeRowMenu();removeAtivo('${t}')"><i class="ti ti-trash" aria-hidden="true"></i> Remover ativo</button>`;
+  document.body.appendChild(m);
+  const r=btn.getBoundingClientRect();
+  m.style.top=(window.scrollY+r.bottom+4)+'px';
+  m.style.left=(window.scrollX+r.right-m.getBoundingClientRect().width)+'px';
+  setTimeout(()=>document.addEventListener('click',closeRowMenu,{once:true}),0);
+}
+
 /* ===== Modal de edição de um lançamento ===== */
 function injectEditModal(){
   if(document.getElementById('modal-edit'))return;
