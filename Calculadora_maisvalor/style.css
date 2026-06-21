@@ -1254,7 +1254,7 @@
             #themeLabel { display: none !important; }
             #modoToggleWrap { margin: 0 !important; padding: 2px !important; gap: 1px !important; height: 26px !important; border-radius: 9px !important; }
             #btnModoSimples, #btnModoCompleto { font-size: 6.5px !important; padding: 2px 5px !important; border-radius: 6px !important; letter-spacing: 0.05em !important; }
-            #vidaRealRow { display: none !important; }
+            body.modo-simples #vidaRealRow { display: none !important; }
 
             /* ── GRID PRINCIPAL: virar coluna, ordem = parâmetros+cards → gráfico → export ── */
             .grid.grid-cols-1.lg\:grid-cols-4 {
@@ -1390,14 +1390,15 @@
             .lg\:col-span-1 > .dark-card .mb-1 { margin-bottom: 1px !important; }
             /* Header do card (Parâmetros + botão reiniciar) */
             .lg\:col-span-1 > .dark-card .border-b.pb-2.mb-4 { padding-bottom: 3px !important; margin-bottom: 4px !important; }
-            /* Seções avançadas (smart-section) ocultas no modo compacto lado-a-lado */
-            .lg\:col-span-1 > .dark-card .smart-section { display: none !important; }
-            /* Divisores e seção avançada ocultos */
-            .lg\:col-span-1 > .dark-card hr { display: none !important; }
-            #divReiniciarAvancado { display: none !important; }
-            /* Sua Idade e Configurações Avançadas: ocultos no mobile calculadora */
-            #idadeSection { display: none !important; }
-            #containerAporteInteligente { display: none !important; }
+            /* Seções avançadas (smart-section): ocultas SÓ no modo Calculadora (simples).
+               No Simulador (modo-completo) elas aparecem no mobile também. */
+            body.modo-simples .lg\:col-span-1 > .dark-card .smart-section { display: none !important; }
+            /* Divisores e seção avançada ocultos só no modo Calculadora */
+            body.modo-simples .lg\:col-span-1 > .dark-card hr { display: none !important; }
+            body.modo-simples #divReiniciarAvancado { display: none !important; }
+            /* Sua Idade e Configurações Avançadas: ocultos só no modo Calculadora */
+            body.modo-simples #idadeSection { display: none !important; }
+            body.modo-simples #containerAporteInteligente { display: none !important; }
             /* Modo Reverso: label+checkbox em row, campo de valor em linha separada abaixo */
             #modoReversoSection {
                 display: flex !important;
