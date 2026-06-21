@@ -37,30 +37,19 @@
 
   <div id="tab-aporte">
     <div class="card" style="margin-bottom:1rem">
-      <div style="font-size:11px;font-weight:600;color:var(--text2,#8A8884);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Quanto vou aportar</div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:15px;color:var(--color-text-secondary)">R$</span>
-        <input id="ap-input" type="number" min="0" step="50" placeholder="0,00" class="cell-edit" style="width:160px;font-size:16px;text-align:right" oninput="apSetAporte(this.value)">
-      </div>
-      <div id="ap-resumo" style="font-size:12px;color:var(--color-text-secondary);margin-top:10px"></div>
-    </div>
-
-    <div class="charts-row">
-      <div class="card">
-        <div class="card-title"><i class="ti ti-rocket" aria-hidden="true" style="color:#1D9E75"></i>E se eu aportar todo mês?</div>
-        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end">
-          <div><div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:3px">Aporte por mês (R$)</div>
-            <input id="sim-aporte" type="number" min="0" step="50" placeholder="0,00" class="cell-edit" style="width:120px;text-align:right" oninput="apSimular()"></div>
-          <div><div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:3px">Por quantos anos</div>
-            <input id="sim-anos" type="number" min="1" max="60" step="1" value="10" class="cell-edit" style="width:80px;text-align:right" oninput="apSimular()"></div>
-          <div><div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:3px">Rendimento (% a.a.)</div>
-            <input id="sim-taxa" type="number" min="0" step="0.5" class="cell-edit" style="width:90px;text-align:right" oninput="apSimular()"></div>
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:18px">
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--text2,#8A8884);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Quanto vou aportar</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:15px;color:var(--color-text-secondary)">R$</span>
+            <input id="ap-input" type="number" min="0" step="50" placeholder="0,00" class="cell-edit" style="width:160px;font-size:16px;text-align:right" oninput="apSetAporte(this.value)">
+          </div>
+          <div id="ap-resumo" style="font-size:12px;color:var(--color-text-secondary);margin-top:10px"></div>
         </div>
-        <div id="sim-resultado" style="margin-top:14px"></div>
-      </div>
-      <div class="card">
-        <div class="card-title"><i class="ti ti-history" aria-hidden="true" style="color:#2E86C1"></i>Seu histórico de aportes</div>
-        <div id="ap-historico"></div>
+        <div style="min-width:260px;max-width:380px">
+          <div class="card-title" style="margin-bottom:8px"><i class="ti ti-history" aria-hidden="true" style="color:#2E86C1"></i>Seu histórico de aportes</div>
+          <div id="ap-historico"></div>
+        </div>
       </div>
     </div>
 
@@ -90,9 +79,6 @@
 
     <div class="section-title" style="margin-top:1.5rem"><i class="ti ti-adjustments" aria-hidden="true"></i>Rebalanceamento por classe</div>
     <div id="ap-rebal"></div>
-
-    <div class="section-title" style="margin-top:1.5rem"><i class="ti ti-target" aria-hidden="true"></i>Alocação ideal vs. atual</div>
-    <div id="ap-aloc"></div>
   </div>
 </div>
 
@@ -354,28 +340,6 @@ function apRenderRebal(){
   <div style="font-size:10px;color:var(--color-text-secondary);margin-top:8px">${aporteAtual>0?'O valor que você vai aportar foi dividido nas classes abaixo da meta.':'Digite quanto vai aportar lá em cima para ver a divisão do dinheiro.'}</div></div>`;
 }
 
-function apRenderAloc(){
-  const el=document.getElementById('ap-aloc'); if(!el)return;
-  const c=calcAtivos(); const total=c.reduce((s,a)=>s+a.vt,0);
-  const bc=byClasse(c); const im=apIdealMap();
-  const cls=AP_CLASSES.filter(k=>(im[k]||0)>0||(bc[k]||0)>0);
-  el.innerHTML=cls.length?cls.map(k=>{
-    const atual=total>0?((bc[k]||0)/total)*100:0; const ideal=im[k]||0;
-    const diff=atual-ideal;
-    const pct=Math.min(100,ideal>0?(atual/ideal)*100:(atual>0?100:0));
-    const cor=diff>2?'#E24B4A':diff<-2?'#BA7517':'#1D9E75';
-    return `<div class="meta-card">
-      <div class="meta-header">
-        <div>
-          <div class="meta-title">${CLASS_LABEL[k]||k}</div>
-          <div class="meta-pcts">Atual: <strong>${fmt(atual)}%</strong> &nbsp;·&nbsp; Ideal: <strong>${ideal}%</strong> &nbsp;·&nbsp; Diferença: <strong style="color:${cor}">${diff>=0?'+':''}${fmt(diff)}%</strong></div>
-        </div>
-        <span style="font-size:12px;color:${cor};font-weight:500">${diff>2?'↑ Acima':diff<-2?'↓ Abaixo':'✓ OK'}</span>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${cor}"></div></div>
-    </div>`;
-  }).join(''):'<div class="empty">Defina suas metas acima.</div>';
-}
 /* ---- Histórico de aportes (a partir das compras lançadas) ---- */
 function apHistorico(){
   const compras=ativos.filter(a=>(a.tipo||'Compra')==='Compra'&&a.data);
@@ -400,44 +364,14 @@ function apRenderHistorico(){
   </div>`;
 }
 
-/* ---- Mini-simulador de juros compostos ---- */
-function apSimular(){
-  const out=document.getElementById('sim-resultado'); if(!out)return;
-  const ap=Math.max(0,parseFloat(document.getElementById('sim-aporte').value)||0);
-  const anos=Math.max(0,parseFloat(document.getElementById('sim-anos').value)||0);
-  const taxa=Math.max(0,parseFloat(document.getElementById('sim-taxa').value)||0);
-  if(ap<=0||anos<=0){ out.innerHTML='<div style="font-size:12px;color:var(--color-text-secondary)">Preencha o aporte e os anos para ver a projeção.</div>'; return; }
-  const r=Math.pow(1+taxa/100,1/12)-1;
-  const n=Math.round(anos*12);
-  let saldo=0;
-  for(let i=0;i<n;i++)saldo=saldo*(1+r)+ap;
-  const investido=ap*n;
-  const juros=saldo-investido;
-  out.innerHTML=`<div style="display:flex;flex-direction:column;gap:9px">
-    <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:12px;color:var(--color-text-secondary)">Você terá em ${anos} anos</span><strong style="font-size:20px;color:#1D9E75">${fmtR(saldo)}</strong></div>
-    <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--color-text-secondary)">Do seu bolso</span><strong>${fmtR(investido)}</strong></div>
-    <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--color-text-secondary)">Juros que o dinheiro fez</span><strong class="positive">${fmtR(juros)}</strong></div>
-  </div>`;
-}
-function apInitSimulador(){
-  const tx=document.getElementById('sim-taxa');
-  if(tx&&!tx.value){ const cdi=parseFloat(BCB?.cdi?.anual)||10; tx.value=cdi.toFixed(1); }
-  const apIn=document.getElementById('sim-aporte');
-  const h=apHistorico();
-  if(apIn&&!apIn.value&&h)apIn.value=Math.round(h.mediaCorrido);
-  apSimular();
-}
-
 function renderAll(){
   apBuildColorMap();
   apRenderEditor();
   apRenderCharts();
   apRenderTabela();
   apRenderResumo();
-  apRenderAloc();
   apRenderRebal();
   apRenderHistorico();
-  apInitSimulador();
   apFirstPaint=false; // a partir daqui, edições não re-animam a entrada
 }
 
