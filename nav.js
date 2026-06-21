@@ -72,6 +72,9 @@ const FERRAMENTA_ICONS = {
   outras: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M14.7 6.3a4 4 0 0 0-5.2 5.2L3 18l3 3 6.5-6.5a4 4 0 0 0 5.2-5.2l-2.4 2.4-2.1-.6-.6-2.1 2.4-2.4z" fill="#e0b84a" fill-opacity="0.13" stroke="#e0b84a" stroke-width="1.4"/></svg>`,
 };
 
+// ── Ícone de carteira (aba "Carteira"), mesmo estilo dourado dos ícones acima ──
+const WALLET_ICON = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M17 8V5a1 1 0 0 0-1-1H6a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V6M20 12v4h-4a2 2 0 0 1 0-4h4" stroke="#e0b84a" stroke-width="5" stroke-opacity="0.22"/><path d="M17 8V5a1 1 0 0 0-1-1H6a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V6M20 12v4h-4a2 2 0 0 1 0-4h4" stroke="#e0b84a" stroke-width="1.5"/></svg>`;
+
 // ── Theme toggle ─────────────────────────────────────────────────
 function getTheme() { return localStorage.getItem('mv_theme') || 'dark'; }
 function applyTheme(t) {
@@ -478,7 +481,7 @@ function renderNav() {
     <a href="${NAV_BASE}ferramentas.html" class="${page==='ferramentas.html'?'active':''}" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.outras} Outras</a>
     <div class="mob-group-label">Conta</div>
     <a href="${NAV_BASE}watchlist.html" class="${watchActive?'active':''}" onclick="toggleMobileMenu()">★ Watchlist</a>
-    <a href="${NAV_BASE}Consolidador/index.html" class="${carteiraActive?'active':''}" onclick="toggleMobileMenu()">📊 Carteira</a>
+    <a href="${NAV_BASE}Consolidador/index.html" class="${carteiraActive?'active':''}" onclick="toggleMobileMenu()">${WALLET_ICON} Carteira</a>
     <a href="${NAV_BASE}status.html" class="${statusActive?'active':''}" onclick="toggleMobileMenu()" style="color:var(--up)">● Status</a>
   </div>
 
@@ -497,7 +500,7 @@ function renderNav() {
         <span id="mv-ativos-btn" style="${dropBtnStyle(ativosActive)}">Ativos ▾</span>
         <span id="mv-ferramentas-btn" style="${dropBtnStyle(ferramentasActive)}">Ferramentas ▾</span>
         <a href="${NAV_BASE}watchlist.html" class="${watchActive?'active':''}">★ Watchlist</a>
-        <a href="${NAV_BASE}Consolidador/index.html" class="${carteiraActive?'active':''}">Carteira</a>
+        <a href="${NAV_BASE}Consolidador/index.html" class="${carteiraActive?'active':''}">${WALLET_ICON} Carteira</a>
         <a href="${NAV_BASE}status.html" class="${statusActive?'active':''}" style="color:var(--up);font-size:11px">● Status</a>
       </div>
       <div class="nav-search-wrap">
