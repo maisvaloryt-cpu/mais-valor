@@ -139,7 +139,7 @@ function renderRankingRent(c){
 }
 
 /* ---- Alfa: carteira vs CDI/IBOV (mesmos aportes simulados) ---- */
-const _benchCacheR={};
+var _benchCacheR=typeof _benchCacheR!=='undefined'?_benchCacheR:{}; // var (não const): a aba recarrega o script ao voltar; mantém o cache
 async function renderAlfa(){
   const el=document.getElementById('metrics-alfa'); if(!el)return;
   for(const idx of ['IBOV','CDI']){ if(!_benchCacheR[idx]){ try{_benchCacheR[idx]=await fetchHistoricoTicker(idx);}catch(e){_benchCacheR[idx]={};} } }

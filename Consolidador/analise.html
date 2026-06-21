@@ -115,7 +115,7 @@ function renderAnalise(){
 }
 
 /* ---- Risco por setor (busca o setor de cada ativo nos fundamentos) ---- */
-const _setorCache={};
+var _setorCache=typeof _setorCache!=='undefined'?_setorCache:{}; // var (não const): a aba recarrega o script ao voltar; mantém o cache
 async function fetchSetor(ticker){
   if(_setorCache[ticker]!==undefined)return _setorCache[ticker];
   try{

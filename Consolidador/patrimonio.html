@@ -184,7 +184,7 @@ function renderRecordes(){
 }
 
 /* ---- Comparação com índices: simula os mesmos aportes no IBOV/CDI/IPCA ---- */
-const _benchCache={};
+var _benchCache=typeof _benchCache!=='undefined'?_benchCache:{}; // var (não const): a aba recarrega o script ao voltar; mantém o cache
 async function carregarBenchmarks(){
   for(const idx of ['IBOV','CDI','IPCA']){
     if(_benchCache[idx])continue;
