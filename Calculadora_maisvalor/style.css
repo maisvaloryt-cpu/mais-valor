@@ -1638,6 +1638,13 @@
                 transform: translateX(-50%) !important;
                 margin-left: 0 !important;
                 width: 160px !important;
+                /* Mobile: fundo sólido e sem blur para o texto ficar legível */
+                background: #18181f !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                color: #e5e7eb !important;
+                border-color: #3a3a48 !important;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.85) !important;
             }
             .tooltip-container:hover .tooltip-box {
                 transform: translateX(-50%) translateY(2px) !important;
