@@ -378,20 +378,22 @@ function renderResumoExtra(){
   // Card carteira vs CDI
   let cardCDI='';
   if(cdi){
-    // Seu lado = patrimônio REAL de hoje. CDI já espelha compras e vendas,
-    // então a diferença mostra só o lucro/prejuízo da sua carteira contra o CDI.
-    const diff=t.total-cdi.saldoCDI;
+    // Seu lado = patrimônio REAL de hoje + proventos que você já recebeu
+    // (dinheiro que suas ações/FIIs geraram). O CDI espelha compras e vendas,
+    // então a diferença mostra o ganho real da carteira contra o CDI.
+    const seuTotal=t.total+(t.proventosTotal||0);
+    const diff=seuTotal-cdi.saldoCDI;
     const ganhou=diff>=0;
     cardCDI=`<div class="card">
       <div class="card-title"><i class="ti ti-scale" aria-hidden="true" style="color:#534AB7"></i>Sua carteira vs Renda Fixa (CDI)</div>
       <div style="display:flex;flex-direction:column;gap:10px">
-        <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--color-text-secondary)">Você tem hoje</span><strong>${fmtR(t.total)}</strong></div>
+        <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--color-text-secondary)">Você tem hoje <span style="font-size:10px">(carteira + proventos)</span></span><strong>${fmtR(seuTotal)}</strong></div>
         <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--color-text-secondary)">Se fosse só CDI</span><strong>${fmtR(cdi.saldoCDI)}</strong></div>
         <div style="display:flex;justify-content:space-between;border-top:1px solid var(--color-border-secondary);padding-top:8px">
           <span style="font-size:12px;color:var(--color-text-secondary)">${ganhou?'Você está ganhando do CDI':'Você está perdendo pro CDI'}</span>
           <strong class="${ganhou?'positive':'negative'}">${ganhou?'+':''}${fmtR(diff)}</strong></div>
       </div>
-      <div style="font-size:10px;color:var(--color-text-secondary);margin-top:8px">Compras e vendas entram e saem do CDI nas mesmas datas — sobra só o lucro/prejuízo. CDI a ${fmt(parseFloat(BCB?.cdi?.anual)||0)}% a.a. (atual).</div>
+      <div style="font-size:10px;color:var(--color-text-secondary);margin-top:8px">Você = patrimônio hoje + proventos recebidos (R$ ${fmt(t.proventosTotal||0)}). CDI espelha compra/venda; sobra só o lucro/prejuízo. CDI a ${fmt(parseFloat(BCB?.cdi?.anual)||0)}% a.a.</div>
     </div>`;
   }
   el.style.display='grid';
