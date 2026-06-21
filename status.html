@@ -379,8 +379,8 @@ async function loadStatus() {
     document.getElementById('bcb-detail').innerHTML = bcb ? `
       <div class="detail-row"><span>Última atualização</span><span style="font-size:12px;color:var(--gold);font-family:'DM Mono',monospace">${bcb.updated_at||'—'}</span></div>
       <div class="detail-row"><span>CDI anual</span><span class="badge badge-ok">${bcb.cdi?.anual||'—'}% a.a.</span></div>
-      <div class="detail-row"><span>Selic</span><span class="badge badge-ok">${bcb.selic?.diario||'—'}% a.a.</span></div>
-      <div class="detail-row"><span>IPCA</span><span class="badge badge-ok">${bcb.ipca?.anual||bcb.ipca?.valor||'—'}${bcb.ipca?'%':''}</span></div>
+      <div class="detail-row"><span>Selic</span><span class="badge badge-ok">${bcb.selic?.anual||'—'}% a.a.</span></div>
+      <div class="detail-row"><span>IPCA</span><span class="badge badge-ok">${bcb.ipca?.acumulado_12m||bcb.ipca?.anual||bcb.ipca?.valor||'—'}${bcb.ipca?'%':''}</span></div>
       <div class="detail-row"><span>Poupança</span><span class="badge badge-ok">${bcb.poupanca?.anual||bcb.poupanca?.valor||'—'}${bcb.poupanca?'% a.a.':''}</span></div>
     ` : `<div class="detail-row"><span style="color:var(--dn)">❌ Arquivo não encontrado</span></div>`;
 

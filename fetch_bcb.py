@@ -54,8 +54,10 @@ def main():
     print(f"  SELIC atual: {selic_atual}% ao dia")
 
     print("Buscando IPCA mensal (433)...")
-    ipca_hist = fetch_serie(433, 24)  # IPCA mensal 2 anos
-    ipca_12m = sum(d["value"] for d in ipca_hist[-12:]) if len(ipca_hist) >= 12 else None
+    ipca_hist = fetch_serie(433, 24)  # IPCA mensal 2 anos (usado no histórico/gráfico)
+    ipca_12m = fetch_ultimo(13522)    # IPCA acumulado 12 meses, pronto (série 13522)
+    if ipca_12m is None and len(ipca_hist) >= 12:  # reserva: soma os 12 meses da série 433
+        ipca_12m = sum(d["value"] for d in ipca_hist[-12:])
     print(f"  IPCA 12m: {ipca_12m:.2f}%" if ipca_12m else "  IPCA: sem dados")
 
     print("Buscando Poupança (195)...")
