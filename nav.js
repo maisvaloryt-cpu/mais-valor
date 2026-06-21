@@ -50,6 +50,19 @@ const NAV_LINKS = [
   { href: 'status.html',       label: '● Status' },
 ];
 
+// ── Ícones SVG dourados do dropdown Ativos (mesmo estilo do Simulador Backtest) ──
+const ATIVO_ICONS = {
+  acoes: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" stroke="#e0b84a" stroke-width="5" stroke-opacity="0.22"/><polyline points="16 7 22 7 22 13" stroke="#e0b84a" stroke-width="5" stroke-opacity="0.22"/><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" stroke="#e0b84a" stroke-width="1.5"/><polyline points="16 7 22 7 22 13" stroke="#e0b84a" stroke-width="1.5"/></svg>`,
+  fiis: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M3 21h18M5 21V9l7-6 7 6v12M9 21v-6h6v6" stroke="#e0b84a" stroke-width="5" stroke-opacity="0.22"/><path d="M3 21h18M5 21V9l7-6 7 6v12M9 21v-6h6v6" stroke="#e0b84a" stroke-width="1.5"/></svg>`,
+  dividendos: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><circle cx="12" cy="12" r="9" stroke="#e0b84a" stroke-width="5" stroke-opacity="0.22"/><circle cx="12" cy="12" r="9" fill="#e0b84a" fill-opacity="0.12" stroke="#e0b84a" stroke-width="1.5"/><path d="M12 7v10M9.6 9.2c0-1.1 1.1-1.7 2.4-1.7s2.5.7 2.5 1.8c0 2.3-4.9 1.3-4.9 3.5 0 1.1 1.1 1.8 2.4 1.8s2.5-.6 2.5-1.7" stroke="#e0b84a" stroke-width="1.3"/></svg>`,
+  criptos: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M11.767 19.089c4.924.868 6.14-6.025 1.216-6.894M10.551 19.089L5.86 18.047m5.908 1.042-.347 1.97m1.563-8.864c4.924.869 6.14-6.025 1.215-6.893m-1.215 6.893-3.94-.694m5.155-6.2L8.29 5.26m5.908 1.042.348-1.97M7.48 20.364l3.126-17.727" stroke="#e0b84a" stroke-width="5" stroke-opacity="0.22"/><path d="M11.767 19.089c4.924.868 6.14-6.025 1.216-6.894M10.551 19.089L5.86 18.047m5.908 1.042-.347 1.97m1.563-8.864c4.924.869 6.14-6.025 1.215-6.893m-1.215 6.893-3.94-.694m5.155-6.2L8.29 5.26m5.908 1.042.348-1.97M7.48 20.364l3.126-17.727" stroke="#e0b84a" stroke-width="1.5"/></svg>`,
+  bdrs: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><circle cx="12" cy="12" r="10" fill="#e0b84a" fill-opacity="0.12" stroke="#e0b84a" stroke-width="1.5"/><line x1="2" y1="12" x2="22" y2="12" stroke="#e0b84a" stroke-width="1" stroke-opacity="0.75"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke="#e0b84a" stroke-width="1" stroke-opacity="0.75"/></svg>`,
+  etfs: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" fill="#e0b84a" fill-opacity="0.15" stroke="#e0b84a" stroke-width="1.4" stroke-linejoin="round"/><line x1="3" y1="6" x2="21" y2="6" stroke="#e0b84a" stroke-width="1.4"/><path d="M16 10a4 4 0 0 1-8 0" stroke="#e0b84a" stroke-width="1.4"/></svg>`,
+  reits: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M3 21h18M5 21V9l7-6 7 6v12M9 21v-6h6v6" stroke="#e0b84a" stroke-width="5" stroke-opacity="0.22"/><path d="M3 21h18M5 21V9l7-6 7 6v12M9 21v-6h6v6" stroke="#e0b84a" stroke-width="1.5"/></svg>`,
+  stocks: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><circle cx="12" cy="12" r="10" fill="#e0b84a" fill-opacity="0.12" stroke="#e0b84a" stroke-width="1.5"/><line x1="2" y1="12" x2="22" y2="12" stroke="#e0b84a" stroke-width="1" stroke-opacity="0.75"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke="#e0b84a" stroke-width="1" stroke-opacity="0.75"/></svg>`,
+  rankings: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z" stroke="#e0b84a" stroke-width="5" stroke-opacity="0.22"/><path d="M7 4h10v4a5 5 0 0 1-10 0V4z" fill="#e0b84a" fill-opacity="0.15" stroke="#e0b84a" stroke-width="1.5"/><path d="M7 5H4.5v1.5A3 3 0 0 0 7 9.5M17 5h2.5v1.5A3 3 0 0 1 17 9.5M9.5 21h5M12 13.5V21" stroke="#e0b84a" stroke-width="1.4"/></svg>`,
+};
+
 // ── Theme toggle ─────────────────────────────────────────────────
 function getTheme() { return localStorage.getItem('mv_theme') || 'dark'; }
 function applyTheme(t) {
@@ -438,16 +451,16 @@ function renderNav() {
     <a href="${NAV_BASE}index.html" class="${homeActive?'active':''}" onclick="toggleMobileMenu()">🏠 Home</a>
     <div class="mob-group-label">Ativos</div>
     <div class="mob-group-sub">Nacional</div>
-    <a href="${NAV_BASE}acoes.html" class="${page==='acoes.html'?'active':''}" onclick="toggleMobileMenu()">📈 Ações</a>
-    <a href="${NAV_BASE}fiis.html" class="${page==='fiis.html'?'active':''}" onclick="toggleMobileMenu()">🏢 FIIs</a>
-    <a href="${NAV_BASE}dividendos.html" class="${page==='dividendos.html'?'active':''}" onclick="toggleMobileMenu()">💰 Dividendos</a>
-    <a href="${NAV_BASE}criptos.html" class="${page==='criptos.html'?'active':''}" onclick="toggleMobileMenu()">₿ Criptos</a>
+    <a href="${NAV_BASE}acoes.html" class="${page==='acoes.html'?'active':''}" onclick="toggleMobileMenu()">${ATIVO_ICONS.acoes} Ações</a>
+    <a href="${NAV_BASE}fiis.html" class="${page==='fiis.html'?'active':''}" onclick="toggleMobileMenu()">${ATIVO_ICONS.fiis} FIIs</a>
+    <a href="${NAV_BASE}dividendos.html" class="${page==='dividendos.html'?'active':''}" onclick="toggleMobileMenu()">${ATIVO_ICONS.dividendos} Dividendos</a>
+    <a href="${NAV_BASE}criptos.html" class="${page==='criptos.html'?'active':''}" onclick="toggleMobileMenu()">${ATIVO_ICONS.criptos} Criptos</a>
     <div class="mob-group-sub">Exterior</div>
-    <a href="${NAV_BASE}bdrs.html" class="${page==='bdrs.html'?'active':''}" onclick="toggleMobileMenu()">🇧🇷 BDRs</a>
-    <a href="${NAV_BASE}etfs.html" class="${page==='etfs.html'?'active':''}" onclick="toggleMobileMenu()">📊 ETFs</a>
-    <a href="${NAV_BASE}reits.html" class="${page==='reits.html'?'active':''}" onclick="toggleMobileMenu()">🏢 REITs</a>
-    <a href="${NAV_BASE}stocks.html" class="${page==='stocks.html'?'active':''}" onclick="toggleMobileMenu()">🇺🇸 Stocks</a>
-    <a href="${NAV_BASE}rankings.html" class="${page==='rankings.html'?'active':''}" onclick="toggleMobileMenu()">🏆 Rankings</a>
+    <a href="${NAV_BASE}bdrs.html" class="${page==='bdrs.html'?'active':''}" onclick="toggleMobileMenu()">${ATIVO_ICONS.bdrs} BDRs</a>
+    <a href="${NAV_BASE}etfs.html" class="${page==='etfs.html'?'active':''}" onclick="toggleMobileMenu()">${ATIVO_ICONS.etfs} ETFs</a>
+    <a href="${NAV_BASE}reits.html" class="${page==='reits.html'?'active':''}" onclick="toggleMobileMenu()">${ATIVO_ICONS.reits} REITs</a>
+    <a href="${NAV_BASE}stocks.html" class="${page==='stocks.html'?'active':''}" onclick="toggleMobileMenu()">${ATIVO_ICONS.stocks} Stocks</a>
+    <a href="${NAV_BASE}rankings.html" class="${page==='rankings.html'?'active':''}" onclick="toggleMobileMenu()">${ATIVO_ICONS.rankings} Rankings</a>
     <div class="mob-group-label">Ferramentas</div>
     <a href="${NAV_BASE}simulador.html" class="${page==='simulador.html'?'active':''}" onclick="toggleMobileMenu()">🧮 Simulador</a>
     <a href="${NAV_BASE}Calculadora_maisvalor/index.html" onclick="toggleMobileMenu()">✦ Calculadora</a>
@@ -568,18 +581,18 @@ function renderNav() {
   ativosDrop.className = 'mv-floatdrop';
   ativosDrop.innerHTML = `
     <div class="mv-drop-label">Nacional</div>
-    <a href="${NAV_BASE}acoes.html" class="${page==='acoes.html'?'active':''}">📈 Ações</a>
-    <a href="${NAV_BASE}fiis.html" class="${page==='fiis.html'?'active':''}">🏢 FIIs</a>
-    <a href="${NAV_BASE}dividendos.html" class="${page==='dividendos.html'?'active':''}">💰 Dividendos</a>
-    <a href="${NAV_BASE}criptos.html" class="${page==='criptos.html'?'active':''}">₿ Criptos</a>
+    <a href="${NAV_BASE}acoes.html" class="${page==='acoes.html'?'active':''}">${ATIVO_ICONS.acoes} Ações</a>
+    <a href="${NAV_BASE}fiis.html" class="${page==='fiis.html'?'active':''}">${ATIVO_ICONS.fiis} FIIs</a>
+    <a href="${NAV_BASE}dividendos.html" class="${page==='dividendos.html'?'active':''}">${ATIVO_ICONS.dividendos} Dividendos</a>
+    <a href="${NAV_BASE}criptos.html" class="${page==='criptos.html'?'active':''}">${ATIVO_ICONS.criptos} Criptos</a>
     <div class="mv-drop-div"></div>
     <div class="mv-drop-label">Exterior</div>
-    <a href="${NAV_BASE}bdrs.html" class="${page==='bdrs.html'?'active':''}">🇧🇷 BDRs</a>
-    <a href="${NAV_BASE}etfs.html" class="${page==='etfs.html'?'active':''}">📊 ETFs</a>
-    <a href="${NAV_BASE}reits.html" class="${page==='reits.html'?'active':''}">🏢 REITs</a>
-    <a href="${NAV_BASE}stocks.html" class="${page==='stocks.html'?'active':''}">🇺🇸 Stocks</a>
+    <a href="${NAV_BASE}bdrs.html" class="${page==='bdrs.html'?'active':''}">${ATIVO_ICONS.bdrs} BDRs</a>
+    <a href="${NAV_BASE}etfs.html" class="${page==='etfs.html'?'active':''}">${ATIVO_ICONS.etfs} ETFs</a>
+    <a href="${NAV_BASE}reits.html" class="${page==='reits.html'?'active':''}">${ATIVO_ICONS.reits} REITs</a>
+    <a href="${NAV_BASE}stocks.html" class="${page==='stocks.html'?'active':''}">${ATIVO_ICONS.stocks} Stocks</a>
     <div class="mv-drop-div"></div>
-    <a href="${NAV_BASE}rankings.html" class="${page==='rankings.html'?'active':''}">🏆 Rankings</a>`;
+    <a href="${NAV_BASE}rankings.html" class="${page==='rankings.html'?'active':''}">${ATIVO_ICONS.rankings} Rankings</a>`;
   document.body.appendChild(ativosDrop);
 
   // ── Dropdown: Ferramentas ────────────────────────────────────────
