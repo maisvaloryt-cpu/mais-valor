@@ -1310,7 +1310,8 @@ function _rfTaxaLabel(rf){
   if(rf.indexador==='Prefixado')return n+'%';
   return t?n+'%':'';
 }
-function rotuloAtivo(a){
+/* Texto do ativo (sem logo) */
+function _rotuloAtivoTexto(a){
   if(a.classe==='TD')return a.ticker; // Tesouro: o ticker já é o nome ("Tesouro IPCA+ 2029")
   if(a.classe==='RF'){
     const em=_rfEmissorCurto((a.rf&&a.rf.emissor)||a.nome||'');
@@ -1321,6 +1322,21 @@ function rotuloAtivo(a){
     }
   }
   return a.ticker;
+}
+/* Logo da empresa + nome (usado nas tabelas de ativos). RF/Tesouro/Fundos/Outros
+   não têm logo de empresa → mostra um pontinho na cor da classe. */
+function rotuloAtivo(a){
+  const nome=_rotuloAtivoTexto(a);
+  const semLogo=(a.classe==='RF'||a.classe==='TD'||a.classe==='FUNDO'||a.classe==='OUTRO');
+  const cor=(typeof CLASS_COLORS!=='undefined'&&CLASS_COLORS[a.classe])||'#888';
+  let icone;
+  if(semLogo){
+    icone=`<span style="width:16px;height:16px;border-radius:50%;background:${cor};flex-shrink:0;display:inline-block"></span>`;
+  }else{
+    const tk=a.classe==='BDR'?a.ticker.replace(/\d+$/,''):a.ticker; // BDR: logo sem o número final (igual ao site)
+    icone=(typeof logoHtml==='function')?logoHtml(tk,22):'';
+  }
+  return `<span style="display:inline-flex;align-items:center;gap:8px">${icone}<span>${nome}</span></span>`;
 }
 function _pendenciasRF(){
   return (typeof ativos!=='undefined'&&ativos?ativos:[]).filter(a=>RF_CLASSES.has(a.classe)&&a.tipo==='Compra'&&rfFaltaDados(a));
