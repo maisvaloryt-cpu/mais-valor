@@ -617,31 +617,33 @@ function renderNav() {
     <a href="${NAV_BASE}ferramentas.html" class="${page==='ferramentas.html'?'active':''}">${FERRAMENTA_ICONS.outras} Outras ferramentas</a>`;
   document.body.appendChild(ferramentasDrop);
 
-  // ── Lógica genérica de hover para os dropdowns ───────────────────
-  function setupDropHover(btnId, dropEl) {
-    let timer;
-    const show = () => {
-      clearTimeout(timer);
+  // ── Dropdowns por CLIQUE (abre/fecha ao clicar; sem depender de hover) ───
+  function setupDropClick(btnId, dropEl) {
+    const posicionar = () => {
       const btn = document.getElementById(btnId);
       if (!btn) return;
       const r = btn.getBoundingClientRect();
-      dropEl.style.display = 'block';
       dropEl.style.top  = (r.bottom + 6) + 'px';
       dropEl.style.left = r.left + 'px';
     };
-    const hide = () => { timer = setTimeout(() => { dropEl.style.display = 'none'; }, 120); };
-    document.addEventListener('mouseover', (e) => {
-      if (e.target.closest('#' + btnId)) show();
-      else if (e.target.closest('#' + dropEl.id)) clearTimeout(timer);
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('#' + btnId)) {
+        e.stopPropagation();
+        const estavaAberto = dropEl.style.display === 'block';
+        // fecha qualquer dropdown aberto antes de abrir este
+        document.querySelectorAll('.mv-floatdrop').forEach(d => d.style.display = 'none');
+        if (!estavaAberto) { posicionar(); dropEl.style.display = 'block'; }
+      } else if (!e.target.closest('#' + dropEl.id)) {
+        dropEl.style.display = 'none'; // clicou fora -> fecha
+      }
     });
-    document.addEventListener('mouseout', (e) => {
-      const to = e.relatedTarget;
-      if (!to || (!to.closest('#' + btnId) && !to.closest('#' + dropEl.id))) hide();
+    window.addEventListener('resize', () => {
+      if (dropEl.style.display === 'block') posicionar();
     });
   }
 
-  setupDropHover('mv-ativos-btn',      ativosDrop);
-  setupDropHover('mv-ferramentas-btn', ferramentasDrop);
+  setupDropClick('mv-ativos-btn',      ativosDrop);
+  setupDropClick('mv-ferramentas-btn', ferramentasDrop);
 
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.nav-search-wrap')) {
