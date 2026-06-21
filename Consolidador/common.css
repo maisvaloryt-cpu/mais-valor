@@ -54,7 +54,7 @@ body { padding: 0 0 2rem; }
   align-items: center;
   gap: 8px;
 }
-.header-actions { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+.header-actions { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; flex: 1 1 100%; }
 
 /* ── Seletor de Carteira ── */
 .carteira-switcher {
