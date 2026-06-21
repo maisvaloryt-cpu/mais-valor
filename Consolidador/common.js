@@ -380,6 +380,96 @@ function removeAtivoIdx(idx){
   toast('Lançamento removido.');
 }
 
+/* ===== Menu "⋮" por linha: abre Editar / Remover transação ===== */
+function openRowMenu(ev, idx){
+  ev.stopPropagation();
+  closeRowMenu();
+  const btn=ev.currentTarget;
+  const m=document.createElement('div');
+  m.id='row-menu';
+  m.className='row-menu';
+  m.innerHTML=`
+    <button type="button" onclick="closeRowMenu();editAtivoIdx(${idx})"><i class="ti ti-pencil" aria-hidden="true"></i> Editar transação</button>
+    <button type="button" class="danger" onclick="closeRowMenu();removeAtivoIdx(${idx})"><i class="ti ti-trash" aria-hidden="true"></i> Remover transação</button>`;
+  document.body.appendChild(m);
+  const r=btn.getBoundingClientRect();
+  // alinha o menu pela direita do botão, logo abaixo dele
+  m.style.top=(window.scrollY+r.bottom+4)+'px';
+  m.style.left=(window.scrollX+r.right-m.getBoundingClientRect().width)+'px';
+  // fecha ao clicar em qualquer lugar fora (no próximo clique)
+  setTimeout(()=>document.addEventListener('click',closeRowMenu,{once:true}),0);
+}
+function closeRowMenu(){ const m=document.getElementById('row-menu'); if(m)m.remove(); }
+
+/* ===== Modal de edição de um lançamento ===== */
+function injectEditModal(){
+  if(document.getElementById('modal-edit'))return;
+  const w=document.createElement('div');
+  w.innerHTML=`
+<div class="modal-bg" id="modal-edit" style="display:none" onclick="if(event.target===this)closeEditModal()">
+  <div class="modal" style="width:min(440px,96vw)">
+    <h2><i class="ti ti-pencil" aria-hidden="true" style="margin-right:6px"></i>Editar Lançamento</h2>
+    <input type="hidden" id="e-idx">
+    <div class="modal-grid">
+      <div class="form-group"><label>Ativo</label><input id="e-ticker" type="text" readonly></div>
+      <div class="form-group"><label>Tipo</label><select id="e-tipo"><option value="Compra">Compra</option><option value="Venda">Venda</option></select></div>
+      <div class="form-group"><label>Data</label><input id="e-data" type="date"></div>
+      <div class="form-group"><label>Quantidade</label><input id="e-qtd" type="number" step="0.0001" min="0" oninput="atualizarTotalEdit()"></div>
+      <div class="form-group"><label>Preço em R$</label><input id="e-pm" type="number" step="0.0001" min="0" oninput="atualizarTotalEdit()"></div>
+      <div class="form-group"><label>Total da operação</label><input id="e-total" type="text" readonly></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeEditModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEdicaoAtivo()"><i class="ti ti-check" aria-hidden="true"></i> Salvar</button>
+    </div>
+  </div>
+</div>`;
+  document.body.appendChild(w);
+}
+function atualizarTotalEdit(){
+  const q=parseFloat(document.getElementById('e-qtd').value)||0;
+  const p=parseFloat(document.getElementById('e-pm').value)||0;
+  document.getElementById('e-total').value=fmtR(q*p);
+}
+function editAtivoIdx(idx){
+  const a=ativos[idx];
+  if(!a){toast('Lançamento não encontrado.');return;}
+  injectEditModal();
+  document.getElementById('e-idx').value=idx;
+  document.getElementById('e-ticker').value=a.ticker||'';
+  document.getElementById('e-data').value=a.data||'';
+  document.getElementById('e-qtd').value=a.qtd;
+  document.getElementById('e-pm').value=a.pm;
+  const tsel=document.getElementById('e-tipo');
+  if(tsel)tsel.value=(a.tipo==='Venda')?'Venda':'Compra';
+  atualizarTotalEdit();
+  document.getElementById('modal-edit').style.display='flex';
+}
+function closeEditModal(){ const m=document.getElementById('modal-edit'); if(m)m.style.display='none'; }
+function salvarEdicaoAtivo(){
+  const idx=parseInt(document.getElementById('e-idx').value);
+  const a=ativos[idx];
+  if(!a){toast('Lançamento não encontrado.');return;}
+  const q=parseFloat(document.getElementById('e-qtd').value);
+  const p=parseFloat(document.getElementById('e-pm').value);
+  if(!isFinite(q)||q<0){toast('Quantidade inválida.');return;}
+  if(!isFinite(p)||p<0){toast('Preço inválido.');return;}
+  // se a cotação ainda era igual ao preço antigo (import), acompanha o novo preço;
+  // se já vier de cotação de mercado, não mexe — atualizarCotacoes() cuida disso.
+  if(a.cotacao==null || a.cotacao===a.pm) a.cotacao=p;
+  a.qtd=q;
+  a.pm=p;
+  a.data=document.getElementById('e-data').value||a.data;
+  if(a.tipo!=='Provento'){
+    const tsel=document.getElementById('e-tipo');
+    if(tsel)a.tipo=tsel.value;
+  }
+  saveAtivos();
+  closeEditModal();
+  if(typeof renderAll==='function')renderAll();
+  toast('Lançamento atualizado.');
+}
+
 /* -- init assíncrono: carrega cotações + dividendos + histórico e re-renderiza.
    Não é mais chamado direto no window 'load' — só roda depois que o login
    resolver e os dados da carteira vierem da nuvem (veja mvGate() mais abaixo). */

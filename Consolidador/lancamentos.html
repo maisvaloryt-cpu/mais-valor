@@ -126,7 +126,7 @@ function renderLancamentos(){
       <td class="r">${a.qtd.toLocaleString('pt-BR')}</td>
       <td class="r">${fmtR(a.pm)}</td>
       <td class="r">${fmtR(a.qtd*a.pm)}</td>
-      <td><button class="btn btn-sm" title="Remover lançamento" onclick="removeAtivoIdx(${a._idx})"><i class="ti ti-trash" aria-hidden="true"></i></button></td>
+      <td><button class="btn btn-sm" title="Opções" onclick="openRowMenu(event,${a._idx})"><i class="ti ti-dots-vertical" aria-hidden="true"></i></button></td>
     </tr>
   `).join(''):'<tr><td colspan="8" style="text-align:center;padding:1.5rem;color:var(--color-text-secondary);font-size:12px">Nenhum lançamento encontrado.</td></tr>';
 
@@ -143,7 +143,7 @@ function renderLancamentos(){
         <td class="r">${a.qtd.toLocaleString('pt-BR')}</td>
         <td class="r">${fmtR(a.pm)}</td>
         <td class="r positive">${fmtR(a.qtd*a.pm)}</td>
-        <td><button class="btn btn-sm" title="Remover provento" onclick="removeAtivoIdx(${a._idx})"><i class="ti ti-trash" aria-hidden="true"></i></button></td>
+        <td><button class="btn btn-sm" title="Opções" onclick="openRowMenu(event,${a._idx})"><i class="ti ti-dots-vertical" aria-hidden="true"></i></button></td>
       </tr>
     `).join('');
   }else{

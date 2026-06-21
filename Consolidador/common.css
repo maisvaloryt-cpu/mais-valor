@@ -115,6 +115,12 @@ body { padding: 0 0 2rem; }
 }
 .btn-sm { padding: 3px 9px; font-size: 11px; }
 
+/* Menu "⋮" por linha (Editar / Remover transação) */
+.row-menu{position:absolute;z-index:9999;background:var(--bg3,#141418);border:1px solid var(--border3,rgba(255,255,255,0.12));border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.45);padding:4px;min-width:180px;display:flex;flex-direction:column;gap:2px}
+.row-menu button{display:flex;align-items:center;gap:8px;background:none;border:none;color:var(--color-text-primary,#ECEAE4);font-size:13px;padding:9px 11px;border-radius:6px;cursor:pointer;text-align:left;width:100%}
+.row-menu button:hover{background:rgba(255,255,255,.07)}
+.row-menu button.danger{color:#ff6b6b}
+
 /* ── Abas internas do Consolidador ── */
 .tabs {
   display: flex;
