@@ -1,5 +1,5 @@
 {
-  "gerado_em": "19/06/2026 22:21",
+  "gerado_em": "21/06/2026 17:47",
   "historico_mensal": {
     "total": 1370,
     "ok": 1350,
@@ -95,26 +95,27 @@
       {
         "ticker": "BRIM11",
         "ultimo": "2026-06-11",
-        "dias_atras": 8
+        "dias_atras": 10
       },
       {
         "ticker": "HGPO11",
         "ultimo": "2026-06-08",
-        "dias_atras": 11
+        "dias_atras": 13
       },
       {
         "ticker": "SPG211",
         "ultimo": "2026-06-10",
-        "dias_atras": 9
+        "dias_atras": 11
       }
     ]
   },
   "cotacoes": {
-    "atualizado_em": "19/06/2026 21:56",
+    "atualizado_em": "21/06/2026 17:21",
     "total_acoes": 459,
     "total_fiis": 486,
-    "fallbacks": 3,
+    "fallbacks": 4,
     "tickers_fallback": [
+      "BREV11",
       "BRIM11",
       "HGPO11",
       "SPG211"
@@ -127,12 +128,12 @@
     "atualizado_fiis": "19/06/2026 21:56"
   },
   "criptos": {
-    "atualizado_em": "19/06/2026 21:54 UTC",
+    "atualizado_em": "21/06/2026 12:31 UTC",
     "total_moedas": 100,
     "com_dados": 100,
     "sem_dados": 0,
     "tickers_sem_dados": [],
-    "historico_ok": 106,
+    "historico_ok": 107,
     "historico_falhou": 0,
     "historico_falhou_lista": []
   },
