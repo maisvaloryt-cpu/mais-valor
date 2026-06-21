@@ -26,6 +26,8 @@ def main():
     limite = hoje + datetime.timedelta(days=DIAS_FUTUROS)
 
     proximos = []
+    total_ativos = 0       # quantos tickers têm histórico guardado
+    total_registros = 0    # quantos pagamentos no banco inteiro
 
     for fname in sorted(os.listdir(pasta)):
         if not fname.endswith(".json"):
@@ -35,6 +37,9 @@ def main():
             with open(f"{pasta}/{fname}") as f:
                 data = json.load(f)
             divs = data.get("dividendos", [])
+            if divs:
+                total_ativos += 1
+                total_registros += len(divs)
             preco = nomes.get(ticker, {}).get("p", 0)
             nome  = nomes.get(ticker, {}).get("n", ticker)
 
@@ -76,7 +81,9 @@ def main():
     now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-3)))
     output = {
         "updated_at": now.strftime("%d/%m/%Y %H:%M"),
-        "total": len(proximos),
+        "total": len(proximos),          # pagamentos previstos nos próximos 90 dias
+        "total_registros": total_registros,  # tamanho real do banco (histórico completo)
+        "total_ativos": total_ativos,        # quantos ativos têm histórico guardado
         "dividendos": proximos,
     }
 
