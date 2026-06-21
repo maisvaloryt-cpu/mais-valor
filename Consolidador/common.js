@@ -384,9 +384,73 @@ function removeAtivoIdx(idx){
    Não é mais chamado direto no window 'load' — só roda depois que o login
    resolver e os dados da carteira vierem da nuvem (veja mvGate() mais abaixo). */
 async function initConsolidador(){
+  mvInitSortableTables();
   await Promise.all([atualizarCotacoes(),loadAllDividendos(),loadAllHistorico()]);
   if(typeof renderAll==='function')renderAll();
   if(typeof atualizarBadgeRF==='function')atualizarBadgeRF();
+}
+
+/* ===================== ORDENAR TABELAS POR CLIQUE NO CABEÇALHO =====================
+   Vale para toda tabela .tbl. Listener delegado (uma vez só) — funciona mesmo após
+   as tabelas serem redesenhadas. Detecta número (R$/%/qtd) x texto automaticamente. */
+var _mvSortReady=false;
+function mvInitSortableTables(){
+  if(_mvSortReady)return; _mvSortReady=true;
+  document.addEventListener('click',e=>{
+    const th=e.target.closest?e.target.closest('table.tbl thead th'):null;
+    if(!th)return;
+    const headRow=th.parentElement;
+    const col=[...headRow.children].indexOf(th);
+    const table=th.closest('table');
+    const tbody=table&&table.querySelector('tbody');
+    if(col<0||!tbody)return;
+    mvSortTable(table,tbody,th,col);
+  });
+}
+/* Tira R$, %, separador de milhar, ▲▼ etc. e devolve só o texto "numérico" */
+function _mvCleanNum(s){
+  return String(s==null?'':s).replace(/\s/g,'').replace(/[R$%▲▼+]/g,'')
+    .replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.'); // milhar '.' fora, decimal ',' -> '.'
+}
+/* É um número "puro" (sem letras)? Ex.: "R$ 1.603,37"=sim, "TAEE11"=não */
+function _mvIsNum(s){ return /^-?\d+(\.\d+)?$/.test(_mvCleanNum(s)); }
+function _mvParseNum(s){ const t=_mvCleanNum(s); const m=t.match(/-?\d+(\.\d+)?/); return m?parseFloat(m[0]):null; }
+function mvSortTable(table,tbody,th,col){
+  const rows=[...tbody.querySelectorAll(':scope > tr')];
+  const cellOf=tr=>[...tr.children].filter(c=>c.tagName==='TD')[col];
+  const isData=tr=>{
+    const tds=[...tr.children].filter(c=>c.tagName==='TD');
+    if(tds.length<=col)return false;
+    if(tds.some(td=>td.hasAttribute('colspan')))return false; // pula linhas "Adicione X", "Troco", etc.
+    return true;
+  };
+  const data=rows.filter(isData);
+  const rest=rows.filter(r=>!isData(r)); // linhas especiais ficam no fim, na ordem original
+  if(data.length<2)return;
+  const valOf=tr=>{const td=cellOf(tr);return td?td.textContent.trim():'';};
+  const naoVazios=data.map(valOf).filter(v=>v&&v!=='—'&&v!=='-');
+  const numeric=naoVazios.length>0 && naoVazios.every(_mvIsNum);
+  // direção: alterna se for a mesma coluna; senão 1º clique inteligente (número=desc, texto=asc)
+  let dir;
+  if(table.__sortCol===col){ dir=table.__sortDir==='asc'?'desc':'asc'; }
+  else { dir=numeric?'desc':'asc'; }
+  table.__sortCol=col; table.__sortDir=dir;
+  const cmp=(a,b)=>{
+    const va=valOf(a), vb=valOf(b);
+    const ea=(!va||va==='—'||va==='-'), eb=(!vb||vb==='—'||vb==='-');
+    if(ea&&eb)return 0; if(ea)return 1; if(eb)return -1; // vazios sempre no fim
+    if(numeric){ const na=_mvParseNum(va),nb=_mvParseNum(vb); return dir==='asc'?na-nb:nb-na; }
+    return dir==='asc'?va.localeCompare(vb,'pt',{numeric:true}):vb.localeCompare(va,'pt',{numeric:true});
+  };
+  data.sort(cmp);
+  data.forEach(tr=>tbody.appendChild(tr));
+  rest.forEach(tr=>tbody.appendChild(tr));
+  // seta indicadora no cabeçalho
+  [...th.parentElement.children].forEach(h=>{const a=h.querySelector(':scope > .sort-arrow');if(a)a.remove();});
+  const ar=document.createElement('span');
+  ar.className='sort-arrow';
+  ar.textContent=dir==='asc'?'▲':'▼';
+  th.appendChild(ar);
 }
 
 /* ===================== GATE DE LOGIN (a carteira só aparece depois de logar) =====================

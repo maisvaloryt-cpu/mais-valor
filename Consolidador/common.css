@@ -280,6 +280,10 @@ body { padding: 0 0 2rem; }
   letter-spacing: .04em;
 }
 .tbl th.r, .tbl td.r { text-align: right; }
+/* Cabeçalho clicável para ordenar */
+.tbl thead th { cursor: pointer; user-select: none; }
+.tbl thead th:hover { color: var(--text, #ECEAE4); }
+.tbl thead th .sort-arrow { font-size: 9px; opacity: .8; margin-left: 3px; }
 .tbl td {
   padding: 10px 12px;
   border-bottom: 1px solid var(--border, rgba(255,255,255,0.04));
