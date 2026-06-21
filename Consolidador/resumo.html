@@ -228,7 +228,7 @@ function renderGrupos(){
     const corCls=idealCls<=0?'var(--color-text-primary)':(diffCls>2?'#E24B4A':diffCls<-2?'#BA7517':'#1D9E75');
     html+=`<div class="grupo">
       <div class="grupo-header" onclick="toggleGrupo('g-${cls}',this)">
-        <div class="grupo-icon" style="background:${CLASS_COLORS[cls]}22;color:${CLASS_COLORS[cls]}">${(CLASS_LABEL[cls]||cls).slice(0,2)}</div>
+        <div class="grupo-icon" style="background:${CLASS_COLORS[cls]}22;color:${CLASS_COLORS[cls]}">${classIconHtml(cls)}</div>
         <span class="grupo-name">${CLASS_LABEL[cls]||cls}</span>
         <div class="grupo-stats">
           <div class="grupo-stat"><div class="gs-label">Ativos</div><div class="gs-value">${items.length}</div></div>

@@ -3,6 +3,23 @@
 const CLASS_COLORS={'B3':'#F2871E','FII':'#E8511F','Crypto':'#C9772E','RF':'#7A1E12','ETF':'#FFCF5C','Exterior':'#9B2D1F','BDR':'#F5A623','TD':'#B5341F','ETFINT':'#D98324','REIT':'#A4451E','FUNDO':'#E0A82E','OUTRO':'#8A5A3B'}; // Paleta "Brasa" (vermelho→amarelo) + extensão quente
 const CLASS_LABEL={'B3':'Ações','FII':'FIIs','Crypto':'Criptomoedas','RF':'Renda Fixa','ETF':'ETFs','Exterior':'Stocks','BDR':'BDRs','TD':'Tesouro Direto','ETFINT':'ETFs Internacionais','REIT':'Reits','FUNDO':'Fundos de Investimentos','OUTRO':'Outros'};
 const CLASS_BADGE={'B3':'badge-b3','FII':'badge-fii','Crypto':'badge-crypto','RF':'badge-rf','ETF':'badge-etf','Exterior':'badge-ext','BDR':'badge-bdr','TD':'badge-rf','ETFINT':'badge-etf','REIT':'badge-fii','FUNDO':'badge-crypto','OUTRO':'badge-ext'};
+/* Ícones dourados por classe (mesmo estilo da aba "Ativos" do site). Usados no cabeçalho dos grupos. */
+const _SVG=(p)=>`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle">${p}</svg>`;
+const CLASS_ICONS={
+  'B3':_SVG('<polyline points="22 7 13.5 15.5 8.5 10.5 2 17" stroke="#e0b84a" stroke-width="1.6"/><polyline points="16 7 22 7 22 13" stroke="#e0b84a" stroke-width="1.6"/>'),
+  'FII':_SVG('<path d="M3 21h18M5 21V9l7-6 7 6v12M9 21v-6h6v6" stroke="#e0b84a" stroke-width="1.5"/>'),
+  'REIT':_SVG('<path d="M3 21h18M5 21V9l7-6 7 6v12M9 21v-6h6v6" stroke="#e0b84a" stroke-width="1.5"/>'),
+  'ETF':_SVG('<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" stroke="#e0b84a" stroke-width="1.5"/><line x1="3" y1="6" x2="21" y2="6" stroke="#e0b84a" stroke-width="1.5"/><path d="M16 10a4 4 0 0 1-8 0" stroke="#e0b84a" stroke-width="1.5"/>'),
+  'ETFINT':_SVG('<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" stroke="#e0b84a" stroke-width="1.5"/><line x1="3" y1="6" x2="21" y2="6" stroke="#e0b84a" stroke-width="1.5"/><path d="M16 10a4 4 0 0 1-8 0" stroke="#e0b84a" stroke-width="1.5"/>'),
+  'BDR':_SVG('<circle cx="12" cy="12" r="9" stroke="#e0b84a" stroke-width="1.5"/><line x1="3" y1="12" x2="21" y2="12" stroke="#e0b84a" stroke-width="1.2"/><path d="M12 3a14 14 0 0 1 3.6 9 14 14 0 0 1-3.6 9 14 14 0 0 1-3.6-9A14 14 0 0 1 12 3z" stroke="#e0b84a" stroke-width="1.2"/>'),
+  'Exterior':_SVG('<circle cx="12" cy="12" r="9" stroke="#e0b84a" stroke-width="1.5"/><line x1="3" y1="12" x2="21" y2="12" stroke="#e0b84a" stroke-width="1.2"/><path d="M12 3a14 14 0 0 1 3.6 9 14 14 0 0 1-3.6 9 14 14 0 0 1-3.6-9A14 14 0 0 1 12 3z" stroke="#e0b84a" stroke-width="1.2"/>'),
+  'Crypto':_SVG('<circle cx="12" cy="12" r="9" stroke="#e0b84a" stroke-width="1.5"/><path d="M9.5 8h4a2.2 2.2 0 0 1 0 4.4h-4M9.5 12.4h4.3a2.2 2.2 0 0 1 0 4.4H9.5M9.5 8v8.8M11 6.5v1.5M11 16.8v1.5" stroke="#e0b84a" stroke-width="1.3"/>'),
+  'RF':_SVG('<rect x="2.5" y="6" width="19" height="12" rx="2" stroke="#e0b84a" stroke-width="1.5"/><circle cx="12" cy="12" r="2.5" stroke="#e0b84a" stroke-width="1.5"/><path d="M5.5 9v6M18.5 9v6" stroke="#e0b84a" stroke-width="1.2"/>'),
+  'TD':_SVG('<path d="M3 21h18M4 10h16M12 3l8 4H4l8-4z" stroke="#e0b84a" stroke-width="1.4"/><path d="M6 10v8M10 10v8M14 10v8M18 10v8" stroke="#e0b84a" stroke-width="1.3"/>'),
+  'FUNDO':_SVG('<circle cx="12" cy="12" r="9" stroke="#e0b84a" stroke-width="1.3" stroke-opacity="0.55"/><path d="M12 3v9l7.5 4.3M12 12 4.5 16.3" stroke="#e0b84a" stroke-width="1.5"/>'),
+  'OUTRO':_SVG('<circle cx="7" cy="9" r="1.7" fill="#e0b84a"/><circle cx="12" cy="9" r="1.7" fill="#e0b84a"/><circle cx="17" cy="9" r="1.7" fill="#e0b84a"/><circle cx="7" cy="15" r="1.7" fill="#e0b84a"/><circle cx="12" cy="15" r="1.7" fill="#e0b84a"/><circle cx="17" cy="15" r="1.7" fill="#e0b84a"/>'),
+};
+function classIconHtml(cls){ return CLASS_ICONS[cls]||`<span>${(CLASS_LABEL[cls]||cls).slice(0,2)}</span>`; }
 const IRPF_CODE={'B3':'03','FII':'73','Crypto':'08','RF':'45','ETF':'03','Exterior':'03','BDR':'04','TD':'45','ETFINT':'03','REIT':'03','FUNDO':'07','OUTRO':'99'}; // legado
 // [BUG-F1 FIX] Grupo e Código IRPF corretos conforme PGFN (declaração 2024)
 const IRPF_GRUPO={'B3':'03','FII':'07','Crypto':'08','RF':'04','ETF':'07','Exterior':'03','BDR':'03','TD':'04','ETFINT':'03','REIT':'03','FUNDO':'07','OUTRO':'99'};
