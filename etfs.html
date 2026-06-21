@@ -249,7 +249,7 @@ function renderTable(arr) {
       </div></td>
       <td class="r" style="color:var(--text2)">${fmtAUM(d.aum, d.mercado)}</td>
       <td class="r" style="color:var(--text2)">${d.ter.toFixed(2)}%</td>
-      <td class="r gold">${d.dy > 0 ? d.dy.toFixed(1)+'%' : '—'}</td>
+      <td class="r gold">${d.dy > 0 ? d.dy.toFixed(1)+'%' : '0%'}</td>
       <td class="r ${v12Cls}">${d.v12 >= 0 ? '+' : ''}${d.v12.toFixed(1)}%</td>
       <td class="r" style="color:var(--text3);font-size:12px">${d.vol}</td>
       <td class="r" style="color:var(--text3);font-size:11px">${d.tipo}</td>`;

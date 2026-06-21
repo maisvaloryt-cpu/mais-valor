@@ -327,7 +327,7 @@ function renderIndicadores(d){
     {label:'Variação 30d',val:(d.v30>=0?'+':'')+fmt(d.v30,'%'),desc:'Últimos 30 dias',cls:d.v30>=0?'up':'dn'},
   ]:[
     {label:'DY 12m',val:fmtPct(d.dy),desc:'Dividend Yield anual',cls:d.dy>8?'gold':''},
-    {label:'P/L',val:d.pl?(d.pl>0?d.pl.toFixed(1)+'x':'neg.'):'—',desc:'Preço/Lucro'},
+    {label:'P/L',val:d.pl?d.pl.toFixed(1)+'x':'—',desc:'Preço/Lucro'},
     {label:'P/VP',val:fmt(d.pvp),desc:'Preço/Valor Patrimonial',cls:d.pvp&&d.pvp<1?'up':''},
     {label:'ROE',val:fmtPct(d.roe),desc:'Retorno s/ Patrimônio',cls:d.roe&&d.roe>15?'up':''},
     {label:'ROIC',val:fmtPct(d.roic),desc:'Retorno s/ Capital',cls:d.roic&&d.roic>12?'up':''},

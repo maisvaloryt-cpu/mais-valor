@@ -186,7 +186,7 @@ function renderTable() {
     { label:'Preço',         v1:`R$ ${a.p.toFixed(2)}`, v2:`R$ ${b.p.toFixed(2)}`, cmp:null },
     { label:'Variação dia',  v1:`${a.v>=0?'+':''}${a.v.toFixed(2)}%`, v2:`${b.v>=0?'+':''}${b.v.toFixed(2)}%`, cmp:(x,y)=>x>y, va:a.v, vb:b.v },
     { label:'DY 12m',        v1:fmtPct(a.dy), v2:fmtPct(b.dy), cmp:(x,y)=>x>y, va:a.dy, vb:b.dy, crit:'DY 12m' },
-    { label:'P/L',           v1:a.pl?(a.pl>0?fmt(a.pl,'x'):'neg.'):'—', v2:b.pl?(b.pl>0?fmt(b.pl,'x'):'neg.'):'—', cmp:(x,y)=>x<y, va:a.pl>0?a.pl:null, vb:b.pl>0?b.pl:null, crit:'P/L' },
+    { label:'P/L',           v1:a.pl?fmt(a.pl,'x'):'—', v2:b.pl?fmt(b.pl,'x'):'—', cmp:(x,y)=>x<y, va:a.pl>0?a.pl:null, vb:b.pl>0?b.pl:null, crit:'P/L' },
     { label:'P/VP',          v1:fmt(a.pvp), v2:fmt(b.pvp), cmp:(x,y)=>x<y, va:a.pvp, vb:b.pvp, crit:'P/VP' },
     { label:'ROE',           v1:fmtPct(a.roe), v2:fmtPct(b.roe), cmp:(x,y)=>x>y, va:a.roe, vb:b.roe, crit:'ROE' },
     { label:'ROIC',          v1:fmtPct(a.roic), v2:fmtPct(b.roic), cmp:(x,y)=>x>y, va:a.roic, vb:b.roic, crit:'ROIC' },
