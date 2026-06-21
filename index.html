@@ -135,9 +135,14 @@
       <div class="table-wrap">
         <table class="data-table">
           <thead><tr>
-            <th>Ativo</th><th class="r">Preço</th><th class="r">Hoje</th>
-            <th class="r">DY 12m</th><th class="r">P/L</th><th class="r">P/VP</th>
-            <th class="r">Score</th><th class="r">Volume</th>
+            <th style="cursor:pointer;user-select:none" onclick="sortTable('t')">Ativo<span class="sort-arrow" id="sarr-t" style="margin-left:3px;font-size:10px;color:var(--gold)"></span></th>
+            <th class="r" style="cursor:pointer;user-select:none" onclick="sortTable('p')">Preço<span class="sort-arrow" id="sarr-p" style="margin-left:3px;font-size:10px;color:var(--gold)"></span></th>
+            <th class="r" style="cursor:pointer;user-select:none" onclick="sortTable('v')">Hoje<span class="sort-arrow" id="sarr-v" style="margin-left:3px;font-size:10px;color:var(--gold)"></span></th>
+            <th class="r" style="cursor:pointer;user-select:none" onclick="sortTable('dy')">DY 12m<span class="sort-arrow" id="sarr-dy" style="margin-left:3px;font-size:10px;color:var(--gold)"></span></th>
+            <th class="r" style="cursor:pointer;user-select:none" onclick="sortTable('pl')">P/L<span class="sort-arrow" id="sarr-pl" style="margin-left:3px;font-size:10px;color:var(--gold)"></span></th>
+            <th class="r" style="cursor:pointer;user-select:none" onclick="sortTable('pvp')">P/VP<span class="sort-arrow" id="sarr-pvp" style="margin-left:3px;font-size:10px;color:var(--gold)"></span></th>
+            <th class="r" style="cursor:pointer;user-select:none" onclick="sortTable('score')">Score<span class="sort-arrow" id="sarr-score" style="margin-left:3px;font-size:10px;color:var(--gold)"></span></th>
+            <th class="r" style="cursor:pointer;user-select:none" onclick="sortTable('volNum')">Volume<span class="sort-arrow" id="sarr-volNum" style="margin-left:3px;font-size:10px;color:var(--gold)"></span></th>
           </tr></thead>
           <tbody id="main-tbody">
             <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text3)">
@@ -224,6 +229,30 @@ function renderTable(arr){
     tb.appendChild(tr);
   });
 }
+
+// ── Ordenação por clique no cabeçalho ─────────────────────────────
+let sortCol = null, sortAsc = false;
+function sortVal(d, col) {
+  if (col === 't')     return (d.t || '').toLowerCase();
+  if (col === 'score') return (typeof calcScore === 'function' ? (calcScore(d) ?? -1) : -1);
+  return (d[col] != null ? d[col] : -Infinity);
+}
+function sortTable(col) {
+  if (sortCol === col) { sortAsc = !sortAsc; }
+  else { sortCol = col; sortAsc = (col === 't'); } // texto começa A→Z, números do maior pro menor
+  currentData.sort((a, b) => {
+    const va = sortVal(a, col), vb = sortVal(b, col);
+    if (va < vb) return sortAsc ? -1 : 1;
+    if (va > vb) return sortAsc ? 1 : -1;
+    return 0;
+  });
+  document.querySelectorAll('.sort-arrow').forEach(s => s.textContent = '');
+  const arr = document.getElementById('sarr-' + col);
+  if (arr) arr.textContent = sortAsc ? ' ▲' : ' ▼';
+  const q = document.getElementById('filter-input').value;
+  q ? filterTable(q) : renderTable(currentData);
+}
+window.sortTable = sortTable;
 
 async function loadChart(d) {
   sel = d;
@@ -320,6 +349,8 @@ function filterTable(q) {
 function switchTab(tab, el) {
   currentTab = tab;
   currentData = tab === 'acoes' ? [...ACOES] : [...FIIS];
+  sortCol = null; sortAsc = false;
+  document.querySelectorAll('.sort-arrow').forEach(s => s.textContent = '');
   document.querySelectorAll('.tabs .tab').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('filter-input').value = '';
