@@ -1,6 +1,6 @@
 /* ===================== CONSOLIDADOR DE CARTEIRA - NÚCLEO COMPARTILHADO ===================== */
 
-const CLASS_COLORS={'B3':'#185FA5','FII':'#3B6D11','Crypto':'#BA7517','RF':'#534AB7','ETF':'#0F6E56','Exterior':'#993C1D','BDR':'#72243E','TD':'#2F6F8F','ETFINT':'#0E8F7E','REIT':'#7A9A2E','FUNDO':'#6C5CE7','OUTRO':'#8A8884'};
+const CLASS_COLORS={'B3':'#F2871E','FII':'#E8511F','Crypto':'#C9772E','RF':'#7A1E12','ETF':'#FFCF5C','Exterior':'#9B2D1F','BDR':'#F5A623','TD':'#B5341F','ETFINT':'#D98324','REIT':'#A4451E','FUNDO':'#E0A82E','OUTRO':'#8A5A3B'}; // Paleta "Brasa" (vermelho→amarelo) + extensão quente
 const CLASS_LABEL={'B3':'Ações','FII':'FIIs','Crypto':'Criptomoedas','RF':'Renda Fixa','ETF':'ETFs','Exterior':'Stocks','BDR':'BDRs','TD':'Tesouro Direto','ETFINT':'ETFs Internacionais','REIT':'Reits','FUNDO':'Fundos de Investimentos','OUTRO':'Outros'};
 const CLASS_BADGE={'B3':'badge-b3','FII':'badge-fii','Crypto':'badge-crypto','RF':'badge-rf','ETF':'badge-etf','Exterior':'badge-ext','BDR':'badge-bdr','TD':'badge-rf','ETFINT':'badge-etf','REIT':'badge-fii','FUNDO':'badge-crypto','OUTRO':'badge-ext'};
 const IRPF_CODE={'B3':'03','FII':'73','Crypto':'08','RF':'45','ETF':'03','Exterior':'03','BDR':'04','TD':'45','ETFINT':'03','REIT':'03','FUNDO':'07','OUTRO':'99'}; // legado
