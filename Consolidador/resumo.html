@@ -275,18 +275,30 @@ function _cdiMensal(){
   const anual=parseFloat(BCB?.cdi?.anual)||0;
   return anual>0?Math.pow(1+anual/100,1/12)-1:0;
 }
-// Simula quanto os mesmos aportes renderiam na renda fixa (CDI), mês a mês.
-function calcSaldoCDI(nMeses=120){
-  const evol=calcEvolucaoPatrimonio(nMeses).filter(m=>m.vt>0||m.custo>0);
-  if(!evol.length)return null;
-  const r=_cdiMensal();
-  let saldo=0, custoAnt=0;
-  evol.forEach(m=>{
-    const aporteMes=Math.max(0,m.custo-custoAnt); // entrada de dinheiro novo no mês
-    saldo=saldo*(1+r)+aporteMes;
-    custoAnt=m.custo;
+// Simula quanto os mesmos aportes renderiam só no CDI.
+// Cada COMPRA rende o CDI desde a data dela até hoje (juros compostos).
+// As VENDAS são somadas à parte (entram no "seu total real", não no CDI).
+// Antes o método contava compras repetidas como dinheiro novo e inflava o CDI;
+// agora é por transação, então não há mais essa contagem dupla.
+function calcSaldoCDI(){
+  const anual=parseFloat(BCB?.cdi?.anual)||0;
+  if(anual<=0)return null;
+  const hoje=new Date();
+  const fatorCDI=(ds)=>{
+    if(!ds)return 1;
+    const d=new Date(ds+'T00:00:00');
+    const dias=Math.max(0,(hoje-d)/86400000);
+    return Math.pow(1+anual/100, dias/365); // CDI composto até hoje
+  };
+  let saldoCDI=0, vendas=0;
+  ativos.forEach(a=>{
+    const tipo=a.tipo||'Compra';
+    if(tipo==='Provento')return;            // proventos entram via getTotals
+    const valor=(a.qtd||0)*(a.pm||0);
+    if(tipo==='Venda'){ vendas+=valor; }     // dinheiro que voltou pro bolso
+    else { saldoCDI+=valor*fatorCDI(a.data); } // compra rendendo CDI até hoje
   });
-  return {saldoCDI:saldo, custo:custoAnt};
+  return {saldoCDI, vendas};
 }
 // Variação do último mês de cada ativo (usa preços históricos do site).
 function destaquesDoMes(){
@@ -366,18 +378,20 @@ function renderResumoExtra(){
   // Card carteira vs CDI
   let cardCDI='';
   if(cdi){
-    const diff=t.total-cdi.saldoCDI;
+    // Seu total REAL = carteira hoje + dinheiro das vendas + proventos recebidos
+    const seuTotal=t.total+(cdi.vendas||0)+(t.proventosTotal||0);
+    const diff=seuTotal-cdi.saldoCDI;
     const ganhou=diff>=0;
     cardCDI=`<div class="card">
       <div class="card-title"><i class="ti ti-scale" aria-hidden="true" style="color:#534AB7"></i>Sua carteira vs Renda Fixa (CDI)</div>
       <div style="display:flex;flex-direction:column;gap:10px">
-        <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--color-text-secondary)">Você tem hoje</span><strong>${fmtR(t.total)}</strong></div>
+        <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--color-text-secondary)">Você tem hoje</span><strong>${fmtR(seuTotal)}</strong></div>
         <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--color-text-secondary)">Se fosse só CDI</span><strong>${fmtR(cdi.saldoCDI)}</strong></div>
         <div style="display:flex;justify-content:space-between;border-top:1px solid var(--color-border-secondary);padding-top:8px">
           <span style="font-size:12px;color:var(--color-text-secondary)">${ganhou?'Você está ganhando do CDI':'Você está perdendo pro CDI'}</span>
           <strong class="${ganhou?'positive':'negative'}">${ganhou?'+':''}${fmtR(diff)}</strong></div>
       </div>
-      <div style="font-size:10px;color:var(--color-text-secondary);margin-top:8px">Simulação: seus mesmos aportes rendendo ${fmt(parseFloat(BCB?.cdi?.anual)||0)}% a.a. (CDI atual).</div>
+      <div style="font-size:10px;color:var(--color-text-secondary);margin-top:8px">Seu total = carteira hoje + vendas realizadas + proventos. CDI = todos os aportes rendendo ${fmt(parseFloat(BCB?.cdi?.anual)||0)}% a.a. (CDI atual).</div>
     </div>`;
   }
   el.style.display='grid';
