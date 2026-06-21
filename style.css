@@ -256,7 +256,7 @@ nav {
 .indices-bar {
   background: var(--bg2);
   border-bottom: 1px solid var(--border);
-  display: grid; grid-template-columns: repeat(5, 1fr);
+  display: grid; grid-template-columns: repeat(6, 1fr);
 }
 .idx-card {
   padding: .65rem 1.25rem;
@@ -838,9 +838,7 @@ footer em { color: var(--gold); font-style: normal; }
   .sidebar      { display: none; }
   .mini-cards   { grid-template-columns: repeat(2, 1fr); }
   .chart-stats  { grid-template-columns: repeat(2, 1fr); }
-  .indices-bar  { grid-template-columns: repeat(3, 1fr); }
-  .indices-bar .idx-card:nth-child(4),
-  .indices-bar .idx-card:nth-child(5) { display: none; }
+  .indices-bar  { grid-template-columns: repeat(3, 1fr); } /* 6 cards em 2 linhas no celular */
   .tool-grid { grid-template-columns: 1fr; }
   .nav-search { width: 140px; }
 }

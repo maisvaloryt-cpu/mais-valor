@@ -526,21 +526,6 @@ function renderNav() {
       <div class="idx-chg" id="idx-ibov-chg">—</div>
     </div>
     <div class="idx-card">
-      <div class="idx-name">IFIX</div>
-      <div class="idx-val" id="idx-ifix">—</div>
-      <div class="idx-chg" id="idx-ifix-chg">—</div>
-    </div>
-    <div class="idx-card">
-      <div class="idx-name">Small Caps</div>
-      <div class="idx-val" id="idx-small">—</div>
-      <div class="idx-chg" id="idx-small-chg">—</div>
-    </div>
-    <div class="idx-card">
-      <div class="idx-name">IDIV</div>
-      <div class="idx-val" id="idx-idiv">—</div>
-      <div class="idx-chg" id="idx-idiv-chg">—</div>
-    </div>
-    <div class="idx-card">
       <div class="idx-name">S&amp;P 500</div>
       <div class="idx-val" id="idx-sp500">—</div>
       <div class="idx-chg" id="idx-sp500-chg">—</div>
@@ -551,14 +536,9 @@ function renderNav() {
       <div class="idx-chg" id="idx-nasdaq-chg">—</div>
     </div>
     <div class="idx-card">
-      <div class="idx-name">USD / BRL</div>
+      <div class="idx-name">Dólar</div>
       <div class="idx-val" id="idx-dolar">—</div>
       <div class="idx-chg" id="idx-dolar-chg">—</div>
-    </div>
-    <div class="idx-card">
-      <div class="idx-name">EUR / BRL</div>
-      <div class="idx-val" id="idx-euro">—</div>
-      <div class="idx-chg" id="idx-euro-chg">—</div>
     </div>
     <div class="idx-card">
       <div class="idx-name">Bitcoin</div>
@@ -569,16 +549,6 @@ function renderNav() {
       <div class="idx-name">Ethereum</div>
       <div class="idx-val" id="idx-eth">—</div>
       <div class="idx-chg" id="idx-eth-chg">—</div>
-    </div>
-    <div class="idx-card">
-      <div class="idx-name">Ouro</div>
-      <div class="idx-val" id="idx-ouro">—</div>
-      <div class="idx-chg" id="idx-ouro-chg">—</div>
-    </div>
-    <div class="idx-card">
-      <div class="idx-name">Petróleo</div>
-      <div class="idx-val" id="idx-petroleo">—</div>
-      <div class="idx-chg" id="idx-petroleo-chg">—</div>
     </div>
   </div>` : ''}`;
 
