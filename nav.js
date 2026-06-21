@@ -640,6 +640,10 @@ function renderNav() {
     window.addEventListener('resize', () => {
       if (dropEl.style.display === 'block') posicionar();
     });
+    // Ao rolar a página, fecha o dropdown (ele é fixo e ficaria solto na tela)
+    window.addEventListener('scroll', () => {
+      if (dropEl.style.display === 'block') dropEl.style.display = 'none';
+    }, { passive: true });
   }
 
   setupDropClick('mv-ativos-btn',      ativosDrop);
