@@ -259,7 +259,7 @@ function renderGrupos(){
               <td class="r">${total?((a.vt/total)*100).toFixed(1):0}%</td>
               <td class="r" title="% alvo automático: ideal da classe × peso da nota">${alvo>0?alvo.toFixed(1)+'%':'-'}</td>
               <td class="r"><span class="pill ${comp==='Sim'?'pill-up':'pill-dn'}" title="Automático: abaixo do % alvo = Sim">${comp==='Sim'?'✓ Sim':'✕ Não'}</span></td>
-              <td><button class="btn btn-sm" title="Opções" onclick="openRowMenuTicker(event,'${a.ticker}')"><i class="ti ti-dots-vertical" aria-hidden="true"></i></button></td>
+              <td><button class="btn btn-sm" title="Opções" onclick="openRowMenuTicker(event,'${a.ticker}')" style="font-size:16px;font-weight:700;line-height:1;padding:3px 10px">⋮</button></td>
             </tr>`;}).join('')}
           </tbody>
         </table>

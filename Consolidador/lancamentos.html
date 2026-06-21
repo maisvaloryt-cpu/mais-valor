@@ -134,7 +134,7 @@ function renderLancamentos(){
       <td class="r">${a.qtd.toLocaleString('pt-BR')}</td>
       <td class="r">${fmtR(a.pm)}</td>
       <td class="r">${fmtR(a.qtd*a.pm)}</td>
-      <td><button class="btn btn-sm" title="Opções" onclick="openRowMenu(event,${a._idx})"><i class="ti ti-dots-vertical" aria-hidden="true"></i></button></td>
+      <td><button class="btn btn-sm" title="Opções" onclick="openRowMenu(event,${a._idx})" style="font-size:16px;font-weight:700;line-height:1;padding:3px 10px">⋮</button></td>
     </tr>
   `).join(''):'<tr><td colspan="8" style="text-align:center;padding:1.5rem;color:var(--color-text-secondary);font-size:12px">Nenhum lançamento encontrado.</td></tr>';
 
@@ -151,7 +151,7 @@ function renderLancamentos(){
         <td class="r">${a.qtd.toLocaleString('pt-BR')}</td>
         <td class="r">${fmtR(a.pm)}</td>
         <td class="r positive">${fmtR(a.qtd*a.pm)}</td>
-        <td><button class="btn btn-sm" title="Opções" onclick="openRowMenu(event,${a._idx})"><i class="ti ti-dots-vertical" aria-hidden="true"></i></button></td>
+        <td><button class="btn btn-sm" title="Opções" onclick="openRowMenu(event,${a._idx})" style="font-size:16px;font-weight:700;line-height:1;padding:3px 10px">⋮</button></td>
       </tr>
     `).join('');
   }else{
