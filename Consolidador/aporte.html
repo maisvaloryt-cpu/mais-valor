@@ -100,7 +100,23 @@ var aporteAtual=0; // var (não let): o script da página roda de novo na troca 
 // Classes possíveis (mesma ordem do app); o editor de meta lista todas.
 var AP_CLASSES=['B3','FII','ETF','BDR','RF','TD','Crypto','Exterior','ETFINT','REIT','FUNDO','OUTRO'];
 var AP_PALETTE=['#E2453C','#FF6B35','#F5A623','#FFCC00','#E8615D','#C9772E','#D4A017','#1D9E75','#0F8E6E','#2E86C1','#3B6D11','#7D5BA6']; // quentes primeiro, frias no fim
-function apColor(cl){var i=AP_CLASSES.indexOf(cl);return i>=0?AP_PALETTE[i%AP_PALETTE.length]:'#888';}
+// Cor por ranking: a maior fatia da meta pega a 1ª cor, e assim por diante.
+// Ordem: classes da meta (ideal>0) por % decrescente; depois as demais (que você tem) por valor decrescente.
+var apColorByClasse={};
+function apBuildColorMap(){
+  const im=apIdealMap();
+  const metaCls=AP_CLASSES.filter(k=>(im[k]||0)>0)
+    .sort((a,b)=>(im[b]||0)-(im[a]||0)||AP_CLASSES.indexOf(a)-AP_CLASSES.indexOf(b));
+  const bc=byClasse(calcAtivos());
+  const extras=AP_CLASSES.filter(k=>!metaCls.includes(k)&&((bc[k]||0)>0||im.hasOwnProperty(k)))
+    .sort((a,b)=>(bc[b]||0)-(bc[a]||0)||AP_CLASSES.indexOf(a)-AP_CLASSES.indexOf(b));
+  apColorByClasse={};
+  metaCls.concat(extras).forEach((cl,i)=>{apColorByClasse[cl]=AP_PALETTE[i%AP_PALETTE.length];});
+}
+function apColor(cl){
+  if(apColorByClasse[cl])return apColorByClasse[cl];
+  var i=AP_CLASSES.indexOf(cl);return i>=0?AP_PALETTE[i%AP_PALETTE.length]:'#888';
+}
 
 function apSetAporte(v){ aporteAtual=Math.max(0,parseFloat(v)||0); apRenderTabela(); apRenderResumo(); apRenderRebal(); }
 
@@ -111,13 +127,14 @@ function apSetMeta(classe,valor){
   const v=Math.max(0,parseFloat(valor)||0);
   const idx=metas.findIndex(m=>m.classe===classe);
   if(idx>=0)metas[idx].ideal=v; else metas.push({classe,ideal:v});
-  saveMetas();
+  saveMetas(); apBuildColorMap();
   apRenderTotal(); apRenderCharts(); apRenderTabela(); apRenderResumo(); apRenderRebal();
 }
 
 function apRenderEditor(){
   const im=apIdealMap();
-  const ativas=AP_CLASSES.filter(cl=>metas.some(m=>m.classe===cl));
+  const ativas=AP_CLASSES.filter(cl=>metas.some(m=>m.classe===cl))
+    .sort((a,b)=>(im[b]||0)-(im[a]||0)||AP_CLASSES.indexOf(a)-AP_CLASSES.indexOf(b));
   const disp=AP_CLASSES.filter(cl=>!metas.some(m=>m.classe===cl));
   const rows=ativas.map(cl=>`
     <div style="display:flex;align-items:center;gap:6px">
@@ -143,11 +160,11 @@ function apRenderEditor(){
 }
 function apAddClasse(cl){
   if(!cl||metas.some(m=>m.classe===cl))return;
-  metas.push({classe:cl,ideal:0}); saveMetas();
+  metas.push({classe:cl,ideal:0}); saveMetas(); apBuildColorMap();
   apRenderEditor(); apRenderCharts(); apRenderTabela(); apRenderResumo(); apRenderRebal();
 }
 function apRemoveClasse(cl){
-  metas=metas.filter(m=>m.classe!==cl); saveMetas();
+  metas=metas.filter(m=>m.classe!==cl); saveMetas(); apBuildColorMap();
   apRenderEditor(); apRenderCharts(); apRenderTabela(); apRenderResumo(); apRenderRebal();
 }
 
@@ -176,20 +193,29 @@ function apRenderCharts(){
   const c=calcAtivos();
   const total=c.reduce((s,a)=>s+a.vt,0);
   const im=apIdealMap();
-  // Sua carteira (atual) — só classes com valor
   const bc=byClasse(c);
-  const clsAtual=Object.keys(bc).filter(k=>bc[k]>0);
+  // Ordem-base (igual à meta): classes da meta por % desc; depois as que você tem fora da meta, por valor desc.
+  const metaCls=AP_CLASSES.filter(k=>(im[k]||0)>0)
+    .sort((a,b)=>(im[b]||0)-(im[a]||0)||AP_CLASSES.indexOf(a)-AP_CLASSES.indexOf(b));
+  const extras=AP_CLASSES.filter(k=>(bc[k]||0)>0&&!metaCls.includes(k))
+    .sort((a,b)=>(bc[b]||0)-(bc[a]||0)||AP_CLASSES.indexOf(a)-AP_CLASSES.indexOf(b));
+  // Sua carteira (hoje): legenda imita a ordem do ideal; classes da meta que faltam aparecem apagadas.
+  const legendCls=metaCls.concat(extras);          // legenda completa (inclui faltantes da meta)
+  const pieCls=legendCls.filter(k=>(bc[k]||0)>0);  // gráfico: só o que você tem
   apPizza('ap-pizza-atual',
-    clsAtual.map(k=>CLASS_LABEL[k]||k),
-    clsAtual.map(k=>+bc[k].toFixed(2)),
-    clsAtual.map(k=>apColor(k)));
-  document.getElementById('ap-legenda-atual').innerHTML=clsAtual.length?clsAtual.map(k=>`
-    <div style="display:flex;align-items:center;gap:8px">
+    pieCls.map(k=>CLASS_LABEL[k]||k),
+    pieCls.map(k=>+bc[k].toFixed(2)),
+    pieCls.map(k=>apColor(k)));
+  document.getElementById('ap-legenda-atual').innerHTML=legendCls.length?legendCls.map(k=>{
+    const tem=(bc[k]||0)>0;
+    const pct=total?((bc[k]||0)/total*100).toFixed(1):0;
+    return `<div style="display:flex;align-items:center;gap:8px;${tem?'':'opacity:.4'}">
       <span style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--color-text-secondary);min-width:96px"><span style="width:9px;height:9px;border-radius:50%;background:${apColor(k)};flex-shrink:0"></span>${CLASS_LABEL[k]||k}</span>
-      <span style="font-size:12px;font-weight:600;color:var(--color-text-primary)">${total?((bc[k]/total)*100).toFixed(1):0}%</span>
-    </div>`).join(''):'<div style="font-size:12px;color:var(--color-text-secondary)">Sem ativos ainda.</div>';
-  // Carteira ideal (meta) — só classes com ideal > 0
-  const clsIdeal=AP_CLASSES.filter(k=>(im[k]||0)>0);
+      <span style="font-size:12px;font-weight:600;color:var(--color-text-primary)">${tem?pct+'%':'—'}</span>
+    </div>`;
+  }).join(''):'<div style="font-size:12px;color:var(--color-text-secondary)">Sem ativos ainda.</div>';
+  // Carteira ideal (meta) — só classes com ideal > 0, por % desc
+  const clsIdeal=metaCls;
   apPizza('ap-pizza-ideal',
     clsIdeal.map(k=>CLASS_LABEL[k]||k),
     clsIdeal.map(k=>im[k]),
@@ -371,6 +397,7 @@ function apInitSimulador(){
 }
 
 function renderAll(){
+  apBuildColorMap();
   apRenderEditor();
   apRenderCharts();
   apRenderTabela();
