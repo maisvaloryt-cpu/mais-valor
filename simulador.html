@@ -962,12 +962,34 @@ const _simAuthReady = new Promise(r => { _simAuthReadyResolve = r; });
 function _renderSimAuthUI(user) {
   const el = document.getElementById('sim-auth-area');
   if (!el) return;
-  el.innerHTML = user
-    ? `<div style="display:flex;align-items:center;gap:10px;">
-         <span style="font-size:12px;color:var(--sim-text2,#8A8884);">${user.displayName || user.email || 'Logado'}</span>
-         <button onclick="navLogout()" style="background:transparent;border:1px solid var(--border,#222);color:#fff;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;">Sair</button>
-       </div>`
-    : `<button onclick="navLoginGoogle()" style="background:var(--sim-accent,#D4A017);border:none;color:#000;font-weight:700;border-radius:6px;padding:7px 14px;font-size:12px;cursor:pointer;">Entrar com Google</button>`;
+  if (user) {
+    const name = (user.displayName || '').split(' ')[0] || 'Conta';
+    const photo = user.photoURL || '';
+    const ini = (user.displayName || user.email || '?').charAt(0).toUpperCase();
+    const fallback = `<div style=&quot;width:32px;height:32px;border-radius:50%;background:#D4A017;color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px&quot;>${ini}</div>`;
+    el.innerHTML = `
+      <div style="position:relative;display:inline-block">
+        <div onclick="var d=document.getElementById('sim-user-drop');d.style.display=(d.style.display==='block'?'none':'block');" style="cursor:pointer;line-height:0" title="${user.displayName || ''}">
+          <img src="${photo}" alt="${name}" referrerpolicy="no-referrer"
+            style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(212,160,23,0.5);display:block"
+            onerror="this.outerHTML='${fallback}'">
+        </div>
+        <div id="sim-user-drop" style="display:none;position:absolute;right:0;top:42px;background:var(--sim-bg2,#1a1a1f);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;z-index:99999;min-width:180px;box-shadow:0 8px 32px rgba(0,0,0,0.5)">
+          <div style="font-size:13px;font-weight:700;color:#eee;margin-bottom:4px;white-space:nowrap">${name}</div>
+          <div style="font-size:11px;color:#888;margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">${user.email || ''}</div>
+          <button onclick="navLogout()" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,0.1);color:#aaa;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit">Sair da conta</button>
+        </div>
+      </div>`;
+    if (!window._simAuthOutside) {
+      window._simAuthOutside = true;
+      document.addEventListener('click', (e) => {
+        const drop = document.getElementById('sim-user-drop');
+        if (drop && !e.target.closest('#sim-auth-area')) drop.style.display = 'none';
+      });
+    }
+  } else {
+    el.innerHTML = `<button onclick="navLoginGoogle()" style="background:var(--sim-accent,#D4A017);border:none;color:#000;font-weight:700;border-radius:6px;padding:7px 14px;font-size:12px;cursor:pointer;">Entrar com Google</button>`;
+  }
 }
 
 if (typeof firebase !== 'undefined') {
