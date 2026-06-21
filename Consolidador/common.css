@@ -513,4 +513,12 @@ select option { background: var(--bg2, #0E0E11); color: var(--text, #ECEAE4); }
   .grupo-stats { display: none; }
   .carteira-switcher { width: 100%; order: -1; margin-right: 0; margin-bottom: 6px; }
   .carteira-switcher select { flex: 1; max-width: none; }
+
+  /* Tabela "Meus ativos" rola na horizontal no celular (12 colunas não cabem) */
+  .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+  .tbl { min-width: 720px; }              /* força largura legível -> habilita o arraste */
+  .tbl th, .tbl td { white-space: nowrap; } /* não quebra/corta o texto das células */
+
+  /* Gráficos de pizza (aporte): legenda desce pra baixo do gráfico, sem furar a tela */
+  .charts-row .card > div { flex-wrap: wrap; }
 }
