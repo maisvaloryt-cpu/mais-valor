@@ -201,6 +201,17 @@ window.MV_LOGO_SVG = '<svg viewBox="0 0 530 530" xmlns="http://www.w3.org/2000/s
 <script>
 let currentTab='acoes', currentData=[], mainChart=null, sel=null, currentRange='1A';
 const SHOW=20;
+const LIQ_MIN_ACOES = 1_000_000; // só ações que negociam de verdade (R$/dia) entram no ranking
+
+// Monta a lista da aba já aplicando o filtro de liquidez (só p/ ações;
+// FIIs ficam sem filtro porque a liquidez do Fundamentus é pouco confiável).
+function buildTabData(tab) {
+  if (tab === 'acoes') {
+    const filt = ACOES.filter(d => (d.volNum || 0) >= LIQ_MIN_ACOES);
+    return filt.length ? filt : [...ACOES]; // fallback se algo der errado nos dados
+  }
+  return [...FIIS];
+}
 
 function renderTable(arr){
   const tb = document.getElementById('main-tbody');
@@ -348,7 +359,7 @@ function filterTable(q) {
 
 function switchTab(tab, el) {
   currentTab = tab;
-  currentData = tab === 'acoes' ? [...ACOES] : [...FIIS];
+  currentData = buildTabData(tab);
   sortCol = null; sortAsc = false;
   document.querySelectorAll('.sort-arrow').forEach(s => s.textContent = '');
   document.querySelectorAll('.tabs .tab').forEach(b => b.classList.remove('active'));
@@ -546,7 +557,7 @@ async function init() {
       if (j.ipca?.acumulado_12m) document.getElementById('mc-ipca').textContent = j.ipca.acumulado_12m.toFixed(2) + '%';
     }
   } catch(e) {}
-  currentData = [...ACOES];
+  currentData = buildTabData('acoes');
   sortCol = null; sortAsc = false;
   sortTable('score');   // tabela já abre ordenada por Score (maior → menor)
   await startCarousel();

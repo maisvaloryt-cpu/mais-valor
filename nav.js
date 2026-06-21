@@ -77,17 +77,20 @@ function calcScore(d) {
   if (!d) return null;
   let pts = 0, max = 0;
   const isFii = d.t && /\d{2}$/.test(d.t);
+  // Base FIXA: dado faltando NÃO infla mais o score. Antes o total possível só
+  // contava indicadores presentes, então microcap com poucos dados chegava a 100.
+  // Agora cada indicador ausente simplesmente não pontua (mas conta na base).
   if (isFii) {
-    if (d.dy > 0)  { max += 30; if (d.dy >= 8 && d.dy <= 25)  pts += 30; else if (d.dy >= 5) pts += 15; }
-    if (d.pvp > 0) { max += 40; if (d.pvp <= 0.95) pts += 40; else if (d.pvp <= 1.05) pts += 20; }
-    if (d.v30 !== undefined) { max += 30; if (d.v30 >= 0) pts += 30; else if (d.v30 >= -5) pts += 15; }
+    max += 30; if (d.dy >= 8 && d.dy <= 25) pts += 30; else if (d.dy >= 5) pts += 15;
+    max += 40; if (d.pvp > 0 && d.pvp <= 0.95) pts += 40; else if (d.pvp > 0 && d.pvp <= 1.05) pts += 20;
+    max += 30; if (d.v30 >= 0) pts += 30; else if (d.v30 >= -5) pts += 15;
   } else {
-    if (d.pl !== undefined && d.pl !== null) { max += 25; if (d.pl > 0 && d.pl <= 15) pts += 25; else if (d.pl > 0 && d.pl <= 25) pts += 12; }
-    if (d.pvp !== undefined && d.pvp !== null) { max += 15; if (d.pvp < 1) pts += 15; else if (d.pvp < 1.5) pts += 8; }
-    if (d.dy > 0)   { max += 20; if (d.dy >= 6) pts += 20; else if (d.dy >= 3) pts += 10; }
-    if (d.roe > 0)  { max += 20; if (d.roe >= 15) pts += 20; else if (d.roe >= 10) pts += 10; }
-    if (d.roic > 0) { max += 10; if (d.roic >= 12) pts += 10; else if (d.roic >= 8) pts += 5; }
-    if (d.mrg_liq !== undefined && d.mrg_liq !== null) { max += 10; if (d.mrg_liq > 10) pts += 10; else if (d.mrg_liq > 0) pts += 5; }
+    max += 25; if (d.pl > 0 && d.pl <= 15) pts += 25; else if (d.pl > 0 && d.pl <= 25) pts += 12;
+    max += 15; if (d.pvp > 0 && d.pvp < 1) pts += 15; else if (d.pvp > 0 && d.pvp < 1.5) pts += 8;
+    max += 20; if (d.dy >= 6) pts += 20; else if (d.dy >= 3) pts += 10;
+    max += 20; if (d.roe >= 15) pts += 20; else if (d.roe >= 10) pts += 10;
+    max += 10; if (d.roic >= 12) pts += 10; else if (d.roic >= 8) pts += 5;
+    max += 10; if (d.mrg_liq > 10) pts += 10; else if (d.mrg_liq > 0) pts += 5;
   }
   if (!max) return null;
   return Math.round((pts / max) * 100);
