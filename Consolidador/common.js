@@ -1344,7 +1344,7 @@ function renderCarteiraSwitcher(){
   const el=document.getElementById('carteira-switcher');
   if(!el)return;
   el.innerHTML=`
-    <span style="display:inline-flex;align-items:center;gap:8px;margin-left:16px">
+    <span style="display:inline-flex;align-items:center;gap:8px;margin-left:3px">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0">
         <path d="M17 8V5a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v8a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12"></path>
         <path d="M20 12v4h-4a2 2 0 0 1 0 -4h4"></path>
