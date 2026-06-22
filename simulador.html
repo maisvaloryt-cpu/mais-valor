@@ -716,11 +716,11 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
         <div class="param-row">
           <div class="param-field">
             <label>Inicial (R$)</label>
-            <input type="number" class="param-inp" id="initialAmount" value="" min="0" step="1000" placeholder="0" oninput="verificarCascata()">
+            <input type="text" inputmode="numeric" class="param-inp" id="initialAmount" value="" placeholder="0" oninput="maskMoney(this);verificarCascata()">
           </div>
           <div class="param-field">
             <label>Mensal (R$)</label>
-            <input type="number" class="param-inp" id="monthlyAmount" value="" min="0" step="100" placeholder="0" oninput="verificarCascata()">
+            <input type="text" inputmode="numeric" class="param-inp" id="monthlyAmount" value="" placeholder="0" oninput="maskMoney(this);verificarCascata()">
           </div>
         </div>
         <button class="btn-confirmar-etapa" id="btnConfirmarAportes" onclick="confirmarAportes()">✓ Confirmar aportes</button>
@@ -2551,6 +2551,18 @@ function tentarSimular() {
   simular();
 }
 
+// Máscara de milhar (pt-BR) nos campos de aporte: 100000 -> "100.000"
+function maskMoney(el) {
+  const d = String(el.value).replace(/\D/g, '');
+  el.value = d ? Number(d).toLocaleString('pt-BR') : '';
+}
+// Lê o valor numérico de um campo com máscara (tira os pontos de milhar)
+function valMoney(id) {
+  const el = document.getElementById(id);
+  if (!el) return 0;
+  return parseFloat(String(el.value).replace(/\./g, '').replace(',', '.')) || 0;
+}
+
 function verificarCascata() {
   const sd = parseDateInput(document.getElementById('startDate').value);
   const ed = parseDateInput(document.getElementById('endDate').value);
@@ -2639,8 +2651,8 @@ function confirmarPeriodo() {
 }
 
 function confirmarAportes() {
-  const initialAmt = parseFloat(document.getElementById('initialAmount').value) || 0;
-  const monthlyAmt = parseFloat(document.getElementById('monthlyAmount').value) || 0;
+  const initialAmt = valMoney('initialAmount');
+  const monthlyAmt = valMoney('monthlyAmount');
   if (initialAmt < 0 || monthlyAmt < 0) {
     showErr('Os aportes não podem ser negativos.', document.getElementById('btnConfirmarAportes'));
     return;
@@ -3407,8 +3419,8 @@ function validate() {
     if (ed > mesAtual) { showErr(`A data fim não pode ser no futuro (máximo: ${monthLabel(mesAtual)}).`, document.getElementById('btnSimular')); return false; }
   }
   // Garante que ao menos um aporte foi informado para haver resultado
-  const initialAmt = parseFloat(document.getElementById('initialAmount').value) || 0;
-  const monthlyAmt = parseFloat(document.getElementById('monthlyAmount').value) || 0;
+  const initialAmt = valMoney('initialAmount');
+  const monthlyAmt = valMoney('monthlyAmount');
   if (initialAmt < 0 || monthlyAmt < 0) { showErr('Os aportes não podem ser negativos.', document.getElementById('btnSimular')); return false; }
   if (initialAmt <= 0 && monthlyAmt <= 0) { showErr('Informe ao menos um valor de aporte (inicial ou mensal).', document.getElementById('btnSimular')); return false; }
   for (const sel of state.classesSel) {
@@ -3434,8 +3446,8 @@ async function simular() {
   try {
     const startDate = parseDateInput(document.getElementById('startDate').value);
     const endDate   = parseDateInput(document.getElementById('endDate').value);
-    const initialAmount = parseFloat(document.getElementById('initialAmount').value) || 0;
-    const monthlyAmount = parseFloat(document.getElementById('monthlyAmount').value) || 0;
+    const initialAmount = valMoney('initialAmount');
+    const monthlyAmount = valMoney('monthlyAmount');
     const rebalance = state.rebalSim ? (document.getElementById('rebalance')?.value || 'annual') : 'none';
     const rebalMode = state.rebalModeVal || 'passive';
     const assets = buildAssetList();
@@ -3552,8 +3564,8 @@ function novaSim() {
   if (_pizzaMode) editarClassesPizza();
   document.getElementById('startDate').value = '01/2019';
   document.getElementById('endDate').value   = '12/2024';
-  document.getElementById('initialAmount').value = '10000';
-  document.getElementById('monthlyAmount').value  = '500';
+  document.getElementById('initialAmount').value = (10000).toLocaleString('pt-BR');
+  document.getElementById('monthlyAmount').value  = (500).toLocaleString('pt-BR');
   if (document.getElementById('rebalance')) document.getElementById('rebalance').value = '';
   document.getElementById('simName').value   = '';
   document.querySelectorAll('#rebalSimBtn,#rebalNaoBtn,#rebalPassivoBtn,#rebalAtivoBtn,.divmode-btn').forEach(b => b.classList.remove('active'));
@@ -3580,8 +3592,8 @@ function loadSimIntoSidebar(idx) {
   state.dividendMode  = sim.result.dividendMode;
   document.getElementById('startDate').value     = ymToInput(sim.config.startDate);
   document.getElementById('endDate').value       = ymToInput(sim.config.endDate);
-  document.getElementById('initialAmount').value = sim.config.initialAmount;
-  document.getElementById('monthlyAmount').value = sim.config.monthlyAmount;
+  document.getElementById('initialAmount').value = (Number(sim.config.initialAmount)||0).toLocaleString('pt-BR');
+  document.getElementById('monthlyAmount').value = (Number(sim.config.monthlyAmount)||0).toLocaleString('pt-BR');
   // Restore rebal state
   const wasRebal = sim.config.rebalance && sim.config.rebalance !== 'none';
   state.rebalSim = wasRebal;
@@ -4612,8 +4624,8 @@ async function restaurarEstado() {
     const f = dados.form || {};
     if (f.startDate)     document.getElementById('startDate').value     = ymToInput(f.startDate);
     if (f.endDate)       document.getElementById('endDate').value       = ymToInput(f.endDate);
-    if (f.initialAmount) document.getElementById('initialAmount').value = f.initialAmount;
-    if (f.monthlyAmount) document.getElementById('monthlyAmount').value = f.monthlyAmount;
+    if (f.initialAmount) { document.getElementById('initialAmount').value = f.initialAmount; maskMoney(document.getElementById('initialAmount')); }
+    if (f.monthlyAmount) { document.getElementById('monthlyAmount').value = f.monthlyAmount; maskMoney(document.getElementById('monthlyAmount')); }
     if (f.rebalance)     document.getElementById('rebalance').value     = f.rebalance;
     if (f.rebalMode && document.getElementById('rebalMode'))
                          document.getElementById('rebalMode').value     = f.rebalMode;
