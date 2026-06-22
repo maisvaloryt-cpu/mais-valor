@@ -1344,12 +1344,13 @@ function renderCarteiraSwitcher(){
   const el=document.getElementById('carteira-switcher');
   if(!el)return;
   el.innerHTML=`
-    <span style="display:inline-flex;align-items:center;gap:8px">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0">
+    <span style="display:inline-flex;align-items:center;gap:8px;margin-left:16px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0">
         <path d="M17 8V5a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v8a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12"></path>
         <path d="M20 12v4h-4a2 2 0 0 1 0 -4h4"></path>
       </svg>
-      <select id="sel-carteira" onchange="trocarCarteira(this.value)" title="Selecionar carteira">
+      <span style="font-size:14px;font-weight:600;color:var(--text,#ECEAE4);white-space:nowrap">Sua carteira:</span>
+      <select id="sel-carteira" onchange="trocarCarteira(this.value)" title="Selecionar carteira" style="font-size:14px;padding:7px 12px;min-width:150px">
         ${carteiras.map(c=>`<option value="${c.id}" ${c.id===carteiraAtual?'selected':''}>${escapeHtml(c.nome)}</option>`).join('')}
       </select>
       <button class="btn btn-sm" onclick="openModalCarteiras()" title="Configurar carteiras">⚙</button>
