@@ -917,6 +917,10 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
             <!-- BREAKDOWN -->
             <div class="param-group-label" style="margin-bottom:10px">Detalhamento por ativo</div>
             <div class="breakdown-grid" id="breakdownGrid"></div>
+
+            <!-- RESUMO ANUAL -->
+            <div id="resumoAnual" style="margin-top:18px"></div>
+
             <div id="availabilityLog"></div>
           </div>
         </div>
@@ -1764,6 +1768,10 @@ function runBacktest(config, allPrices, allDividends) {
   const primeiroMesComDado = months.find(m => normAssets.some(a => allPrices[a.ticker]?.[m])) || null;
   const dividendsByTicker = {};
   normAssets.forEach(a => dividendsByTicker[a.ticker] = 0);
+  // Cotas adquiridas via REINVESTIMENTO de dividendos (por ativo), para mostrar
+  // "quantas cotas vieram de dividendo" no resultado.
+  const cotasFromDiv = {};
+  normAssets.forEach(a => cotasFromDiv[a.ticker] = 0);
   const series = [];
   let prevVal = null;
 
@@ -1977,6 +1985,11 @@ function runBacktest(config, allPrices, allDividends) {
     });
     totalDividendsEver += totalDivMes;
 
+    // Snapshot das cotas antes de reinvestir os dividendos deste mês — usado depois
+    // para medir quantas cotas foram compradas com dividendo (por ativo).
+    const _hBeforeDiv = {};
+    normAssets.forEach(a => _hBeforeDiv[a.ticker] = holdings[a.ticker]);
+
     if (totalDivMes > 0) {
       if (mode === 'none') {
         // Modo caixa: o dividendo vai para a reserva-CDI (rende 100% do CDI).
@@ -2131,6 +2144,12 @@ function runBacktest(config, allPrices, allDividends) {
       }
     }
 
+    // Cotas líquidas adicionadas após os dividendos = compradas com dividendo.
+    normAssets.forEach(a => {
+      const d = holdings[a.ticker] - _hBeforeDiv[a.ticker];
+      if (d > 0) cotasFromDiv[a.ticker] += d;
+    });
+
     const pv = portValue(month);
     // Patrimônio total = valor dos ativos + reserva-CDI + caixa de espera. A
     // reserva e o caixa entram aqui (no retorno e no valor final), mas NÃO no
@@ -2156,7 +2175,10 @@ function runBacktest(config, allPrices, allDividends) {
       // assim "ação = 50%" continua sendo dentro da parte investida nos ativos.
       weights[a.ticker] = p && pv > 0 ? (holdings[a.ticker]*p)/pv : 0;
     });
-    series.push({ date: month, portfolioValue: patrimonio, ativosValue: pv, reservaCDI, totalInvested, monthReturn: monthRet, dividendsCash, dividendsMonth: totalDivMes, weights });
+    // Snapshots por ativo (cotas e dividendos do mês) para montar o resumo anual.
+    const holdingsSnap = {}, divSnap = {};
+    normAssets.forEach(a => { holdingsSnap[a.ticker] = holdings[a.ticker]; divSnap[a.ticker] = divByTicker[a.ticker] || 0; });
+    series.push({ date: month, portfolioValue: patrimonio, ativosValue: pv, reservaCDI, totalInvested, monthReturn: monthRet, dividendsCash, dividendsMonth: totalDivMes, weights, holdings: holdingsSnap, divByTicker: divSnap });
     prevVal = patrimonio;
   }
 
@@ -2280,13 +2302,25 @@ function runBacktest(config, allPrices, allDividends) {
     const fv = INDICES_ACUMULADOS.has(a.ticker)
       ? holdings[a.ticker]                                   // saldo BRL direto
       : (pFinal && pFinal > 0 ? holdings[a.ticker] * pFinal : 0);
+    // Dados extras: cotas início/fim, cotas vindas de dividendo, preço médio, yield on cost
+    const isIdx = INDICES_ACUMULADOS.has(a.ticker);
+    const fM = priceMap ? months.find(m => priceMap[m]) || null : null;
+    const cotasFim = isIdx ? 0 : holdings[a.ticker];
+    const cotasIni = (series[0] && series[0].holdings) ? (series[0].holdings[a.ticker] || 0) : 0;
+    const custo = custoBase[a.ticker] || 0;
+    const div12 = series.slice(-12).reduce((s,x) => s + ((x.divByTicker && x.divByTicker[a.ticker]) || 0), 0);
     return {
       ticker: a.ticker, assetClass: a.assetClass, targetWeight: a.weight,
       finalValue: fv, contribution: finalValue > 0 ? fv/finalValue : 0,
       totalDividends: dividendsByTicker[a.ticker] || 0,
       mesesComDado, totalMeses: months.length,
-      firstMonth: priceMap ? months.find(m => priceMap[m]) || null : null,
-      lastMonth: lastM,
+      firstMonth: fM, lastMonth: lastM,
+      cotasInicio: cotasIni, cotasFim, cotasFromDiv: cotasFromDiv[a.ticker] || 0,
+      custo, precoMedio: cotasFim > 0 ? custo / cotasFim : 0,
+      precoInicial: fM ? (getPrice(a.ticker, fM) || 0) : 0,
+      precoFinal: pFinal || 0,
+      yieldOnCost: custo > 0 ? div12 / custo : 0,
+      isIndice: isIdx,
     };
   });
 
@@ -2296,18 +2330,56 @@ function runBacktest(config, allPrices, allDividends) {
   // Representa o valor efetivamente investido em ativos com cota.
   const ativosFinal   = Math.max(0, finalValue - reservaFinal - caixaFinal);
 
+  // ── RESUMO ANUAL (consolidado + por ativo) ──
+  const anos = [...new Set(series.map(s => s.date.slice(0,4)))].sort();
+  const yearlyConsolidado = anos.map(ano => {
+    const dosAno = series.filter(s => s.date.slice(0,4) === ano);
+    const ult = dosAno[dosAno.length - 1];
+    const divAno = dosAno.reduce((s,x) => s + (x.dividendsMonth || 0), 0);
+    const retAno = dosAno.reduce((acc,x) => acc * (1 + (x.monthReturn || 0)), 1) - 1;
+    return { ano, valor: ult.portfolioValue, aporte: ult.totalInvested, dividendos: divAno, retorno: retAno };
+  });
+  const yearlyPorAtivo = {};
+  normAssets.forEach(a => {
+    if (INDICES_ACUMULADOS.has(a.ticker)) return;
+    yearlyPorAtivo[a.ticker] = anos.map(ano => {
+      const dosAno = series.filter(s => s.date.slice(0,4) === ano);
+      const ult = dosAno[dosAno.length - 1];
+      const cotas = (ult.holdings && ult.holdings[a.ticker]) || 0;
+      const p = getPrice(a.ticker, ult.date) || 0;
+      const divAno = dosAno.reduce((s,x) => s + ((x.divByTicker && x.divByTicker[a.ticker]) || 0), 0);
+      return { ano, cotas, valor: cotas * p, dividendos: divAno };
+    });
+  });
+  // Melhor / pior ano (retorno) e consistência
+  let melhorAno = null, piorAno = null;
+  yearlyConsolidado.forEach(y => {
+    if (melhorAno === null || y.retorno > melhorAno.retorno) melhorAno = y;
+    if (piorAno === null || y.retorno < piorAno.retorno) piorAno = y;
+  });
+  const mesesRet = series.slice(1);
+  const mesesPos = mesesRet.filter(s => (s.monthReturn || 0) > 0).length;
+  const pctMesesPositivos = mesesRet.length > 0 ? mesesPos / mesesRet.length : 0;
+  const profit = finalValue - totalInvested;
+  const paybackDividendos = totalInvested > 0 ? totalDividendsEver / totalInvested : 0;
+  const rendaPassiva12m = series.slice(-12).reduce((s,x) => s + (x.dividendsMonth || 0), 0);
+  const pctGanhoDividendos = profit > 0 ? totalDividendsEver / profit : 0;
+
   return {
     series, metrics: {
-      finalValue, totalInvested, profit: finalValue - totalInvested,
-      totalReturn: totalInvested > 0 ? (finalValue - totalInvested) / totalInvested : 0,
+      finalValue, totalInvested, profit,
+      totalReturn: totalInvested > 0 ? profit / totalInvested : 0,
       cagr, volatility: vol, sharpeRatio: sharpe, maxDrawdown: maxDD,
       totalDividends: totalDividendsEver, dividendsCash, months: months.length,
       reservaCDI: reservaFinal, ativosValue: ativosFinal,
       caixaEspera: caixaFinal, irPago,
       mesesRetorno: n,   // nº de meses de retorno usados nas métricas de risco
-      primeiroMesComDado
+      primeiroMesComDado,
+      melhorAno, piorAno, pctMesesPositivos, paybackDividendos,
+      rendaPassiva12m, pctGanhoDividendos
     },
-    breakdown, dividendMode: mode
+    breakdown, dividendMode: mode,
+    yearly: { consolidado: yearlyConsolidado, porAtivo: yearlyPorAtivo }
   };
 }
 
@@ -3952,13 +4024,24 @@ function renderSingleView(idx) {
     <div class="metric-card"><div class="metric-label">Meses</div><div class="metric-value">${metrics.months}</div></div>
     <div class="metric-card"><div class="metric-label">Estratégia Div.</div><div class="metric-value" style="font-size:11px;color:var(--sim-text2);font-family:var(--sim-font)">${divModeLabel[dividendMode]}</div></div>
     ${(metrics.irPago || 0) > 0.005 ? `<div class="metric-card"><div class="metric-label">IR estimado pago</div><div class="metric-value red">${brl(metrics.irPago)}</div><div class="metric-sub">Vendas do rebal + reserva</div></div>` : ''}
+    ${metrics.melhorAno ? `<div class="metric-card"><div class="metric-label">Melhor ano</div><div class="metric-value green">${pct(metrics.melhorAno.retorno)}</div><div class="metric-sub">${metrics.melhorAno.ano}</div></div>` : ''}
+    ${metrics.piorAno ? `<div class="metric-card"><div class="metric-label">Pior ano</div><div class="metric-value ${metrics.piorAno.retorno<0?'red':''}">${pct(metrics.piorAno.retorno)}</div><div class="metric-sub">${metrics.piorAno.ano}</div></div>` : ''}
+    <div class="metric-card"><div class="metric-label">Meses positivos</div><div class="metric-value">${pct(metrics.pctMesesPositivos)}</div><div class="metric-sub">Consistência</div></div>
+    ${(metrics.totalDividends||0) > 0.005 ? `<div class="metric-card"><div class="metric-label">Payback dividendos</div><div class="metric-value gold">${(metrics.paybackDividendos||0).toFixed(2)}x</div><div class="metric-sub">do que foi aportado</div></div>` : ''}
+    ${(metrics.rendaPassiva12m||0) > 0.005 ? `<div class="metric-card"><div class="metric-label">Renda passiva (12m)</div><div class="metric-value gold">${brl(metrics.rendaPassiva12m)}</div><div class="metric-sub">≈ ${brl(metrics.rendaPassiva12m/12)}/mês</div></div>` : ''}
+    ${(metrics.totalDividends||0) > 0.005 && metrics.profit > 0 ? `<div class="metric-card"><div class="metric-label">Dividendos / lucro</div><div class="metric-value gold">${pct(metrics.pctGanhoDividendos)}</div><div class="metric-sub">do lucro veio de proventos</div></div>` : ''}
   `;
 
   // Breakdown por ativo
+  const nCotas = v => (v||0).toLocaleString('pt-BR', {maximumFractionDigits: 2});
   const maxFV = Math.max(...breakdown.map(b => b.finalValue), 1);
   document.getElementById('breakdownGrid').innerHTML = breakdown.map(b => {
     const coverPct = b.totalMeses > 0 ? Math.round(b.mesesComDado / b.totalMeses * 100) : 0;
     const coverColor = coverPct === 100 ? 'var(--up)' : coverPct > 50 ? 'var(--gold)' : 'var(--dn)';
+    const linhasCotas = b.isIndice ? '' : `
+        <div class="bd-divs">Cotas: ${nCotas(b.cotasInicio)} → <b style="color:var(--sim-text)">${nCotas(b.cotasFim)}</b>${b.cotasFromDiv>0.0001?` <span style="color:var(--gold)">(+${nCotas(b.cotasFromDiv)} de dividendo)</span>`:''}</div>
+        <div class="bd-divs">Preço médio: ${brl(b.precoMedio)} → atual ${brl(b.precoFinal)}</div>
+        ${b.yieldOnCost>0?`<div class="bd-divs">Yield on cost: <span style="color:var(--gold)">${pct(b.yieldOnCost)}</span></div>`:''}`;
     return `
       <div class="breakdown-card">
         <div class="bd-ticker">${b.ticker}
@@ -3967,10 +4050,54 @@ function renderSingleView(idx) {
         <div class="bd-class">${b.assetClass} · ${pct(b.targetWeight)}</div>
         <div class="bd-val">${brl(b.finalValue)}</div>
         <div class="bd-divs">Dividendos: ${brl(b.totalDividends)}</div>
+        ${linhasCotas}
         <div class="bd-bar-wrap"><div class="bd-bar" style="width:${(b.finalValue/maxFV*100).toFixed(1)}%"></div></div>
       </div>
     `;
   }).join('');
+
+  // ── Resumo anual (consolidado + por ativo expansível) ──
+  const elAnual = document.getElementById('resumoAnual');
+  if (elAnual && result.yearly && result.yearly.consolidado.length) {
+    const yc = result.yearly.consolidado;
+    const linhasCons = yc.map(y => `
+      <tr>
+        <td style="font-family:var(--sim-mono)">${y.ano}</td>
+        <td class="r">${brl(y.valor)}</td>
+        <td class="r">${brl(y.aporte)}</td>
+        <td class="r gold">${brl(y.dividendos)}</td>
+        <td class="r ${y.retorno>=0?'green':'red'}">${pct(y.retorno)}</td>
+      </tr>`).join('');
+    const tabelaCons = `
+      <div class="param-group-label" style="margin:6px 0 8px">Resumo anual — carteira</div>
+      <div style="overflow-x:auto"><table class="sim-anual"><thead><tr>
+        <th>Ano</th><th class="r">Patrimônio</th><th class="r">Aportado</th><th class="r">Dividendos</th><th class="r">Retorno</th>
+      </tr></thead><tbody>${linhasCons}</tbody></table></div>`;
+
+    const porAtivo = result.yearly.porAtivo || {};
+    const tabelasAtivo = Object.keys(porAtivo).map(tk => {
+      const linhas = porAtivo[tk].map(y => `
+        <tr>
+          <td style="font-family:var(--sim-mono)">${y.ano}</td>
+          <td class="r">${nCotas(y.cotas)}</td>
+          <td class="r">${brl(y.valor)}</td>
+          <td class="r gold">${brl(y.dividendos)}</td>
+        </tr>`).join('');
+      return `<details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:var(--sim-text2);font-family:var(--sim-font)">${tk} — ano a ano</summary>
+        <div style="overflow-x:auto;margin-top:6px"><table class="sim-anual"><thead><tr>
+          <th>Ano</th><th class="r">Cotas</th><th class="r">Valor</th><th class="r">Dividendos</th>
+        </tr></thead><tbody>${linhas}</tbody></table></div></details>`;
+    }).join('');
+
+    const estilo = `<style>
+      table.sim-anual{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--sim-mono)}
+      table.sim-anual th{text-align:left;color:var(--sim-text2);font-weight:700;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.1);font-family:var(--sim-font);font-size:11px}
+      table.sim-anual td{padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.05)}
+      table.sim-anual .r{text-align:right}
+      table.sim-anual .green{color:var(--up)} table.sim-anual .red{color:var(--dn)} table.sim-anual .gold{color:var(--gold)}
+    </style>`;
+    elAnual.innerHTML = estilo + tabelaCons + tabelasAtivo;
+  } else if (elAnual) { elAnual.innerHTML = ''; }
 
   // Linha do tempo por ativo
   const logEl = document.getElementById('availabilityLog');
