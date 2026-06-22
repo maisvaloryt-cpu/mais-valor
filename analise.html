@@ -399,6 +399,12 @@ function acKey(e) {
 
 async function init(){
   await loadData();
+  // Se veio da página do ativo (?t=PETR4), já deixa a empresa selecionada no campo.
+  const _tParam=new URLSearchParams(location.search).get('t');
+  if(_tParam){
+    const inp=document.getElementById('a-ticker');
+    if(inp){ inp.value=_tParam.toUpperCase().trim(); }
+  }
   // Fecha dropdown ao clicar fora
   document.addEventListener('click', e => {
     if (!e.target.closest('#a-ticker') && !e.target.closest('#ac-dropdown')) {
