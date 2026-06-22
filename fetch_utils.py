@@ -19,17 +19,31 @@ SI_HEADERS = {
     "Referer": "https://statusinvest.com.br/",
     "x-requested-with": "XMLHttpRequest",
 }
-BRAPI_TOKENS = [
+# Todas as chaves Brapi disponíveis (BRAPI_TOKEN_1..5; a "sem número" = _1).
+# Usamos RODÍZIO: cada ticker consome a próxima chave, distribuindo o gasto
+# entre todas em vez de queimar só uma.
+_BRAPI_RAW = [
+    os.environ.get("BRAPI_TOKEN_1", "") or os.environ.get("BRAPI_TOKEN", ""),
     os.environ.get("BRAPI_TOKEN_2", ""),
     os.environ.get("BRAPI_TOKEN_3", ""),
     os.environ.get("BRAPI_TOKEN_4", ""),
     os.environ.get("BRAPI_TOKEN_5", ""),
 ]
-BRAPI_TOKENS = [t for t in BRAPI_TOKENS if t]
-# Fallback para token 1 se nenhum dos outros estiver disponível
-if not BRAPI_TOKENS:
-    BRAPI_TOKENS = [os.environ.get("BRAPI_TOKEN_1", os.environ.get("BRAPI_TOKEN", ""))]
-BRAPI_TOKEN = BRAPI_TOKENS[0] if BRAPI_TOKENS else ""
+BRAPI_TOKENS = []
+for _t in _BRAPI_RAW:
+    if _t and _t not in BRAPI_TOKENS:   # remove vazios e duplicados
+        BRAPI_TOKENS.append(_t)
+BRAPI_TOKEN = BRAPI_TOKENS[0] if BRAPI_TOKENS else ""  # compat (1ª chave)
+_brapi_idx = 0
+
+def _next_brapi_token() -> str:
+    """Retorna a próxima chave Brapi em rodízio (round-robin)."""
+    global _brapi_idx
+    if not BRAPI_TOKENS:
+        return ""
+    tok = BRAPI_TOKENS[_brapi_idx % len(BRAPI_TOKENS)]
+    _brapi_idx += 1
+    return tok
 
 
 def merge_historico(path: str, ticker: str, novos_pts: list) -> int:
@@ -122,9 +136,10 @@ def fetch_yahoo_mensal(symbol: str, anos: int = 12) -> list:
 
 def fetch_brapi_mensal(ticker: str) -> list:
     """Busca histórico mensal via Brapi. ticker ex: 'PETR4'"""
-    if not BRAPI_TOKEN:
+    token = _next_brapi_token()   # rodízio entre as chaves
+    if not token:
         return []
-    token_param = f"?token={BRAPI_TOKEN}"
+    token_param = f"?token={token}"
     url = f"https://brapi.dev/api/quote/{ticker}{token_param}&range=10y&interval=1mo"
     try:
         r = requests.get(url, headers=YAHOO_HEADERS, timeout=20)

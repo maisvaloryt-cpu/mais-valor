@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       modo:
-        description: 'diario | g1-g5 | fii1-fii4 | dividendos | indices | relatorio | fundamentalistas | setup | us-diario | us1 | us2 | us3 | us4 | us5 | etfs | bdrs | hist-etfs | hist-bdrs'
+        description: 'diario | hist-all (regenera todo o histórico BR) | g1-g5 | fii1-fii4 | dividendos | indices | relatorio | fundamentalistas | setup | us-diario | us1 | us2 | us3 | us4 | us5 | etfs | bdrs | hist-etfs | hist-bdrs'
         required: false
         default: 'diario'
 
@@ -91,6 +91,7 @@ jobs:
       - name: Cotações diárias
         if: ${{ steps.modo.outputs.modo == 'diario' }}
         env:
+          BRAPI_TOKEN_1: ${{ secrets.BRAPI_TOKEN_1 }}
           BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
           BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
           BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
@@ -161,6 +162,7 @@ jobs:
       - name: Histórico Ações G1
         if: ${{ steps.modo.outputs.modo == 'g1' }}
         env:
+          BRAPI_TOKEN_1: ${{ secrets.BRAPI_TOKEN_1 }}
           BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
           BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
           BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
@@ -170,6 +172,7 @@ jobs:
       - name: Histórico Ações G2
         if: ${{ steps.modo.outputs.modo == 'g2' }}
         env:
+          BRAPI_TOKEN_1: ${{ secrets.BRAPI_TOKEN_1 }}
           BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
           BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
           BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
@@ -179,6 +182,7 @@ jobs:
       - name: Histórico Ações G3
         if: ${{ steps.modo.outputs.modo == 'g3' }}
         env:
+          BRAPI_TOKEN_1: ${{ secrets.BRAPI_TOKEN_1 }}
           BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
           BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
           BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
@@ -188,6 +192,7 @@ jobs:
       - name: Histórico Ações G4
         if: ${{ steps.modo.outputs.modo == 'g4' }}
         env:
+          BRAPI_TOKEN_1: ${{ secrets.BRAPI_TOKEN_1 }}
           BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
           BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
           BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
@@ -197,6 +202,7 @@ jobs:
       - name: Histórico Ações G5
         if: ${{ steps.modo.outputs.modo == 'g5' }}
         env:
+          BRAPI_TOKEN_1: ${{ secrets.BRAPI_TOKEN_1 }}
           BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
           BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
           BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
@@ -206,6 +212,7 @@ jobs:
       - name: Histórico FIIs G1
         if: ${{ steps.modo.outputs.modo == 'fii1' }}
         env:
+          BRAPI_TOKEN_1: ${{ secrets.BRAPI_TOKEN_1 }}
           BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
           BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
           BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
@@ -215,6 +222,7 @@ jobs:
       - name: Histórico FIIs G2
         if: ${{ steps.modo.outputs.modo == 'fii2' }}
         env:
+          BRAPI_TOKEN_1: ${{ secrets.BRAPI_TOKEN_1 }}
           BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
           BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
           BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
@@ -224,6 +232,7 @@ jobs:
       - name: Histórico FIIs G3
         if: ${{ steps.modo.outputs.modo == 'fii3' }}
         env:
+          BRAPI_TOKEN_1: ${{ secrets.BRAPI_TOKEN_1 }}
           BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
           BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
           BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
@@ -233,11 +242,31 @@ jobs:
       - name: Histórico FIIs G4
         if: ${{ steps.modo.outputs.modo == 'fii4' }}
         env:
+          BRAPI_TOKEN_1: ${{ secrets.BRAPI_TOKEN_1 }}
           BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
           BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
           BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
           BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
         run: python fetch_historico_fii_g4.py
+
+      - name: Histórico TODOS BR (ações G1-G5 + FIIs G1-G4)
+        if: ${{ steps.modo.outputs.modo == 'hist-all' }}
+        env:
+          BRAPI_TOKEN_1: ${{ secrets.BRAPI_TOKEN_1 }}
+          BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
+          BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
+          BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
+          BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
+        run: |
+          python fetch_historico_g1.py
+          python fetch_historico_g2.py
+          python fetch_historico_g3.py
+          python fetch_historico_g4.py
+          python fetch_historico_g5.py
+          python fetch_historico_fii_g1.py
+          python fetch_historico_fii_g2.py
+          python fetch_historico_fii_g3.py
+          python fetch_historico_fii_g4.py
 
       # ── HISTÓRICO EUA (S&P 500) — grupos de ~100 tickers cada ─────────────────
       - name: Histórico EUA US1 (~100 tickers)
