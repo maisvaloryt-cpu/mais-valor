@@ -124,15 +124,18 @@ body { padding: 0 0 2rem; }
 /* ── Abas internas do Consolidador ── */
 .tabs {
   display: flex;
+  align-items: stretch;
   gap: 0;
   border-bottom: 1px solid var(--border, rgba(255,255,255,0.06));
   margin-bottom: 1.25rem;
-  overflow-x: auto;
 }
 /* O style.css do site principal aplica .tabs{margin:0 auto} e CENTRALIZA as abas,
    desalinhando-as do seletor de carteira. Aqui (maior especificidade) forçamos as
    abas a começarem na esquerda, alinhadas com o seletor. */
 .app .tabs { margin-left: 0; margin-right: auto; }
+/* As abas rolam na horizontal aqui dentro; os botões (Importar/Transação) ficam fixos à direita. */
+.tabs-scroll { display: flex; overflow-x: auto; flex: 1 1 auto; min-width: 0; }
+.tabs-actions { display: flex; align-items: center; gap: 7px; flex-shrink: 0; margin-left: auto; padding-bottom: 4px; }
 .tab {
   padding: 9px 16px;
   font-size: 12px;
@@ -523,6 +526,12 @@ select option { background: var(--bg2, #0E0E11); color: var(--text, #ECEAE4); }
   .grupo-stats { display: none; }
   .carteira-switcher { width: 100%; order: -1; margin-right: 0; margin-bottom: 6px; }
   .carteira-switcher select { flex: 1; max-width: none; }
+
+  /* No celular: botões numa linha própria ENTRE o seletor e as abas (sempre visíveis). */
+  .tabs { flex-direction: column; align-items: stretch; }
+  .tabs-actions { order: -1; margin: 0 0 8px 0; padding-bottom: 0; justify-content: flex-end; }
+  .tabs-actions .btn { flex: 1; justify-content: center; }
+  .tabs-scroll { width: 100%; }
 
   /* Tabela "Meus ativos" rola na horizontal no celular (12 colunas não cabem) */
   .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
