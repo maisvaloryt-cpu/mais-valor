@@ -41,7 +41,7 @@
         </select>
       </div>
       <div style="position:relative;height:220px"><canvas id="chartBench" role="img" aria-label="Carteira comparada a IBOV, CDI e IPCA"></canvas></div>
-      <div style="font-size:10px;color:var(--color-text-secondary);margin-top:8px">Simula seus mesmos aportes aplicados no IBOV, no CDI e corrigidos pelo IPCA (inflação). Linha verde = sua carteira de verdade.</div>
+      <div style="font-size:10px;color:var(--color-text-secondary);margin-top:8px">Simula seus mesmos aportes aplicados no IBOV, no CDI e corrigidos pelo IPCA (inflação). Linha amarela = sua carteira de verdade.</div>
     </div>
     <div class="card" style="margin-bottom:1.25rem">
       <div class="card-title"><i class="ti ti-telescope" aria-hidden="true" style="color:#1D9E75"></i>Projeção do patrimônio</div>
@@ -99,9 +99,9 @@ function renderPatrimonio(){
     data:{
       labels:clsKeys.map(k=>CLASS_LABEL[k]||k),
       datasets:[
-        {label:'Custo',data:clsKeys.map(k=>parseFloat(bcc[k].custo.toFixed(2))),backgroundColor:'#185FA5',stack:'s',borderRadius:2},
-        {label:'Ganho',data:clsKeys.map(k=>parseFloat(Math.max(0,bcc[k].res).toFixed(2))),backgroundColor:'#1D9E75',stack:'s',borderRadius:2},
-        {label:'Perda',data:clsKeys.map(k=>parseFloat(Math.min(0,bcc[k].res).toFixed(2))),backgroundColor:'#E24B4A',stack:'s',borderRadius:2}
+        {label:'Custo',data:clsKeys.map(k=>parseFloat(bcc[k].custo.toFixed(2))),backgroundColor:'#DC2626',stack:'s',borderRadius:2},
+        {label:'Ganho',data:clsKeys.map(k=>parseFloat(Math.max(0,bcc[k].res).toFixed(2))),backgroundColor:'#FFCC00',stack:'s',borderRadius:2},
+        {label:'Perda',data:clsKeys.map(k=>parseFloat(Math.min(0,bcc[k].res).toFixed(2))),backgroundColor:'#F97316',stack:'s',borderRadius:2}
       ]
     },
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtR(c.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#888',font:{size:10}}},y:{grid:{color:'rgba(128,128,128,0.08)'},ticks:{color:'#888',font:{size:10},callback:v=>'R$'+Math.round(v/1000)+'k'}}}}
@@ -224,7 +224,7 @@ async function renderBenchmark(nMeses=24){
   charts.bench=new Chart(ctx.getContext('2d'),{
     type:'line',
     data:{labels:evol.map(m=>m.label),datasets:[
-      {label:'Sua carteira',data:carteira,borderColor:'#1D9E75',backgroundColor:'transparent',borderWidth:2.5,tension:.25,pointRadius:0},
+      {label:'Sua carteira',data:carteira,borderColor:'#FFCC00',backgroundColor:'transparent',borderWidth:2.5,tension:.25,pointRadius:0},
       {label:'IBOV',data:ibov,borderColor:'#2E86C1',backgroundColor:'transparent',borderWidth:1.5,tension:.25,pointRadius:0},
       {label:'CDI',data:cdi,borderColor:'#BA7517',backgroundColor:'transparent',borderWidth:1.5,tension:.25,pointRadius:0,borderDash:[5,3]},
       {label:'IPCA (inflação)',data:ipca,borderColor:'#888',backgroundColor:'transparent',borderWidth:1.2,tension:.25,pointRadius:0,borderDash:[2,3]}
