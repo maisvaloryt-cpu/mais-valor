@@ -515,17 +515,30 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
 
 
 /* ── BREAKDOWN ── */
-.breakdown-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.breakdown-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(225px, 1fr)); gap: 10px; }
 .breakdown-card {
   background: var(--sim-surf2); border: 1px solid var(--sim-border);
-  border-radius: var(--sim-r); padding: 12px 14px;
+  border-radius: var(--sim-r); padding: 12px 14px; display: flex; flex-direction: column;
 }
+.bd-head { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; }
 .bd-ticker { font-family: var(--sim-mono); font-size: 12px; font-weight: 600; }
-.bd-class { font-size: 9px; color: var(--sim-text3); margin-bottom: 8px; }
+.bd-class { font-size: 9px; color: var(--sim-text3); margin: 2px 0 8px; }
+.bd-slides { flex: 1; min-height: 70px; }
+.bd-slide { display: none; }
+.bd-slide.active { display: block; }
+.bd-slide-label { font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--sim-text3); margin-bottom: 4px; }
 .bd-val { font-family: var(--sim-mono); font-size: 16px; color: var(--sim-accent); font-weight: 600; }
-.bd-divs { font-size: 10px; color: var(--sim-text2); margin-top: 2px; }
+.bd-val .green { color: var(--up); } .bd-val .red { color: var(--dn); }
+.bd-divs { font-size: 11px; color: var(--sim-text2); margin-top: 3px; line-height: 1.5; }
+.bd-divs .green { color: var(--up); } .bd-divs .red { color: var(--dn); }
 .bd-bar-wrap { margin-top: 8px; background: var(--sim-surf3); border-radius: 2px; height: 3px; }
 .bd-bar { height: 3px; border-radius: 2px; background: var(--sim-accent); }
+.bd-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+.bd-nav button { background: transparent; border: 1px solid var(--sim-border); color: var(--sim-text2); border-radius: 6px; width: 24px; height: 22px; cursor: pointer; font-size: 14px; line-height: 1; padding: 0; }
+.bd-nav button:hover { color: var(--sim-text); border-color: var(--sim-text3); }
+.bd-dots { display: flex; gap: 5px; align-items: center; }
+.bd-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--sim-text3); opacity: .35; }
+.bd-dot.on { opacity: 1; background: var(--sim-accent); }
 
 /* ── COMPARE VIEW ── */
 .compare-metrics { display: grid; gap: 16px; margin-bottom: 20px; }
@@ -3991,6 +4004,38 @@ function renderAvailabilityLog(logs) {
   `;
 }
 
+// Carrossel dentro do card de cada ativo: alterna entre Valor/Cotas/Preço/Dividendos
+function bdSlideCard(card, dir) {
+  if (!card) return;
+  const slides = [...card.querySelectorAll('.bd-slide')];
+  if (slides.length < 2) return;
+  const dots = [...card.querySelectorAll('.bd-dot')];
+  let i = slides.findIndex(s => s.classList.contains('active'));
+  if (i < 0) i = 0;
+  slides[i].classList.remove('active'); if (dots[i]) dots[i].classList.remove('on');
+  i = (i + dir + slides.length) % slides.length;
+  slides[i].classList.add('active'); if (dots[i]) dots[i].classList.add('on');
+}
+function bdSlide(btn, dir) { bdSlideCard(btn.closest('.breakdown-card'), dir); }
+// Arrastar (swipe) no card pra trocar de slide — delegado, ligado uma vez só.
+function bindBreakdownSwipe() {
+  const grid = document.getElementById('breakdownGrid');
+  if (!grid || grid._swipeBound) return;
+  grid._swipeBound = true;
+  let x0 = null, y0 = null, card0 = null;
+  grid.addEventListener('touchstart', e => {
+    const t = e.touches[0]; x0 = t.clientX; y0 = t.clientY;
+    card0 = e.target.closest('.breakdown-card');
+  }, { passive: true });
+  grid.addEventListener('touchend', e => {
+    if (x0 == null || !card0) { x0 = y0 = card0 = null; return; }
+    const t = e.changedTouches[0];
+    const dx = t.clientX - x0, dy = t.clientY - y0;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) bdSlideCard(card0, dx < 0 ? 1 : -1);
+    x0 = y0 = card0 = null;
+  }, { passive: true });
+}
+
 function renderSingleView(idx) {
   document.getElementById('singleView').style.display  = 'block';
   document.getElementById('compareView').style.display = 'none';
@@ -4044,29 +4089,54 @@ function renderSingleView(idx) {
     ${(metrics.totalDividends||0) > 0.005 && metrics.profit > 0 ? `<div class="metric-card"><div class="metric-label">Dividendos / lucro</div><div class="metric-value gold">${pct(metrics.pctGanhoDividendos)}</div><div class="metric-sub">do lucro veio de proventos</div></div>` : ''}
   `;
 
-  // Breakdown por ativo
+  // Breakdown por ativo — cada card é um carrossel (Valor / Cotas / Preço / Dividendos)
   const nCotas = v => (v||0).toLocaleString('pt-BR', {maximumFractionDigits: 2});
   const maxFV = Math.max(...breakdown.map(b => b.finalValue), 1);
   document.getElementById('breakdownGrid').innerHTML = breakdown.map(b => {
     const coverPct = b.totalMeses > 0 ? Math.round(b.mesesComDado / b.totalMeses * 100) : 0;
     const coverColor = coverPct === 100 ? 'var(--up)' : coverPct > 50 ? 'var(--gold)' : 'var(--dn)';
-    const linhasCotas = b.isIndice ? '' : `
-        <div class="bd-divs">Cotas: ${nCotas(b.cotasInicio)} → <b style="color:var(--sim-text)">${nCotas(b.cotasFim)}</b>${b.cotasFromDiv>0.0001?` <span style="color:var(--gold)">(+${nCotas(b.cotasFromDiv)} de dividendo)</span>`:''}</div>
-        <div class="bd-divs">Preço médio: ${brl(b.precoMedio)} → atual ${brl(b.precoFinal)}</div>
-        ${b.yieldOnCost>0?`<div class="bd-divs">Yield on cost: <span style="color:var(--gold)">${pct(b.yieldOnCost)}</span></div>`:''}`;
+    const slides = [];
+    // Valor
+    slides.push(`<div class="bd-slide-label">Valor final</div>
+      <div class="bd-val">${brl(b.finalValue)}</div>
+      <div class="bd-divs">${pct(b.contribution)} da carteira</div>
+      <div class="bd-bar-wrap"><div class="bd-bar" style="width:${(b.finalValue/maxFV*100).toFixed(1)}%"></div></div>`);
+    if (!b.isIndice) {
+      // Cotas
+      slides.push(`<div class="bd-slide-label">Cotas</div>
+        <div class="bd-val" style="font-size:14px">${nCotas(b.cotasInicio)} <span style="color:var(--sim-text3)">→</span> ${nCotas(b.cotasFim)}</div>
+        ${b.cotasFromDiv>0.0001 ? `<div class="bd-divs" style="color:var(--gold)">+${nCotas(b.cotasFromDiv)} compradas com dividendo</div>` : '<div class="bd-divs">início → fim</div>'}`);
+      // Preço
+      const valoriz = b.precoInicial>0 ? (b.precoFinal/b.precoInicial - 1) : null;
+      slides.push(`<div class="bd-slide-label">Preço da cota</div>
+        <div class="bd-val" style="font-size:14px">${brl(b.precoMedio)} <span style="color:var(--sim-text3);font-size:11px">médio</span></div>
+        <div class="bd-divs">Atual: ${brl(b.precoFinal)}${valoriz!=null?` · <span class="${valoriz>=0?'green':'red'}">${pct(valoriz)}</span>`:''}</div>`);
+    }
+    // Dividendos
+    slides.push(`<div class="bd-slide-label">Dividendos</div>
+      <div class="bd-val" style="color:var(--gold)">${brl(b.totalDividends)}</div>
+      ${b.yieldOnCost>0 ? `<div class="bd-divs">Yield on cost: <span style="color:var(--gold)">${pct(b.yieldOnCost)}</span></div>` : '<div class="bd-divs">no período</div>'}`);
+
+    const slidesHtml = slides.map((s,i) => `<div class="bd-slide ${i===0?'active':''}">${s}</div>`).join('');
+    const dots = slides.map((_,i) => `<span class="bd-dot ${i===0?'on':''}"></span>`).join('');
+    const nav = slides.length > 1 ? `<div class="bd-nav">
+        <button type="button" onclick="bdSlide(this,-1)" aria-label="Anterior">‹</button>
+        <span class="bd-dots">${dots}</span>
+        <button type="button" onclick="bdSlide(this,1)" aria-label="Próximo">›</button>
+      </div>` : '';
     return `
       <div class="breakdown-card">
-        <div class="bd-ticker">${b.ticker}
-          <span style="font-size:9px;font-weight:700;font-family:var(--sim-mono);margin-left:4px;color:${coverColor}">${coverPct}% do período</span>
+        <div class="bd-head">
+          <span class="bd-ticker">${b.ticker}</span>
+          <span style="font-size:9px;font-weight:700;font-family:var(--sim-mono);color:${coverColor}">${coverPct}%</span>
         </div>
         <div class="bd-class">${b.assetClass} · ${pct(b.targetWeight)}</div>
-        <div class="bd-val">${brl(b.finalValue)}</div>
-        <div class="bd-divs">Dividendos: ${brl(b.totalDividends)}</div>
-        ${linhasCotas}
-        <div class="bd-bar-wrap"><div class="bd-bar" style="width:${(b.finalValue/maxFV*100).toFixed(1)}%"></div></div>
+        <div class="bd-slides">${slidesHtml}</div>
+        ${nav}
       </div>
     `;
   }).join('');
+  bindBreakdownSwipe();
 
   // ── Resumo anual (consolidado + por ativo expansível) ──
   const elAnual = document.getElementById('resumoAnual');
