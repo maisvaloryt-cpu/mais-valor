@@ -1407,18 +1407,22 @@ const NAV_TABS=[
 function renderHeaderAndNav(active){
   const headerActions=document.getElementById('header-actions');
   if(headerActions){
+    // Só o seletor de carteira fica nesta linha. Os botões Importar/Transação foram
+    // pro final da linha das ABAS (ali sobra espaço à direita).
     headerActions.innerHTML=`
       <div class="carteira-switcher" id="carteira-switcher"></div>
-      <button class="btn" onclick="openImport()"><i class="ti ti-file-spreadsheet" aria-hidden="true"></i> Importar Excel</button>
-      <input type="file" id="csv-input" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleCSVImport(this)">
-      <button class="btn btn-primary" onclick="openModal()" style="position:relative">+ Transação<span id="rf-badge" title="Há Renda Fixa sem dados" style="display:none;position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#e23b3b;color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center;box-shadow:0 0 0 2px var(--bg2,#16161a)">!</span></button>
     `;
     renderCarteiraSwitcher();
-    atualizarBadgeRF();
   }
   const tabsEl=document.getElementById('tabs');
   if(tabsEl){
-    tabsEl.innerHTML=NAV_TABS.map(t=>`<a class="tab ${t.id===active?'active':''}" href="${t.href}"><i class="ti ${t.icon}" aria-hidden="true"></i> ${t.label}</a>`).join('');
+    tabsEl.innerHTML=NAV_TABS.map(t=>`<a class="tab ${t.id===active?'active':''}" href="${t.href}"><i class="ti ${t.icon}" aria-hidden="true"></i> ${t.label}</a>`).join('')
+      +`<div class="tabs-actions" style="margin-left:auto;display:flex;align-items:center;gap:7px;flex-shrink:0;padding-bottom:4px">
+          <input type="file" id="csv-input" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleCSVImport(this)">
+          <button class="btn btn-sm" onclick="openImport()"><i class="ti ti-file-spreadsheet" aria-hidden="true"></i> Importar Excel</button>
+          <button class="btn btn-sm btn-primary" onclick="openModal()" style="position:relative">+ Transação<span id="rf-badge" title="Há Renda Fixa sem dados" style="display:none;position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#e23b3b;color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center;box-shadow:0 0 0 2px var(--bg2,#16161a)">!</span></button>
+        </div>`;
+    atualizarBadgeRF();
   }
   mvInitSpaTabs();
 }
