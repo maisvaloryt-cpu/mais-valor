@@ -1,5 +1,5 @@
 {
-  "updated_at": "22/06/2026 17:14",
+  "updated_at": "22/06/2026 17:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,8 +1128,8 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 170539.08,
-      "changePct": 0.0131,
+      "price": 170370.38,
+      "changePct": 0.0121,
       "high": 170749.77,
       "low": 168326.27
     },
@@ -1138,8 +1138,8 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3795.89,
-      "changePct": -0.0011,
+      "price": 3796.44,
+      "changePct": -0.001,
       "high": 3804.08,
       "low": 3792.06
     },
@@ -1158,9 +1158,9 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 12129.93,
-      "changePct": 0.013300000000000001,
-      "high": 12129.93,
+      "price": 12121.11,
+      "changePct": 0.0126,
+      "high": 12130.34,
       "low": 11970.63
     },
     {
@@ -1218,8 +1218,8 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 3004.74,
-      "changePct": 0.0084,
+      "price": 3004.4,
+      "changePct": 0.0083,
       "high": 3015.41,
       "low": 2985.09
     },
