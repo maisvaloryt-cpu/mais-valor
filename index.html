@@ -374,7 +374,7 @@ function switchTab(tab, el) {
   document.getElementById('filter-input').value = '';
   document.getElementById('ver-todos-link').href = tab === 'acoes' ? 'acoes.html' : 'fiis.html';
   document.getElementById('ver-todos-link').textContent = `Ver ${tab === 'acoes' ? 'todas as ações' : 'todos os FIIs'} →`;
-  sortTable('score');   // já abre ordenado por Score (maior → menor)
+  sortTable('volNum');   // já abre ordenado por Volume (maior → menor)
   if (currentData.length) { loadChart(currentData[0]); resetCarouselTimer(); }
 }
 
@@ -567,7 +567,7 @@ async function init() {
   currentData = buildTabData('acoes');
   sortCol = null; sortAsc = false;
   updateDynCols('acoes');
-  sortTable('score');   // tabela já abre ordenada por Score (maior → menor)
+  sortTable('volNum');   // tabela já abre ordenada por Volume (maior → menor)
   await startCarousel();
   renderSidebar();
   updateMiniCards();
