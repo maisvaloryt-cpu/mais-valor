@@ -116,6 +116,10 @@
             <button class="range-btn" onclick="setRange('5A',this)">5A</button>
             <button class="range-btn" onclick="setRange('10A',this)">10A</button>
           </div>
+          <div style="display:flex;gap:4px;margin-bottom:1rem">
+            <button class="range-btn active" id="cm-padrao" onclick="setChartMode('padrao',this)" title="Cotação sem dividendos (preço de mercado)">Padrão</button>
+            <button class="range-btn" id="cm-ajustado" onclick="setChartMode('ajustado',this)" title="Cotação ajustada por proventos (com dividendos reinvestidos)">Ajustado</button>
+          </div>
           <div style="position:relative;height:260px">
             <canvas id="mainChart" role="img" aria-label="Histórico"></canvas>
           </div>
@@ -207,7 +211,7 @@ window.MV_LOGO_SVG = '<svg viewBox="0 0 530 530" xmlns="http://www.w3.org/2000/s
 const params = new URLSearchParams(location.search);
 const TICKER = (params.get('t') || 'PETR4').toUpperCase();
 const TIPO = params.get('tipo') || 'acao';
-let ativo=null, mainChart=null, currentRange='1A', histData=[], divData=[];
+let ativo=null, mainChart=null, currentRange='1A', histData=[], divData=[], chartMode='padrao';
 
 function switchTab(id,el){
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
@@ -415,7 +419,9 @@ async function drawChartWithCDI() {
   const filt = filterByRange(histData, currentRange);
   let pts, labels;
   if (filt && filt.length > 2) {
-    pts = filt.map(p => p.close);
+    // Padrão = preço sem dividendos (close). Ajustado = com proventos (adj).
+    // Se o ponto não tiver 'adj' (dado antigo/diário), cai pro close.
+    pts = filt.map(p => chartMode === 'ajustado' ? (p.adj ?? p.close) : p.close);
     labels = filt.map(p => p.date);
     const mn = Math.min(...pts), mx = Math.max(...pts);
     document.getElementById('ch-min').textContent = 'R$ ' + mn.toFixed(2);
@@ -502,7 +508,14 @@ async function drawChartWithCDI() {
 
 function setRange(r,el){
   currentRange=r;
-  document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active'));
+  // só desativa os botões de período (mesma classe do toggle, mas IDs cm-* ficam de fora)
+  document.querySelectorAll('.range-btn').forEach(b=>{ if(!b.id||!b.id.startsWith('cm-'))b.classList.remove('active'); });
+  el.classList.add('active');
+  drawChartWithCDI();
+}
+function setChartMode(m,el){
+  chartMode=m;
+  ['cm-padrao','cm-ajustado'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
   el.classList.add('active');
   drawChartWithCDI();
 }
