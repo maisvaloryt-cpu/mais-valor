@@ -343,6 +343,63 @@ function getDividendosPorMes(){
     .map(([ym,v])=>({ym,...v}));
 }
 
+/* Proventos totais por mês em TODO o histórico → { 'YYYY-MM': totalR$ }.
+   Usado no gráfico de evolução para estimar o "dividendo reinvestido". */
+function getDividendosTotalPorMes(){
+  const map={};
+  const tickers=[...new Set(ativos.map(a=>a.ticker))];
+  tickers.forEach(ticker=>{
+    const cache=DIVIDENDOS_CACHE[ticker]||[];
+    if(cache.length>0){
+      cache.forEach(d=>{
+        const ym=d.date.slice(0,7);
+        const qtd=getQtdTickerAtDate(ticker,d.date);
+        if(qtd<=0)return;
+        const val=Math.round(d.value*qtd*100)/100;
+        map[ym]=(map[ym]||0)+val;
+      });
+    }else{
+      ativos.filter(a=>a.ticker===ticker&&a.tipo==='Provento'&&a.data).forEach(a=>{
+        const ym=a.data.slice(0,7);
+        const val=Math.round(a.qtd*a.pm*100)/100;
+        if(val<=0)return;
+        map[ym]=(map[ym]||0)+val;
+      });
+    }
+  });
+  return map;
+}
+
+/* Dado o array de evolução (com .ym e .custo), separa o custo acumulado em
+   "aporte próprio" (dinheiro novo) e "dividendo reinvestido" (provento que voltou
+   pra carteira), usando um caixa de dividendos: o provento recebido num mês fica
+   disponível para cobrir o aporte dos meses SEGUINTES (com carry-over se não houver
+   compra). Retorna {proprio[], reinvest[]} alinhados ao array de evolução.
+
+   IMPORTANTE (uso futuro): estes dois vetores são a base de dados de "quanto do
+   meu aporte foi dinheiro novo vs dividendo reaplicado". Em QUALQUER lugar que
+   mencione "aporte", a parte de dividendo retornando = split.reinvest[i], e o
+   dinheiro novo do bolso = split.proprio[i] (proprio + reinvest = custo acumulado).
+   Pode alimentar ferramentas futuras: taxa de reinvestimento, "bola de neve" de
+   proventos, renda passiva que vira patrimônio, snowball/yield-on-cost no tempo. */
+function calcSplitAporteDividendo(evol){
+  const divMes=getDividendosTotalPorMes();
+  const proprio=[], reinvest=[];
+  let custoAnt=0, caixaDiv=0, reinvestAcum=0;
+  evol.forEach(m=>{
+    const deltaCusto=Math.max(0, (m.custo||0)-custoAnt);   // quanto entrou de aporte no mês
+    const usado=Math.min(deltaCusto, caixaDiv);            // coberto por dividendo de meses anteriores
+    caixaDiv-=usado;
+    reinvestAcum+=usado;
+    caixaDiv+=(divMes[m.ym]||0);                            // dividendo do mês entra para os próximos
+    custoAnt=m.custo||0;
+    const ra=Math.min(reinvestAcum, m.custo||0);
+    reinvest.push(parseFloat(ra.toFixed(2)));
+    proprio.push(parseFloat(Math.max(0,(m.custo||0)-ra).toFixed(2)));
+  });
+  return {proprio, reinvest};
+}
+
 /* Calcula proventos recebidos em um ano-calendário específico (para IRPF) */
 function calcProventosAno(ticker,ano){
   const from=String(ano)+'-01-01';const to=String(ano)+'-12-31';

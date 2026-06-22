@@ -136,14 +136,19 @@ function renderEvolucaoPatri(nMeses){
   const emp=ctx.canvas.parentElement.querySelector('.patri-empty');
   if(emp)emp.remove();
   // Barras mensais empilhadas: base = aportes (azul-piscina); lucro (amarelo) acima; prejuízo (vermelho) abaixo do zero.
+  // split.proprio[i] = aporte de DINHEIRO NOVO no mês i; split.reinvest[i] = parte do
+  // aporte que é DIVIDENDO REINVESTIDO (provento recebido em meses anteriores e reaplicado).
+  // proprio + reinvest = custo acumulado (m.custo). Dado reaproveitável para ferramentas futuras.
+  const split=(typeof calcSplitAporteDividendo==='function')?calcSplitAporteDividendo(evol):{proprio:evol.map(m=>m.custo),reinvest:evol.map(()=>0)};
   charts.patri=new Chart(ctx,{
     type:'bar',
     data:{
       labels:evol.map(m=>m.label),
       datasets:[
-        {label:'Aportes',data:evol.map(m=>m.custo),backgroundColor:'#0E7C4B',stack:'p',maxBarThickness:30},
+        {label:'Aporte próprio',data:split.proprio,backgroundColor:'#DC2626',stack:'p',maxBarThickness:30},
+        {label:'Dividendo reinvestido',data:split.reinvest,backgroundColor:'#7F1D1D',stack:'p',maxBarThickness:30},
         {label:'Lucro',data:evol.map(m=>Math.max(0,m.vt-m.custo)),backgroundColor:'#FFCC00',stack:'p',maxBarThickness:30,borderRadius:3},
-        {label:'Prejuízo',data:evol.map(m=>-Math.max(0,m.custo-m.vt)),backgroundColor:'#E24B4A',stack:'p',maxBarThickness:30,borderRadius:3}
+        {label:'Prejuízo',data:evol.map(m=>-Math.max(0,m.custo-m.vt)),backgroundColor:'#F97316',stack:'p',maxBarThickness:30,borderRadius:3}
       ]
     },
     options:{responsive:true,maintainAspectRatio:false,
@@ -152,7 +157,7 @@ function renderEvolucaoPatri(nMeses){
         legend:{display:true,position:'bottom',labels:{boxWidth:10,boxHeight:10,usePointStyle:true,font:{size:10},color:'#888'}},
         tooltip:{filter:i=>i.datasetIndex===0,callbacks:{
           title:items=>items[0].label,
-          label:item=>{const m=evol[item.dataIndex];const res=m.vt-m.custo;return [' Patrimônio: '+fmtR(m.vt),' Aportes: '+fmtR(m.custo),(res>=0?' Lucro: ':' Prejuízo: ')+fmtR(Math.abs(res))];}
+          label:item=>{const i=item.dataIndex;const m=evol[i];const res=m.vt-m.custo;const reinv=split.reinvest[i]||0;const linhas=[' Patrimônio: '+fmtR(m.vt),' Aporte próprio: '+fmtR(split.proprio[i]||0)];if(reinv>0.005)linhas.push(' Dividendo reinvestido: '+fmtR(reinv));linhas.push((res>=0?' Lucro: ':' Prejuízo: ')+fmtR(Math.abs(res)));return linhas;}
         }}
       },
       scales:{
