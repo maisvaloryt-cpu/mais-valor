@@ -330,13 +330,13 @@ body { padding: 0 0 2rem; }
   border-radius: 10px;
   font-weight: 600;
 }
-.badge-b3     { background: rgba(24,95,165,0.2); color: #5BAEF5; }
-.badge-fii    { background: rgba(59,109,17,0.2); color: #7DC94A; }
-.badge-crypto { background: rgba(186,117,23,0.2); color: var(--gold, #F5A623); }
-.badge-rf     { background: rgba(83,74,183,0.2); color: #9B92F5; }
-.badge-ext    { background: rgba(153,60,29,0.2); color: #F5A07A; }
-.badge-etf    { background: rgba(15,110,86,0.2); color: #4BC9A5; }
-.badge-bdr    { background: rgba(114,36,62,0.2); color: #F589B4; }
+.badge-b3     { background: rgba(242,135,30,0.18); color: #F2871E; }
+.badge-fii    { background: rgba(232,81,31,0.18); color: #E8511F; }
+.badge-crypto { background: rgba(201,119,46,0.20); color: #C9772E; }
+.badge-rf     { background: rgba(122,30,18,0.32); color: #C25A45; }
+.badge-ext    { background: rgba(155,45,31,0.28); color: #D06A52; }
+.badge-etf    { background: rgba(255,207,92,0.16); color: #FFCF5C; }
+.badge-bdr    { background: rgba(245,166,35,0.18); color: #F5A623; }
 
 /* ── Metas ── */
 .meta-card {
