@@ -870,3 +870,20 @@ document.addEventListener('DOMContentLoaded', () => {
   navUpdateTotal();
   initSiteAuth();
 });
+
+/* ===== PWA: liga o manifest e registra o service worker em todas as páginas ===== */
+(function(){
+  const head = document.head;
+  if (head && !document.querySelector('link[rel="manifest"]')){
+    const l = document.createElement('link'); l.rel = 'manifest'; l.href = '/manifest.json'; head.appendChild(l);
+  }
+  if (head && !document.querySelector('meta[name="theme-color"]')){
+    const m = document.createElement('meta'); m.name = 'theme-color'; m.content = '#080809'; head.appendChild(m);
+  }
+  if (head && !document.querySelector('link[rel="apple-touch-icon"]')){
+    const a = document.createElement('link'); a.rel = 'apple-touch-icon'; a.href = '/icons/icon-192.png'; head.appendChild(a);
+  }
+  if ('serviceWorker' in navigator){
+    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(()=>{}));
+  }
+})();
