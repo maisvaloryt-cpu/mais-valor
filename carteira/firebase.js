@@ -1,4 +1,4 @@
-/* ============ FIREBASE — Consolidador de Carteira ============ */
+/* ============ FIREBASE — Carteira ============ */
 
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBDojPPrdkrqr52WxDL-WPy5wL1fsWo1HI",

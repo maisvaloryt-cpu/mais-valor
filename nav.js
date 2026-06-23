@@ -46,7 +46,7 @@ const NAV_LINKS = [
   { href: 'analise.html',      label: '✦ Análise' },
   { href: 'watchlist.html',    label: '★ Watchlist' },
   { href: 'simulador.html',    label: 'Simulador' },
-  { href: 'Consolidador/index.html', label: 'Carteira' },
+  { href: 'carteira/index.html', label: 'Carteira' },
   { href: 'status.html',       label: '● Status' },
 ];
 
@@ -401,7 +401,7 @@ function renderNavSlim() {
 
 function renderNav() {
   const page = location.pathname.split('/').pop() || 'index.html';
-  const inConsolidador = location.pathname.includes('Consolidador');
+  const inConsolidador = location.pathname.includes('carteira');
   document.body.classList.toggle('is-consolidador', inConsolidador);
 
   const ativosNacPages  = ['acoes.html','fiis.html','dividendos.html','criptos.html'];
@@ -461,6 +461,7 @@ function renderNav() {
     </div>
     <div id="nav-auth-area-mobile" style="padding:12px 0 16px;border-bottom:1px solid var(--border);margin-bottom:4px"></div>
     <a href="${NAV_BASE}index.html" class="${homeActive?'active':''}" onclick="toggleMobileMenu()">🏠 Home</a>
+    <a href="${NAV_BASE}carteira/index.html" class="${carteiraActive?'active':''}" onclick="toggleMobileMenu()">${WALLET_ICON} Carteira</a>
     <div class="mob-group-label">Ativos</div>
     <div class="mob-group-sub">Nacional</div>
     <a href="${NAV_BASE}acoes.html" class="${page==='acoes.html'?'active':''}" onclick="toggleMobileMenu()">${ATIVO_ICONS.acoes} Ações</a>
@@ -481,7 +482,6 @@ function renderNav() {
     <a href="${NAV_BASE}ferramentas.html" class="${page==='ferramentas.html'?'active':''}" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.outras} Outras</a>
     <div class="mob-group-label">Conta</div>
     <a href="${NAV_BASE}watchlist.html" class="${watchActive?'active':''}" onclick="toggleMobileMenu()">★ Watchlist</a>
-    <a href="${NAV_BASE}Consolidador/index.html" class="${carteiraActive?'active':''}" onclick="toggleMobileMenu()">${WALLET_ICON} Carteira</a>
     <a href="${NAV_BASE}status.html" class="${statusActive?'active':''}" onclick="toggleMobileMenu()" style="color:var(--up)">● Status</a>
   </div>
 
@@ -497,10 +497,10 @@ function renderNav() {
     <div class="nav-bottom-row">
       <div class="nav-links">
         <a href="${NAV_BASE}index.html" class="${homeActive?'active':''}">Home</a>
+        <a href="${NAV_BASE}carteira/index.html" class="${carteiraActive?'active':''}">${WALLET_ICON} Carteira</a>
         <span id="mv-ativos-btn" style="${dropBtnStyle(ativosActive)}">Ativos ▾</span>
         <span id="mv-ferramentas-btn" style="${dropBtnStyle(ferramentasActive)}">Ferramentas ▾</span>
         <a href="${NAV_BASE}watchlist.html" class="${watchActive?'active':''}">★ Watchlist</a>
-        <a href="${NAV_BASE}Consolidador/index.html" class="${carteiraActive?'active':''}">${WALLET_ICON} Carteira</a>
         <a href="${NAV_BASE}status.html" class="${statusActive?'active':''}" style="color:var(--up);font-size:11px">● Status</a>
       </div>
       <div class="nav-search-wrap">
@@ -753,7 +753,7 @@ function _navAuthBtnHtml(user) {
         style="display:none;position:absolute;right:0;top:38px;background:var(--bg2,#1a1a1f);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;z-index:99999;min-width:170px;box-shadow:0 8px 32px rgba(0,0,0,0.5)">
         <div style="font-size:13px;font-weight:700;color:var(--text,#eee);margin-bottom:4px;white-space:nowrap">${name}</div>
         <div style="font-size:11px;color:var(--text3,#666);margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px">${user.email || ''}</div>
-        <a href="${NAV_BASE}Consolidador/index.html" style="display:block;font-size:12px;color:var(--gold,#D4A017);text-decoration:none;padding:4px 0;font-weight:600">📊 Minha Carteira</a>
+        <a href="${NAV_BASE}carteira/index.html" style="display:block;font-size:12px;color:var(--gold,#D4A017);text-decoration:none;padding:4px 0;font-weight:600">📊 Minha Carteira</a>
         <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:8px 0">
         <button onclick="navLogout()"
           style="width:100%;background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--text2,#aaa);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit">

@@ -1,0 +1,6 @@
+{
+  "redirects": [
+    { "source": "/Consolidador", "destination": "/carteira", "permanent": true },
+    { "source": "/Consolidador/:path*", "destination": "/carteira/:path*", "permanent": true }
+  ]
+}
