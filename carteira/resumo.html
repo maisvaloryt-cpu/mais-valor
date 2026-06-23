@@ -128,7 +128,7 @@ function renderEvolucao(nMeses=24){
       datasets:[
         {label:'Aporte próprio',data:split.proprio,backgroundColor:'#DC2626',stack:'p',maxBarThickness:30},
         {label:'Dividendo reinvestido',data:split.reinvest,backgroundColor:'#7F1D1D',stack:'p',maxBarThickness:30},
-        {label:'Lucro',data:evol.map(m=>Math.max(0,m.vt-m.custo)),backgroundColor:'#FFCC00',stack:'p',maxBarThickness:30,borderRadius:3},
+        {label:'Lucro',data:evol.map(m=>Math.max(0,m.vt-m.custo)),backgroundColor:'#F5A623',stack:'p',maxBarThickness:30,borderRadius:3},
         {label:'Prejuízo',data:evol.map(m=>-Math.max(0,m.custo-m.vt)),backgroundColor:'#F97316',stack:'p',maxBarThickness:30,borderRadius:3}
       ]
     },

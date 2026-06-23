@@ -30,8 +30,8 @@
 
 const LOGO_SVG_HTML = `<svg viewBox="0 0 530 530" xmlns="http://www.w3.org/2000/svg" style="display:block;border-radius:12px;overflow:hidden;flex-shrink:0">
   <rect width="530" height="530" fill="#C90D08"/>
-  <path fill="#FFD76A" d="M459 58 L346 125 L387 142 L365 181 L296 277 L258 315 L212 349 L174 367 L147 374 L110 376 L89 372 L67 362 L49 345 L37 324 L32 302 L31 349 L52 392 L70 409 L94 422 L150 429 L196 420 L230 407 L298 365 L337 329 L377 280 L441 171 L475 192 L480 191 Z"/>
-  <path fill="#FFD76A" d="M399 303 L384 326 L358 359 L318 398 L283 424 L258 438 L222 452 L190 459 L161 460 L178 465 L200 468 L237 467 L278 458 L315 441 L340 421 L361 395 L383 353 L397 314 Z"/>
+  <path fill="#F5A623" d="M459 58 L346 125 L387 142 L365 181 L296 277 L258 315 L212 349 L174 367 L147 374 L110 376 L89 372 L67 362 L49 345 L37 324 L32 302 L31 349 L52 392 L70 409 L94 422 L150 429 L196 420 L230 407 L298 365 L337 329 L377 280 L441 171 L475 192 L480 191 Z"/>
+  <path fill="#F5A623" d="M399 303 L384 326 L358 359 L318 398 L283 424 L258 438 L222 452 L190 459 L161 460 L178 465 L200 468 L237 467 L278 458 L315 441 L340 421 L361 395 L383 353 L397 314 Z"/>
 </svg>`;
 
 const NAV_LINKS = [
@@ -73,7 +73,7 @@ const FERRAMENTA_ICONS = {
 };
 
 // ── Ícone de carteira (aba "Carteira"), mesmo estilo dourado dos ícones acima ──
-const WALLET_ICON = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M17 8V5a1 1 0 0 0-1-1H6a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V6M20 12v4h-4a2 2 0 0 1 0-4h4" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M17 8V5a1 1 0 0 0-1-1H6a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V6M20 12v4h-4a2 2 0 0 1 0-4h4" stroke="#F5A623" stroke-width="1.5"/></svg>`;
+const WALLET_ICON = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M17 8V5a1 1 0 0 0-1-1H6a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V6M20 12v4h-4a2 2 0 0 1 0-4h4" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M17 8V5a1 1 0 0 0-1-1H6a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V6M20 12v4h-4a2 2 0 0 1 0-4h4" stroke="#F5A623" stroke-width="1.5"/></svg>`;
 
 // ── Theme toggle ─────────────────────────────────────────────────
 function getTheme() { return localStorage.getItem('mv_theme') || 'dark'; }
