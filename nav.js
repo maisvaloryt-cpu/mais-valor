@@ -890,4 +890,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if ('serviceWorker' in navigator){
     window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(()=>{}));
   }
+  /* Google AdSense — carrega o anúncio em todas as páginas (sem duplicar onde já está no HTML) */
+  if (head && !document.querySelector('script[src*="adsbygoogle"]')){
+    const ad = document.createElement('script');
+    ad.async = true;
+    ad.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8043391674129748';
+    ad.crossOrigin = 'anonymous';
+    head.appendChild(ad);
+  }
 })();
