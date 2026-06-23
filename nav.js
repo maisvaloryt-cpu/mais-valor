@@ -856,6 +856,11 @@ function renderFooter() {
   <footer>
     <p>© ${year} <em>Mais Valor</em> — dados atualizados diariamente após o fechamento do pregão B3.<br>
     Não constitui recomendação de investimento.</p>
+    <p style="margin-top:10px;font-size:13px">
+      <a href="/privacidade.html" style="color:var(--text2);text-decoration:none">Política de Privacidade</a>
+      <span style="color:var(--text3);margin:0 8px">·</span>
+      <a href="/termos.html" style="color:var(--text2);text-decoration:none">Termos de Serviço</a>
+    </p>
   </footer>`;
 }
 
