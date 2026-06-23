@@ -476,7 +476,7 @@ function renderNav() {
     <a href="${NAV_BASE}rankings.html" class="${page==='rankings.html'?'active':''}" onclick="toggleMobileMenu()">${ATIVO_ICONS.rankings} Rankings</a>
     <div class="mob-group-label">Ferramentas</div>
     <a href="${NAV_BASE}simulador.html" class="${page==='simulador.html'?'active':''}" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.simulador} Simulador</a>
-    <a href="${NAV_BASE}Calculadora_maisvalor/index.html" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.calculadora} Calculadora</a>
+    <a href="${NAV_BASE}calculadora/index.html" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.calculadora} Calculadora</a>
     <a href="${NAV_BASE}comparador.html" class="${page==='comparador.html'?'active':''}" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.comparador} Comparador</a>
     <a href="${NAV_BASE}analise.html" class="${page==='analise.html'?'active':''}" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.analise} Análise IA</a>
     <a href="${NAV_BASE}ferramentas.html" class="${page==='ferramentas.html'?'active':''}" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.outras} Outras</a>
@@ -583,7 +583,7 @@ function renderNav() {
   ferramentasDrop.className = 'mv-floatdrop';
   ferramentasDrop.innerHTML = `
     <a href="${NAV_BASE}simulador.html" class="${page==='simulador.html'?'active':''}">${FERRAMENTA_ICONS.simulador} Simulador</a>
-    <a href="${NAV_BASE}Calculadora_maisvalor/index.html">${FERRAMENTA_ICONS.calculadora} Calculadora</a>
+    <a href="${NAV_BASE}calculadora/index.html">${FERRAMENTA_ICONS.calculadora} Calculadora</a>
     <a href="${NAV_BASE}comparador.html" class="${page==='comparador.html'?'active':''}">${FERRAMENTA_ICONS.comparador} Comparador</a>
     <a href="${NAV_BASE}analise.html" class="${page==='analise.html'?'active':''}">${FERRAMENTA_ICONS.analise} Análise IA</a>
     <div class="mv-drop-div"></div>
