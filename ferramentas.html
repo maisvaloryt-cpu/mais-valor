@@ -457,8 +457,8 @@ const CHART_OPTS = {
   responsive:true,maintainAspectRatio:false,
   plugins:{legend:{labels:{color:'#8A8884',font:{size:11}}}},
   scales:{
-    x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#4E4D4A',font:{size:10}}},
-    y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#4E4D4A',font:{size:10}}}
+    x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#7C7A75',font:{size:10}}},
+    y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#7C7A75',font:{size:10}}}
   }
 };
 
@@ -503,7 +503,7 @@ function calcJuros(){
   jurosChart=new Chart(document.getElementById('jurosChart'),{type:'line',
     data:{labels,datasets:[
       {label:'Acumulado',data:dTot,borderColor:'#F5A623',borderWidth:2,pointRadius:0,fill:true,backgroundColor:'rgba(245,166,35,0.08)',tension:0.4},
-      {label:'Investido',data:dInv,borderColor:'#4E4D4A',borderWidth:1.5,pointRadius:0,fill:false,tension:0.4,borderDash:[4,4]}
+      {label:'Investido',data:dInv,borderColor:'#7C7A75',borderWidth:1.5,pointRadius:0,fill:false,tension:0.4,borderDash:[4,4]}
     ]},
     options:{...CHART_OPTS,plugins:{...CHART_OPTS.plugins},scales:{...CHART_OPTS.scales,y:{...CHART_OPTS.scales.y,ticks:{...CHART_OPTS.scales.y.ticks,callback:v=>'R$'+Math.round(v/1000)+'k'}}}}
   });

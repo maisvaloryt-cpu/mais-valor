@@ -683,7 +683,7 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
   <div class="sim-nav-divider" style="width:1px;height:36px;background:var(--border,#222);flex-shrink:0;"></div>
   <div class="sim-nav-info" style="display:flex;flex-direction:column;gap:2px;">
     <span style="font-size:14px;font-weight:700;color:#fff;font-family:var(--font-body,sans-serif);letter-spacing:.01em;">Simulador de Carteiras — Backtest</span>
-    <span style="font-size:11px;color:#4E4D4A;font-family:var(--font-body,sans-serif);">Ferramenta criada pelo canal Mais Valor</span>
+    <span style="font-size:11px;color:#7C7A75;font-family:var(--font-body,sans-serif);">Ferramenta criada pelo canal Mais Valor</span>
   </div>
   <div id="sim-auth-area" style="margin-left:auto;flex-shrink:0;"></div>
 </div>
@@ -4195,7 +4195,7 @@ function renderSingleView(idx) {
 // CHARTS
 // ══════════════════════════════════════════════════════════════
 const CHART_GRID_COLOR = 'rgba(255,255,255,0.05)';
-const CHART_TICK_COLOR = '#4E4D4A';
+const CHART_TICK_COLOR = '#7C7A75';
 const CHART_TOOLTIP_BG = '#0E0E11';
 
 function chartOpts(unit) {
@@ -4480,7 +4480,7 @@ function renderCompareBarChart() {
     type: 'bar',
     data: { labels, datasets: [
       { label:'CAGR %', data:simulations.map(s=>{ const c=s.result.metrics.cagr; return isNaN(c) ? 0 : +(c*100).toFixed(2); }), backgroundColor:colors.map(c=>c+'cc'), borderRadius:4 },
-      { label:'Volatilidade %', data:simulations.map(s=>+(s.result.metrics.volatility*100).toFixed(2)), backgroundColor:simulations.map(()=>'#4E4D4A80'), borderRadius:4 },
+      { label:'Volatilidade %', data:simulations.map(s=>+(s.result.metrics.volatility*100).toFixed(2)), backgroundColor:simulations.map(()=>'#7C7A7580'), borderRadius:4 },
       { label:'Sharpe', data:simulations.map(s=>+s.result.metrics.sharpeRatio.toFixed(2)), backgroundColor:simulations.map(()=>'#9b72ef80'), borderRadius:4 },
     ]},
     options: {

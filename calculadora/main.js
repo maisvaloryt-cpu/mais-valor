@@ -188,7 +188,7 @@
                 dot.style.background = 'transparent';
                 dot.style.borderColor = '#3a3a48';
                 dot.style.boxShadow = 'none';
-                document.getElementById('lblTaxaPoupanca').style.color = '#4b5563';
+                document.getElementById('lblTaxaPoupanca').style.color = '#6b7280';
             }
         } else {
             poupancaAtivaCorrente = !poupancaAtivaCorrente;
@@ -3429,7 +3429,7 @@
         const nome = nomes[_cisneIntensidadeSorteada] || 'Crise';
         const infoEl = document.getElementById('cisneInfoTxt');
         const info = document.getElementById('cisneInfoInline') || document.getElementById('cisneInfo');
-        if (infoEl) infoEl.innerHTML = 'Ano <strong style="color:#ef4444">' + _cisneAnoSorteado + '</strong> · Queda <strong style="color:#ef4444">' + _cisneIntensidadeSorteada + '%</strong> <span style="color:#4b5563">(' + nome + ')</span>';
+        if (infoEl) infoEl.innerHTML = 'Ano <strong style="color:#ef4444">' + _cisneAnoSorteado + '</strong> · Queda <strong style="color:#ef4444">' + _cisneIntensidadeSorteada + '%</strong> <span style="color:#6b7280">(' + nome + ')</span>';
         if (info) { info.classList.remove('hidden'); info.style.display = 'flex'; }
         executarPipelineCore();
     }
@@ -4396,15 +4396,15 @@
         arrows.style.cssText = 'display:flex;flex-direction:column;margin-left:auto;';
         const bUp = document.createElement('button');
         bUp.textContent = '▲';
-        bUp.style.cssText = 'background:none;border:none;color:#4b5563;cursor:pointer;font-size:8px;line-height:1;padding:0 2px;';
+        bUp.style.cssText = 'background:none;border:none;color:#6b7280;cursor:pointer;font-size:8px;line-height:1;padding:0 2px;';
         bUp.onmouseenter = () => bUp.style.color = '#c084fc';
-        bUp.onmouseleave = () => bUp.style.color = '#4b5563';
+        bUp.onmouseleave = () => bUp.style.color = '#6b7280';
         bUp.onclick = (e) => { e.stopPropagation(); inp.value = Math.min(120,(parseInt(inp.value)||1)+1); inp.dispatchEvent(new Event('input')); };
         const bDn = document.createElement('button');
         bDn.textContent = '▼';
-        bDn.style.cssText = 'background:none;border:none;color:#4b5563;cursor:pointer;font-size:8px;line-height:1;padding:0 2px;';
+        bDn.style.cssText = 'background:none;border:none;color:#6b7280;cursor:pointer;font-size:8px;line-height:1;padding:0 2px;';
         bDn.onmouseenter = () => bDn.style.color = '#c084fc';
-        bDn.onmouseleave = () => bDn.style.color = '#4b5563';
+        bDn.onmouseleave = () => bDn.style.color = '#6b7280';
         bDn.onclick = (e) => { e.stopPropagation(); inp.value = Math.max(1,(parseInt(inp.value)||1)-1); inp.dispatchEvent(new Event('input')); };
         arrows.appendChild(bUp); arrows.appendChild(bDn);
         editor.appendChild(inp); editor.appendChild(arrows);
