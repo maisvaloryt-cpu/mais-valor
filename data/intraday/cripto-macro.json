@@ -1,5 +1,5 @@
 {
-  "updated_at": "25/06/2026 17:44",
+  "updated_at": "29/06/2026 15:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,20 +1128,20 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 171990.2,
-      "changePct": 0.0087,
-      "high": 173277.1,
-      "low": 170507.92
+      "price": 173252.06,
+      "changePct": -0.0002,
+      "high": 173891.53,
+      "low": 172392.55
     },
     {
       "ticker": "INDEXBVMF:IFIX",
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3795.4,
-      "changePct": 0.0038,
-      "high": 3795.4,
-      "low": 3781.09
+      "price": 3813.06,
+      "changePct": 0.0017000000000000001,
+      "high": 3813.4,
+      "low": 3805.25
     },
     {
       "ticker": "INDEXBVMF:SMLL",
@@ -1158,10 +1158,10 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 12224.57,
-      "changePct": 0.0096,
-      "high": 12321.41,
-      "low": 12108.93
+      "price": 12356.95,
+      "changePct": 0.0022,
+      "high": 12370.79,
+      "low": 12281.5
     },
     {
       "ticker": "INDEXBVMF:IMAB",
@@ -1188,40 +1188,40 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7357.49,
-      "changePct": -0.0001,
-      "high": 7419.08,
-      "low": 7323.5
+      "price": 7435.22,
+      "changePct": 0.011000000000000001,
+      "high": 7436.81,
+      "low": 7348.88
     },
     {
       "ticker": "INDEXNASDAQ:.IXIC",
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 25358.6,
-      "changePct": -0.0046,
-      "high": 25724.78,
-      "low": 25123.43
+      "price": 25765.62,
+      "changePct": 0.018500000000000003,
+      "high": 25782.88,
+      "low": 25289.76
     },
     {
       "ticker": "INDEXDJX:.DJI",
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 51920.62,
-      "changePct": 0.0014000000000000002,
-      "high": 52655.66,
-      "low": 51857.78
+      "price": 52258.2,
+      "changePct": 0.0074,
+      "high": 52311.63,
+      "low": 51949.54
     },
     {
       "ticker": "INDEXRUSSELL:RUT",
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 3007.86,
-      "changePct": 0.0070999999999999995,
-      "high": 3033.75,
-      "low": 2989.2
+      "price": 2998.31,
+      "changePct": -0.0039000000000000003,
+      "high": 3011.95,
+      "low": 2969.87
     },
     {
       "ticker": "CBOE:VIX",
@@ -1238,20 +1238,20 @@
       "stale": false,
       "descricao": "FTSE 100 (Reino Unido)",
       "tipo": "Índice Global",
-      "price": 10529.89,
-      "changePct": 0.006500000000000001,
-      "high": 10575.31,
-      "low": 10415.45
+      "price": 10484.22,
+      "changePct": -0.0023,
+      "high": 10521.03,
+      "low": 10471.98
     },
     {
       "ticker": "INDEXDB:DAX",
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 24994.83,
-      "changePct": 0.0103,
-      "high": 25088.28,
-      "low": 24761.72
+      "price": 24626.89,
+      "changePct": -0.0018,
+      "high": 24762.24,
+      "low": 24556.78
     },
     {
       "ticker": "INDEXEURO:SX5E",
@@ -1268,20 +1268,20 @@
       "stale": false,
       "descricao": "Nikkei 225 (Japão)",
       "tipo": "Índice Global",
-      "price": 72366.34,
-      "changePct": 0.0461,
-      "high": 72594.22,
-      "low": 69982.67
+      "price": 69468.11,
+      "changePct": 0.0015,
+      "high": 69609.88,
+      "low": 67997.57
     },
     {
       "ticker": "INDEXHANGSENG:HSI",
       "stale": false,
       "descricao": "Hang Seng (HK)",
       "tipo": "Índice Global",
-      "price": 23076.91,
-      "changePct": -0.0143,
-      "high": 23388.5,
-      "low": 22978.59
+      "price": 23026.68,
+      "changePct": 0.015700000000000002,
+      "high": 23183.17,
+      "low": 22783.64
     },
     {
       "ticker": "SHA:000001",
