@@ -2,7 +2,8 @@ name: Atualizar Cotações Diariamente
 
 on:
   schedule:
-    - cron: '0 21 * * 1-5'
+    - cron: '0 21 * * 1-5'   # dias úteis às 21h UTC → atualização diária
+    - cron: '0 6 * * 6'      # sábados às 6h UTC → reconstrói o histórico dos gráficos
   workflow_dispatch:
     inputs:
       modo:
@@ -30,21 +31,14 @@ jobs:
         id: modo
         run: |
           if [ "${{ github.event.inputs.modo }}" != "" ]; then
+            # Execução manual: usa o modo escolhido na mão
             echo "modo=${{ github.event.inputs.modo }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "0 6 * * 6" ]; then
+            # Sábado: reconstrói o histórico dos gráficos (não atrapalha o diário)
+            echo "modo=hist-all" >> $GITHUB_OUTPUT
           else
-            ACOES=$(ls data/historico/*.json 2>/dev/null | grep -v "11\.json" | wc -l)
-            FIIS=$(ls data/historico/*11.json 2>/dev/null | wc -l)
-            if [ "$ACOES" -lt 100 ]; then echo "modo=g1" >> $GITHUB_OUTPUT
-            elif [ "$ACOES" -lt 200 ]; then echo "modo=g2" >> $GITHUB_OUTPUT
-            elif [ "$ACOES" -lt 300 ]; then echo "modo=g3" >> $GITHUB_OUTPUT
-            elif [ "$ACOES" -lt 400 ]; then echo "modo=g4" >> $GITHUB_OUTPUT
-            elif [ "$ACOES" -lt 403 ]; then echo "modo=g5" >> $GITHUB_OUTPUT
-            elif [ "$FIIS" -lt 100 ]; then echo "modo=fii1" >> $GITHUB_OUTPUT
-            elif [ "$FIIS" -lt 200 ]; then echo "modo=fii2" >> $GITHUB_OUTPUT
-            elif [ "$FIIS" -lt 300 ]; then echo "modo=fii3" >> $GITHUB_OUTPUT
-            elif [ "$FIIS" -lt 380 ]; then echo "modo=fii4" >> $GITHUB_OUTPUT
-            else echo "modo=diario" >> $GITHUB_OUTPUT
-            fi
+            # Dias úteis: SEMPRE a atualização diária — nunca depende da contagem de FIIs
+            echo "modo=diario" >> $GITHUB_OUTPUT
           fi
 
       # ── SETUP: cria estrutura de pastas + JSONs placeholder ──────────────────
