@@ -288,7 +288,9 @@ async function loadStatus() {
     document.getElementById('hist-detail').innerHTML = `
       <div class="detail-row"><span>Total de arquivos</span><span class="badge badge-ok">${hist.total||0}</span></div>
       <div class="detail-row"><span>Com dados OK (≥10 pts)</span><span class="badge badge-ok">${hist.ok||0}</span></div>
-      <div class="detail-row"><span>Com poucos dados</span><span class="badge ${(hist.poucos_dados||0)>10?'badge-warn':'badge-ok'}">${hist.poucos_dados||0}</span></div>
+      <div class="detail-row" style="cursor:pointer" title="Clique para ver quais são" onclick="var l=document.getElementById('poucos-list');if(l){var o=l.style.display==='none';l.style.display=o?'block':'none';this.querySelector('.poucos-arrow').textContent=o?'▾':'▸';}"><span>Com poucos dados <span class="poucos-arrow" style="color:var(--text3);font-size:10px">▸</span></span><span class="badge ${(hist.poucos_dados||0)>10?'badge-warn':'badge-ok'}">${hist.poucos_dados||0}</span></div>
+      ${(hist.lista_poucos||[]).length>0?`<div id="poucos-list" style="display:none;margin-top:8px;font-size:11px;color:var(--text3)">Ativos com menos de 10 pontos de histórico:
+      <div class="ticker-list" style="margin-top:4px">${hist.lista_poucos.map(t=>`<span class="ticker-badge">${t.ticker} (${t.pontos||0} pts)</span>`).join('')}</div></div>`:''}
       <div class="detail-row"><span>Meta (ações + FIIs)</span><span style="color:var(--text3)">${metaHist}</span></div>
       <div class="progress-wrap" style="margin-top:8px"><div class="progress-bar ${pctHist>=90?'progress-ok':'progress-warn'}" style="width:${pctHist}%"></div></div>
       <div style="font-size:11px;color:var(--text3);margin-top:4px;text-align:right">${pctHist}% da meta</div>
