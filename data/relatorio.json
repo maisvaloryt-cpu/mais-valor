@@ -1,53 +1,45 @@
 {
-  "gerado_em": "21/06/2026 17:47",
+  "gerado_em": "29/06/2026 16:28",
   "historico_mensal": {
-    "total": 1370,
-    "ok": 1350,
-    "poucos_dados": 20,
+    "total": 1372,
+    "ok": 1355,
+    "poucos_dados": 17,
     "lista_poucos": [
       {
         "ticker": "ADSH11",
-        "pontos": 5
+        "pontos": 6
       },
       {
         "ticker": "ARTE11",
-        "pontos": 5
+        "pontos": 6
       },
       {
         "ticker": "AUAU3",
-        "pontos": 7
+        "pontos": 8
       },
       {
         "ticker": "AZUL3",
-        "pontos": 7
+        "pontos": 8
       },
       {
         "ticker": "BFCC11",
-        "pontos": 7
+        "pontos": 8
       },
       {
         "ticker": "CYRE4",
-        "pontos": 6
+        "pontos": 7
       },
       {
         "ticker": "FDXF",
         "pontos": 4
       },
       {
-        "ticker": "FIXX11",
-        "pontos": 9
-      },
-      {
         "ticker": "HIRE11",
-        "pontos": 7
-      },
-      {
-        "ticker": "HJCT11",
-        "pontos": 9
+        "pontos": 8
       },
       {
         "ticker": "ICNE11",
-        "pontos": 8
+        "pontos": 9
       },
       {
         "ticker": "MATICBRL",
@@ -55,11 +47,11 @@
       },
       {
         "ticker": "MIDW11",
-        "pontos": 7
+        "pontos": 8
       },
       {
         "ticker": "OBTC3",
-        "pontos": 8
+        "pontos": 9
       },
       {
         "ticker": "OXRL11",
@@ -67,81 +59,100 @@
       },
       {
         "ticker": "PASS3",
-        "pontos": 3
+        "pontos": 4
       },
       {
         "ticker": "PMRL11",
-        "pontos": 8
-      },
-      {
-        "ticker": "RBFY11",
         "pontos": 9
       },
       {
         "ticker": "REME11",
-        "pontos": 3
+        "pontos": 4
       },
       {
         "ticker": "RMBS11",
-        "pontos": 7
+        "pontos": 8
       }
     ]
   },
   "historico_diario": {
-    "total": 945,
-    "atualizados": 942,
-    "desatualizados": 3,
+    "total": 946,
+    "atualizados": 939,
+    "desatualizados": 7,
     "lista_desatualizados": [
+      {
+        "ticker": "BREV11",
+        "ultimo": "2026-06-20",
+        "dias_atras": 9
+      },
       {
         "ticker": "BRIM11",
         "ultimo": "2026-06-11",
-        "dias_atras": 10
+        "dias_atras": 18
+      },
+      {
+        "ticker": "GLOG11",
+        "ultimo": "2026-06-21",
+        "dias_atras": 8
       },
       {
         "ticker": "HGPO11",
         "ultimo": "2026-06-08",
-        "dias_atras": 13
+        "dias_atras": 21
+      },
+      {
+        "ticker": "PLOG11",
+        "ultimo": "2026-06-21",
+        "dias_atras": 8
       },
       {
         "ticker": "SPG211",
         "ultimo": "2026-06-10",
-        "dias_atras": 11
+        "dias_atras": 19
+      },
+      {
+        "ticker": "TKNO4",
+        "ultimo": "2026-06-21",
+        "dias_atras": 8
       }
     ]
   },
   "cotacoes": {
-    "atualizado_em": "21/06/2026 17:21",
+    "atualizado_em": "29/06/2026 15:41",
     "total_acoes": 459,
-    "total_fiis": 486,
-    "fallbacks": 4,
+    "total_fiis": 487,
+    "fallbacks": 7,
     "tickers_fallback": [
+      "TKNO4",
       "BREV11",
       "BRIM11",
+      "GLOG11",
       "HGPO11",
+      "PLOG11",
       "SPG211"
     ]
   },
   "fundamentus": {
-    "atualizado_em": "19/06/2026 21:56",
+    "atualizado_em": "29/06/2026 15:41",
     "total_acoes": 994,
-    "total_fiis": 552,
-    "atualizado_fiis": "19/06/2026 21:56"
+    "total_fiis": 553,
+    "atualizado_fiis": "29/06/2026 15:41"
   },
   "criptos": {
-    "atualizado_em": "21/06/2026 12:31 UTC",
+    "atualizado_em": "29/06/2026 17:13 UTC",
     "total_moedas": 100,
     "com_dados": 100,
     "sem_dados": 0,
     "tickers_sem_dados": [],
-    "historico_ok": 107,
+    "historico_ok": 110,
     "historico_falhou": 0,
     "historico_falhou_lista": []
   },
   "resumo": {
-    "acoes_com_historico": 1350,
-    "fiis_com_historico": 364,
-    "cotacoes_atuais": 945,
-    "indicadores_fundamentus": 1546,
+    "acoes_com_historico": 1355,
+    "fiis_com_historico": 367,
+    "cotacoes_atuais": 946,
+    "indicadores_fundamentus": 1547,
     "criptos_atuais": 100,
     "status_geral": "✅ OK"
   }
