@@ -2,12 +2,12 @@
 fetch_dividendos_historico.py — Histórico de dividendos (merge incremental)
 
 Fontes em CASCATA (primeira que retornar dados vence, por ticker):
-  1. Brapi      (rodízio dos 5 tokens) — proventos recentes + ANUNCIADOS/futuros (data de pagamento)
-  2. StatusInvest (scraping)           — proventos recentes + anunciados (data de pagamento)
-  3. Yahoo                             — histórico (data-ex), reserva
+  1. Brapi      (rodízio dos 5 tokens) — data-com + pagamento + tipo (recentes e ANUNCIADOS/futuros)
+  2. StatusInvest (scraping)           — data-com + pagamento + tipo
+  3. Yahoo                             — só data-ex (reserva, sem data-com)
 
-Captura a DATA DE PAGAMENTO quando disponível (Brapi/StatusInvest), o que permite
-mostrar pagamentos futuros previstos. Nunca apaga dados existentes.
+Guarda por provento: {"com": data-com, "pag": data-pagamento, "value": valor, "tipo": tipo}
+A data de pagamento futura permite mostrar pagamentos previstos. Nunca apaga dados existentes.
 """
 import json, datetime, os, sys, time, requests
 
@@ -44,25 +44,30 @@ def get_tickers():
             tickers.extend(list(d[key].keys()))
         except Exception:
             pass
-    # remove duplicados preservando ordem
     return list(dict.fromkeys(tickers))
 
 
 def _norm_date(s):
-    """Aceita 'YYYY-MM-DD' ou 'DD/MM/YYYY' (com hora opcional) → 'YYYY-MM-DD' ou None."""
+    """Aceita 'YYYY-MM-DD' ou 'DD/MM/YYYY' (com hora opcional) → 'YYYY-MM-DD' ou ''."""
     if not s:
-        return None
-    s = str(s).strip()
-    s = s.replace("T", " ").split(" ")[0]
+        return ""
+    s = str(s).strip().replace("T", " ").split(" ")[0]
     for fmt in ("%Y-%m-%d", "%d/%m/%Y"):
         try:
             return datetime.datetime.strptime(s[:10], fmt).strftime("%Y-%m-%d")
         except Exception:
             pass
-    return None
+    return ""
 
 
-# ── Fonte 1: Brapi (data de pagamento, inclui anunciados) ─────────────────────
+def _num(v):
+    try:
+        return round(float(str(v).replace(",", ".")), 6)
+    except Exception:
+        return None
+
+
+# ── Fonte 1: Brapi (data-com = lastDatePrior, pagamento = paymentDate) ────────
 def fetch_brapi(ticker):
     token = next_brapi_token()
     if not token:
@@ -78,19 +83,18 @@ def fetch_brapi(ticker):
         cash = (results[0].get("dividendsData") or {}).get("cashDividends") or []
         out = []
         for c in cash:
-            dt = _norm_date(c.get("paymentDate") or c.get("lastDatePrior"))
-            val = c.get("rate")
-            if dt and val:
-                try:
-                    out.append({"date": dt, "value": round(float(val), 4)})
-                except Exception:
-                    pass
+            com = _norm_date(c.get("lastDatePrior"))
+            pag = _norm_date(c.get("paymentDate"))
+            val = _num(c.get("rate"))
+            tipo = (c.get("label") or c.get("relatedTo") or "").strip()
+            if (com or pag) and val:
+                out.append({"com": com, "pag": pag or com, "value": val, "tipo": tipo})
         return out
     except Exception:
         return []
 
 
-# ── Fonte 2: StatusInvest (scraping, data de pagamento) ───────────────────────
+# ── Fonte 2: StatusInvest (ed = data-com, pd = pagamento) ─────────────────────
 def fetch_statusinvest(ticker):
     base = "fii" if ticker.endswith("11") else "acao"
     url = f"https://statusinvest.com.br/{base}/companytickerprovents?ticker={ticker}&chartProventsType=2"
@@ -102,20 +106,18 @@ def fetch_statusinvest(ticker):
         arr = data.get("assetEarningsModels") or data.get("earningsModels") or []
         out = []
         for e in arr:
-            # pd = data de pagamento | ed = data-com (ex)
-            dt = _norm_date(e.get("pd") or e.get("paymentDate") or e.get("ed"))
-            val = e.get("v") or e.get("value")
-            if dt and val:
-                try:
-                    out.append({"date": dt, "value": round(float(str(val).replace(",", ".")), 4)})
-                except Exception:
-                    pass
+            com = _norm_date(e.get("ed"))
+            pag = _norm_date(e.get("pd") or e.get("paymentDate"))
+            val = _num(e.get("v") or e.get("value"))
+            tipo = str(e.get("etd") or e.get("et") or "").strip()
+            if (com or pag) and val:
+                out.append({"com": com, "pag": pag or com, "value": val, "tipo": tipo})
         return out
     except Exception:
         return []
 
 
-# ── Fonte 3: Yahoo (histórico, data-ex) — reserva ─────────────────────────────
+# ── Fonte 3: Yahoo (só data-ex, sem data-com) — reserva ───────────────────────
 def fetch_yahoo(ticker):
     symbol = ticker + ".SA"
     end = int(datetime.datetime.now().timestamp())
@@ -129,13 +131,13 @@ def fetch_yahoo(ticker):
         if not result:
             return []
         events = result[0].get("events", {}).get("dividends", {})
-        divs = []
+        out = []
         for ts, info in sorted(events.items()):
             dt = datetime.datetime.fromtimestamp(int(ts)).strftime("%Y-%m-%d")
-            val = round(info.get("amount", 0), 4)
-            if val > 0:
-                divs.append({"date": dt, "value": val})
-        return divs
+            val = _num(info.get("amount", 0))
+            if val:
+                out.append({"com": "", "pag": dt, "value": val, "tipo": ""})
+        return out
     except Exception:
         return []
 
@@ -152,8 +154,20 @@ def get_dividendos(ticker):
     return [], "-"
 
 
+def _normalize(d):
+    """Converte qualquer entrada (formato antigo {date,value} ou novo) p/ o padrão."""
+    if "pag" in d or "com" in d:
+        return {"com": d.get("com", ""), "pag": d.get("pag", "") or d.get("date", ""),
+                "value": d.get("value"), "tipo": d.get("tipo", "")}
+    return {"com": "", "pag": d.get("date", ""), "value": d.get("value"), "tipo": ""}
+
+
+def _key(d):
+    return f"{d.get('com','')}|{d.get('pag','')}|{d.get('value','')}"
+
+
 def merge_dividendos(path, ticker, novos):
-    """Merge incremental para dividendos (chave = date). Nunca apaga."""
+    """Merge incremental (chave = com|pag|valor). Nunca apaga; normaliza o formato antigo."""
     existente = []
     if os.path.exists(path):
         try:
@@ -161,9 +175,10 @@ def merge_dividendos(path, ticker, novos):
                 existente = json.load(f).get("dividendos", [])
         except Exception:
             existente = []
-    datas = {d["date"] for d in existente}
-    adicionados = [d for d in novos if d["date"] not in datas]
-    merged = sorted(existente + adicionados, key=lambda x: x["date"])
+    existente = [_normalize(d) for d in existente]
+    seen = {_key(d) for d in existente}
+    adicionados = [d for d in novos if _key(d) not in seen]
+    merged = sorted(existente + adicionados, key=lambda x: (x.get("pag") or x.get("com") or ""))
     now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-3))).strftime("%d/%m/%Y %H:%M")
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w") as f:

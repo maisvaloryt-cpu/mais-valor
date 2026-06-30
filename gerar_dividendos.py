@@ -44,9 +44,11 @@ def main():
             nome  = nomes.get(ticker, {}).get("n", ticker)
 
             for d in divs:
-                # data pode ser YYYY-MM-DD
+                # Novo formato: {com, pag, value, tipo}. Antigo: {date, value}.
+                com_s = d.get("com") or d.get("date") or ""
+                pag_s = d.get("pag") or d.get("date") or com_s
                 try:
-                    dt = datetime.date.fromisoformat(d["date"])
+                    dt = datetime.date.fromisoformat(pag_s)   # janela pela data de PAGAMENTO
                 except:
                     continue
                 # Mostra dividendos futuros (previstos) e recentes (últimos 35 dias)
@@ -65,9 +67,9 @@ def main():
                 proximos.append({
                     "t":    ticker,
                     "n":    nome,
-                    "tipo": "Rendimento" if isFii else "Dividendo",
-                    "com":  d["date"],   # data com (Yahoo retorna a data ex)
-                    "pag":  d["date"],   # data pagamento (aproximada, mesmo campo)
+                    "tipo": d.get("tipo") or ("Rendimento" if isFii else "Dividendo"),
+                    "com":  com_s,   # data-com real (Brapi/StatusInvest); "" se só Yahoo
+                    "pag":  pag_s,   # data de pagamento real
                     "val":  round(val, 4),
                     "dy":   dy_est,
                 })
