@@ -344,9 +344,17 @@ jobs:
           BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
         run: python fetch_historico_bdrs.py
 
-      - name: Histórico Dividendos (rode uma vez)
+      - name: Histórico Dividendos (3 fontes) + consolida
         if: ${{ steps.modo.outputs.modo == 'dividendos' }}
-        run: python fetch_dividendos_historico.py
+        env:
+          BRAPI_TOKEN_1: ${{ secrets.BRAPI_TOKEN_1 }}
+          BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
+          BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
+          BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
+          BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
+        run: |
+          python fetch_dividendos_historico.py
+          python gerar_dividendos.py
 
       - name: Relatório manual
         if: ${{ steps.modo.outputs.modo == 'relatorio' }}
