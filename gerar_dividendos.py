@@ -49,8 +49,8 @@ def main():
                     dt = datetime.date.fromisoformat(d["date"])
                 except:
                     continue
-                # Mostra dividendos futuros e recentes (últimos 5 dias)
-                if dt < hoje - datetime.timedelta(days=5):
+                # Mostra dividendos futuros (previstos) e recentes (últimos 35 dias)
+                if dt < hoje - datetime.timedelta(days=35):
                     continue
                 if dt > limite:
                     continue
