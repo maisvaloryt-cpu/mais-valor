@@ -1,5 +1,5 @@
 {
-  "updated_at": "29/06/2026 17:44",
+  "updated_at": "30/06/2026 10:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1189,9 +1189,9 @@
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
       "price": 7440.43,
-      "changePct": 0.0118,
-      "high": 7444.32,
-      "low": 7348.88
+      "changePct": 0,
+      "high": null,
+      "low": null
     },
     {
       "ticker": "INDEXNASDAQ:.IXIC",
@@ -1209,7 +1209,7 @@
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
       "price": 52182.74,
-      "changePct": 0.0059,
+      "changePct": 0,
       "high": 52311.63,
       "low": 51949.54
     },
@@ -1238,20 +1238,20 @@
       "stale": false,
       "descricao": "FTSE 100 (Reino Unido)",
       "tipo": "Índice Global",
-      "price": 10484.22,
-      "changePct": -0.0023,
-      "high": 10521.03,
-      "low": 10471.98
+      "price": 10551.01,
+      "changePct": 0.0064,
+      "high": 10613.18,
+      "low": 10483.86
     },
     {
       "ticker": "INDEXDB:DAX",
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 24626.89,
-      "changePct": -0.0018,
-      "high": 24762.24,
-      "low": 24556.78
+      "price": 24947.45,
+      "changePct": 0.013000000000000001,
+      "high": 25024.27,
+      "low": 24794.84
     },
     {
       "ticker": "INDEXEURO:SX5E",
@@ -1268,20 +1268,20 @@
       "stale": false,
       "descricao": "Nikkei 225 (Japão)",
       "tipo": "Índice Global",
-      "price": 69468.11,
-      "changePct": 0.0015,
-      "high": 69609.88,
-      "low": 67997.57
+      "price": 70062.32,
+      "changePct": 0.0086,
+      "high": 70667,
+      "low": 69302.19
     },
     {
       "ticker": "INDEXHANGSENG:HSI",
       "stale": false,
       "descricao": "Hang Seng (HK)",
       "tipo": "Índice Global",
-      "price": 23026.68,
-      "changePct": 0.015700000000000002,
-      "high": 23183.17,
-      "low": 22783.64
+      "price": 22881.02,
+      "changePct": -0.0063,
+      "high": 23086.85,
+      "low": 22685.14
     },
     {
       "ticker": "SHA:000001",
