@@ -1,5 +1,5 @@
 {
-  "updated_at": "30/06/2026 01:21",
+  "updated_at": "30/06/2026 05:46",
   "acoes": [
     {
       "ticker": "GPAR3",
@@ -1394,6 +1394,18 @@
       "fallback": false
     },
     {
+      "ticker": "EGGY3",
+      "name": "Granja Faria S.A.",
+      "price": 0.17,
+      "change": 0,
+      "volume": 0,
+      "marketCap": 0,
+      "pe": null,
+      "pb": null,
+      "dividendYield": 0.0,
+      "fallback": false
+    },
+    {
       "ticker": "CCTY3",
       "name": "RDVC CITY   ON      NM",
       "price": 8.21,
@@ -1424,18 +1436,6 @@
       "change": 0,
       "volume": 1416500,
       "marketCap": 2725912087,
-      "pe": null,
-      "pb": null,
-      "dividendYield": 0.0,
-      "fallback": false
-    },
-    {
-      "ticker": "EGGY3",
-      "name": "Granja Faria S.A.",
-      "price": 0.17,
-      "change": 0,
-      "volume": 0,
-      "marketCap": 0,
       "pe": null,
       "pb": null,
       "dividendYield": 0.0,
@@ -1670,7 +1670,7 @@
       "fallback": false
     },
     {
-      "ticker": "MMAQ4",
+      "ticker": "MMAQ3",
       "name": "Minasmáquinas S/A",
       "price": 2550.01,
       "change": 0,
@@ -1682,7 +1682,7 @@
       "fallback": false
     },
     {
-      "ticker": "MMAQ3",
+      "ticker": "MMAQ4",
       "name": "Minasmáquinas S/A",
       "price": 2550.01,
       "change": 0,
