@@ -300,9 +300,9 @@ async function loadStatus() {
     document.getElementById('diario-detail').innerHTML = `
       <div class="detail-row"><span>Total de arquivos</span><span class="badge badge-ok">${diario.total||0}</span></div>
       <div class="detail-row"><span>Atualizados (≤3 dias)</span><span class="badge badge-ok">${diario.atualizados||0}</span></div>
-      <div class="detail-row"><span>Desatualizados</span><span class="badge ${(diario.desatualizados||0)>5?'badge-warn':'badge-ok'}">${diario.desatualizados||0}</span></div>
-      ${diario.desatualizados>0?`<div style="margin-top:8px;font-size:11px;color:var(--text3)">Sem atualização recente:</div>
-      <div class="ticker-list">${(diario.lista_desatualizados||[]).slice(0,10).map(t=>`<span class="ticker-badge">${t.ticker} (${t.dias_atras||'?'}d)</span>`).join('')}</div>`:''}
+      <div class="detail-row" style="cursor:pointer" title="Clique para ver" onclick="var l=document.getElementById('diario-list');if(l){var o=l.style.display==='none';l.style.display=o?'block':'none';this.querySelector('.tg-arr').textContent=o?'▾':'▸';}"><span>Desatualizados <span class="tg-arr" style="color:var(--text3);font-size:10px">▸</span></span><span class="badge ${(diario.desatualizados||0)>5?'badge-warn':'badge-ok'}">${diario.desatualizados||0}</span></div>
+      ${diario.desatualizados>0?`<div id="diario-list" style="display:none;margin-top:8px;font-size:11px;color:var(--text3)">Sem atualização recente:
+      <div class="ticker-list" style="margin-top:4px">${(diario.lista_desatualizados||[]).slice(0,30).map(t=>`<span class="ticker-badge">${t.ticker} (${t.dias_atras||'?'}d)</span>`).join('')}</div></div>`:''}
     `;
 
     // COTAÇÕES
@@ -310,9 +310,9 @@ async function loadStatus() {
       <div class="detail-row"><span>Última atualização</span><span style="font-size:12px;color:var(--gold);font-family:'DM Mono',monospace">${cot.updated_at||'—'}</span></div>
       <div class="detail-row"><span>Ações com cotação</span><span class="badge badge-ok">${cot.total_acoes||0}</span></div>
       <div class="detail-row"><span>FIIs com cotação</span><span class="badge badge-ok">${cot.total_fiis||0}</span></div>
-      <div class="detail-row"><span>Usando preço histórico (stale)</span><span class="badge ${(cot.fallbacks||0)>0?'badge-warn':'badge-ok'}">${cot.fallbacks||0}</span></div>
-      ${(cot.tickers_fallback||[]).length>0?`<div style="margin-top:8px;font-size:11px;color:var(--stale)">⚠ Ativos com dado desatualizado (exibidos em amarelo no site):</div>
-      <div class="ticker-list">${cot.tickers_fallback.map(t=>`<span class="ticker-badge" style="color:var(--stale);border-color:var(--stale-bg)">${t}</span>`).join('')}</div>`:''}
+      <div class="detail-row" style="cursor:pointer" title="Clique para ver" onclick="var l=document.getElementById('stale-list');if(l){var o=l.style.display==='none';l.style.display=o?'block':'none';this.querySelector('.tg-arr').textContent=o?'▾':'▸';}"><span>Usando preço histórico (stale) <span class="tg-arr" style="color:var(--text3);font-size:10px">▸</span></span><span class="badge ${(cot.fallbacks||0)>0?'badge-warn':'badge-ok'}">${cot.fallbacks||0}</span></div>
+      ${(cot.tickers_fallback||[]).length>0?`<div id="stale-list" style="display:none;margin-top:8px;font-size:11px;color:var(--stale)">⚠ Ativos com dado desatualizado (exibidos em amarelo no site):
+      <div class="ticker-list" style="margin-top:4px">${cot.tickers_fallback.map(t=>`<span class="ticker-badge" style="color:var(--stale);border-color:var(--stale-bg)">${t}</span>`).join('')}</div></div>`:''}
     `;
 
     // FUNDAMENTUS
@@ -333,13 +333,13 @@ async function loadStatus() {
         <div class="detail-row"><span>Última atualização</span><span style="font-size:12px;color:var(--gold);font-family:'DM Mono',monospace">${cripto.atualizado_em||'—'}</span></div>
         <div class="detail-row"><span>Total de moedas</span><span class="badge badge-ok">${cripto.total_moedas||0}</span></div>
         <div class="detail-row"><span>Com cotação</span><span class="badge badge-ok">${cripto.com_dados||0}</span></div>
-        <div class="detail-row"><span>Sem cotação</span><span class="badge ${(cripto.sem_dados||0)>0?'badge-warn':'badge-ok'}">${cripto.sem_dados||0}</span></div>
+        <div class="detail-row" style="cursor:pointer" title="Clique para ver" onclick="var l=document.getElementById('cripto-sem-list');if(l){var o=l.style.display==='none';l.style.display=o?'block':'none';this.querySelector('.tg-arr').textContent=o?'▾':'▸';}"><span>Sem cotação <span class="tg-arr" style="color:var(--text3);font-size:10px">▸</span></span><span class="badge ${(cripto.sem_dados||0)>0?'badge-warn':'badge-ok'}">${cripto.sem_dados||0}</span></div>
         <div class="detail-row"><span>Histórico OK (≥10 pts)</span><span class="badge badge-ok">${cripto.historico_ok||0}</span></div>
-        <div class="detail-row"><span>Histórico com falha</span><span class="badge ${(cripto.historico_falhou||0)>0?'badge-warn':'badge-ok'}">${cripto.historico_falhou||0}</span></div>
-        ${(cripto.tickers_sem_dados||[]).length>0?`<div style="margin-top:8px;font-size:11px;color:var(--text3)">Sem cotação:</div>
-        <div class="ticker-list">${cripto.tickers_sem_dados.map(t=>`<span class="ticker-badge">${t}</span>`).join('')}</div>`:''}
-        ${(cripto.historico_falhou_lista||[]).length>0?`<div style="margin-top:8px;font-size:11px;color:var(--text3)">Histórico falhou:</div>
-        <div class="ticker-list">${cripto.historico_falhou_lista.map(t=>`<span class="ticker-badge">${t.symbol}</span>`).join('')}</div>`:''}
+        <div class="detail-row" style="cursor:pointer" title="Clique para ver" onclick="var l=document.getElementById('cripto-falha-list');if(l){var o=l.style.display==='none';l.style.display=o?'block':'none';this.querySelector('.tg-arr').textContent=o?'▾':'▸';}"><span>Histórico com falha <span class="tg-arr" style="color:var(--text3);font-size:10px">▸</span></span><span class="badge ${(cripto.historico_falhou||0)>0?'badge-warn':'badge-ok'}">${cripto.historico_falhou||0}</span></div>
+        ${(cripto.tickers_sem_dados||[]).length>0?`<div id="cripto-sem-list" style="display:none;margin-top:8px;font-size:11px;color:var(--text3)">Sem cotação:
+        <div class="ticker-list" style="margin-top:4px">${cripto.tickers_sem_dados.map(t=>`<span class="ticker-badge">${t}</span>`).join('')}</div></div>`:''}
+        ${(cripto.historico_falhou_lista||[]).length>0?`<div id="cripto-falha-list" style="display:none;margin-top:8px;font-size:11px;color:var(--text3)">Histórico falhou:
+        <div class="ticker-list" style="margin-top:4px">${cripto.historico_falhou_lista.map(t=>`<span class="ticker-badge">${t.symbol}</span>`).join('')}</div></div>`:''}
       `;
     }
 
@@ -348,7 +348,9 @@ async function loadStatus() {
       <div class="detail-row"><span>Última atualização</span><span style="font-size:12px;color:var(--gold);font-family:'DM Mono',monospace">${bdrs.updated_at||'—'}</span></div>
       <div class="detail-row"><span>Total de BDRs</span><span class="badge badge-ok">${bdrs.total||0}</span></div>
       <div class="detail-row"><span>Com cotação</span><span class="badge badge-ok">${bdrs.com_preco||0}</span></div>
-      <div class="detail-row"><span>Sem cotação</span><span class="badge ${(bdrs.sem_preco||0)>0?'badge-warn':'badge-ok'}">${bdrs.sem_preco||0}</span></div>
+      <div class="detail-row" style="cursor:pointer" title="Clique para ver" onclick="var l=document.getElementById('bdrs-sem-list');if(l){var o=l.style.display==='none';l.style.display=o?'block':'none';this.querySelector('.tg-arr').textContent=o?'▾':'▸';}"><span>Sem cotação <span class="tg-arr" style="color:var(--text3);font-size:10px">▸</span></span><span class="badge ${(bdrs.sem_preco||0)>0?'badge-warn':'badge-ok'}">${bdrs.sem_preco||0}</span></div>
+      <div id="bdrs-sem-list" style="display:none;margin-top:8px;font-size:11px;color:var(--text3)">Sem cotação:
+      <div class="ticker-list" style="margin-top:4px">${(bdrs.bdrs||[]).filter(b=>!b.p).map(b=>`<span class="ticker-badge">${b.t}</span>`).join('')||'nenhum 🎉'}</div></div>
     ` : `<div class="detail-row"><span style="color:var(--dn)">❌ Arquivo não encontrado</span></div>`;
 
     // ETFs
@@ -356,7 +358,9 @@ async function loadStatus() {
       <div class="detail-row"><span>Última atualização</span><span style="font-size:12px;color:var(--gold);font-family:'DM Mono',monospace">${etfs.updated_at||'—'}</span></div>
       <div class="detail-row"><span>Total de ETFs</span><span class="badge badge-ok">${etfs.total||0}</span></div>
       <div class="detail-row"><span>Com cotação</span><span class="badge badge-ok">${etfs.com_preco||0}</span></div>
-      <div class="detail-row"><span>Sem cotação</span><span class="badge ${(etfs.sem_preco||0)>0?'badge-warn':'badge-ok'}">${etfs.sem_preco||0}</span></div>
+      <div class="detail-row" style="cursor:pointer" title="Clique para ver" onclick="var l=document.getElementById('etfs-sem-list');if(l){var o=l.style.display==='none';l.style.display=o?'block':'none';this.querySelector('.tg-arr').textContent=o?'▾':'▸';}"><span>Sem cotação <span class="tg-arr" style="color:var(--text3);font-size:10px">▸</span></span><span class="badge ${(etfs.sem_preco||0)>0?'badge-warn':'badge-ok'}">${etfs.sem_preco||0}</span></div>
+      <div id="etfs-sem-list" style="display:none;margin-top:8px;font-size:11px;color:var(--text3)">Sem cotação:
+      <div class="ticker-list" style="margin-top:4px">${(etfs.etfs||[]).filter(e=>!e.p).map(e=>`<span class="ticker-badge">${e.t}</span>`).join('')||'nenhum 🎉'}</div></div>
     ` : `<div class="detail-row"><span style="color:var(--dn)">❌ Arquivo não encontrado</span></div>`;
 
     // Stocks US
@@ -364,7 +368,9 @@ async function loadStatus() {
       <div class="detail-row"><span>Última atualização</span><span style="font-size:12px;color:var(--gold);font-family:'DM Mono',monospace">${stocksUs.updated_at||'—'}</span></div>
       <div class="detail-row"><span>Total de Stocks</span><span class="badge badge-ok">${stocksUs.total||0}</span></div>
       <div class="detail-row"><span>Com cotação</span><span class="badge badge-ok">${stocksUs.com_preco||stocksUs.total||0}</span></div>
-      <div class="detail-row"><span>Sem cotação</span><span class="badge ${(stocksUs.sem_preco||0)>0?'badge-warn':'badge-ok'}">${stocksUs.sem_preco||0}</span></div>
+      <div class="detail-row" style="cursor:pointer" title="Clique para ver" onclick="var l=document.getElementById('stocks-sem-list');if(l){var o=l.style.display==='none';l.style.display=o?'block':'none';this.querySelector('.tg-arr').textContent=o?'▾':'▸';}"><span>Sem cotação <span class="tg-arr" style="color:var(--text3);font-size:10px">▸</span></span><span class="badge ${(stocksUs.sem_preco||0)>0?'badge-warn':'badge-ok'}">${stocksUs.sem_preco||0}</span></div>
+      <div id="stocks-sem-list" style="display:none;margin-top:8px;font-size:11px;color:var(--text3)">Sem cotação:
+      <div class="ticker-list" style="margin-top:4px">${(stocksUs.stocks||[]).filter(s=>!s.p).map(s=>`<span class="ticker-badge">${s.t}</span>`).join('')||'nenhum 🎉'}</div></div>
     ` : `<div class="detail-row"><span style="color:var(--dn)">❌ Arquivo não encontrado</span></div>`;
 
     // Índices
