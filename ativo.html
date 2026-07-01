@@ -152,6 +152,18 @@
       <h3>Indicadores vs Média do Setor</h3>
       <div id="ind-vs-setor"></div>
     </div>
+    <div class="section-box" id="fx-osc-box" style="display:none;margin-top:1.5rem">
+      <h3>Oscilação por período</h3>
+      <div class="ind-grid" id="fx-osc"></div>
+    </div>
+    <div class="section-box" id="fx-bal-box" style="display:none;margin-top:1.5rem">
+      <h3>Balanço Patrimonial</h3>
+      <div class="ind-grid" id="fx-bal"></div>
+    </div>
+    <div class="section-box" id="fx-res-box" style="display:none;margin-top:1.5rem">
+      <h3>Demonstrativo de Resultados (12 meses)</h3>
+      <div class="ind-grid" id="fx-res"></div>
+    </div>
   </div>
 
   <!-- HISTÓRICO -->
@@ -220,7 +232,7 @@ function switchTab(id,el){
   el.classList.add('active');
   if(id==='dividendos') renderDividendos();
   if(id==='analise') renderAnalise();
-  if(id==='indicadores') renderIndVsSetor();
+  if(id==='indicadores'){ renderIndVsSetor(); renderFundExtra(); }
 }
 
 // Watchlist — guardado só na nuvem (Firestore), nada no navegador
@@ -520,6 +532,34 @@ function setChartMode(m,el){
   drawChartWithCDI();
 }
 
+function fmtRS(s){
+  if(!s) return '—';
+  var n=parseFloat(String(s).replace(/\./g,'').replace(',','.'));
+  if(isNaN(n)) return s;
+  var neg=n<0; n=Math.abs(n); var o;
+  if(n>=1e9) o=(n/1e9).toFixed(2).replace('.',',')+' bi';
+  else if(n>=1e6) o=(n/1e6).toFixed(1).replace('.',',')+' mi';
+  else if(n>=1e3) o=(n/1e3).toFixed(0)+' mil';
+  else o=n.toFixed(0);
+  return 'R$ '+(neg?'-':'')+o;
+}
+async function renderFundExtra(){
+  try{
+    const r=await fetch(`data/fundamentalistas/${TICKER}.json?t=${Date.now()}`);
+    if(!r.ok) return;
+    const d=await r.json();
+    const osc=d.oscilacoes||{};
+    const ordem=['Dia','Mês','30 dias','12 meses','2026','2025','2024','2023','2022','2021','2020'];
+    const oc=ordem.filter(k=>osc[k]).map(k=>{const v=osc[k];const neg=String(v).trim().startsWith('-');return `<div class="ind-card"><div class="ind-label">${k}</div><div class="ind-val ${neg?'dn':'up'}">${v}</div></div>`;}).join('');
+    if(oc){document.getElementById('fx-osc').innerHTML=oc;document.getElementById('fx-osc-box').style.display='';}
+    const bal=[['Ativo','ativo'],['Ativo Circulante','ativo_circ'],['Disponibilidades','disponibilidades'],['Dívida Bruta','div_bruta'],['Dívida Líquida','div_liquida'],['Patrimônio Líq.','patrim_liq']];
+    const bc=bal.filter(x=>d[x[1]]).map(x=>`<div class="ind-card"><div class="ind-label">${x[0]}</div><div class="ind-val">${fmtRS(d[x[1]])}</div></div>`).join('');
+    if(bc){document.getElementById('fx-bal').innerHTML=bc;document.getElementById('fx-bal-box').style.display='';}
+    const res=[['Receita Líquida','receita_liq'],['EBIT','ebit'],['Lucro Líquido','lucro_liq']];
+    const rc=res.filter(x=>d[x[1]]).map(x=>`<div class="ind-card"><div class="ind-label">${x[0]}</div><div class="ind-val">${fmtRS(d[x[1]])}</div></div>`).join('');
+    if(rc){document.getElementById('fx-res').innerHTML=rc;document.getElementById('fx-res-box').style.display='';}
+  }catch(e){}
+}
 async function renderDividendos(){
   try{
     const r=await fetch(`data/dividendos/${TICKER}.json?t=${Date.now()}`);
