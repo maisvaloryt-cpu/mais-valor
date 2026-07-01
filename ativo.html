@@ -563,6 +563,44 @@ async function renderFundExtra(){
     if(rc){document.getElementById('fx-res').innerHTML=rc;document.getElementById('fx-res-box').style.display='';}
   }catch(e){}
 }
+async function renderFundFull(){
+  const cont=document.getElementById('fund-full');
+  if(!cont) return;
+  let d={};
+  try{
+    const r=await fetch(`data/fundamentalistas/${TICKER}.json?t=${Date.now()}`);
+    if(r.ok) d=await r.json();
+  }catch(e){}
+  const isFii=TIPO==='fii';
+  const card=(lab,val,cls)=>`<div class="ind-card"><div class="ind-label">${lab}</div><div class="ind-val ${cls||''}">${(val==null||val==='')?'—':val}</div></div>`;
+  const box=(titulo,cards)=>`<div class="section-box" style="margin-bottom:1.25rem"><h3>${titulo}</h3><div class="ind-grid">${cards.join('')}</div></div>`;
+  const osc=d.oscilacoes||{};
+  const oscOrdem=['Dia','Mês','30 dias','12 meses','2026','2025','2024','2023','2022','2021','2020'];
+  const oscCards=oscOrdem.filter(k=>osc[k]).map(k=>card(k,osc[k],String(osc[k]).trim().startsWith('-')?'dn':'up'));
+  let html='';
+  html+=box('Informações',[
+    card('Valor de Mercado',fmtRS(d.market_cap)),card('Valor da Firma',fmtRS(d.valor_firma)),
+    card('Nº de Ações',d.nro_acoes),card('Último Balanço',d.ult_balanco),
+    card('Setor',d.setor),card('Subsetor',d.subsetor)]);
+  if(oscCards.length) html+=box('Oscilações',oscCards);
+  html+=box('Indicadores de Valuation',[
+    card('P/L',d.pl),card('P/VP',d.pvp),card('P/EBIT',d.p_ebit),card('PSR',d.psr),
+    card('P/Ativos',d.p_ativos),card('P/Ativ Circ Liq',d.p_ativ_circ_liq),
+    card('Dividend Yield',d.dy),card('EV/EBITDA',d.ev_ebitda),card('EV/EBIT',d.ev_ebit),card('P/Cap Giro',d.p_cap_giro)]);
+  html+=box('Indicadores de Rentabilidade',[
+    card('ROE',d.roe),card('ROIC',d.roic),card('EBIT/Ativo',d.ebit_ativo),card('Cresc. Receita 5a',d.cagr_rec_5a),
+    card('Giro Ativos',d.giro_ativos),card('Margem Bruta',d.mrg_bruta),card('Margem EBIT',d.mrg_ebit),card('Margem Líquida',d.mrg_liq)]);
+  html+=box('Indicadores de Endividamento',[
+    card('Liquidez Corrente',d.liq_corrente),card('Dív. Líq/Patrim',d.div_liq_patrim),
+    card('Dív. Líq/EBITDA',d.div_liq_ebitda),card('PL/Ativos',d.patrim_ativos)]);
+  html+=box('Balanço Patrimonial',[
+    card('Ativo',fmtRS(d.ativo)),card('Ativo Circulante',fmtRS(d.ativo_circ)),card('Disponibilidades',fmtRS(d.disponibilidades)),
+    card('Dívida Bruta',fmtRS(d.div_bruta)),card('Dívida Líquida',fmtRS(d.div_liquida)),card('Patrimônio',fmtRS(d.patrim_liq))]);
+  html+=box('Demonstrativo de Resultados (12 meses)', isFii
+    ?[card('Receita',fmtRS(d.receita)),card('FFO',fmtRS(d.ffo)),card('Rendimento Distribuído',fmtRS(d.rend_distribuido)),card('Venda de Ativos',fmtRS(d.venda_ativos))]
+    :[card('Receita Líquida',fmtRS(d.receita_liq)),card('EBIT',fmtRS(d.ebit)),card('Lucro Líquido',fmtRS(d.lucro_liq))]);
+  cont.innerHTML=html;
+}
 async function renderDividendos(){
   try{
     const r=await fetch(`data/dividendos/${TICKER}.json?t=${Date.now()}`);
@@ -724,6 +762,7 @@ async function init(){
   if(!ativo){document.getElementById('ativo-nome').textContent='Ativo não encontrado';return;}
   renderHero(ativo);
   renderIndicadores(ativo);
+  renderFundFull();
   renderAbout(ativo);
   renderSameSetor(ativo);
   initWatchlist();
