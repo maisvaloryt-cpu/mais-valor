@@ -142,9 +142,38 @@ def fetch_yahoo(ticker):
         return []
 
 
+def fetch_fundamentus_prov(ticker):
+    """Fundamentus — proventos: data-com, valor, tipo, data de pagamento (inclui anunciados/futuros). Grátis."""
+    base = "fii_proventos" if ticker.endswith("11") else "proventos"
+    url = f"https://www.fundamentus.com.br/{base}.php?papel={ticker}&tipo=2"
+    try:
+        r = requests.get(url, headers=HEADERS, timeout=15)
+        if r.status_code != 200:
+            return []
+        r.encoding = "latin-1"
+        import lxml.html
+        tree = lxml.html.fromstring(r.text)
+        out = []
+        for tr in tree.xpath("//tr"):
+            cells = [c.text_content().strip() for c in tr.xpath("./td")]
+            if len(cells) < 3:
+                continue
+            datas = [d for d in (_norm_date(c) for c in cells) if d]
+            nums = [n for n in (_num(c) for c in cells) if n]
+            tipos = [c for c in cells if c and _num(c) is None and not _norm_date(c)]
+            if not datas or not nums:
+                continue
+            com = datas[0]
+            pag = datas[1] if len(datas) > 1 else datas[0]
+            out.append({"com": com, "pag": pag, "value": nums[0], "tipo": (tipos[0] if tipos else "")})
+        return out
+    except Exception:
+        return []
+
+
 def get_dividendos(ticker):
     """Cascata: tenta as fontes na ordem; a primeira com dados vence."""
-    for nome, fn in (("Brapi", fetch_brapi), ("StatusInvest", fetch_statusinvest), ("Yahoo", fetch_yahoo)):
+    for nome, fn in (("Fundamentus", fetch_fundamentus_prov), ("Yahoo", fetch_yahoo)):
         try:
             divs = fn(ticker)
         except Exception:
