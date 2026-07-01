@@ -1,1 +1,1 @@
-{"ticker": "BIED3", "dividendos": [{"date": "2017-03-01", "value": 0.1137}, {"date": "2017-04-01", "value": 0.1137}], "updated_at": "30/06/2026 04:00"}
+{"ticker": "BIED3", "dividendos": [{"com": "", "pag": "2017-03-01", "value": 0.1137, "tipo": ""}, {"com": "", "pag": "2017-04-01", "value": 0.1137, "tipo": ""}, {"com": "", "pag": "2017-04-01", "value": 0.113688, "tipo": ""}], "updated_at": "30/06/2026 20:59"}

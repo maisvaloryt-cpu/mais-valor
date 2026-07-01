@@ -1,1 +1,1 @@
-{"ticker": "VTRU3", "dividendos": [{"date": "2025-03-01", "value": 0.0216}, {"date": "2026-03-01", "value": 0.0251}], "updated_at": "30/06/2026 04:04"}
+{"ticker": "VTRU3", "dividendos": [{"com": "", "pag": "2025-03-01", "value": 0.0216, "tipo": ""}, {"com": "", "pag": "2025-03-01", "value": 0.021604, "tipo": ""}, {"com": "", "pag": "2026-03-01", "value": 0.0251, "tipo": ""}, {"com": "", "pag": "2026-03-01", "value": 0.025117, "tipo": ""}], "updated_at": "30/06/2026 21:03"}

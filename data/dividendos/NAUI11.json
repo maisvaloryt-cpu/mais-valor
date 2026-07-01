@@ -1,1 +1,1 @@
-{"ticker": "NAUI11", "dividendos": [{"date": "2025-02-01", "value": 179.7622}, {"date": "2026-02-01", "value": 115.9757}], "updated_at": "30/06/2026 04:15"}
+{"ticker": "NAUI11", "dividendos": [{"com": "", "pag": "2025-02-01", "value": 179.7622, "tipo": ""}, {"com": "", "pag": "2025-02-01", "value": 179.76225, "tipo": ""}, {"com": "", "pag": "2026-02-01", "value": 115.9757, "tipo": ""}, {"com": "", "pag": "2026-02-01", "value": 115.97565, "tipo": ""}], "updated_at": "30/06/2026 21:15"}
