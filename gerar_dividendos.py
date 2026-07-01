@@ -58,6 +58,9 @@ def main():
                     continue
 
                 val = d.get("value", 0)
+                # Filtro de sanidade: descarta valor furado (DY implícito > 150%/ano é impossível)
+                if preco and val and (val / preco) * 12 > 1.5:
+                    continue
                 dy_est = ""
                 if preco and val:
                     dy_anual = (val / preco) * 12 * 100

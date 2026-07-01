@@ -122,7 +122,7 @@ def fetch_yahoo(ticker):
     symbol = ticker + ".SA"
     end = int(datetime.datetime.now().timestamp())
     start = end - (10 * 365 * 24 * 3600)
-    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?period1={start}&period2={end}&interval=3mo&events=dividends"
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?period1={start}&period2={end}&interval=1d&events=dividends"
     try:
         r = requests.get(url, headers=HEADERS, timeout=15)
         if r.status_code != 200:
