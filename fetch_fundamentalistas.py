@@ -125,6 +125,7 @@ def get_fundamentus_acao(ticker: str) -> dict:
         if not r.ok:
             return {}
         # Extrai campos básicos via parsing simples de texto
+        r.encoding = "latin-1"   # Fundamentus é ISO-8859-1 (acentos)
         text = r.text
         out  = {}
         import re
@@ -142,6 +143,48 @@ def get_fundamentus_acao(ticker: str) -> dict:
             v = extract(label)
             if v:
                 out[field] = v
+
+        # ── Extração completa via lxml: balanço, resultados (R$) e oscilações ──
+        try:
+            import lxml.html
+            tree = lxml.html.fromstring(text)
+            pares = {}
+            for tr in tree.xpath("//tr"):
+                cels = [c.text_content().strip().lstrip("?").strip() for c in tr.xpath("./td")]
+                for i in range(0, len(cels) - 1, 2):
+                    lab, val = cels[i], cels[i + 1]
+                    if lab and val:
+                        pares.setdefault(lab, val)   # 1a ocorrencia (ex.: Receita 12m antes de 3m)
+
+            # Balanço patrimonial (valores absolutos em R$)
+            for f, lab in [("ativo", "Ativo"), ("disponibilidades", "Disponibilidades"),
+                           ("ativo_circ", "Ativo Circulante"), ("div_bruta", "Dív. Bruta"),
+                           ("div_liquida", "Dív. Líquida"), ("patrim_liq", "Patrim. Líq")]:
+                if pares.get(lab):
+                    out[f] = pares[lab]
+            # Demonstrativo de resultados (últimos 12 meses)
+            for f, lab in [("receita_liq", "Receita Líquida"), ("ebit", "EBIT"),
+                           ("lucro_liq", "Lucro Líquido")]:
+                if pares.get(lab):
+                    out[f] = pares[lab]
+            # Oscilação por período e por ano
+            osc = {}
+            for lab in ["Dia", "Mês", "30 dias", "12 meses",
+                        "2026", "2025", "2024", "2023", "2022", "2021", "2020"]:
+                if pares.get(lab):
+                    osc[lab] = pares[lab]
+            if osc:
+                out["oscilacoes"] = osc
+            # Infos e indicadores extras
+            for f, lab in [("subsetor", "Subsetor"), ("valor_firma", "Valor da firma"),
+                           ("nro_acoes", "Nro. Ações"), ("ult_balanco", "Últ balanço processado"),
+                           ("p_ativos", "P/Ativos"), ("p_cap_giro", "P/Cap. Giro"),
+                           ("p_ativ_circ_liq", "P/Ativ Circ Liq"), ("ebit_ativo", "EBIT / Ativo")]:
+                if pares.get(lab):
+                    out[f] = pares[lab]
+        except Exception:
+            pass
+
         return out
     except Exception:
         return {}
