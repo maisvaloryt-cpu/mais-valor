@@ -555,7 +555,9 @@ async function renderFundExtra(){
     const bal=[['Ativo','ativo'],['Ativo Circulante','ativo_circ'],['Disponibilidades','disponibilidades'],['Dívida Bruta','div_bruta'],['Dívida Líquida','div_liquida'],['Patrimônio Líq.','patrim_liq']];
     const bc=bal.filter(x=>d[x[1]]).map(x=>`<div class="ind-card"><div class="ind-label">${x[0]}</div><div class="ind-val">${fmtRS(d[x[1]])}</div></div>`).join('');
     if(bc){document.getElementById('fx-bal').innerHTML=bc;document.getElementById('fx-bal-box').style.display='';}
-    const res=[['Receita Líquida','receita_liq'],['EBIT','ebit'],['Lucro Líquido','lucro_liq']];
+    const res=TIPO==='fii'
+      ?[['Receita','receita'],['FFO','ffo'],['Rendimento Distribuído','rend_distribuido'],['Venda de Ativos','venda_ativos']]
+      :[['Receita Líquida','receita_liq'],['EBIT','ebit'],['Lucro Líquido','lucro_liq']];
     const rc=res.filter(x=>d[x[1]]).map(x=>`<div class="ind-card"><div class="ind-label">${x[0]}</div><div class="ind-val">${fmtRS(d[x[1]])}</div></div>`).join('');
     if(rc){document.getElementById('fx-res').innerHTML=rc;document.getElementById('fx-res-box').style.display='';}
   }catch(e){}

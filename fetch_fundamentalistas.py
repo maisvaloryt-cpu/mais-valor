@@ -286,6 +286,28 @@ def processar_acao(ticker: str) -> bool:
     return True
 
 
+def _detalhes_pares(ticker: str) -> dict:
+    """Lê o detalhes.php e devolve todos os pares rótulo→valor (ação ou FII)."""
+    try:
+        r = requests.get(f"https://fundamentus.com.br/detalhes.php?papel={ticker}",
+                         headers=HEADERS_FUND, timeout=15)
+        if not r.ok:
+            return {}
+        r.encoding = "latin-1"
+        import lxml.html
+        tree = lxml.html.fromstring(r.text)
+        pares = {}
+        for tr in tree.xpath("//tr"):
+            cels = [c.text_content().strip().lstrip("?").strip() for c in tr.xpath("./td")]
+            for i in range(0, len(cels) - 1, 2):
+                lab, val = cels[i], cels[i + 1]
+                if lab and val:
+                    pares.setdefault(lab, val)
+        return pares
+    except Exception:
+        return {}
+
+
 def processar_fii(ticker: str) -> bool:
     log.info(f"  {ticker} (FII)...")
     data = {"ticker": ticker, "tipo": "fii"}
@@ -310,6 +332,23 @@ def processar_fii(ticker: str) -> bool:
             "tipo_fundo":      fund.get("fund_type"),
         })
     time.sleep(DELAY)
+
+    # 1b. Fundamentus detalhes — oscilações, balanço e resultados (FII)
+    pares = _detalhes_pares(ticker)
+    if pares:
+        osc = {}
+        for lab in ["Dia", "Mês", "30 dias", "12 meses",
+                    "2026", "2025", "2024", "2023", "2022", "2021", "2020"]:
+            if pares.get(lab):
+                osc[lab] = pares[lab]
+        if osc:
+            data["oscilacoes"] = osc
+        for f, lab in [("ativo", "Ativos"), ("patrim_liq", "Patrimônio Líquido"),
+                       ("receita", "Receita"), ("ffo", "FFO"),
+                       ("rend_distribuido", "Rendimento Distribuído"),
+                       ("venda_ativos", "Venda de Ativos"), ("imoveis_pl", "Imóveis/PL do FII")]:
+            if pares.get(lab):
+                data[f] = pares[lab]
 
     # 2. BolsaI — empresa (CNPJ, razão social)
     company = get_bolsai(f"/companies/{ticker}")
