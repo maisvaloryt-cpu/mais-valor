@@ -104,7 +104,6 @@
   <!-- OVERVIEW -->
   <div id="tab-overview" class="tab-content active" style="padding-top:1.5rem">
     <div id="oportunidades" style="margin-bottom:1rem"></div>
-    <div id="fund-full"></div>
     <div class="ind-grid" id="ind-grid" style="display:none"></div>
     <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem">
       <div>
@@ -145,6 +144,7 @@
         </div>
       </div>
     </div>
+    <div id="fund-full" style="margin-top:1.5rem"></div>
   </div>
 
   <!-- INDICADORES -->
@@ -578,27 +578,43 @@ async function renderFundFull(){
   const oscOrdem=['Dia','Mês','30 dias','12 meses','2026','2025','2024','2023','2022','2021','2020'];
   const oscCards=oscOrdem.filter(k=>osc[k]).map(k=>card(k,osc[k],String(osc[k]).trim().startsWith('-')?'dn':'up'));
   let html='';
-  html+=box('Informações',[
-    card('Valor de Mercado',fmtRS(d.market_cap)),card('Valor da Firma',fmtRS(d.valor_firma)),
-    card('Nº de Ações',d.nro_acoes),card('Último Balanço',d.ult_balanco),
-    card('Setor',d.setor),card('Subsetor',d.subsetor)]);
-  if(oscCards.length) html+=box('Oscilações',oscCards);
-  html+=box('Indicadores de Valuation',[
-    card('P/L',d.pl),card('P/VP',d.pvp),card('P/EBIT',d.p_ebit),card('PSR',d.psr),
-    card('P/Ativos',d.p_ativos),card('P/Ativ Circ Liq',d.p_ativ_circ_liq),
-    card('Dividend Yield',d.dy),card('EV/EBITDA',d.ev_ebitda),card('EV/EBIT',d.ev_ebit),card('P/Cap Giro',d.p_cap_giro)]);
-  html+=box('Indicadores de Rentabilidade',[
-    card('ROE',d.roe),card('ROIC',d.roic),card('EBIT/Ativo',d.ebit_ativo),card('Cresc. Receita 5a',d.cagr_rec_5a),
-    card('Giro Ativos',d.giro_ativos),card('Margem Bruta',d.mrg_bruta),card('Margem EBIT',d.mrg_ebit),card('Margem Líquida',d.mrg_liq)]);
-  html+=box('Indicadores de Endividamento',[
-    card('Liquidez Corrente',d.liq_corrente),card('Dív. Líq/Patrim',d.div_liq_patrim),
-    card('Dív. Líq/EBITDA',d.div_liq_ebitda),card('PL/Ativos',d.patrim_ativos)]);
-  html+=box('Balanço Patrimonial',[
-    card('Ativo',fmtRS(d.ativo)),card('Ativo Circulante',fmtRS(d.ativo_circ)),card('Disponibilidades',fmtRS(d.disponibilidades)),
-    card('Dívida Bruta',fmtRS(d.div_bruta)),card('Dívida Líquida',fmtRS(d.div_liquida)),card('Patrimônio',fmtRS(d.patrim_liq))]);
-  html+=box('Demonstrativo de Resultados (12 meses)', isFii
-    ?[card('Receita',fmtRS(d.receita)),card('FFO',fmtRS(d.ffo)),card('Rendimento Distribuído',fmtRS(d.rend_distribuido)),card('Venda de Ativos',fmtRS(d.venda_ativos))]
-    :[card('Receita Líquida',fmtRS(d.receita_liq)),card('EBIT',fmtRS(d.ebit)),card('Lucro Líquido',fmtRS(d.lucro_liq))]);
+  if(isFii){
+    html+=box('Informações',[
+      card('Segmento',d.segmento),card('Mandato',d.mandato),card('Gestão',d.tipo_gestao),
+      card('Nº de Cotas',d.cotas_emitidas||d.nro_acoes),card('Nº de Cotistas',d.num_cotistas),
+      card('Valor de Mercado',fmtRS(d.market_cap)),card('Taxa de Adm.',d.taxa_adm),card('Último Balanço',d.ult_balanco)]);
+    if(oscCards.length) html+=box('Oscilações',oscCards);
+    html+=box('Indicadores',[
+      card('P/VP',d.pvp),card('Dividend Yield',d.dy),card('Patrim./Cota',d.patrimonio_cota),
+      card('Último Rendimento',d.ultimo_rend),card('Vacância',d.vacancia),card('Cap Rate',d.cap_rate),
+      card('Qtd. Imóveis',d.qtd_imoveis),card('Imóveis/PL',d.imoveis_pl)]);
+    html+=box('Patrimônio',[
+      card('Ativos',fmtRS(d.ativo)),card('Patrimônio Líquido',fmtRS(d.patrim_liq||d.patrimonio_total))]);
+    html+=box('Demonstrativo de Resultados (12 meses)',[
+      card('Receita',fmtRS(d.receita)),card('FFO',fmtRS(d.ffo)),
+      card('Rendimento Distribuído',fmtRS(d.rend_distribuido)),card('Venda de Ativos',fmtRS(d.venda_ativos))]);
+  } else {
+    html+=box('Informações',[
+      card('Valor de Mercado',fmtRS(d.market_cap)),card('Valor da Firma',fmtRS(d.valor_firma)),
+      card('Nº de Ações',d.nro_acoes),card('Último Balanço',d.ult_balanco),
+      card('Setor',d.setor),card('Subsetor',d.subsetor)]);
+    if(oscCards.length) html+=box('Oscilações',oscCards);
+    html+=box('Indicadores de Valuation',[
+      card('P/L',d.pl),card('P/VP',d.pvp),card('P/EBIT',d.p_ebit),card('PSR',d.psr),
+      card('P/Ativos',d.p_ativos),card('P/Ativ Circ Liq',d.p_ativ_circ_liq),
+      card('Dividend Yield',d.dy),card('EV/EBITDA',d.ev_ebitda),card('EV/EBIT',d.ev_ebit),card('P/Cap Giro',d.p_cap_giro)]);
+    html+=box('Indicadores de Rentabilidade',[
+      card('ROE',d.roe),card('ROIC',d.roic),card('EBIT/Ativo',d.ebit_ativo),card('Cresc. Receita 5a',d.cagr_rec_5a),
+      card('Giro Ativos',d.giro_ativos),card('Margem Bruta',d.mrg_bruta),card('Margem EBIT',d.mrg_ebit),card('Margem Líquida',d.mrg_liq)]);
+    html+=box('Indicadores de Endividamento',[
+      card('Liquidez Corrente',d.liq_corrente),card('Dív. Líq/Patrim',d.div_liq_patrim),
+      card('Dív. Líq/EBITDA',d.div_liq_ebitda),card('PL/Ativos',d.patrim_ativos)]);
+    html+=box('Balanço Patrimonial',[
+      card('Ativo',fmtRS(d.ativo)),card('Ativo Circulante',fmtRS(d.ativo_circ)),card('Disponibilidades',fmtRS(d.disponibilidades)),
+      card('Dívida Bruta',fmtRS(d.div_bruta)),card('Dívida Líquida',fmtRS(d.div_liquida)),card('Patrimônio',fmtRS(d.patrim_liq))]);
+    html+=box('Demonstrativo de Resultados (12 meses)',[
+      card('Receita Líquida',fmtRS(d.receita_liq)),card('EBIT',fmtRS(d.ebit)),card('Lucro Líquido',fmtRS(d.lucro_liq))]);
+  }
   cont.innerHTML=html;
 }
 async function renderDividendos(){
