@@ -1,9 +1,9 @@
 {
-  "gerado_em": "02/07/2026 05:56",
+  "gerado_em": "03/07/2026 06:04",
   "historico_mensal": {
-    "total": 1372,
-    "ok": 1355,
-    "poucos_dados": 17,
+    "total": 1374,
+    "ok": 1356,
+    "poucos_dados": 18,
     "lista_poucos": [
       {
         "ticker": "ADSH11",
@@ -31,11 +31,15 @@
       },
       {
         "ticker": "FDXF",
-        "pontos": 4
+        "pontos": 5
       },
       {
         "ticker": "HIRE11",
         "pontos": 8
+      },
+      {
+        "ticker": "HONA",
+        "pontos": 2
       },
       {
         "ticker": "ICNE11",
@@ -83,42 +87,42 @@
       {
         "ticker": "BREV11",
         "ultimo": "2026-06-20",
-        "dias_atras": 12
+        "dias_atras": 13
       },
       {
         "ticker": "BRIM11",
         "ultimo": "2026-06-11",
-        "dias_atras": 21
+        "dias_atras": 22
       },
       {
         "ticker": "GLOG11",
         "ultimo": "2026-06-21",
-        "dias_atras": 11
+        "dias_atras": 12
       },
       {
         "ticker": "HGPO11",
         "ultimo": "2026-06-08",
-        "dias_atras": 24
+        "dias_atras": 25
       },
       {
         "ticker": "PLOG11",
         "ultimo": "2026-06-21",
-        "dias_atras": 11
+        "dias_atras": 12
       },
       {
         "ticker": "SPG211",
         "ultimo": "2026-06-10",
-        "dias_atras": 22
+        "dias_atras": 23
       },
       {
         "ticker": "TKNO4",
         "ultimo": "2026-06-21",
-        "dias_atras": 11
+        "dias_atras": 12
       }
     ]
   },
   "cotacoes": {
-    "atualizado_em": "02/07/2026 05:30",
+    "atualizado_em": "03/07/2026 05:38",
     "total_acoes": 459,
     "total_fiis": 487,
     "fallbacks": 7,
@@ -133,23 +137,23 @@
     ]
   },
   "fundamentus": {
-    "atualizado_em": "02/07/2026 05:30",
+    "atualizado_em": "03/07/2026 05:38",
     "total_acoes": 994,
     "total_fiis": 553,
-    "atualizado_fiis": "02/07/2026 05:30"
+    "atualizado_fiis": "03/07/2026 05:38"
   },
   "criptos": {
-    "atualizado_em": "01/07/2026 22:49 UTC",
+    "atualizado_em": "02/07/2026 21:53 UTC",
     "total_moedas": 100,
     "com_dados": 100,
     "sem_dados": 0,
     "tickers_sem_dados": [],
-    "historico_ok": 110,
+    "historico_ok": 111,
     "historico_falhou": 0,
     "historico_falhou_lista": []
   },
   "resumo": {
-    "acoes_com_historico": 1355,
+    "acoes_com_historico": 1356,
     "fiis_com_historico": 367,
     "cotacoes_atuais": 946,
     "indicadores_fundamentus": 1547,
