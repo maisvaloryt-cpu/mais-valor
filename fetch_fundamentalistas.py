@@ -35,7 +35,7 @@ BOLSAI_BASE  = "https://api.usebolsai.com/api/v1"
 FUND_BASE    = "https://fundamentus.com.br/resultado.php"
 OUT_DIR      = Path("data/fundamentalistas")
 ESTADO_FILE  = OUT_DIR / "_estado.json"
-GRUPO_SIZE   = 180   # req/dia com margem de segurança
+GRUPO_SIZE   = 2000  # >= total de ativos → processa TODOS (ações + FIIs) numa rodada só
 DELAY        = 0.4   # segundos entre requests
 
 HEADERS_BOLSAI = {"X-API-Key": BOLSAI_KEY, "Accept": "application/json"}
@@ -91,20 +91,41 @@ FIIS = [
     "XPPR11","XPSF11","XPVG11","YVRA11",
 ]
 
-ALL_TICKERS = ACOES + FIIS
-FII_SET     = set(FIIS)
+def _load_site_tickers():
+    """Lê ações e FIIs direto do cotacoes.json (fonte do site).
+    Assim cobre TODOS os ativos e nunca desatualiza. Fallback: listas fixas."""
+    try:
+        with open("data/cotacoes.json", encoding="utf-8") as f:
+            cot = json.load(f)
+        ac = [a["ticker"] for a in cot.get("acoes", []) if a.get("ticker")]
+        fi = [a["ticker"] for a in cot.get("fiis", []) if a.get("ticker")]
+        if ac or fi:
+            return ac, fi
+    except Exception:
+        pass
+    return ACOES, FIIS
+
+
+ACOES_SITE, FIIS_SITE = _load_site_tickers()
+ALL_TICKERS = ACOES_SITE + FIIS_SITE
+FII_SET     = set(FIIS_SITE)
 
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
+_BOLSAI_OFF = False   # vira True no 1º 429 → não insiste mais no BolsaI nesta rodada
+
 def get_bolsai(path: str) -> dict | None:
-    if not BOLSAI_KEY:
+    global _BOLSAI_OFF
+    if not BOLSAI_KEY or _BOLSAI_OFF:
         return None
     try:
         r = requests.get(f"{BOLSAI_BASE}{path}", headers=HEADERS_BOLSAI, timeout=15)
         if r.status_code == 429:
-            log.warning("BolsaI: limite diário atingido (429)")
+            if not _BOLSAI_OFF:
+                log.warning("BolsaI: limite diário atingido (429) — desligando BolsaI nesta rodada")
+            _BOLSAI_OFF = True
             return None
         if r.status_code == 404:
             return None
