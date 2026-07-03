@@ -1,5 +1,5 @@
 {
-  "updated_at": "03/07/2026 10:14",
+  "updated_at": "03/07/2026 10:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,20 +1128,20 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 172787.63,
-      "changePct": 0.0064,
-      "high": 174425.69,
-      "low": 171697.17
+      "price": 173360.66,
+      "changePct": 0.0033,
+      "high": 173742.94,
+      "low": 172790.39
     },
     {
       "ticker": "INDEXBVMF:IFIX",
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3833.57,
-      "changePct": 0.0018,
-      "high": 3834.66,
-      "low": 3826.69
+      "price": 3836.7,
+      "changePct": 0.0008,
+      "high": 3837.57,
+      "low": 3833.59
     },
     {
       "ticker": "INDEXBVMF:SMLL",
@@ -1158,10 +1158,10 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 12329.11,
-      "changePct": 0.006500000000000001,
-      "high": 12428.09,
-      "low": 12249.38
+      "price": 12331.7,
+      "changePct": 0.0002,
+      "high": 12383.44,
+      "low": 12303.05
     },
     {
       "ticker": "INDEXBVMF:IMAB",
@@ -1238,8 +1238,8 @@
       "stale": false,
       "descricao": "FTSE 100 (Reino Unido)",
       "tipo": "Índice Global",
-      "price": 10644.44,
-      "changePct": -0.0008,
+      "price": 10655.99,
+      "changePct": 0.0003,
       "high": 10701.32,
       "low": 10604.25
     },
@@ -1248,7 +1248,7 @@
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 25744.84,
+      "price": 25744.59,
       "changePct": 0.0064,
       "high": 25809.79,
       "low": 25611.69
