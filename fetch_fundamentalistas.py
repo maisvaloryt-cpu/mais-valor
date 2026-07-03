@@ -35,8 +35,9 @@ BOLSAI_BASE  = "https://api.usebolsai.com/api/v1"
 FUND_BASE    = "https://fundamentus.com.br/resultado.php"
 OUT_DIR      = Path("data/fundamentalistas")
 ESTADO_FILE  = OUT_DIR / "_estado.json"
-GRUPO_SIZE   = 2000  # >= total de ativos → processa TODOS (ações + FIIs) numa rodada só
-DELAY        = 0.4   # segundos entre requests
+GRUPO_SIZE   = 130   # detalhe.php por dia (rodízio) — evita bloqueio do Fundamentus
+DELAY        = 0.4   # segundos entre requests do BolsaI
+FUND_DELAY   = 1.5   # pausa educada entre requests do detalhe.php do Fundamentus
 
 HEADERS_BOLSAI = {"X-API-Key": BOLSAI_KEY, "Accept": "application/json"}
 HEADERS_FUND   = {
@@ -140,7 +141,7 @@ def _fundamentus_tree(ticker: str):
     """Baixa o detalhes.php do Fundamentus (ISO-8859-1) e devolve (arvore, pares)."""
     r = requests.get(
         f"https://fundamentus.com.br/detalhes.php?papel={ticker}",
-        headers=HEADERS_FUND, timeout=15
+        headers=HEADERS_FUND, timeout=8
     )
     if not r.ok:
         return None, {}
@@ -290,7 +291,7 @@ def processar_acao(ticker: str) -> bool:
 
     # 0. Fundamentus — fonte principal (não depende do limite diário do BolsaI)
     data.update(get_fundamentus_acao(ticker))
-    time.sleep(DELAY)
+    time.sleep(FUND_DELAY)
 
     # 1. BolsaI — empresa (CNPJ, setor, cidade)
     company = get_bolsai(f"/companies/{ticker}")
@@ -384,7 +385,7 @@ def processar_fii(ticker: str) -> bool:
 
     # 0. Fundamentus — fonte principal (P/VP, DY, VP/Cota, patrimônio, resultados, imóveis, oscilações)
     data.update(get_fundamentus_fii(ticker))
-    time.sleep(DELAY)
+    time.sleep(FUND_DELAY)
 
     # 1. BolsaI — fundamentals de FII (reforço; só sobrescreve com valor real)
     fund = get_bolsai(f"/fiis/{ticker}/fundamentals")
@@ -431,6 +432,81 @@ def processar_fii(ticker: str) -> bool:
     return True
 
 
+# ── Dados em massa (resultado.php já baixado) — básico de TODOS os ativos ──────
+def _nz(v):
+    """Devolve v se for número útil (não None e não zero); senão None."""
+    try:
+        if v is None:
+            return None
+        return v if float(v) != 0 else None
+    except Exception:
+        return v or None
+
+
+def _bulk_acao(ticker: str, bulk: dict) -> dict:
+    d = bulk.get(ticker)
+    if not d:
+        return {}
+    m = {"pl": _nz(d.get("pl")), "pvp": _nz(d.get("pvp")), "psr": _nz(d.get("psr")),
+         "dy": _nz(d.get("dy")), "roic": _nz(d.get("roic")), "roe": _nz(d.get("roe")),
+         "mrg_liq": _nz(d.get("mrg_liq")), "cagr_rec_5a": _nz(d.get("cresc5a")),
+         "patrim_liq": _nz(d.get("patrim"))}
+    return {k: v for k, v in m.items() if v is not None}
+
+
+def _bulk_fii(ticker: str, bulk: dict) -> dict:
+    d = bulk.get(ticker)
+    if not d:
+        return {}
+    m = {"ffo_yield": _nz(d.get("ffo_yield")), "dy": _nz(d.get("dy")), "pvp": _nz(d.get("pvp")),
+         "qtd_imoveis": _nz(d.get("qtd_imoveis")), "cap_rate": _nz(d.get("cap_rate")),
+         "vacancia": _nz(d.get("vacancia"))}
+    return {k: v for k, v in m.items() if v is not None}
+
+
+def merge_fill(path: Path, new_data: dict):
+    """Preenche SÓ os campos que faltam (não sobrescreve o detalhe já obtido)."""
+    existing = {}
+    if path.exists():
+        try:
+            existing = json.loads(path.read_text())
+        except Exception:
+            existing = {}
+    for k, v in new_data.items():
+        if existing.get(k) in (None, "", 0, 0.0) and v not in (None, "", 0, 0.0):
+            existing[k] = v
+    existing.setdefault("ticker", new_data.get("ticker"))
+    existing.setdefault("tipo", new_data.get("tipo"))
+    existing["_updated_at"] = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M UTC")
+    path.write_text(json.dumps(existing, ensure_ascii=False, separators=(",", ":")))
+
+
+def preencher_basico_todos():
+    """Lê os 2 arquivos em massa e preenche o básico de TODOS os ativos (sem HTTP)."""
+    try:
+        acb = json.loads(Path("data/fundamentus.json").read_text()).get("acoes", {})
+    except Exception:
+        acb = {}
+    try:
+        fib = json.loads(Path("data/fiis_fundamentus.json").read_text()).get("fiis", {})
+    except Exception:
+        fib = {}
+    n = 0
+    for t in ACOES_SITE:
+        m = _bulk_acao(t, acb)
+        if m:
+            m["ticker"], m["tipo"] = t, "acao"
+            merge_fill(OUT_DIR / f"{t}.json", m)
+            n += 1
+    for t in FIIS_SITE:
+        m = _bulk_fii(t, fib)
+        if m:
+            m["ticker"], m["tipo"] = t, "fii"
+            merge_fill(OUT_DIR / f"{t}.json", m)
+            n += 1
+    log.info(f"Básico (dados em massa) preenchido em {n} ativos")
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 def main():
     parser = argparse.ArgumentParser()
@@ -439,8 +515,7 @@ def main():
     args = parser.parse_args()
 
     if not BOLSAI_KEY:
-        log.error("BOLSAI_KEY não definida — configure como secret no GitHub Actions")
-        sys.exit(1)
+        log.warning("BOLSAI_KEY não definida — seguindo só com Fundamentus (fonte principal)")
 
     # Modo ticker único
     if args.ticker:
@@ -451,7 +526,10 @@ def main():
             processar_acao(t)
         return
 
-    # Modo rotativo
+    # 1. Básico de TODOS os ativos (dados em massa, sem HTTP) — roda todo dia
+    preencher_basico_todos()
+
+    # 2. Detalhe pesado (balanço, resultados, oscilações) em rodízio diário
     estado = load_estado()
     if args.reset:
         estado = {"grupo": 0}
