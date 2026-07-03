@@ -278,6 +278,12 @@ def _upd(data: dict, novos: dict):
     data.update({k: v for k, v in novos.items() if v not in (None, "")})
 
 
+def _pace_bolsai():
+    """Só espera entre chamadas do BolsaI enquanto ele estiver ativo (não perde tempo depois do 429)."""
+    if not _BOLSAI_OFF:
+        time.sleep(DELAY)
+
+
 def processar_acao(ticker: str) -> bool:
     log.info(f"  {ticker} (ação)...")
     data = {"ticker": ticker, "tipo": "acao"}
@@ -299,7 +305,7 @@ def processar_acao(ticker: str) -> bool:
             "website":      company.get("website"),
             "cvm_code":     company.get("cvm_code"),
         })
-    time.sleep(DELAY)
+    _pace_bolsai()
 
     # 2. BolsaI — fundamentals (27 indicadores) — só sobrescreve com valor real
     fund = get_bolsai(f"/fundamentals/{ticker}")
@@ -333,7 +339,7 @@ def processar_acao(ticker: str) -> bool:
             "patrim_ativos":   fund.get("equity_to_assets"),
             "passiv_ativos":   fund.get("liabilities_to_assets"),
         })
-    time.sleep(DELAY)
+    _pace_bolsai()
 
     # 3. BolsaI — stats (52 semanas, YTD)
     stats = get_bolsai(f"/stocks/{ticker}/stats")
@@ -344,7 +350,7 @@ def processar_acao(ticker: str) -> bool:
             "ytd_ret":      stats.get("ytd_return_pct"),
             "vol_med_52s":  stats.get("avg_volume_52w"),
         })
-    time.sleep(DELAY)
+    _pace_bolsai()
 
     merge_json(OUT_DIR / f"{ticker}.json", data)
     return True
@@ -399,7 +405,7 @@ def processar_fii(ticker: str) -> bool:
             "tipo_gestao":     fund.get("management_type"),
             "tipo_fundo":      fund.get("fund_type"),
         })
-    time.sleep(DELAY)
+    _pace_bolsai()
 
     # 2. BolsaI — empresa (CNPJ, razão social)
     company = get_bolsai(f"/companies/{ticker}")
@@ -409,7 +415,7 @@ def processar_fii(ticker: str) -> bool:
             "cnpj":         company.get("cnpj"),
             "cvm_code":     company.get("cvm_code"),
         })
-    time.sleep(DELAY)
+    _pace_bolsai()
 
     # 3. Stats de preço
     stats = get_bolsai(f"/stocks/{ticker}/stats")
@@ -419,7 +425,7 @@ def processar_fii(ticker: str) -> bool:
             "min_52s": stats.get("week_52_low"),
             "ytd_ret": stats.get("ytd_return_pct"),
         })
-    time.sleep(DELAY)
+    _pace_bolsai()
 
     merge_json(OUT_DIR / f"{ticker}.json", data)
     return True
