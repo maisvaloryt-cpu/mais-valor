@@ -115,76 +115,110 @@ def get_bolsai(path: str) -> dict | None:
         return None
 
 
+def _fundamentus_tree(ticker: str):
+    """Baixa o detalhes.php do Fundamentus (ISO-8859-1) e devolve (arvore, pares)."""
+    r = requests.get(
+        f"https://fundamentus.com.br/detalhes.php?papel={ticker}",
+        headers=HEADERS_FUND, timeout=15
+    )
+    if not r.ok:
+        return None, {}
+    r.encoding = "latin-1"   # Fundamentus é ISO-8859-1 (acentos)
+    import lxml.html, re
+    tree = lxml.html.fromstring(r.text)
+
+    def norm(s):
+        return re.sub(r"\s+", " ", s.replace("?", "").strip())
+
+    pares = {}
+    for tr in tree.xpath("//tr"):
+        cels = [norm(c.text_content()) for c in tr.xpath("./td")]
+        for i in range(0, len(cels) - 1, 2):
+            lab, val = cels[i], cels[i + 1]
+            if lab and val:
+                pares.setdefault(lab, val)   # 1a ocorrência (ex.: Receita 12m antes de 3m)
+    return tree, pares
+
+
+def _map_pares(pares: dict, mapa) -> dict:
+    """Aplica um mapa [(rótulo, chave)] ignorando vazios e traços."""
+    out = {}
+    for lab, key in mapa:
+        v = pares.get(lab)
+        if v and v not in ("-", "--"):
+            out[key] = v
+    return out
+
+
+def _oscilacoes(pares: dict) -> dict:
+    osc = {}
+    for lab in ["Dia", "Mês", "30 dias", "12 meses",
+                "2026", "2025", "2024", "2023", "2022", "2021", "2020"]:
+        v = pares.get(lab)
+        if v and v not in ("-", "--"):
+            osc[lab] = v
+    return osc
+
+
+# Rótulos exatos do Fundamentus (detalhes.php) → chave usada no site (AÇÃO)
+_MAP_ACAO = [
+    ("Setor", "setor"), ("Subsetor", "subsetor"),
+    ("Valor de mercado", "market_cap"), ("Valor da firma", "valor_firma"),
+    ("Nro. Ações", "nro_acoes"), ("Últ balanço processado", "ult_balanco"),
+    ("P/L", "pl"), ("P/VP", "pvp"), ("P/EBIT", "p_ebit"), ("PSR", "psr"),
+    ("P/Ativos", "p_ativos"), ("P/Cap. Giro", "p_cap_giro"), ("P/Ativ Circ Liq", "p_ativ_circ_liq"),
+    ("Div. Yield", "dy"), ("EV / EBITDA", "ev_ebitda"), ("EV / EBIT", "ev_ebit"),
+    ("Cres. Rec (5a)", "cagr_rec_5a"), ("LPA", "lpa"), ("VPA", "vpa"),
+    ("Marg. Bruta", "mrg_bruta"), ("Marg. EBIT", "mrg_ebit"), ("Marg. Líquida", "mrg_liq"),
+    ("EBIT / Ativo", "ebit_ativo"), ("ROIC", "roic"), ("ROE", "roe"),
+    ("Liquidez Corr", "liq_corrente"), ("Dív Líq / Patrim", "div_liq_patrim"),
+    ("Giro Ativos", "giro_ativos"),
+    ("Ativo", "ativo"), ("Disponibilidades", "disponibilidades"), ("Ativo Circulante", "ativo_circ"),
+    ("Dív. Bruta", "div_bruta"), ("Dív. Líquida", "div_liquida"), ("Patrim. Líq", "patrim_liq"),
+    ("Receita Líquida", "receita_liq"), ("EBIT", "ebit"), ("Lucro Líquido", "lucro_liq"),
+]
+
+# Rótulos exatos do Fundamentus (detalhes.php) → chave usada no site (FII)
+_MAP_FII = [
+    ("Segmento", "segmento"), ("Gestão", "tipo_gestao"), ("Mandato", "mandato"),
+    ("Valor de mercado", "market_cap"), ("Nro. Cotas", "cotas_emitidas"),
+    ("Últ Info Trimestral", "ult_balanco"),
+    ("FFO Yield", "ffo_yield"), ("Div. Yield", "dy"), ("P/VP", "pvp"),
+    ("FFO/Cota", "ffo_cota"), ("Dividendo/cota", "ultimo_rend"), ("VP/Cota", "patrimonio_cota"),
+    ("Receita", "receita"), ("Venda de ativos", "venda_ativos"), ("FFO", "ffo"),
+    ("Rend. Distribuído", "rend_distribuido"),
+    ("Ativos", "ativo"), ("Patrim Líquido", "patrim_liq"),
+    ("Qtd imóveis", "qtd_imoveis"), ("Cap Rate", "cap_rate"),
+    ("Vacância Média", "vacancia"), ("Imóveis/PL do FII", "imoveis_pl"),
+]
+
+
 def get_fundamentus_acao(ticker: str) -> dict:
-    """Scraping leve do Fundamentus para complementar dados de ação."""
+    """Fundamentus (AÇÃO): indicadores, balanço, resultados e oscilações.
+    Fonte principal — não depende do limite diário do BolsaI."""
     try:
-        r = requests.get(
-            f"https://fundamentus.com.br/detalhes.php?papel={ticker}",
-            headers=HEADERS_FUND, timeout=15
-        )
-        if not r.ok:
+        _, pares = _fundamentus_tree(ticker)
+        if not pares:
             return {}
-        # Extrai campos básicos via parsing simples de texto
-        r.encoding = "latin-1"   # Fundamentus é ISO-8859-1 (acentos)
-        text = r.text
-        out  = {}
-        import re
-        def extract(label):
-            pat = rf'{re.escape(label)}.*?<td[^>]*>([\d.,%-]+)</td>'
-            m   = re.search(pat, text, re.DOTALL)
-            return m.group(1).strip() if m else None
+        out = _map_pares(pares, _MAP_ACAO)
+        osc = _oscilacoes(pares)
+        if osc:
+            out["oscilacoes"] = osc
+        return out
+    except Exception:
+        return {}
 
-        # Campos que o BolsaI free pode não ter
-        for field, label in [
-            ("liq_corr",    "Liq. Corr."),
-            ("div_yield_12","Div. Yield"),
-            ("cresc_rec_5a","Cresc. Rec.5a"),
-        ]:
-            v = extract(label)
-            if v:
-                out[field] = v
 
-        # ── Extração completa via lxml: balanço, resultados (R$) e oscilações ──
-        try:
-            import lxml.html
-            tree = lxml.html.fromstring(text)
-            pares = {}
-            for tr in tree.xpath("//tr"):
-                cels = [c.text_content().strip().lstrip("?").strip() for c in tr.xpath("./td")]
-                for i in range(0, len(cels) - 1, 2):
-                    lab, val = cels[i], cels[i + 1]
-                    if lab and val:
-                        pares.setdefault(lab, val)   # 1a ocorrencia (ex.: Receita 12m antes de 3m)
-
-            # Balanço patrimonial (valores absolutos em R$)
-            for f, lab in [("ativo", "Ativo"), ("disponibilidades", "Disponibilidades"),
-                           ("ativo_circ", "Ativo Circulante"), ("div_bruta", "Dív. Bruta"),
-                           ("div_liquida", "Dív. Líquida"), ("patrim_liq", "Patrim. Líq")]:
-                if pares.get(lab):
-                    out[f] = pares[lab]
-            # Demonstrativo de resultados (últimos 12 meses)
-            for f, lab in [("receita_liq", "Receita Líquida"), ("ebit", "EBIT"),
-                           ("lucro_liq", "Lucro Líquido")]:
-                if pares.get(lab):
-                    out[f] = pares[lab]
-            # Oscilação por período e por ano
-            osc = {}
-            for lab in ["Dia", "Mês", "30 dias", "12 meses",
-                        "2026", "2025", "2024", "2023", "2022", "2021", "2020"]:
-                if pares.get(lab):
-                    osc[lab] = pares[lab]
-            if osc:
-                out["oscilacoes"] = osc
-            # Infos e indicadores extras
-            for f, lab in [("subsetor", "Subsetor"), ("valor_firma", "Valor da firma"),
-                           ("nro_acoes", "Nro. Ações"), ("ult_balanco", "Últ balanço processado"),
-                           ("p_ativos", "P/Ativos"), ("p_cap_giro", "P/Cap. Giro"),
-                           ("p_ativ_circ_liq", "P/Ativ Circ Liq"), ("ebit_ativo", "EBIT / Ativo")]:
-                if pares.get(lab):
-                    out[f] = pares[lab]
-        except Exception:
-            pass
-
+def get_fundamentus_fii(ticker: str) -> dict:
+    """Fundamentus (FII): P/VP, DY, VP/Cota, patrimônio, resultados, imóveis e oscilações."""
+    try:
+        _, pares = _fundamentus_tree(ticker)
+        if not pares:
+            return {}
+        out = _map_pares(pares, _MAP_FII)
+        osc = _oscilacoes(pares)
+        if osc:
+            out["oscilacoes"] = osc
         return out
     except Exception:
         return {}
@@ -218,14 +252,23 @@ def save_estado(estado: dict):
 
 
 # ── Processamento de um ticker ────────────────────────────────────────────────
+def _upd(data: dict, novos: dict):
+    """Atualiza só com valores reais (ignora None/''), pra não apagar o Fundamentus."""
+    data.update({k: v for k, v in novos.items() if v not in (None, "")})
+
+
 def processar_acao(ticker: str) -> bool:
     log.info(f"  {ticker} (ação)...")
     data = {"ticker": ticker, "tipo": "acao"}
 
+    # 0. Fundamentus — fonte principal (não depende do limite diário do BolsaI)
+    data.update(get_fundamentus_acao(ticker))
+    time.sleep(DELAY)
+
     # 1. BolsaI — empresa (CNPJ, setor, cidade)
     company = get_bolsai(f"/companies/{ticker}")
     if company:
-        data.update({
+        _upd(data, {
             "razao_social": company.get("corporate_name"),
             "nome":         company.get("trade_name"),
             "cnpj":         company.get("cnpj"),
@@ -237,10 +280,10 @@ def processar_acao(ticker: str) -> bool:
         })
     time.sleep(DELAY)
 
-    # 2. BolsaI — fundamentals (27 indicadores)
+    # 2. BolsaI — fundamentals (27 indicadores) — só sobrescreve com valor real
     fund = get_bolsai(f"/fundamentals/{ticker}")
     if fund:
-        data.update({
+        _upd(data, {
             "pl":              fund.get("pe_ratio"),
             "pvp":             fund.get("pb_ratio"),
             "psr":             fund.get("ps_ratio"),
@@ -274,7 +317,7 @@ def processar_acao(ticker: str) -> bool:
     # 3. BolsaI — stats (52 semanas, YTD)
     stats = get_bolsai(f"/stocks/{ticker}/stats")
     if stats:
-        data.update({
+        _upd(data, {
             "max_52s":      stats.get("week_52_high"),
             "min_52s":      stats.get("week_52_low"),
             "ytd_ret":      stats.get("ytd_return_pct"),
@@ -312,10 +355,14 @@ def processar_fii(ticker: str) -> bool:
     log.info(f"  {ticker} (FII)...")
     data = {"ticker": ticker, "tipo": "fii"}
 
-    # 1. BolsaI — fundamentals de FII
+    # 0. Fundamentus — fonte principal (P/VP, DY, VP/Cota, patrimônio, resultados, imóveis, oscilações)
+    data.update(get_fundamentus_fii(ticker))
+    time.sleep(DELAY)
+
+    # 1. BolsaI — fundamentals de FII (reforço; só sobrescreve com valor real)
     fund = get_bolsai(f"/fiis/{ticker}/fundamentals")
     if fund:
-        data.update({
+        _upd(data, {
             "pvp":             fund.get("pb_ratio"),
             "dy":              fund.get("dividend_yield"),
             "market_cap":      fund.get("market_cap"),
@@ -333,27 +380,10 @@ def processar_fii(ticker: str) -> bool:
         })
     time.sleep(DELAY)
 
-    # 1b. Fundamentus detalhes — oscilações, balanço e resultados (FII)
-    pares = _detalhes_pares(ticker)
-    if pares:
-        osc = {}
-        for lab in ["Dia", "Mês", "30 dias", "12 meses",
-                    "2026", "2025", "2024", "2023", "2022", "2021", "2020"]:
-            if pares.get(lab):
-                osc[lab] = pares[lab]
-        if osc:
-            data["oscilacoes"] = osc
-        for f, lab in [("ativo", "Ativos"), ("patrim_liq", "Patrimônio Líquido"),
-                       ("receita", "Receita"), ("ffo", "FFO"),
-                       ("rend_distribuido", "Rendimento Distribuído"),
-                       ("venda_ativos", "Venda de Ativos"), ("imoveis_pl", "Imóveis/PL do FII")]:
-            if pares.get(lab):
-                data[f] = pares[lab]
-
     # 2. BolsaI — empresa (CNPJ, razão social)
     company = get_bolsai(f"/companies/{ticker}")
     if company:
-        data.update({
+        _upd(data, {
             "razao_social": company.get("corporate_name"),
             "cnpj":         company.get("cnpj"),
             "cvm_code":     company.get("cvm_code"),
@@ -363,7 +393,7 @@ def processar_fii(ticker: str) -> bool:
     # 3. Stats de preço
     stats = get_bolsai(f"/stocks/{ticker}/stats")
     if stats:
-        data.update({
+        _upd(data, {
             "max_52s": stats.get("week_52_high"),
             "min_52s": stats.get("week_52_low"),
             "ytd_ret": stats.get("ytd_return_pct"),
