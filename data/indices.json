@@ -1,39 +1,39 @@
 {
-  "updated_at": "03/07/2026 05:37",
+  "updated_at": "04/07/2026 04:30",
   "ibov": {
-    "val": 172788.0,
-    "chg": 0.64,
-    "chg_pts": 1099.39,
+    "val": 174266.0,
+    "chg": 0.86,
+    "chg_pts": 1478.38,
     "stale": false
   },
   "ifix": {
-    "val": 13.54,
-    "chg": 0.59,
-    "chg_pts": 0.08,
+    "val": 13.57,
+    "chg": 0.22,
+    "chg_pts": 0.03,
     "stale": false
   },
   "small": {
-    "val": 108.15,
-    "chg": 0.69,
-    "chg_pts": 0.74,
+    "val": 109.15,
+    "chg": 0.92,
+    "chg_pts": 1.0,
     "stale": false
   },
   "idiv": {
-    "val": 125.85,
-    "chg": 0.76,
-    "chg_pts": 0.95,
+    "val": 126.13,
+    "chg": 0.22,
+    "chg_pts": 0.28,
     "stale": false
   },
   "ibra": {
-    "val": 169.9,
-    "chg": 0.65,
-    "chg_pts": 1.1,
+    "val": 171.11,
+    "chg": 0.71,
+    "chg_pts": 1.21,
     "stale": false
   },
   "ifnc": {
-    "val": 175.21,
+    "val": 176.63,
     "chg": 0.81,
-    "chg_pts": 1.4,
+    "chg_pts": 1.42,
     "stale": false
   },
   "sp500": {
