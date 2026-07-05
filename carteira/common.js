@@ -109,6 +109,11 @@ const fmtP=(v,plus=true)=>(plus&&v>=0?'+':'')+fmt(v)+'%';
 
 let COTACOES={};            // ticker → preço atual (carregado do site a cada página)
 let BCB={};                 // taxas do Banco Central (CDI/Selic/IPCA), carregado de data/bcb.json
+// Séries HISTÓRICAS do BCB (data/bcb_historico.json, gerado pelo fetch_bcb.py):
+// corrigem a Renda Fixa com a taxa REAL de cada dia/mês, não com a taxa de hoje.
+let BCB_HIST=null;          // {cdi_diario:{'YYYY-MM-DD':%}, selic_diario:{...}, ipca_mensal:{'YYYY-MM':%}}
+let _bcbHistKeys=null;      // chaves ordenadas de cada série (para busca binária)
+const _fatorRFCache={};     // cache: indexador|taxa|de|ate → fator (limpa ao recarregar séries)
 const DIVIDENDOS_CACHE={};  // ticker → [{date, value}]  (carregado do site a cada página)
 // [BUG-D1 FIX] Taxas de câmbio: moeda → multiplicador para BRL (USD/BRL carregado de indices.json)
 const TAXAS_CAMBIO={'BRL':1};
@@ -147,6 +152,23 @@ async function atualizarCotacoes(){
     try{
       const rBcb=await fetch(base+'bcb.json?t='+Date.now());
       if(rBcb.ok)BCB=await rBcb.json();
+    }catch(e){}
+    // Séries históricas do BCB (correção fiel da RF). Se o arquivo ainda não
+    // existir (workflow não rodou), fatorRF usa o fallback com a taxa atual.
+    try{
+      const rH=await fetch(base+'bcb_historico.json?t='+Date.now());
+      if(rH.ok){
+        const jH=await rH.json();
+        if(jH&&jH.cdi_diario&&Object.keys(jH.cdi_diario).length>0){
+          BCB_HIST=jH;
+          _bcbHistKeys={
+            cdi:Object.keys(jH.cdi_diario||{}).sort(),
+            selic:Object.keys(jH.selic_diario||{}).sort(),
+            ipca:Object.keys(jH.ipca_mensal||{}).sort(),
+          };
+          for(const k in _fatorRFCache)delete _fatorRFCache[k];
+        }
+      }
     }catch(e){}
   }catch(e){console.warn('atualizarCotacoes:',e);}
 }
@@ -802,14 +824,69 @@ function diasUteisRF(de,ate){
   }
   return dias;
 }
+/* ---- Correção HISTÓRICA da RF (usa as séries reais do BCB) --------------------
+   CDI 110%: produto diário de (1 + cdi_dia% × 110%) usando o CDI real de cada dia.
+   Selic+X%: produto diário da Selic real × (1+X%)^(du/252).
+   IPCA+X%: produto dos IPCAs mensais FECHADOS após o mês da compra × (1+X%)^(du/252)
+            (aproximação: o mês da compra e o mês corrente, ainda sem IPCA publicado,
+             rendem só o spread — erro máximo de ~1 mês de IPCA).
+   Retorna null quando a série não cobre o período → fatorRF cai no fallback antigo. */
+function _fatorRFHistorico(idx,taxa,de,ate){
+  if(!BCB_HIST||!_bcbHistKeys||!de)return null;
+  const fim=ate||new Date().toISOString().slice(0,10);
+  if(fim<=de)return 1;
+  const ck=idx+'|'+taxa+'|'+de+'|'+fim;
+  if(ck in _fatorRFCache)return _fatorRFCache[ck];
+  // percorre a série [de+1 .. fim] a partir de busca binária do início
+  const acumula=(serie,keys,taxaDiaFn)=>{
+    if(!serie||!keys.length)return null;
+    // a série precisa cobrir o começo da aplicação (até 10 dias de tolerância)
+    if(keys[0]>de){
+      const gap=(new Date(keys[0])-new Date(de))/86400000;
+      if(gap>10)return null;
+    }
+    let lo=0,hi=keys.length-1,start=keys.length;
+    while(lo<=hi){const mid=(lo+hi)>>1;if(keys[mid]>de){start=mid;hi=mid-1;}else lo=mid+1;}
+    let acc=1,usou=false;
+    for(let i=start;i<keys.length&&keys[i]<=fim;i++){acc*=1+taxaDiaFn(serie[keys[i]]);usou=true;}
+    return usou?acc:null;
+  };
+  let f=null;
+  if(idx==='CDI'){
+    f=acumula(BCB_HIST.cdi_diario,_bcbHistKeys.cdi,p=>(p/100)*(taxa/100));
+  }else if(idx==='Selic'){
+    const base=acumula(BCB_HIST.selic_diario,_bcbHistKeys.selic,p=>p/100);
+    if(base!=null)f=base*Math.pow(1+Math.max(0,taxa)/100,diasUteisRF(de,fim)/252);
+  }else if(idx==='IPCA'){
+    const serie=BCB_HIST.ipca_mensal,keys=_bcbHistKeys.ipca;
+    if(serie&&keys.length&&keys[0]<=de.slice(0,7)){
+      const mDe=de.slice(0,7),mAte=fim.slice(0,7);
+      let acc=1;
+      for(const k of keys){if(k>mDe&&k<=mAte&&serie[k]!=null)acc*=1+serie[k]/100;}
+      f=acc*Math.pow(1+Math.max(0,taxa)/100,diasUteisRF(de,fim)/252);
+    }
+  }
+  // Prefixado não precisa de série (o fallback já é exato para taxa fixa)
+  if(f!=null&&(!isFinite(f)||f<=0))f=null;
+  _fatorRFCache[ck]=f;
+  return f;
+}
+
 /* Fator de correção que multiplica o valor aplicado.
-   CDI: rende (CDI diário × taxa%) por dia útil. Selic/IPCA/Prefixado: taxa anual → dia útil (base 252).
+   1º tenta o caminho HISTÓRICO (séries reais do BCB — bcb_historico.json).
+   Fallback: CDI: rende (CDI diário ATUAL × taxa%) por dia útil. Selic/IPCA/Prefixado:
+   taxa anual atual → dia útil (base 252). Usado só sem histórico carregado.
    Proteção: se a taxa do bcb.json vier inválida/quebrada, não corrige (fator 1). */
 function fatorRF(rf,dataAplic,ate){
   if(!rf)return 1;
   const idx=rf.indexador,taxa=parseFloat(rf.taxa)||0;
   const dias=diasUteisRF(dataAplic,ate);
   if(dias<=0)return 1;
+  // Caminho histórico (taxas reais de cada dia). null = série indisponível → fallback abaixo.
+  if(idx!=='Prefixado'){
+    const fHist=_fatorRFHistorico(idx,taxa,dataAplic,ate);
+    if(fHist!=null)return fHist;
+  }
   // Converte uma taxa anual (% a.a.) em fator acumulado por dias úteis, ignorando dados absurdos.
   const porAnual=(anual)=>{
     if(!isFinite(anual)||anual<=0||anual>100)return 1;
@@ -1118,6 +1195,7 @@ function processB3Rows(rows){
   if(hi<0){toast('Formato não reconhecido. Use o extrato de movimentação da B3.');return;}
 
   const ops={}; // ticker → {nome, txs:[{data,side,qtd,preco}]}
+  const grupamentosDetectados=new Set(); // tickers com Grupamento no extrato (não aplicado automaticamente)
 
   for(let i=hi+1;i<rows.length;i++){
     const r=rows[i];
@@ -1125,9 +1203,16 @@ function processB3Rows(rows){
     const mov=String(r[col.mov]||'').trim();
     const movLow=mov.toLowerCase();
     // Aceita: "Transferência - Liquidação" (ações/FIIs), "COMPRA / VENDA" (CDB/RF), "Compra", "Venda"
+    // e eventos societários: "Desdobro" (split) e "Bonificação em Ativos" viram entrada de cotas
+    // (desdobro a custo ZERO — o custo total não muda e o PM dilui, regra da Receita;
+    //  bonificação com o custo unitário informado no extrato, quando houver).
+    // "Grupamento" (reverse split) NÃO é aplicado automaticamente — gera aviso ao final.
     const isLiquid=movLow.includes('liquid');
     const isCompraVenda=movLow.includes('compra')||movLow.includes('venda');
-    if(!isLiquid&&!isCompraVenda)continue;
+    const isDesdobro=movLow.includes('desdobro');
+    const isBonificacao=movLow.includes('bonifica');
+    const isGrupamento=movLow.includes('grupamento');
+    if(!isLiquid&&!isCompraVenda&&!isDesdobro&&!isBonificacao&&!isGrupamento)continue;
 
     // Normaliza "Credito"/"Crédito"/"Debito"/"Débito"
     const tipoNorm=String(r[col.tipo]||'').trim().toLowerCase()
@@ -1144,7 +1229,9 @@ function processB3Rows(rows){
       isBuy=tipoNorm==='credito';   // ativo entrou → comprou
       isSell=tipoNorm==='debito';   // ativo saiu   → vendeu
     }
-    if(!isBuy&&!isSell)continue;
+    // Desdobro/Bonificação: só interessa a linha de CRÉDITO (novas cotas recebidas)
+    if((isDesdobro||isBonificacao)&&!isBuy)continue;
+    if(!isBuy&&!isSell&&!isGrupamento)continue;
 
     const produtoRaw=String(r[col.produto]||'').trim();
     if(!produtoRaw)continue;
@@ -1178,6 +1265,10 @@ function processB3Rows(rows){
       continue;
     }
 
+    // Grupamento (reverse split): o extrato não traz dados suficientes para recalcular
+    // a posição com segurança em todos os formatos — não importa a linha, só avisa no final.
+    if(isGrupamento){ grupamentosDetectados.add(ticker); continue; }
+
     // Parse data DD/MM/YYYY → YYYY-MM-DD
     let dataStr='';
     const dv=r[col.data];
@@ -1201,7 +1292,13 @@ function processB3Rows(rows){
 
     if(!ops[ticker])ops[ticker]={nome,txs:[],rfTipo:isTesouro?'TD':(isCDB?'RF':null),isRF:isCDB||isTesouro,rfSubtipo:isCDB?produtoRaw.split(/\s*-\s*/)[0].trim().toUpperCase():isTesouro?'Tesouro Direto':null};
     if(nome&&!ops[ticker].nome)ops[ticker].nome=nome;
-    ops[ticker].txs.push({data:dataStr,side:isBuy?'buy':'sell',qtd,preco,valor:valorOp});
+    ops[ticker].txs.push({
+      data:dataStr,side:isBuy?'buy':'sell',qtd,
+      // Desdobro: novas cotas a custo ZERO (custo total inalterado → PM dilui sozinho no calcPosicoes)
+      preco:isDesdobro?0:preco,
+      valor:isDesdobro?0:valorOp,
+      evento:isDesdobro?'Desdobro':(isBonificacao?'Bonificação':null)
+    });
   }
 
   let importados=0;
@@ -1230,6 +1327,7 @@ function processB3Rows(rows){
         nota:0,ideal:0,moeda:'BRL',comprar:'Não',
         nome:nome||'',rfSubtipo:rfSubtipo||''
       };
+      if(tx.evento)obj.evento=tx.evento; // Desdobro/Bonificação (informativo)
       // RF: se já existe esse título nessa data, atualiza valor/nome em vez de duplicar
       //     (corrige CDBs antigos que entraram zerados ou sem o nome do banco).
       if(isRF){
@@ -1264,6 +1362,11 @@ function processB3Rows(rows){
   });
 
   saveAtivos();
+  // Aviso de grupamentos: o site não aplica reverse split automaticamente
+  if(grupamentosDetectados.size){
+    const gl=[...grupamentosDetectados].join(', ');
+    setTimeout(()=>toast('⚠ Grupamento detectado em: '+gl+'. Ajuste a quantidade manualmente — o import não aplica grupamentos.'),2800);
+  }
   if(pendingRF.length){
     toast(`B3: ${importados} lançamento(s) importado(s). Completando dados da Renda Fixa…`);
     openModalRFComplement(pendingRF,()=>{

@@ -238,7 +238,9 @@
             const curMeses = tipoPeriodo === 'anual' ? parseInt(labels[i]) * 12 : parseInt(labels[i]);
             const steps = curMeses - prevMeses;
             for (let s = 0; s < steps; s++) {
-                saldo = saldo * (1 + taxaMensal) + aporteMensal;
+                // Convenção do site: mês 1 sem aporte (o 1º aporte já está no valor inicial)
+                const mesAbs = prevMeses + s + 1;
+                saldo = saldo * (1 + taxaMensal) + (mesAbs === 1 ? 0 : aporteMensal);
             }
             data.push(Math.round(saldo));
         }
@@ -721,7 +723,8 @@
                     for (let s = 0; s < stepsPerCiclo; s++) {
                         const m = baseM + s + 1;
                         if (m > mesSabInicioG && m <= mesSabFimG) { saldoSab = saldoSab * (1 + taxaMensalSab) - saqueMensalG; }
-                        else { saldoSab = saldoSab * (1 + taxaMensalSab) + aporteMensalSab; }
+                        // Convenção do site: mês 1 sem aporte (o 1º aporte já está no valor inicial)
+                        else { saldoSab = saldoSab * (1 + taxaMensalSab) + (m === 1 ? 0 : aporteMensalSab); }
                         if (saldoSab < 0) saldoSab = 0;
                     }
                     sabArray.push(Math.round(saldoSab));
@@ -749,7 +752,9 @@
         const usarInflacao = document.getElementById('chkInflacao')?.checked;
         if (usarInflacao && modoAtual === 'completo') {
             const inflacao = (parseFloat(document.getElementById('inputInflacao')?.value) || 0) / 100;
-            const fator = Math.pow(1 + inflacao, tempoInput);
+            // tempoInput é ANOS no período anual e MESES no mensal — o deflator é sempre por anos
+            const anosDeflacao = tipoPeriodo === 'anual' ? tempoInput : tempoInput / 12;
+            const fator = Math.pow(1 + inflacao, anosDeflacao);
             const totalEl = document.getElementById('kpiTotal');
             const rendaEl = document.getElementById('kpiRendaAnual');
             const totalNum = (_kpiState['kpiTotal']?.current) ?? parseCurrencyValue(totalEl.innerText.replace('R$','').trim());
@@ -3152,11 +3157,14 @@
             : taxaInput;
         const totalMeses = tipoPeriodo === 'anual' ? tempoInput * 12 : tempoInput;
 
-        // FV = PV*(1+r)^n + PMT * [((1+r)^n - 1)/r]
-        // PMT = (FV - PV*(1+r)^n) / [((1+r)^n - 1)/r]
+        // Convenção do site: mês 1 SEM aporte (o 1º aporte já está no valor inicial).
+        // São (n-1) aportes, do mês 2 ao mês n:
+        // FV = PV*(1+r)^n + PMT * [((1+r)^(n-1) - 1)/r]
+        // PMT = (FV - PV*(1+r)^n) / [((1+r)^(n-1) - 1)/r]
         const fatorComp = Math.pow(1 + taxaMensal, totalMeses);
         const fvSemAporte = vInicial * fatorComp;
-        const fatorAnuidade = (fatorComp - 1) / taxaMensal;
+        const fatorAnuidade = (Math.pow(1 + taxaMensal, totalMeses - 1) - 1) / taxaMensal;
+        if (fatorAnuidade <= 0) { resEl?.classList.add('hidden'); return; }
         const aportNecessario = (patrimonioAlvo - fvSemAporte) / fatorAnuidade;
 
         if (aportNecessario < 0) {
@@ -3164,7 +3172,7 @@
             detEl.textContent = 'Seu capital inicial já ultrapassa a meta com os juros!';
         } else {
             valEl.textContent = formatCurrency(Math.ceil(aportNecessario));
-            const totalInvestido = vInicial + Math.ceil(aportNecessario) * totalMeses;
+            const totalInvestido = vInicial + Math.ceil(aportNecessario) * (totalMeses - 1); // (n-1) aportes
             const jurosGerados = patrimonioAlvo - totalInvestido;
             detEl.textContent = `Total aportado: ${formatCurrency(totalInvestido)} · Juros gerados: ${formatCurrency(Math.max(0, jurosGerados))}`;
         }
@@ -3558,7 +3566,9 @@
             const taxaMensal = Math.pow(1 + taxaAnual, 1/12) - 1;
             const steps = tipoPeriodo === 'anual' ? 12 : 1;
             for (let s = 0; s < steps; s++) {
-                saldo = saldo * (1 + taxaMensal) + aporteMensal;
+                // Convenção do site: mês 1 sem aporte (o 1º aporte já está no valor inicial)
+                const mesAbs = (i - 1) * steps + s + 1;
+                saldo = saldo * (1 + taxaMensal) + (mesAbs === 1 ? 0 : aporteMensal);
             }
             data.push(Math.round(Math.max(0, saldo)));
         }
@@ -3622,7 +3632,8 @@
         const taxaMensal = tipoTaxa === 'anual' ? Math.pow(1 + taxaAnual, 1/12) - 1 : taxaAnual;
         const calcFV = (meses) => {
             let s = vInicial;
-            for (let i = 0; i < meses; i++) s = s * (1 + taxaMensal) + aporteMensal;
+            // Convenção do site: mês 1 sem aporte (o 1º aporte já está no valor inicial)
+            for (let i = 0; i < meses; i++) s = s * (1 + taxaMensal) + (i === 0 ? 0 : aporteMensal);
             return s;
         };
         const hoje = calcFV(totalMeses);
@@ -3940,8 +3951,11 @@
             let emPausa = false, saquePausa = 0;
             for (const p of pausas) { if (m > p.mesInicio && m <= p.mesFim) { emPausa = true; saquePausa = p.saqueMensal; } }
             if (!emPausa) {
-                if (preco > 0) cotas += (aporteMensal * pctRV) / preco;
-                saldoRF += aporteMensal * pctRF; totalAportado += aporteMensal;
+                // Convenção do site: mês 1 sem aporte (o 1º aporte já está no valor inicial)
+                if (m > 1) {
+                    if (preco > 0) cotas += (aporteMensal * pctRV) / preco;
+                    saldoRF += aporteMensal * pctRF; totalAportado += aporteMensal;
+                }
             } else {
                 const cv = Math.min(cotas, saquePausa / Math.max(preco, 0.001));
                 cotas = Math.max(0, cotas - cv); totalAportado -= saquePausa;

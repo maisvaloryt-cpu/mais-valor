@@ -488,17 +488,21 @@ function fmt(v){ return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,m
 function calcJuros(){
   const C=+document.getElementById('j-cap').value||0;
   const A=+document.getElementById('j-aporte').value||0;
-  const r=((+document.getElementById('j-taxa').value||0)/100)/12;
+  // Taxa efetiva anual → mensal GEOMÉTRICA: (1+i)^(1/12)-1 (mesma conversão da Calculadora)
+  const ta=(+document.getElementById('j-taxa').value||0)/100;
+  const r=Math.pow(1+ta,1/12)-1;
   const n=(+document.getElementById('j-anos').value||0)*12;
-  if(!n||!r) return;
-  const M=C*Math.pow(1+r,n)+A*(Math.pow(1+r,n)-1)/r;
-  const inv=C+A*n;
+  if(!n) return;
+  // Convenção do site: mês 1 sem aporte (o 1º aporte já está no capital inicial) → (k-1) aportes em k meses
+  const fvAporte=k=>k<=1?0:(r>0?A*(Math.pow(1+r,k-1)-1)/r:A*(k-1));
+  const M=C*Math.pow(1+r,n)+fvAporte(n);
+  const inv=C+A*Math.max(0,n-1);
   document.getElementById('j-total').textContent=fmt(M);
   document.getElementById('j-inv').textContent=fmt(inv);
   document.getElementById('j-juros').textContent=fmt(M-inv);
   const anos=+document.getElementById('j-anos').value;
   const labels=[],dInv=[],dTot=[];
-  for(let y=0;y<=anos;y++){const ny=y*12;labels.push(y+'a');dInv.push(Math.round(C+A*ny));dTot.push(Math.round(C*Math.pow(1+r,ny)+A*(Math.pow(1+r,ny)-1)/r));}
+  for(let y=0;y<=anos;y++){const ny=y*12;labels.push(y+'a');dInv.push(Math.round(C+A*Math.max(0,ny-1)));dTot.push(Math.round(C*Math.pow(1+r,ny)+fvAporte(ny)));}
   if(jurosChart) jurosChart.destroy();
   jurosChart=new Chart(document.getElementById('jurosChart'),{type:'line',
     data:{labels,datasets:[
@@ -514,7 +518,9 @@ function calcAp(){
   const apos=+document.getElementById('ap-apos').value||60;
   const renda=+document.getElementById('ap-renda').value||5000;
   const taxa=((+document.getElementById('ap-taxa').value||10)/100);
-  const anos=apos-idade; const r=taxa/12;
+  // Taxa efetiva anual → mensal geométrica (mesma conversão da Calculadora)
+  const anos=apos-idade; const r=Math.pow(1+taxa,1/12)-1;
+  if(!(taxa>0)||anos<=0||!(r>0)) return;
   const pat=renda*12/taxa;
   document.getElementById('ap-pat').textContent=fmt(pat);
   document.getElementById('ap-anos').textContent=anos+' anos';

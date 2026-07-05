@@ -27,6 +27,93 @@ def fetch_ultimo(codigo):
     serie = fetch_serie(codigo, 1)
     return serie[-1]["value"] if serie else None
 
+
+# ─── Histórico completo (bcb_historico.json) ─────────────────────────────────
+# Séries longas para corrigir a Renda Fixa da carteira com as taxas REAIS de
+# cada dia/mês (e não a taxa atual aplicada ao passado). A API do SGS limita
+# consultas por data a ~10 anos, então buscamos em janelas.
+
+DATA_INICIO_HIST = "01/01/1995"  # mesma data mínima do resto do site (Plano Real)
+
+def _br(d):  # datetime.date → "dd/mm/yyyy"
+    return d.strftime("%d/%m/%Y")
+
+def _iso(data_br):  # "dd/mm/yyyy" → "yyyy-mm-dd"
+    dd, mm, yy = data_br.split("/")
+    return f"{yy}-{mm}-{dd}"
+
+def fetch_serie_completa(codigo, inicio_br=DATA_INICIO_HIST):
+    """Busca a série inteira desde inicio_br, em janelas de 9 anos (limite da API)."""
+    out = {}
+    ini = datetime.datetime.strptime(inicio_br, "%d/%m/%Y").date()
+    hoje = datetime.date.today()
+    while ini <= hoje:
+        fim = min(datetime.date(ini.year + 9, 12, 31), hoje)
+        url = (f"https://api.bcb.gov.br/dados/serie/bcdata.sgs.{codigo}/dados"
+               f"?formato=json&dataInicial={_br(ini)}&dataFinal={_br(fim)}")
+        ok = False
+        for tentativa in range(3):
+            try:
+                r = requests.get(url, headers=HEADERS, timeout=30)
+                r.raise_for_status()
+                for d in r.json():
+                    out[_iso(d["data"])] = float(d["valor"].replace(",", "."))
+                ok = True
+                break
+            except Exception as e:
+                print(f"  Erro série {codigo} {_br(ini)}–{_br(fim)} (tentativa {tentativa+1}/3): {e}")
+                time.sleep(2)
+        if not ok:
+            print(f"  ⚠ Janela {_br(ini)}–{_br(fim)} da série {codigo} falhou — histórico pode ficar incompleto.")
+        ini = datetime.date(fim.year + 1, 1, 1)
+        time.sleep(0.4)  # gentileza com a API
+    return out
+
+def gerar_bcb_historico(now_str):
+    """Gera/atualiza data/bcb_historico.json (incremental: só busca o que falta)."""
+    path = "data/bcb_historico.json"
+    hist = {"cdi_diario": {}, "selic_diario": {}, "ipca_mensal": {}}
+    if os.path.exists(path):
+        try:
+            with open(path, encoding="utf-8") as f:
+                antigo = json.load(f)
+            for k in hist:
+                hist[k] = antigo.get(k, {}) or {}
+        except Exception:
+            pass
+
+    def inicio_incremental(mapa):
+        if not mapa:
+            return DATA_INICIO_HIST
+        ultima = max(mapa)  # "yyyy-mm-dd" ou "yyyy-mm"
+        if len(ultima) == 7:
+            ultima += "-01"
+        d = datetime.datetime.strptime(ultima, "%Y-%m-%d").date() - datetime.timedelta(days=45)
+        return _br(d)  # sobreposição de 45 dias cobre revisões/atrasos de publicação
+
+    print("Buscando histórico CDI diário (12)...")
+    hist["cdi_diario"].update(fetch_serie_completa(12, inicio_incremental(hist["cdi_diario"])))
+    print(f"  {len(hist['cdi_diario'])} dias de CDI")
+
+    print("Buscando histórico SELIC diária (11)...")
+    hist["selic_diario"].update(fetch_serie_completa(11, inicio_incremental(hist["selic_diario"])))
+    print(f"  {len(hist['selic_diario'])} dias de Selic")
+
+    print("Buscando histórico IPCA mensal (433)...")
+    ipca = fetch_serie_completa(433, inicio_incremental(hist["ipca_mensal"]))
+    # IPCA mensal: chave por mês (yyyy-mm)
+    hist["ipca_mensal"].update({k[:7]: v for k, v in ipca.items()})
+    print(f"  {len(hist['ipca_mensal'])} meses de IPCA")
+
+    if not hist["cdi_diario"]:
+        print("  ⚠ Sem dados de CDI — bcb_historico.json NÃO será gravado (o site usa o fallback).")
+        return
+
+    out = {"updated_at": now_str, **hist}
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
+    print(f"✅ bcb_historico.json salvo ({os.path.getsize(path)//1024} KB)")
+
 def main():
     os.makedirs("data", exist_ok=True)
     now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-3)))
@@ -125,6 +212,12 @@ def main():
 
     with open("data/bcb.json", "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
+
+    # Histórico completo para a correção da Renda Fixa (incremental)
+    try:
+        gerar_bcb_historico(now_str)
+    except Exception as e:
+        print(f"  ⚠ Falha ao gerar bcb_historico.json: {e} (o site usa o fallback)")
 
     print(f"\n✅ bcb.json salvo!")
     print(f"   CDI: {cdi_anual:.2f}% a.a." if cdi_anual else "   CDI: sem dados")

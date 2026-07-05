@@ -108,7 +108,9 @@ function calcScore(d) {
   if (isFii) {
     max += 30; if (d.dy >= 8 && d.dy <= 25) pts += 30; else if (d.dy >= 5) pts += 15;
     max += 40; if (d.pvp > 0 && d.pvp <= 0.95) pts += 40; else if (d.pvp > 0 && d.pvp <= 1.05) pts += 20;
-    max += 30; if (d.v30 >= 0) pts += 30; else if (d.v30 >= -5) pts += 15;
+    // v30 real pode não existir (null nas listagens) — o critério só entra no
+    // score quando há dado de verdade (na página do ativo ele é recalculado do histórico).
+    if (d.v30 != null) { max += 30; if (d.v30 >= 0) pts += 30; else if (d.v30 >= -5) pts += 15; }
   } else {
     max += 25; if (d.pl > 0 && d.pl <= 15) pts += 25; else if (d.pl > 0 && d.pl <= 25) pts += 12;
     max += 15; if (d.pvp > 0 && d.pvp < 1) pts += 15; else if (d.pvp > 0 && d.pvp < 1.5) pts += 8;

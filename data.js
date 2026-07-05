@@ -359,8 +359,10 @@ async function loadData() {
         return {
           t: f.ticker, n: cot.name || f.ticker,
           p: cot.price, v: cot.change || 0,
-          v7:  (cot.change || 0) * (0.8 + Math.random() * 0.8),
-          v30: (cot.change || 0) * (1.5 + Math.random() * 2),
+          // v7/v30: sem dado real pré-calculado — null exibe "—".
+          // O valor REAL é calculado na página do ativo a partir do histórico (data/diario).
+          v7:  null,
+          v30: null,
           dy:   sanitizeDY(rawDY),
           div12m,
           pl:   f.pl, pvp: f.pvp,
@@ -386,7 +388,7 @@ async function loadData() {
         return {
           t: d.ticker, n: cot.name || d.ticker,
           p: cot.price || 0, v: +(cot.change||0).toFixed(2),
-          v7: 0, v30: 0,
+          v7: null, v30: null,
           dy: sanitizeDY(cot.dividendYield||0),
           pl: null, pvp: null,
           vol: formatVol(cot.volume), vm: formatVM(cot.marketCap),
@@ -410,8 +412,10 @@ async function loadData() {
         return {
           t: f.ticker, n: cot.name || f.ticker,
           p: cot.price, v: cot.change || 0,
-          v7:  (cot.change || 0) * (0.8 + Math.random() * 0.8),
-          v30: (cot.change || 0) * (1.5 + Math.random() * 2),
+          // v7/v30: sem dado real pré-calculado — null exibe "—".
+          // O valor REAL é calculado na página do ativo a partir do histórico (data/diario).
+          v7:  null,
+          v30: null,
           dy:  sanitizeDY(rawDY),
           pvp: f.pvp,
           vol:    formatVol(cot.volume),
@@ -435,7 +439,7 @@ async function loadData() {
         return {
           t: d.ticker, n: cot.name || d.ticker,
           p: cot.price || 0, v: +(cot.change||0).toFixed(2),
-          v7: 0, v30: 0,
+          v7: null, v30: null,
           dy: sanitizeDY(cot.dividendYield||0),
           pvp: null, vol: formatVol(cot.volume), vm: '—',
           mcap:   cot.marketCap || 0,
@@ -472,19 +476,8 @@ async function loadData() {
 }
 
 // ─── Utilitários de gráfico ───────────────────────────────────────────────────
-function genHistory(base, trend, pts=60) {
-  const arr=[]; let v=base*(0.80+Math.random()*0.10);
-  for(let i=0;i<pts;i++){v=v*(1+(Math.random()-0.47)*0.028)+(trend>0?0.03:-0.02);arr.push(parseFloat(v.toFixed(2)));}
-  arr.push(base); return arr;
-}
-function genLabels(n) {
-  const labels=[]; const now=new Date();
-  for(let i=n-1;i>=0;i--){
-    const d=new Date(now); d.setDate(d.getDate()-i*2);
-    labels.push(i%10===0?d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}):'');
-  }
-  return labels;
-}
+// (genHistory/genLabels removidos: o site não exibe mais gráficos sintéticos —
+//  sem histórico real, as páginas mostram "Histórico indisponível".)
 
 async function loadHistoricoCompleto(ticker) {
   const cache = window._histCache || (window._histCache = {});

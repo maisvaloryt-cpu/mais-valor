@@ -330,10 +330,27 @@ async function loadChart(d) {
       pts   = filt.map(p => p.close);
       labels = filt.map(p => p.date);
     } else {
-      pts   = genHistory(d.p || 100, d.v);
-      labels = genLabels(pts.length);
+      // Sem histórico real: NÃO desenha gráfico sintético — mostra aviso.
+      pts = []; labels = [];
     }
   }
+
+  // Sem dados reais → aviso no lugar do gráfico (nada de série inventada)
+  const cvEl = document.getElementById('mainChart');
+  let semHist = document.getElementById('chart-sem-hist');
+  if (!pts.length) {
+    if (mainChart) { mainChart.destroy(); mainChart = null; }
+    if (!semHist && cvEl?.parentElement) {
+      semHist = document.createElement('div');
+      semHist.id = 'chart-sem-hist';
+      semHist.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#8A8782;font-size:12px;';
+      cvEl.parentElement.style.position = 'relative';
+      cvEl.parentElement.appendChild(semHist);
+    }
+    if (semHist) { semHist.textContent = 'Histórico indisponível para este ativo'; semHist.style.display = 'flex'; }
+    return;
+  }
+  if (semHist) semHist.style.display = 'none';
 
   // Atualiza badge com variação do período selecionado
   if (pts.length >= 2) {

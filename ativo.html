@@ -340,8 +340,8 @@ function renderIndicadores(d){
     {label:'Cap Rate',val:fmtPct(d.cap_rate),desc:'Retorno sobre valor'},
     {label:'Qtd. Imóveis',val:d.qtd_imoveis||'—',desc:'Imóveis na carteira'},
     {label:'Volume',val:d.vol,desc:'Volume médio diário'},
-    {label:'Variação 7d',val:(d.v7>=0?'+':'')+fmt(d.v7,'%'),desc:'Últimos 7 dias',cls:d.v7>=0?'up':'dn'},
-    {label:'Variação 30d',val:(d.v30>=0?'+':'')+fmt(d.v30,'%'),desc:'Últimos 30 dias',cls:d.v30>=0?'up':'dn'},
+    {label:'Variação 7d',val:d.v7==null?'—':(d.v7>=0?'+':'')+fmt(d.v7,'%'),desc:'Últimos 7 dias',cls:d.v7==null?'':(d.v7>=0?'up':'dn')},
+    {label:'Variação 30d',val:d.v30==null?'—':(d.v30>=0?'+':'')+fmt(d.v30,'%'),desc:'Últimos 30 dias',cls:d.v30==null?'':(d.v30>=0?'up':'dn')},
   ]:[
     {label:'DY 12m',val:fmtPct(d.dy),desc:'Dividend Yield anual',cls:d.dy>8?'gold':''},
     {label:'P/L',val:d.pl?d.pl.toFixed(1)+'x':'—',desc:'Preço/Lucro'},
@@ -419,6 +419,30 @@ async function renderChart(){
   await drawChartWithCDI();
 }
 
+/* Variação REAL de N dias a partir do histórico carregado (mensal+diário).
+   Substitui os antigos v7/v30 aleatórios. Retorna null se não houver dado
+   próximo o suficiente da data-alvo (aí a UI mostra "—"). */
+function calcVarPeriodo(dias){
+  if(!histData?.length) return null;
+  const last=histData[histData.length-1];
+  if(!(last?.close>0)) return null;
+  const alvo=new Date(); alvo.setDate(alvo.getDate()-dias);
+  const alvoStr=alvo.toISOString().slice(0,10);
+  let base=null;
+  for(let i=histData.length-1;i>=0;i--){
+    const dt=histData[i].date.length===7?histData[i].date+'-01':histData[i].date;
+    if(dt<=alvoStr){ base=histData[i]; break; }
+  }
+  if(!(base?.close>0)) return null;
+  // Exige que o ponto-base esteja razoavelmente perto da data-alvo:
+  // 7d precisa de dado diário (folga máx. 5 dias); 30d aceita folga de até 40 dias.
+  const baseDt=base.date.length===7?base.date+'-01':base.date;
+  const folga=(alvo-new Date(baseDt+'T00:00:00Z'))/86400000;
+  if(dias<=7&&folga>5) return null;
+  if(folga>40) return null;
+  return (last.close/base.close-1)*100;
+}
+
 
 async function loadBCBData() {
   try {
@@ -444,10 +468,22 @@ async function drawChartWithCDI() {
     el.textContent = (ret >= 0 ? '+' : '') + ret.toFixed(1) + '%';
     el.className = 'ind-val ' + (ret >= 0 ? 'up' : 'dn');
   } else {
-    pts = genHistory(ativo?.p || 10, ativo?.v || 0);
-    labels = genLabels(pts.length);
+    // Sem histórico real: NÃO desenha gráfico sintético — mostra aviso e sai.
     ['ch-min','ch-max','ch-ret'].forEach(id => document.getElementById(id).textContent = '—');
+    if (mainChart) { mainChart.destroy(); mainChart = null; }
+    const cvEl = document.getElementById('mainChart');
+    let semHist = document.getElementById('chart-sem-hist');
+    if (!semHist && cvEl?.parentElement) {
+      semHist = document.createElement('div');
+      semHist.id = 'chart-sem-hist';
+      semHist.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:13px;';
+      cvEl.parentElement.style.position = 'relative';
+      cvEl.parentElement.appendChild(semHist);
+    }
+    if (semHist) { semHist.textContent = 'Histórico indisponível para este ativo'; semHist.style.display = 'flex'; }
+    return;
   }
+  document.getElementById('chart-sem-hist')?.style.setProperty('display','none');
 
   const isUp = (ativo?.v || 0) >= 0;
   const color = isUp ? '#F5A623' : '#E8503A';
@@ -783,6 +819,13 @@ async function init(){
   renderSameSetor(ativo);
   initWatchlist();
   await renderChart();
+  // v7/v30 REAIS a partir do histórico (substituem os nulos da listagem) e
+  // re-renderiza indicadores + score com os dados verdadeiros.
+  ativo.v7=calcVarPeriodo(7);
+  ativo.v30=calcVarPeriodo(30);
+  renderIndicadores(ativo);
+  const sbEl=document.getElementById('ativo-score-badge');
+  if(sbEl&&typeof scoreBadge==='function')sbEl.innerHTML=scoreBadge(ativo);
   renderHistTable();
 }
 init();
