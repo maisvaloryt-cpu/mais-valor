@@ -1,7 +1,7 @@
 {
-  "updated_at": "04/07/2026 05:00",
-  "total": 2641,
-  "total_registros": 76080,
+  "updated_at": "05/07/2026 10:07",
+  "total": 2838,
+  "total_registros": 76287,
   "total_ativos": 1094,
   "dividendos": [
     {
@@ -19490,6 +19490,15 @@
       "dy": "7.87%"
     },
     {
+      "t": "ADSH11",
+      "n": "Ad Shopping Fundo de Investimento Imobiliario Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-06-23",
+      "pag": "2026-06-30",
+      "val": 0.04,
+      "dy": "4.50%"
+    },
+    {
       "t": "AFHF11",
       "n": "AF Invest Real Estate Multiestrategia Fundo de Investimento Imobiliario Responsabilidade Limitada",
       "tipo": "Rendimento",
@@ -20199,6 +20208,15 @@
       "pag": "2026-06-30",
       "val": 0.0074,
       "dy": "6.29%"
+    },
+    {
+      "t": "CPLE3",
+      "n": "Companhia Paranaense de Energia",
+      "tipo": "DIVIDENDO",
+      "com": "2025-12-30",
+      "pag": "2026-06-30",
+      "val": 0.4545,
+      "dy": "36.22%"
     },
     {
       "t": "CPLG11",
@@ -22145,6 +22163,15 @@
       "dy": "10.77%"
     },
     {
+      "t": "RIAA3",
+      "n": "RIACHUELO",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-06-30",
+      "pag": "2026-06-30",
+      "val": 0.0996,
+      "dy": "13.46%"
+    },
+    {
       "t": "RINV11",
       "n": "Real Investor Fundo de Investimento Imobiliario",
       "tipo": "Rendimento",
@@ -23126,6 +23153,15 @@
       "dy": "121.27%"
     },
     {
+      "t": "MBRF11",
+      "n": "Fundo de Investimento Imobiliario Rio Bravo Oportunidades Imobiliarias FII",
+      "tipo": "Rendimento",
+      "com": "",
+      "pag": "2026-07-01",
+      "val": 1.1,
+      "dy": "5.74%"
+    },
+    {
       "t": "PLPL3",
       "n": "Plano & Plano Desenvolvimento Imobiliario Ltda",
       "tipo": "DIVIDENDO",
@@ -23180,6 +23216,42 @@
       "dy": "7.96%"
     },
     {
+      "t": "SPG211",
+      "n": "SPG211",
+      "tipo": "Rendimento",
+      "com": "2026-06-29",
+      "pag": "2026-07-06",
+      "val": 0.08,
+      "dy": "8.04%"
+    },
+    {
+      "t": "ABCP11",
+      "n": "Fundo de Investimento Imobiliario Grand Plaza Shopping Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.55,
+      "dy": "8.85%"
+    },
+    {
+      "t": "AROA11",
+      "n": "AROEIRA 333 RENDA LOGISTICA FUNDO DE INVESTIMENTO IMOBILIARIO",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.01,
+      "dy": "10.00%"
+    },
+    {
+      "t": "ARRI11",
+      "n": "Fundo de Investimento Imobiliario Atrio Reit Recebiveis",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.07,
+      "dy": "18.10%"
+    },
+    {
       "t": "B3SA3",
       "n": "B3 SA - Brasil, Bolsa, Balcao",
       "tipo": "JRS CAP PROPRIO",
@@ -23207,6 +23279,24 @@
       "dy": "6.06%"
     },
     {
+      "t": "BFCC11",
+      "n": "BFC Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.73,
+      "dy": "8.41%"
+    },
+    {
+      "t": "BICE11",
+      "n": "FII BRIO CRECI  EA",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 5.98,
+      "dy": "13.29%"
+    },
+    {
       "t": "BLAU3",
       "n": "Blau Farmaceutica SA",
       "tipo": "JRS CAP PROPRIO",
@@ -23214,6 +23304,258 @@
       "pag": "2026-07-07",
       "val": 0.0758,
       "dy": "8.99%"
+    },
+    {
+      "t": "BRIM11",
+      "n": "BRIM11",
+      "tipo": "Amortização",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 10.0,
+      "dy": "126.32%"
+    },
+    {
+      "t": "EDGE11",
+      "n": "Edge Fundo de Investimento Imobiliario de Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 77.33,
+      "dy": "98.16%"
+    },
+    {
+      "t": "GARE11",
+      "n": "Fundo de Investimento Imobiliario Guardian Real Estate",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.08,
+      "dy": "11.79%"
+    },
+    {
+      "t": "HOSI11",
+      "n": "Fundo de Investimento Imobiliario Housi",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.16,
+      "dy": "2.48%"
+    },
+    {
+      "t": "HSAF11",
+      "n": "HSI Ativos Financeiros Fundos Investimentos Imobiliarios",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.95,
+      "dy": "14.58%"
+    },
+    {
+      "t": "HSML11",
+      "n": "HSI Malls Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.75,
+      "dy": "10.39%"
+    },
+    {
+      "t": "HTMX11",
+      "n": "Fundo de Investimento Imobiliario Hotel Maxinvest Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 2.95,
+      "dy": "26.00%"
+    },
+    {
+      "t": "HUSC11",
+      "n": "Fundo Investimento Imobiliario Hospital Unimed Sul Capixaba",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.94,
+      "dy": "11.75%"
+    },
+    {
+      "t": "LASC11",
+      "n": "Legatus Shoppings Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.56,
+      "dy": "6.02%"
+    },
+    {
+      "t": "LIFE11",
+      "n": "Life Capital Partners Fundo de Investimentos Imobiliarios 1",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.12,
+      "dy": "20.99%"
+    },
+    {
+      "t": "LVBI11",
+      "n": "Patria - VBI Asset Management Ltda",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.75,
+      "dy": "8.69%"
+    },
+    {
+      "t": "NSLU11",
+      "n": "Fundo de Investimento Imobiliario FII Hospital da Nossa Senhora de Lourdes Responsabilidade Limitada Fund",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 1.72,
+      "dy": "12.05%"
+    },
+    {
+      "t": "OCRE11",
+      "n": "Octo Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.36,
+      "dy": "7.08%"
+    },
+    {
+      "t": "PATA11",
+      "n": "Patagonia Capital Multiestrategia Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.12,
+      "dy": "13.86%"
+    },
+    {
+      "t": "PATL11",
+      "n": "Patria Logistica Fundo De Investimento Imobiliario",
+      "tipo": "Amortização",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 7.26,
+      "dy": "135.81%"
+    },
+    {
+      "t": "PLAG11",
+      "n": "FII PLAG",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.65,
+      "dy": "12.58%"
+    },
+    {
+      "t": "PLRI11",
+      "n": "Polo FII - FII Recebiveis Imobiliarios I Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.66,
+      "dy": "108.64%"
+    },
+    {
+      "t": "PNRC11",
+      "n": "Panorama Real Estate Credito Fundo De Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.02,
+      "dy": "0.85%"
+    },
+    {
+      "t": "PORD11",
+      "n": "Polo Fundo de Investimento Imobiliario - Recebiveis Imobiliarios II - FII Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.1,
+      "dy": "14.29%"
+    },
+    {
+      "t": "PVBI11",
+      "n": "Patria - VBI Asset Management Ltda",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.4,
+      "dy": "6.53%"
+    },
+    {
+      "t": "RZTR11",
+      "n": "Fundo de Investimento Imobiliario Riza Terrax",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.9,
+      "dy": "12.37%"
+    },
+    {
+      "t": "SPDE11",
+      "n": "FII WHG F SPCI",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 12.44,
+      "dy": "11.79%"
+    },
+    {
+      "t": "SPTW11",
+      "n": "SP Downtown Fundo de Investimento Imobiliario - FII Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.85,
+      "dy": "27.60%"
+    },
+    {
+      "t": "STRX11",
+      "n": "FII STARX   CI",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.81,
+      "dy": "6.85%"
+    },
+    {
+      "t": "VGHF11",
+      "n": "Valora Hedge Fund Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.07,
+      "dy": "14.05%"
+    },
+    {
+      "t": "VGRI11",
+      "n": "Valora Renda Imobiliaria Fundo De Investimento Imobiliario - Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.08,
+      "dy": "17.55%"
+    },
+    {
+      "t": "VPSI11",
+      "n": "VERITAS FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-07",
+      "val": 0.3,
+      "dy": "16.09%"
+    },
+    {
+      "t": "AIEC11",
+      "n": "Autonomy Edificios Corporativos Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-08",
+      "val": 0.38,
+      "dy": "7.61%"
     },
     {
       "t": "EQPA3",
@@ -23252,6 +23594,51 @@
       "dy": "37.88%"
     },
     {
+      "t": "GGRC11",
+      "n": "Zagros Renda Imobiliaria Fundo de Investimento Imobiliario - Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-07-01",
+      "pag": "2026-07-08",
+      "val": 0.1,
+      "dy": "12.38%"
+    },
+    {
+      "t": "HGPO11",
+      "n": "HGPO11",
+      "tipo": "Rendimento",
+      "com": "2026-07-01",
+      "pag": "2026-07-08",
+      "val": 1.2,
+      "dy": "9.39%"
+    },
+    {
+      "t": "NVHO11",
+      "n": "Fundo de Investimento Imobiliario Novo Horizonte Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-08",
+      "val": 0.08,
+      "dy": "9.45%"
+    },
+    {
+      "t": "PATC11",
+      "n": "Patria Edificios Corporativos Fundo Investimento Imobiliario FII",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-08",
+      "val": 0.05,
+      "dy": "1.51%"
+    },
+    {
+      "t": "RBLG11",
+      "n": "RB Capital Logistico Fundo de Investimento Imobiliario FII",
+      "tipo": "Rendimento",
+      "com": "2026-07-01",
+      "pag": "2026-07-08",
+      "val": 0.06,
+      "dy": "4.06%"
+    },
+    {
       "t": "RDOR3",
       "n": "Rede D'Or Sao Luiz SA",
       "tipo": "JRS CAP PROPRIO",
@@ -23259,6 +23646,114 @@
       "pag": "2026-07-08",
       "val": 0.1832,
       "dy": "6.15%"
+    },
+    {
+      "t": "VSHO11",
+      "n": "Fundo De Investimento Imobiliario Votorantim Shopping",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-08",
+      "val": 0.7,
+      "dy": "11.35%"
+    },
+    {
+      "t": "LMAI11",
+      "n": "LABINA Multi Ativos Imobiliarios - Fundo de Investimento Imobiliario Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-09",
+      "val": 0.12,
+      "dy": "3.91%"
+    },
+    {
+      "t": "AVUR11",
+      "n": "Arch Vanguarda Unidades Residenciais Fundo De Investimento Imobiliario Responsabilidade Limitada",
+      "tipo": "Amortização",
+      "com": "2026-06-30",
+      "pag": "2026-07-10",
+      "val": 1.46,
+      "dy": "18.16%"
+    },
+    {
+      "t": "AVUR11",
+      "n": "Arch Vanguarda Unidades Residenciais Fundo De Investimento Imobiliario Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-10",
+      "val": 1.31,
+      "dy": "16.30%"
+    },
+    {
+      "t": "CRFF11",
+      "n": "Caixa Rio Bravo Fundo De Fundos De Investimento Imobiliario II",
+      "tipo": "Rendimento",
+      "com": "2026-07-01",
+      "pag": "2026-07-10",
+      "val": 0.65,
+      "dy": "10.71%"
+    },
+    {
+      "t": "CXRI11",
+      "n": "Caixa Rio Bravo Fundo de Fundos de Investimentos Imobiliario - FII Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-07-01",
+      "pag": "2026-07-10",
+      "val": 0.63,
+      "dy": "11.63%"
+    },
+    {
+      "t": "FIIB11",
+      "n": "Fundo de Investimento Industrial do Brasil Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-10",
+      "val": 1.94,
+      "dy": "5.25%"
+    },
+    {
+      "t": "GRUL11",
+      "n": "Icatu Vanguarda Gru Logistico Fundo de Investimento Imobiliario Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-10",
+      "val": 0.08,
+      "dy": "11.58%"
+    },
+    {
+      "t": "HABT11",
+      "n": "Fundo de Investimento Imobiliario Habitat II",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-10",
+      "val": 0.97,
+      "dy": "16.39%"
+    },
+    {
+      "t": "JHSF3",
+      "n": "JHSF Participacoes S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-07-01",
+      "pag": "2026-07-10",
+      "val": 0.0692,
+      "dy": "7.54%"
+    },
+    {
+      "t": "KNHF11",
+      "n": "Kinea Hedge Fund Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-10",
+      "val": 1.0,
+      "dy": "12.65%"
+    },
+    {
+      "t": "KNUQ11",
+      "n": "Kinea Unique HY CDI Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-10",
+      "val": 1.15,
+      "dy": "13.21%"
     },
     {
       "t": "SMRE11",
@@ -23279,6 +23774,555 @@
       "dy": "7.20%"
     },
     {
+      "t": "VERE11",
+      "n": "Vc6 Fundo Invest Imobiliario FII",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-10",
+      "val": 4.89,
+      "dy": "13.16%"
+    },
+    {
+      "t": "ICRI11",
+      "n": "Itau Credito Imobiliario IPCA Fundo De Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-13",
+      "val": 1.1,
+      "dy": "13.95%"
+    },
+    {
+      "t": "ITRI11",
+      "n": "Itau Total Return Fundo De Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-13",
+      "val": 0.85,
+      "dy": "12.79%"
+    },
+    {
+      "t": "KCRE11",
+      "n": "Kinea Creditas Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-13",
+      "val": 0.13,
+      "dy": "17.37%"
+    },
+    {
+      "t": "KNCR11",
+      "n": "Kinea Rendimentos Imobiliarios Fundo de Investimento Imobiliario - FII Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-13",
+      "val": 1.1,
+      "dy": "12.26%"
+    },
+    {
+      "t": "KNHY11",
+      "n": "Kinea High Yield CRI Fundo De Investimento Imobiliario - FII",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-13",
+      "val": 1.2,
+      "dy": "14.47%"
+    },
+    {
+      "t": "KNIP11",
+      "n": "Kinea Indices Precos Fundo de Investimento Imobiliario- FII Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-13",
+      "val": 1.12,
+      "dy": "14.46%"
+    },
+    {
+      "t": "KNSC11",
+      "n": "Kinea Securities Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-13",
+      "val": 0.1,
+      "dy": "13.14%"
+    },
+    {
+      "t": "TMPS11",
+      "n": "Itau Tempus Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-13",
+      "val": 1.8,
+      "dy": "29.60%"
+    },
+    {
+      "t": "VCJR11",
+      "n": "Vectis Juros Real Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-13",
+      "val": 1.25,
+      "dy": "20.01%"
+    },
+    {
+      "t": "ZAVC11",
+      "n": "Zavit Credito Imobiliario - Fundo De Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-13",
+      "val": 0.13,
+      "dy": "17.18%"
+    },
+    {
+      "t": "ZAVI11",
+      "n": "Zavit Real Estate Fund Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-13",
+      "val": 0.12,
+      "dy": "15.14%"
+    },
+    {
+      "t": "ALMI11",
+      "n": "Fundo de Investimento Imobiliario Torre Almirante Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 2.7,
+      "dy": "5.49%"
+    },
+    {
+      "t": "ARXD11",
+      "n": "ARX Dover Recebiveis Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.11,
+      "dy": "16.65%"
+    },
+    {
+      "t": "ATSA11",
+      "n": "CSHG Atrium Shopping Santo Andre Fundo de Investimento Imobiliario-FII Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 1.2,
+      "dy": "24.00%"
+    },
+    {
+      "t": "AZPL11",
+      "n": "AZ Quest Panorama Logistica Fundo De Investimento Imobiliario Renda",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.09,
+      "dy": "14.30%"
+    },
+    {
+      "t": "BBFO11",
+      "n": "BB Fundos de Fundos Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.95,
+      "dy": "16.73%"
+    },
+    {
+      "t": "BBRC11",
+      "n": "BB Renda Corporativa Fundo de Investimento Imobiliario Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 2.15,
+      "dy": "24.81%"
+    },
+    {
+      "t": "BLMO11",
+      "n": "Bluemacaw Office Fund II Fundo De Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.53,
+      "dy": "7.16%"
+    },
+    {
+      "t": "BNFS11",
+      "n": "Banrisul Novas Fronteiras Fundo de Investimento Imobiliario - FII Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.5,
+      "dy": "15.26%"
+    },
+    {
+      "t": "BRCO11",
+      "n": "Bresco - Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 1.05,
+      "dy": "11.01%"
+    },
+    {
+      "t": "BTML11",
+      "n": "Barra Malls Fundo De Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 1.1,
+      "dy": "11.86%"
+    },
+    {
+      "t": "BTWR11",
+      "n": "Btowers Fundo Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.94,
+      "dy": "12.31%"
+    },
+    {
+      "t": "CBOP11",
+      "n": "Castello Branco Office Park - Fundo de Investime nto Imobiliario - Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.16,
+      "dy": "6.20%"
+    },
+    {
+      "t": "CJCT11",
+      "n": "Cidade Jardim Continental Tower Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.46,
+      "dy": "8.24%"
+    },
+    {
+      "t": "CSUD3",
+      "n": "CSU Digital SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-07-02",
+      "pag": "2026-07-14",
+      "val": 0.1717,
+      "dy": "14.21%"
+    },
+    {
+      "t": "CXCO11",
+      "n": "Fundo de Investimento Imobiliario Caixa Imoveis Corporativos",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.75,
+      "dy": "13.43%"
+    },
+    {
+      "t": "EDFO11",
+      "n": "Fundo de Investimento Imobiliario Edificio Ourinvest Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.83,
+      "dy": "6.91%"
+    },
+    {
+      "t": "FIGS11",
+      "n": "General Shopping Ativo e Renda Fundo de Investimento Imobiliario Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.5,
+      "dy": "11.97%"
+    },
+    {
+      "t": "FIIP11",
+      "n": "Fundo de Investimento Imobiliario RB Capital Renda I Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 1.42,
+      "dy": "12.79%"
+    },
+    {
+      "t": "FLRP11",
+      "n": "Hedge Floripa Shopping Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.15,
+      "dy": "8.72%"
+    },
+    {
+      "t": "FMOF11",
+      "n": "Fundo De Investimento Imobiliario Memorial Office",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.1,
+      "dy": "3.20%"
+    },
+    {
+      "t": "FVPQ11",
+      "n": "Fundo de Investimentos Imobiliario Bamerindus - Via Parque Shopping Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.4,
+      "dy": "8.41%"
+    },
+    {
+      "t": "GTWR11",
+      "n": "Fundo Investimento Imobiliario Green Towers",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.9,
+      "dy": "13.43%"
+    },
+    {
+      "t": "HAAA11",
+      "n": "Hedge AAA Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.08,
+      "dy": "1.72%"
+    },
+    {
+      "t": "HCHG11",
+      "n": "Hectare Recebiveis High Grade Fundo de Investimento Imobiliario FII",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.71,
+      "dy": "11.07%"
+    },
+    {
+      "t": "HFOF11",
+      "n": "Hedge Top Fofii 3 Fundo Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.06,
+      "dy": "11.39%"
+    },
+    {
+      "t": "HGBL11",
+      "n": "Hedge Brasil Logistico Industrial Fundo de Investimento Imobiliario de Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.07,
+      "dy": "9.39%"
+    },
+    {
+      "t": "HGBS11",
+      "n": "CSHG Brasil Shopping Fundo de Investimento Imobiliario Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.17,
+      "dy": "10.53%"
+    },
+    {
+      "t": "HGCR11",
+      "n": "CSHG Recebiveis Imobiliarios - Fundo de Investimento Imobiliario - FII Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.95,
+      "dy": "12.46%"
+    },
+    {
+      "t": "HGLG11",
+      "n": "Patria Log - Fundo de Investimento Imobiliario - Responsabilidade Limitada Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 1.1,
+      "dy": "8.78%"
+    },
+    {
+      "t": "HGRE11",
+      "n": "Patria Escritorios - Fundo de Investimento Imobi liario - Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 1.5,
+      "dy": "14.19%"
+    },
+    {
+      "t": "HGRU11",
+      "n": "Patria Renda Urbana Fundo de Investimento Imobiliario Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.95,
+      "dy": "8.77%"
+    },
+    {
+      "t": "HIRE11",
+      "n": "Hire Fundo De Investimento Imobiliario Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.87,
+      "dy": "10.40%"
+    },
+    {
+      "t": "HLOG11",
+      "n": "Hedge Logistica Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.11,
+      "dy": "15.00%"
+    },
+    {
+      "t": "HPDP11",
+      "n": "Hedge Shopping Parque Dom Pedro Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.61,
+      "dy": "8.25%"
+    },
+    {
+      "t": "HREC11",
+      "n": "Hedge Recebiveis Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.1,
+      "dy": "14.56%"
+    },
+    {
+      "t": "HUSI11",
+      "n": "Husi Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 9.34,
+      "dy": "9.34%"
+    },
+    {
+      "t": "INLG11",
+      "n": "Inter Logistico Fundo De Investimento Imobiliario FII",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.6,
+      "dy": "10.64%"
+    },
+    {
+      "t": "INRD11",
+      "n": "Inter Residence Fundo de Investimento Imobiliario FII",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.72,
+      "dy": "11.37%"
+    },
+    {
+      "t": "ITIP11",
+      "n": "Inter Teva Indice de Papel Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.73,
+      "dy": "14.30%"
+    },
+    {
+      "t": "ITIT11",
+      "n": "Inter Teva Indice de Tijolo Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.64,
+      "dy": "13.47%"
+    },
+    {
+      "t": "JFLL11",
+      "n": "JFL Living Fundo de Iinvestimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.2,
+      "dy": "4.30%"
+    },
+    {
+      "t": "JPPA11",
+      "n": "JPP Allocation Mogno - Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 1.52,
+      "dy": "21.62%"
+    },
+    {
+      "t": "JSAF11",
+      "n": "JS Ativos Financeiros Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.08,
+      "dy": "12.96%"
+    },
+    {
+      "t": "JSCR11",
+      "n": "JS Recebiveis Imobiliarios Fundo De Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.1,
+      "dy": "14.74%"
+    },
+    {
+      "t": "JSRE11",
+      "n": "JS Real Estate Multigestao-FII Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.48,
+      "dy": "9.75%"
+    },
+    {
+      "t": "KEVE11",
+      "n": "Even II Kinea Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 10.83,
+      "dy": "28.44%"
+    },
+    {
+      "t": "KFOF11",
+      "n": "Kinea Fundo Fundos de Investimento Imobiliario -FII",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.8,
+      "dy": "12.08%"
+    },
+    {
+      "t": "KNRI11",
+      "n": "Kinea Renda Imobiliaria Fundo de Investimento Imobiliario - FII Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 1.38,
+      "dy": "10.55%"
+    },
+    {
+      "t": "KORE11",
+      "n": "Kinea Oportunidades Real Estate Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.6,
+      "dy": "11.60%"
+    },
+    {
       "t": "LREN3",
       "n": "Lojas Renner S.A.",
       "tipo": "JRS CAP PROPRIO",
@@ -23286,6 +24330,321 @@
       "pag": "2026-07-14",
       "val": 0.2293,
       "dy": "18.59%"
+    },
+    {
+      "t": "MFII11",
+      "n": "Merito Recebiveis Imobiliarios FII-Fundo de Investimento",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.91,
+      "dy": "22.07%"
+    },
+    {
+      "t": "NEWL11",
+      "n": "Newport Logistica Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 1.0,
+      "dy": "11.47%"
+    },
+    {
+      "t": "NEWU11",
+      "n": "Newport Renda Urbana Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.6,
+      "dy": "6.37%"
+    },
+    {
+      "t": "OUJP11",
+      "n": "Ourinvest JPP Fundo de Investimento Imobiliario - FII",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 1.58,
+      "dy": "26.37%"
+    },
+    {
+      "t": "PEMA11",
+      "n": "Performa Real Estate Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.28,
+      "dy": "13.44%"
+    },
+    {
+      "t": "PMIS11",
+      "n": "PARAMIS HEDGE FUND FUNDO DE INVESTIMENTO IMOBILIARIO - FII",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.1,
+      "dy": "15.48%"
+    },
+    {
+      "t": "PMLL11",
+      "n": "Patria Malls Fundo de Investimento Imobiliario Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 1.0,
+      "dy": "11.61%"
+    },
+    {
+      "t": "PQAG11",
+      "n": "RB Capital Anhanguera Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.49,
+      "dy": "10.89%"
+    },
+    {
+      "t": "RBHG11",
+      "n": "Rio Bravo Credito Imobiliario High Grade Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.8,
+      "dy": "15.26%"
+    },
+    {
+      "t": "RBHY11",
+      "n": "Rio Bravo Credito Imobiliario High Yield Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 1.0,
+      "dy": "16.54%"
+    },
+    {
+      "t": "RBIR11",
+      "n": "RB Capital Desenvolvimento Residencial IV Fundo de Investimento Imobiliario - FII",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.47,
+      "dy": "7.53%"
+    },
+    {
+      "t": "RBRD11",
+      "n": "RB Capital Renda II Fundo de Investimento Imobiliario - FII Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.55,
+      "dy": "17.74%"
+    },
+    {
+      "t": "RBRL11",
+      "n": "Patria Logistica II",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.6,
+      "dy": "9.73%"
+    },
+    {
+      "t": "RECD11",
+      "n": "Rec Fundo De Cri Cotas Amortizaveis - Fundo De Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.08,
+      "dy": "13.15%"
+    },
+    {
+      "t": "REIT11",
+      "n": "GV Salar Fundo De Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 4.18,
+      "dy": "62.69%"
+    },
+    {
+      "t": "REIT11",
+      "n": "GV Salar Fundo De Investimento Imobiliario",
+      "tipo": "Amortização",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 5.82,
+      "dy": "87.29%"
+    },
+    {
+      "t": "REME11",
+      "n": "FII REME CI ER",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 1.22,
+      "dy": "19.52%"
+    },
+    {
+      "t": "RNGO11",
+      "n": "Fundo de Investimento Imobiliario Rio Negro - FII Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.52,
+      "dy": "12.04%"
+    },
+    {
+      "t": "RPRI11",
+      "n": "RBR Premium Recebiveis Imobioliarios Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 1.4,
+      "dy": "21.71%"
+    },
+    {
+      "t": "RRES11",
+      "n": "FII RRES    CI",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.2,
+      "dy": "24.00%"
+    },
+    {
+      "t": "RSPD11",
+      "n": "RB Capital Desenvolvimento Residencial III Fundo de Investimento Imobiliario - FII",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 3.83,
+      "dy": "6.57%"
+    },
+    {
+      "t": "SAPI11",
+      "n": "Santander Papeis Imobiliarios Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.12,
+      "dy": "15.79%"
+    },
+    {
+      "t": "SEED11",
+      "n": "Hedge Seed Fundo De Investimeto Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 1.15,
+      "dy": "13.80%"
+    },
+    {
+      "t": "TGAR11",
+      "n": "Fundo de Investimento Imobiliario TG Ativo Real Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.72,
+      "dy": "16.60%"
+    },
+    {
+      "t": "TRXB11",
+      "n": "TRX Real Estate II Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 10.3,
+      "dy": "68.65%"
+    },
+    {
+      "t": "TRXF11",
+      "n": "TRX Real Estate Fundo Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 1.5,
+      "dy": "19.69%"
+    },
+    {
+      "t": "TRXY11",
+      "n": "TRX Hedge Fund Fundo de Investimento Imobiliario Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.13,
+      "dy": "18.82%"
+    },
+    {
+      "t": "TVRI11",
+      "n": "Tivio Renda Imobiliaria Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 1.05,
+      "dy": "13.82%"
+    },
+    {
+      "t": "URHF11",
+      "n": "Urca Hedge Fund Estrategia Imobiliaaria Fundo De Investimento Imobiliario - Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 1.0,
+      "dy": "20.62%"
+    },
+    {
+      "t": "URPR11",
+      "n": "URCA Prime Renda Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.3,
+      "dy": "18.09%"
+    },
+    {
+      "t": "VCRI11",
+      "n": "Vinci Credit Securities Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.1,
+      "dy": "16.74%"
+    },
+    {
+      "t": "VCRR11",
+      "n": "Vectis Renda Residencial Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.4,
+      "dy": "8.54%"
+    },
+    {
+      "t": "VILG11",
+      "n": "Vinci Logistica Fundo de Investimento Imobiliario - FII",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.82,
+      "dy": "10.44%"
+    },
+    {
+      "t": "VINO11",
+      "n": "Vinci Offices Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.04,
+      "dy": "10.30%"
+    },
+    {
+      "t": "VISC11",
+      "n": "Vinci Shopping Centers Fundo de Investimento Imobiliario - FII Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.84,
+      "dy": "9.60%"
     },
     {
       "t": "VIVT3",
@@ -23297,6 +24656,330 @@
       "dy": "43.22%"
     },
     {
+      "t": "VJFD11",
+      "n": "FII JFDCAM  CI",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.88,
+      "dy": "8.32%"
+    },
+    {
+      "t": "VOTS11",
+      "n": "Votorantim Securities Master Fundo de Investimento Imobiliario FII",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 1.2,
+      "dy": "16.16%"
+    },
+    {
+      "t": "WHGR11",
+      "n": "WHG Real Estate Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.1,
+      "dy": "13.29%"
+    },
+    {
+      "t": "WPLZ11",
+      "n": "Fundo de Investimento Imobiliario Shopping West Plaza Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.37,
+      "dy": "9.75%"
+    },
+    {
+      "t": "XLPR11",
+      "n": "FII XLPR RI CI",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.38,
+      "dy": "6.38%"
+    },
+    {
+      "t": "XPCI11",
+      "n": "XP Credito Imobiliario - Fundo De Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.95,
+      "dy": "13.63%"
+    },
+    {
+      "t": "XPLG11",
+      "n": "XP Log Fundo Investimento Imobiliario FII",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.82,
+      "dy": "10.66%"
+    },
+    {
+      "t": "XPSF11",
+      "n": "XP Selection Fundo de Fundos de Investimento Imobiliario - FII",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-14",
+      "val": 0.07,
+      "dy": "13.33%"
+    },
+    {
+      "t": "BBIG11",
+      "n": "BB Premium Malls Fundo de Investimento Imobiliario de Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-15",
+      "val": 0.02,
+      "dy": "4.13%"
+    },
+    {
+      "t": "BCRI11",
+      "n": "Banestes Recebiveis Imobiliarios Fundo de Investimento Imobiliario- FII Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-15",
+      "val": 0.79,
+      "dy": "15.99%"
+    },
+    {
+      "t": "BTHI11",
+      "n": "XP Hoteis - Fundo de Investimento Imobiliario - FII Shs",
+      "tipo": "Rendimento",
+      "com": "2026-07-03",
+      "pag": "2026-07-15",
+      "val": 0.45,
+      "dy": "12.28%"
+    },
+    {
+      "t": "CXCE11",
+      "n": "Fundo de Investimento Imobiliario Caixa Cedae Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-15",
+      "val": 0.46,
+      "dy": "13.75%"
+    },
+    {
+      "t": "CXTL11",
+      "n": "Fundo de Investimento Imobiliario TRX Caixa Logistica Renda Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-15",
+      "val": 0.94,
+      "dy": "3.67%"
+    },
+    {
+      "t": "EURO11",
+      "n": "Fundo de Investimento Imobiliario Europar Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-15",
+      "val": 2.45,
+      "dy": "9.42%"
+    },
+    {
+      "t": "HSLG11",
+      "n": "HSI Logistica Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-15",
+      "val": 0.74,
+      "dy": "10.10%"
+    },
+    {
+      "t": "KIVO11",
+      "n": "Kilima Volkano Recebiveis Imobiliarios Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-15",
+      "val": 0.85,
+      "dy": "17.02%"
+    },
+    {
+      "t": "RBFM11",
+      "n": "Rio Bravo Multiestrategia Fundo de Investimento Imobiliario de Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-15",
+      "val": 0.11,
+      "dy": "12.64%"
+    },
+    {
+      "t": "RBFY11",
+      "n": "Rio Bravo For You Fundo de Investimento Imobiliario de Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-15",
+      "val": 0.32,
+      "dy": "5.49%"
+    },
+    {
+      "t": "RBOP11",
+      "n": "Fundo de Investimento Imobiliario Rio Bravo Oportunidades Imobiliarias FII",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-15",
+      "val": 1.1,
+      "dy": "5.74%"
+    },
+    {
+      "t": "RBRS11",
+      "n": "RIO Bravo Renda Residencial Fundo de Investimentos Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-15",
+      "val": 0.36,
+      "dy": "8.78%"
+    },
+    {
+      "t": "RBVA11",
+      "n": "Fundo de Investimento Imobiliario Rio Bravo Renda Varejo - FII",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-15",
+      "val": 0.09,
+      "dy": "11.99%"
+    },
+    {
+      "t": "RCRB11",
+      "n": "Fundo de Investimento Imobiliario Rio Bravo de Renda Corporativa",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-15",
+      "val": 1.08,
+      "dy": "9.39%"
+    },
+    {
+      "t": "RECD11",
+      "n": "Rec Fundo De Cri Cotas Amortizaveis - Fundo De Investimento Imobiliario",
+      "tipo": "Amortização",
+      "com": "2026-07-01",
+      "pag": "2026-07-15",
+      "val": 0.49,
+      "dy": "80.55%"
+    },
+    {
+      "t": "SHPH11",
+      "n": "Fundo de Investimento Imobiliario Shopping Patio Higienopolis Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-15",
+      "val": 12.0,
+      "dy": "15.16%"
+    },
+    {
+      "t": "TEPP11",
+      "n": "Tellus Properties - Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-15",
+      "val": 0.13,
+      "dy": "19.62%"
+    },
+    {
+      "t": "TRBL11",
+      "n": "Fundo de Investimento Imobiliario Tellus Rio Bravo Renda Logidtica FII",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-15",
+      "val": 2.68,
+      "dy": "55.78%"
+    },
+    {
+      "t": "TSER11",
+      "n": "Tishman Speyer Renda Corporativa Fundo De Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-15",
+      "val": 1.65,
+      "dy": "18.33%"
+    },
+    {
+      "t": "VRTA11",
+      "n": "Fator Verita Fundo de Investimento Imobiliario - FII Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-15",
+      "val": 0.85,
+      "dy": "14.50%"
+    },
+    {
+      "t": "VRTM11",
+      "n": "Fator Verita Multiestrategia Fundo De Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-15",
+      "val": 0.09,
+      "dy": "15.49%"
+    },
+    {
+      "t": "CXAG11",
+      "n": "Fundo de Investimento Imobiliario Caixa Agencias",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-16",
+      "val": 0.72,
+      "dy": "11.48%"
+    },
+    {
+      "t": "APTO11",
+      "n": "Navi Residencial Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-20",
+      "val": 0.1,
+      "dy": "14.41%"
+    },
+    {
+      "t": "BEES3",
+      "n": "Banestes S.A. - Banco do Estado do Espirito Santo",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-07-02",
+      "pag": "2026-07-20",
+      "val": 0.0729,
+      "dy": "10.00%"
+    },
+    {
+      "t": "BEES4",
+      "n": "Banestes SA Banco do Estado do Espirito Santo Pfd",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-07-02",
+      "pag": "2026-07-20",
+      "val": 0.0729,
+      "dy": "9.79%"
+    },
+    {
+      "t": "PQDP11",
+      "n": "Fundo de Investimento Imobiliario FII Parque Dom Pedro Shopping Center Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-20",
+      "val": 17.81,
+      "dy": "8.25%"
+    },
+    {
+      "t": "MANA11",
+      "n": "Manati Capital Hedge Fund Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-21",
+      "val": 0.13,
+      "dy": "16.88%"
+    },
+    {
+      "t": "HUCG11",
+      "n": "Fundo de Investimento Imobiliario Hospital Unimed Campina Grande",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-22",
+      "val": 0.75,
+      "dy": "9.96%"
+    },
+    {
       "t": "TIMS3",
       "n": "TIM S.A.",
       "tipo": "JRS CAP PROPRIO",
@@ -23304,6 +24987,15 @@
       "pag": "2026-07-22",
       "val": 0.1675,
       "dy": "8.82%"
+    },
+    {
+      "t": "BCIA11",
+      "n": "Bradesco Carteira Imobiliatia Ative- Fundo de Fundos de Investimento Imobiliario- FII Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-06-30",
+      "pag": "2026-07-28",
+      "val": 0.97,
+      "dy": "13.30%"
     },
     {
       "t": "BBDC3",
@@ -23322,6 +25014,15 @@
       "pag": "2026-07-31",
       "val": 0.3863,
       "dy": "25.39%"
+    },
+    {
+      "t": "IRBR3",
+      "n": "IRB Brasil Resseguros SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-06-30",
+      "pag": "2026-07-31",
+      "val": 0.3201,
+      "dy": "7.01%"
     },
     {
       "t": "ODER3",
@@ -23351,6 +25052,51 @@
       "dy": "3.88%"
     },
     {
+      "t": "BBDC3",
+      "n": "Banco Bradesco SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-07-01",
+      "pag": "2026-08-03",
+      "val": 0.0172,
+      "dy": "1.30%"
+    },
+    {
+      "t": "BBDC4",
+      "n": "Banco Bradesco SA Pfd",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-07-01",
+      "pag": "2026-08-03",
+      "val": 0.019,
+      "dy": "1.25%"
+    },
+    {
+      "t": "BEES3",
+      "n": "Banestes S.A. - Banco do Estado do Espirito Santo",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-07-01",
+      "pag": "2026-08-03",
+      "val": 0.0288,
+      "dy": "3.95%"
+    },
+    {
+      "t": "BEES4",
+      "n": "Banestes SA Banco do Estado do Espirito Santo Pfd",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-07-01",
+      "pag": "2026-08-03",
+      "val": 0.0288,
+      "dy": "3.87%"
+    },
+    {
+      "t": "ITUB3",
+      "n": "Itau Unibanco Holding S.A.",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-06-30",
+      "pag": "2026-08-03",
+      "val": 0.0182,
+      "dy": "0.49%"
+    },
+    {
       "t": "ITUB4",
       "n": "Itau Unibanco Holding SA Pfd",
       "tipo": "Dividendo",
@@ -23363,6 +25109,15 @@
       "t": "ITUB4",
       "n": "Itau Unibanco Holding SA Pfd",
       "tipo": "JCP",
+      "com": "2026-06-30",
+      "pag": "2026-08-03",
+      "val": 0.0182,
+      "dy": "0.51%"
+    },
+    {
+      "t": "ITUB4",
+      "n": "Itau Unibanco Holding SA Pfd",
+      "tipo": "JRS CAP PROPRIO",
       "com": "2026-06-30",
       "pag": "2026-08-03",
       "val": 0.0182,
@@ -23385,6 +25140,24 @@
       "pag": "2026-08-12",
       "val": 0.4128,
       "dy": "10.66%"
+    },
+    {
+      "t": "RBIR11",
+      "n": "RB Capital Desenvolvimento Residencial IV Fundo de Investimento Imobiliario - FII",
+      "tipo": "Amortização",
+      "com": "2026-06-30",
+      "pag": "2026-08-14",
+      "val": 5.23,
+      "dy": "83.80%"
+    },
+    {
+      "t": "RSPD11",
+      "n": "RB Capital Desenvolvimento Residencial III Fundo de Investimento Imobiliario - FII",
+      "tipo": "Amortização",
+      "com": "2026-06-30",
+      "pag": "2026-08-14",
+      "val": 53.69,
+      "dy": "92.04%"
     },
     {
       "t": "SHUL4",
