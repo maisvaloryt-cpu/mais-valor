@@ -1,5 +1,5 @@
 {
-  "gerado_em": "07/07/2026 06:22",
+  "gerado_em": "07/07/2026 22:08",
   "historico_mensal": {
     "total": 1375,
     "ok": 1363,
@@ -103,30 +103,53 @@
     ]
   },
   "cotacoes": {
-    "atualizado_em": "07/07/2026 05:57",
+    "atualizado_em": "07/07/2026 21:16",
     "total_acoes": 460,
     "total_fiis": 487,
-    "fallbacks": 9,
+    "fallbacks": 32,
     "tickers_fallback": [
+      "MGEL4",
+      "BMKS3",
+      "FIGE3",
+      "VLID3",
+      "BMGB4",
+      "CGRA4",
+      "VSTE3",
       "NEOE3",
       "MRSA6B",
+      "HAGA3",
+      "AFLT3",
       "TKNO4",
+      "LOGN3",
+      "AJFI11",
+      "BBGO11",
       "BREV11",
       "BRIM11",
+      "COPP11",
+      "CXRI11",
+      "EIRA11",
+      "ERCR11",
+      "FFCI11",
+      "FPNG11",
       "GLOG11",
       "HGPO11",
+      "HGRU11",
+      "IAAG11",
+      "NEXG11",
       "PLOG11",
+      "PURB11",
+      "RBGS11",
       "SPG211"
     ]
   },
   "fundamentus": {
-    "atualizado_em": "07/07/2026 05:57",
+    "atualizado_em": "07/07/2026 21:16",
     "total_acoes": 994,
     "total_fiis": 553,
-    "atualizado_fiis": "07/07/2026 05:57"
+    "atualizado_fiis": "07/07/2026 21:16"
   },
   "criptos": {
-    "atualizado_em": "06/07/2026 22:45 UTC",
+    "atualizado_em": "07/07/2026 22:21 UTC",
     "total_moedas": 100,
     "com_dados": 100,
     "sem_dados": 0,
