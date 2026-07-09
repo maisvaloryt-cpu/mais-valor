@@ -1,5 +1,5 @@
 {
-  "updated_at": "07/07/2026 21:15",
+  "updated_at": "09/07/2026 19:13",
   "cdi": {
     "diario": 0.052531,
     "anual": 14.15,
@@ -19,8 +19,8 @@
     "stale": false
   },
   "poupanca": {
-    "mensal": 0.674,
-    "anual": 8.39,
+    "mensal": 0.6741,
+    "anual": 8.4,
     "stale": false
   }
 }
