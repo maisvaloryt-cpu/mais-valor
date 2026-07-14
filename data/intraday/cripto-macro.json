@@ -1,5 +1,5 @@
 {
-  "updated_at": "14/07/2026 14:44",
+  "updated_at": "14/07/2026 15:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,7 +1128,7 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 175953.9,
+      "price": 175946.02,
       "changePct": 0.0012,
       "high": 177179.1,
       "low": 175742.88
@@ -1138,8 +1138,8 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3828.37,
-      "changePct": -0.0004,
+      "price": 3828.14,
+      "changePct": -0.0005,
       "high": 3837.94,
       "low": 3826.48
     },
@@ -1158,7 +1158,7 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 12628.71,
+      "price": 12627.59,
       "changePct": -0.0007000000000000001,
       "high": 12709.61,
       "low": 12620.16
@@ -1188,8 +1188,8 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7546.68,
-      "changePct": 0.0042,
+      "price": 7551.56,
+      "changePct": 0.0048,
       "high": 7557.44,
       "low": 7513.23
     },
@@ -1198,8 +1198,8 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 26138.94,
-      "changePct": 0.0103,
+      "price": 26162.68,
+      "changePct": 0.011200000000000002,
       "high": 26164.55,
       "low": 25912.4
     },
@@ -1208,8 +1208,8 @@
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 52418.33,
-      "changePct": -0.0015,
+      "price": 52478.67,
+      "changePct": -0.0004,
       "high": 52695.06,
       "low": 52046.36
     },
@@ -1218,8 +1218,8 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2964.27,
-      "changePct": 0.0038,
+      "price": 2964.16,
+      "changePct": 0.0037,
       "high": 2977.38,
       "low": 2957.89
     },
