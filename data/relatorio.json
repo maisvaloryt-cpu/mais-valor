@@ -1,5 +1,5 @@
 {
-  "gerado_em": "13/07/2026 19:04",
+  "gerado_em": "14/07/2026 19:08",
   "historico_mensal": {
     "total": 1375,
     "ok": 1365,
@@ -55,47 +55,47 @@
       {
         "ticker": "BREV11",
         "ultimo": "2026-06-20",
-        "dias_atras": 23
+        "dias_atras": 24
       },
       {
         "ticker": "BRIM11",
         "ultimo": "2026-06-11",
-        "dias_atras": 32
+        "dias_atras": 33
       },
       {
         "ticker": "GLOG11",
         "ultimo": "2026-06-21",
-        "dias_atras": 22
+        "dias_atras": 23
       },
       {
         "ticker": "HGPO11",
         "ultimo": "2026-06-08",
-        "dias_atras": 35
+        "dias_atras": 36
       },
       {
         "ticker": "NEOE3",
         "ultimo": "2026-07-04",
-        "dias_atras": 9
+        "dias_atras": 10
       },
       {
         "ticker": "PLOG11",
         "ultimo": "2026-06-21",
-        "dias_atras": 22
+        "dias_atras": 23
       },
       {
         "ticker": "SPG211",
         "ultimo": "2026-06-10",
-        "dias_atras": 33
+        "dias_atras": 34
       },
       {
         "ticker": "TKNO4",
         "ultimo": "2026-06-21",
-        "dias_atras": 22
+        "dias_atras": 23
       }
     ]
   },
   "cotacoes": {
-    "atualizado_em": "13/07/2026 18:45",
+    "atualizado_em": "14/07/2026 18:48",
     "total_acoes": 460,
     "total_fiis": 497,
     "fallbacks": 8,
@@ -111,13 +111,13 @@
     ]
   },
   "fundamentus": {
-    "atualizado_em": "13/07/2026 18:45",
+    "atualizado_em": "14/07/2026 18:48",
     "total_acoes": 994,
     "total_fiis": 553,
-    "atualizado_fiis": "13/07/2026 18:45"
+    "atualizado_fiis": "14/07/2026 18:48"
   },
   "criptos": {
-    "atualizado_em": "13/07/2026 19:25 UTC",
+    "atualizado_em": "14/07/2026 19:22 UTC",
     "total_moedas": 100,
     "com_dados": 100,
     "sem_dados": 0,
