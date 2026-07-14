@@ -1,5 +1,5 @@
 {
-  "updated_at": "14/07/2026 15:44",
+  "updated_at": "14/07/2026 16:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,8 +1128,8 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 176203.63,
-      "changePct": 0.0026,
+      "price": 176612.73,
+      "changePct": 0.005,
       "high": 177179.1,
       "low": 175742.88
     },
@@ -1138,8 +1138,8 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3829.95,
-      "changePct": 0,
+      "price": 3831.03,
+      "changePct": 0.0003,
       "high": 3837.94,
       "low": 3826.48
     },
@@ -1158,8 +1158,8 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 12648.31,
-      "changePct": 0.0009,
+      "price": 12688.18,
+      "changePct": 0.004,
       "high": 12709.61,
       "low": 12620.16
     },
@@ -1188,8 +1188,8 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7545.67,
-      "changePct": 0.004,
+      "price": 7547.22,
+      "changePct": 0.0042,
       "high": 7557.44,
       "low": 7513.23
     },
@@ -1198,8 +1198,8 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 26129.57,
-      "changePct": 0.009899999999999999,
+      "price": 26137.38,
+      "changePct": 0.0102,
       "high": 26168.81,
       "low": 25912.4
     },
@@ -1208,8 +1208,8 @@
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 52474.99,
-      "changePct": -0.0005,
+      "price": 52508.75,
+      "changePct": 0.0002,
       "high": 52695.06,
       "low": 52046.36
     },
@@ -1218,8 +1218,8 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2966.05,
-      "changePct": 0.0044,
+      "price": 2963.85,
+      "changePct": 0.0036,
       "high": 2977.38,
       "low": 2957.89
     },
