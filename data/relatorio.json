@@ -1,5 +1,5 @@
 {
-  "gerado_em": "14/07/2026 19:08",
+  "gerado_em": "15/07/2026 19:07",
   "historico_mensal": {
     "total": 1375,
     "ok": 1365,
@@ -55,50 +55,50 @@
       {
         "ticker": "BREV11",
         "ultimo": "2026-06-20",
-        "dias_atras": 24
+        "dias_atras": 25
       },
       {
         "ticker": "BRIM11",
         "ultimo": "2026-06-11",
-        "dias_atras": 33
+        "dias_atras": 34
       },
       {
         "ticker": "GLOG11",
         "ultimo": "2026-06-21",
-        "dias_atras": 23
+        "dias_atras": 24
       },
       {
         "ticker": "HGPO11",
         "ultimo": "2026-06-08",
-        "dias_atras": 36
+        "dias_atras": 37
       },
       {
         "ticker": "NEOE3",
         "ultimo": "2026-07-04",
-        "dias_atras": 10
+        "dias_atras": 11
       },
       {
         "ticker": "PLOG11",
         "ultimo": "2026-06-21",
-        "dias_atras": 23
+        "dias_atras": 24
       },
       {
         "ticker": "SPG211",
         "ultimo": "2026-06-10",
-        "dias_atras": 34
+        "dias_atras": 35
       },
       {
         "ticker": "TKNO4",
         "ultimo": "2026-06-21",
-        "dias_atras": 23
+        "dias_atras": 24
       }
     ]
   },
   "cotacoes": {
-    "atualizado_em": "14/07/2026 18:48",
+    "atualizado_em": "15/07/2026 18:49",
     "total_acoes": 460,
     "total_fiis": 497,
-    "fallbacks": 8,
+    "fallbacks": 10,
     "tickers_fallback": [
       "NEOE3",
       "TKNO4",
@@ -106,18 +106,20 @@
       "BRIM11",
       "GLOG11",
       "HGPO11",
+      "ONEF11",
+      "OURE11",
       "PLOG11",
       "SPG211"
     ]
   },
   "fundamentus": {
-    "atualizado_em": "14/07/2026 18:48",
+    "atualizado_em": "15/07/2026 18:49",
     "total_acoes": 994,
     "total_fiis": 553,
-    "atualizado_fiis": "14/07/2026 18:48"
+    "atualizado_fiis": "15/07/2026 18:49"
   },
   "criptos": {
-    "atualizado_em": "14/07/2026 19:22 UTC",
+    "atualizado_em": "15/07/2026 19:14 UTC",
     "total_moedas": 100,
     "com_dados": 100,
     "sem_dados": 0,
