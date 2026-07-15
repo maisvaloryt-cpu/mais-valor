@@ -135,6 +135,20 @@ function renderEvolucaoPatri(nMeses){
   ctx.canvas.style.display='';
   const emp=ctx.canvas.parentElement.querySelector('.patri-empty');
   if(emp)emp.remove();
+  // [5.9] Aviso quando algum mês foi avaliado SEM preço histórico (usou a cotação
+  // atual como aproximação) — a curva desses meses é estimada, não real.
+  const parentEl=ctx.canvas.parentElement;
+  let notaFb=parentEl.querySelector('.patri-fallback-note');
+  const nFb=evol.filter(m=>m.fallback).length;
+  if(nFb>0){
+    if(!notaFb){
+      notaFb=document.createElement('div');
+      notaFb.className='patri-fallback-note';
+      notaFb.style.cssText='font-size:10px;color:var(--color-text-secondary);margin-top:6px';
+      parentEl.appendChild(notaFb);
+    }
+    notaFb.textContent='ℹ '+nFb+' mês(es) sem preço histórico de algum ativo — nesses pontos foi usada a cotação atual como aproximação.';
+  }else if(notaFb){notaFb.remove();}
   // Barras mensais empilhadas: base = aportes (azul-piscina); lucro (amarelo) acima; prejuízo (vermelho) abaixo do zero.
   // split.proprio[i] = aporte de DINHEIRO NOVO no mês i; split.reinvest[i] = parte do
   // aporte que é DIVIDENDO REINVESTIDO (provento recebido em meses anteriores e reaplicado).

@@ -982,8 +982,13 @@
 
             <!-- EXPORT BUTTONS — aparecem após simulação (FIX 10: título discreto + labels simplificados) -->
             <div id="exportBtns" class="hidden flex flex-col gap-2 items-end">
-                <p class="text-[10px] text-gray-600 uppercase tracking-widest">Baixe seus resultados</p>
+                <p class="text-[10px] text-gray-600 uppercase tracking-widest">Baixe ou compartilhe seus resultados</p>
                 <div class="flex gap-3">
+                    <!-- [S8-17] Compartilhar simulação por URL -->
+                    <button onclick="compartilharSimulacao(this)" title="Copia um link desta simulação — quem abrir vê os mesmos parâmetros" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#16161a] border border-[#24242b] text-xs font-bold text-sky-400 hover:border-sky-500/50 hover:bg-sky-500/5 transition-all">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5.4 8.6l3.2-3.2M6.2 4.2l1.1-1.1a2.4 2.4 0 013.4 3.4L9.6 7.6M7.8 9.8l-1.1 1.1a2.4 2.4 0 01-3.4-3.4l1.1-1.1" stroke="#38bdf8" stroke-width="1.2" stroke-linecap="round"/></svg>
+                        Link
+                    </button>
                     <button onclick="exportarExcel()" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#16161a] border border-[#24242b] text-xs font-bold text-emerald-400 hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all">
                         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="#34d399" stroke-width="1.2"/><path d="M3 4h8M3 7h8M3 10h5" stroke="#34d399" stroke-width="1.2" stroke-linecap="round"/></svg>
                         Excel

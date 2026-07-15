@@ -7,9 +7,10 @@
   index.html, nav.js, sw.js, fetch_*.py (amostragem)
 ================================================================================
 
-  IMPORTANTE: nada foi alterado no código. Este arquivo é só diagnóstico +
-  sugestões. Cada item diz onde está o problema e como eu sugiro corrigir —
-  você decide o que aplicar.
+  NOTA (05/07/2026): este arquivo nasceu como diagnóstico puro; desde então
+  praticamente TODOS os itens foram implementados (veja o STATUS abaixo).
+  Os textos das seções descrevem o problema COMO ERA na análise original —
+  itens marcados [CORRIGIDO ✔] já não existem mais no código.
 
   LEGENDA DE GRAVIDADE:
   [CRÍTICO] mostra informação errada pro usuário ou quebra confiança no site
@@ -19,10 +20,140 @@
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STATUS DAS CORREÇÕES — atualizado em 05/07/2026
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+JÁ CORRIGIDO (verificado com testes numéricos):
+  ✔ 1.1  v7/v30 aleatórios — removidos; página do ativo calcula a variação REAL
+         do histórico; listagens mostram "—"; score só usa v30 real.
+  ✔ 1.2  Gráfico sintético (genHistory) — removido; mostra "Histórico indisponível".
+  ✔ 2.1  Convenção de aporte UNIFICADA: mês 1 SEM aporte (decisão do Diego — o 1º
+         aporte já está no valor inicial). Aplicada em: pipeline, modo reverso
+         (fórmula (n-1) aportes; agora bate a meta com erro zero), poupança
+         (gráfico = card), monte carlo, custo do atraso, sabático e modelo híbrido.
+  ✔ 2.2  Deflator de inflação no período mensal — corrigido (meses ÷ 12).
+  ✔ 2.8  Pasta files/ duplicada — apagada.
+  ✔ 3.1  ferramentas.html — taxa geométrica (1+i)^(1/12)-1 + mesma convenção de
+         aporte; agora dá resultado IDÊNTICO à calculadora.
+  ✔ 3.2  Guard para taxa 0% em ferramentas.html.
+  ✔ 5.2  Renda Fixa com séries HISTÓRICAS do BCB — fetch_bcb.py gera
+         data/bcb_historico.json (CDI/Selic diários + IPCA mensal desde 1995,
+         incremental); fatorRF usa a taxa real de cada dia, com fallback ao
+         comportamento antigo enquanto o workflow não gerar o arquivo.
+         → conferir no GitHub Actions: log "✅ bcb_historico.json salvo".
+  ✔ 5.3  Import B3: Desdobro = compra a custo zero (PM dilui, regra da Receita);
+         Bonificação = custo informado no extrato; Grupamento = aviso ao usuário
+         (não é aplicado automaticamente).
+
+CORRIGIDO EM 05/07/2026 (2ª rodada — todos os itens escolhidos pelo Diego):
+  ✔ 1.3  Intraday não-fresco agora aparece como stale (amarelo).
+  ✔ 1.4  _vistos.clear() no início do loadData() — pode rodar de novo sem esvaziar listas.
+  ✔ 1.5  Frescor do intraday calculado em horário de Brasília/UTC (independe do fuso do visitante).
+  ✔ 1.6  DY até 200% é mantido (só acima disso vira erro de dado).
+  ✔ 1.7  div12m REAL: fetch_dividendos_historico.py gera data/div12m.json (soma
+         deduplicada dos proventos 12m); Bazin usa o valor real com fallback à estimativa.
+  ✔ 2.3  LED mostra "aportes suspensos na retirada" + card do ano mostra "sem aportes".
+  ✔ 2.4  Retirada única consome juros primeiro e abate o investido (linha azul nunca cruza a verde).
+  ✔ 2.5  Monte Carlo no período mensal usa σ mensal = σ anual/√12 (risco igual nos dois modos).
+  ✔ 2.6  Monte Carlo e Custo do Atraso usam o cronograma REAL de aportes do pipeline
+         (baseDadosCalculados.aportesMensais — com IPCA, aporte inteligente e retiradas).
+  ✔ 2.7  Modo reverso com IPCA ativo resolve o PMT por busca binária no cronograma real.
+  ✔ 4.1  Variância do backtest centrada na média aritmética (Sharpe segue geométrica).
+  ✔ 4.2  Mês corrente incompleto não conta como fechamento (histToMap + fallbacks).
+  ✔ 4.4  Nota "estimativa simplificada" no card de IR do backtest (tooltip com detalhes).
+  ✔ 4.5  Banda de rebalanceamento configurável (1/5/10%) na sidebar, salva por simulação.
+  ✔ 4.6  Variável morta removida.
+  ✔ 5.1  DY 12m real por ativo (proventos 12m ÷ preço) + coluna YoC 12m na Rentabilidade.
+  ✔ 5.4  IRPF unificado: calcImpostoGanhos() em common.js é a fonte única (card,
+         painel e exportação) com isenções 20k/35k e FII a 20%.
+  ✔ 5.5  Compensação de prejuízos por modalidade (meses e anos anteriores).
+  ✔ 5.6  Alfa vs IBOV/CDI: benchmark também vende quando a carteira vende.
+  ✔ 5.7  Volatilidade por ativo com variância amostral (n-1).
+  ✔ 5.8  Data-com: consumidores de dividendos usam d.com quando disponível.
+  ✔ 5.9  Evolução patrimonial avisa quando meses usaram cotação atual como aproximação.
+  ✔ 5.10 Texto da projeção de metas esclarece que não considera valorização das cotas.
+  ✔ 6.3  tests/test_motores.js (21 testes dos motores reais) + workflow tests.yml no Actions.
+  ✔ 6.4  Removido ?t=Date.now() de 15 arquivos — cache HTTP do GitHub Pages (~10 min) volta a funcionar.
+  ✔ 6.6  console.log de produção removidos.
+
+  BÔNUS descoberto na rodada: os JSONs de dividendos migraram para o formato
+  {com, pag, value} e o site ainda lia d.date — proventos da carteira e
+  dividendos do backtest vinham VAZIOS. Corrigido (com dedup de pagamentos
+  duplicados de fontes distintas) em common.js e simulador.html.
+
+CORRIGIDO EM 05/07/2026 (3ª rodada):
+  ✔ 4.3  Câmbio client-side em JANELAS de 4 anos desde 1995 (antes truncava em ~4 anos).
+  ✔ Dedup NA ORIGEM: merge_dividendos agora funde pagamentos quase-duplicados por
+    tolerância (mesmo dia, valores com dif. < 0,5%), mantendo a versão com data-com.
+    Mesmo critério aplicado nos consumidores (common.js, simulador.html) e no
+    div12m.json — que foi regenerado (ex.: PETR4 12m caiu de R$14,83 p/ R$9,25;
+    os quase-duplicados inflavam a soma em ~60%).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+O QUE AINDA FALTA (só 3 itens — todo o resto foi feito)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  1. [6.2] Token do GitHub no Apps Script — AÇÃO SUA (não é código):
+        a) github.com/settings/personal-access-tokens → Generate new token (fine-grained)
+        b) Repository access: só o repo mais-valor · Permissions: Contents = Read/Write
+        c) Expiração de 1 ano · troque o token no Apps Script (constante do script)
+        d) Revogue o token clássico antigo em github.com/settings/tokens
+
+  2. [6.5] Modularização — quebrar simulador.html (~5.000 linhas) e
+     calculadora/main.js (~5.200 linhas) em arquivos menores (motor / UI / estilos).
+     Não muda nada para o usuário; é manutenção. Recomendo sessão dedicada,
+     um arquivo por vez, com os testes automáticos de guarda.
+
+  3. [6.1-resto] analise.js (raiz) ≈ api/analise.js — duplicação pequena que
+     sobrou; decidir qual é a fonte e apagar a outra (2 minutos, mas precisa
+     saber qual delas o deploy usa).
+
+  E fora do TXT, o checklist pós-push:
+  • GitHub Actions: conferir "✅ bcb_historico.json salvo" (RF histórica ativa)
+  • GitHub Actions: workflow "Testes dos motores de cálculo" verde
+  • div12m.json e dividendos dedupados renovam sozinhos na próxima rodada diária
+  • Seção 8 — melhorias de produto (implementando 1-2 por rodada):
+    ✔ TWR na carteira (05/07/2026): cards "Rentabilidade TWR — período" e "TWR 12
+      meses" na aba Rentabilidade, com IBOV/CDI na MESMA janela. Encadeia o
+      retorno mensal descontando o fluxo — validado: com aportes e vendas no
+      meio, o TWR devolve exatamente o retorno do ativo (dif = 0).
+    ✔ Compartilhar simulação por URL (05/07/2026): botão "Link" na calculadora
+      copia um link com os parâmetros (inicial, mensal, taxa, período, modo);
+      quem abrir vê a mesma simulação. Parâmetros validados na entrada.
+    ✔ Aba "Projeção" no simulador (05/07/2026): bootstrap com meses REAIS do
+      backtest — 1.000 futuros sorteados, leque P10/P50/P90, controles de
+      horizonte (5-30 anos) e aporte futuro, botão re-sortear e resumo em
+      linguagem simples ("não é previsão — é o passado embaralhado").
+      Validado: pool constante → percentis colapsam no valor determinístico
+      exato; pool com crises → P10 < P50 < P90.
+    ✔ Benchmark no gráfico do backtest (05/07/2026): botões IBOV / CDI na aba
+      Evolução — simulam os MESMOS aportes da carteira comprando o índice.
+    ✔ Patrimônio real (IPCA) no backtest (05/07/2026): botão "Real (IPCA)"
+      deflaciona a linha mês a mês com o IPCA histórico.
+    ✔ Export Excel/PDF do backtest (05/07/2026): botões na barra de ações —
+      Excel com 3 abas (Resumo, Mensal, Ativos) e PDF imprimível com métricas,
+      resumo anual e ativos.
+    ✔ Alertas de rebalanceamento (05/07/2026): card "Rebalanceamento" no Resumo
+      da carteira — compara alocação real vs metas, avisa desvios > 5pp com o
+      valor em R$ para ajustar e sugere rebalancear por aportes (sem imposto).
+    ✔ Renda passiva projetada (05/07/2026): card em Proventos — renda mensal
+      atual e projeção reinvestindo tudo a (1+DY)^anos para 5/10/20 anos
+      (conservadora: sem aportes novos, sem valorização).
+    ✔ Página de metodologia (05/07/2026): metodologia.html explica TODAS as
+      fórmulas em linguagem simples (calculadora, backtest, projeção, carteira,
+      IRPF, dados) + link no rodapé e no menu de ferramentas.
+    ✔ PWA offline da carteira (05/07/2026): persistência do Firestore
+      (IndexedDB — carteira abre sem internet com o último estado e sincroniza
+      ao reconectar) + páginas da carteira no pré-cache do service worker (v2).
+
+  SEÇÃO 8 COMPLETA — todas as melhorias de produto implementadas.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SEÇÃO 1 — COTAÇÕES E DADOS (data.js, index.html, ativo.html)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[1.1] [CRÍTICO] VARIAÇÃO 7d E 30d SÃO NÚMEROS INVENTADOS
+[1.1] [CORRIGIDO ✔ 04/07/2026] VARIAÇÃO 7d E 30d SÃO NÚMEROS INVENTADOS
 Onde: data.js, linhas ~362-363 e ~413-414
 Código:
   v7:  (cot.change || 0) * (0.8 + Math.random() * 0.8),
@@ -37,7 +168,7 @@ Sugestão: você já tem os dados reais em data/historico/ e data/diario/.
   Dá pra fazer no Python (pré-calculado no JSON, melhor pra performance) ou no
   front. Enquanto não fizer, é mais honesto esconder essas colunas.
 
-[1.2] [CRÍTICO] GRÁFICO DE PREÇO FALSO SEM AVISO (genHistory)
+[1.2] [CORRIGIDO ✔ 04/07/2026] GRÁFICO DE PREÇO FALSO SEM AVISO (genHistory)
 Onde: data.js linhas 475-479; usado em index.html:333 e ativo.html:447
 Problema: quando não há histórico do ativo, o site desenha um gráfico
   gerado com Math.random() (random walk) que TERMINA no preço atual — parece
@@ -47,31 +178,31 @@ Sugestão: (a) mostrar "sem histórico disponível" no lugar do gráfico, ou
   (b) manter o desenho mas com selo claro "ilustrativo". Opção (a) é a certa
   para um site de cotações.
 
-[1.3] [MÉDIO] PREÇO INTRADAY VELHO EXIBIDO COMO "FRESCO"
+[1.3] [CORRIGIDO ✔ 05/07/2026] PREÇO INTRADAY VELHO EXIBIDO COMO "FRESCO"
 Onde: data.js, mergeCot(), caminho '_source: intraday_stale' (linha ~326-340)
 Problema: quando o JSON intraday existe mas NÃO é fresco, o código usa o
   preço mesmo assim e marca stale:false. O mecanismo de "stale" (amarelo)
   existe justamente pra sinalizar dado velho, mas esse caminho o desativa.
 Sugestão: marcar stale:true nesse caminho, ou usar o fechamento diário.
 
-[1.4] [MÉDIO] RISCO LATENTE: loadData() só funciona 1 vez por página
+[1.4] [CORRIGIDO ✔ 05/07/2026] RISCO LATENTE: loadData() só funciona 1 vez por página
 Onde: data.js, isDuplicado() com Set global _vistos (linhas 278-284)
 Problema: o Set nunca é limpo. Se um dia você chamar loadData() de novo na
   mesma página (auto-refresh, botão "atualizar"), TODOS os tickers serão
   considerados duplicados e as listas virão vazias.
 Sugestão: limpar o Set no início de loadData() (_vistos.clear()).
 
-[1.5] [BAIXO] Frescor do intraday usa o relógio do VISITANTE
+[1.5] [CORRIGIDO ✔ 05/07/2026] Frescor do intraday usa o relógio do VISITANTE
 Onde: data.js, intradayFresh()
 Problema: compara o horário do JSON (gerado em horário de Brasília) com o
   horário local de quem visita. Visitante em Portugal/EUA classifica errado.
 Sugestão: comparar tudo em UTC ou embutir timestamp epoch no JSON.
 
-[1.6] [BAIXO] sanitizeDY zera DY acima de 50% silenciosamente
+[1.6] [CORRIGIDO ✔ 05/07/2026] sanitizeDY zera DY acima de 50% silenciosamente
   Casos raros mas legítimos (proventos extraordinários) aparecem como 0.
   Sugestão: exibir com aviso, em vez de zerar.
 
-[1.7] [BAIXO] div12m para preço-teto de Bazin é estimado por DY × preço atual
+[1.7] [CORRIGIDO ✔ 05/07/2026] div12m para preço-teto de Bazin é estimado por DY × preço atual
 Onde: data.js linha ~358
   É aproximação razoável, mas você tem os dividendos reais em
   data/dividendos/*.json — somar os últimos 12 meses seria exato.
@@ -81,7 +212,7 @@ Onde: data.js linha ~358
 SEÇÃO 2 — CALCULADORA / SIMULADOR DE JUROS (calculadora/main.js)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[2.1] [ALTO] CONVENÇÃO DO 1º APORTE É INCONSISTENTE — E CONTAMINA 4 FUNÇÕES
+[2.1] [CORRIGIDO ✔ 04/07/2026] CONVENÇÃO DO 1º APORTE É INCONSISTENTE — E CONTAMINA 4 FUNÇÕES
 Onde: executarPipelineCore(), linha 568: aporteEsteMes = (m === 1) ? 0 : aporteVigente
 Contexto: o motor principal NÃO aporta no mês 1 (são n-1 aportes no total).
   Pode até ser uma escolha de design ("o aporte começa no mês seguinte"), mas
@@ -113,7 +244,7 @@ Sugestão: escolher UMA convenção (recomendo aporte a partir do mês 1, que é
   gráfico), monte carlo e atraso. Idealmente extrair uma função única
   simularSaldo() usada por todos.
 
-[2.2] [ALTO] VALOR "REAL" (DESCONTADO DA INFLAÇÃO) ERRADO NO PERÍODO MENSAL
+[2.2] [CORRIGIDO ✔ 04/07/2026] VALOR "REAL" (DESCONTADO DA INFLAÇÃO) ERRADO NO PERÍODO MENSAL
 Onde: executarPipelineCore(), linhas ~750-758
 Código: const fator = Math.pow(1 + inflacao, tempoInput);
 Problema: tempoInput é ANOS no período anual, mas é MESES no período mensal.
@@ -124,7 +255,7 @@ Sugestão: const anosReais = tipoPeriodo === 'anual' ? tempoInput : tempoInput/1
   (o card "comentarioTotal" na linha 810 já faz essa divisão corretamente —
   é só replicar).
 
-[2.3] [MÉDIO] RETIRADA MENSAL DESLIGA O APORTE SEM AVISAR
+[2.3] [CORRIGIDO ✔ 05/07/2026] RETIRADA MENSAL DESLIGA O APORTE SEM AVISAR
 Onde: executarPipelineCore(), linhas 577-591
 Problema: quando a retirada mensal está ativa (ano >= anoInicioRetirada), o
   branch da retirada não soma aporteEsteMes — ou seja, aportes param
@@ -134,7 +265,7 @@ Problema: quando a retirada mensal está ativa (ano >= anoInicioRetirada), o
 Sugestão: ou somar o aporte antes do saque, ou avisar na UI ("aportes são
   suspensos durante a fase de retirada").
 
-[2.4] [MÉDIO] RETIRADA ÚNICA PODE DEIXAR "INVESTIDO" MAIOR QUE O "TOTAL"
+[2.4] [CORRIGIDO ✔ 05/07/2026] RETIRADA ÚNICA PODE DEIXAR "INVESTIDO" MAIOR QUE O "TOTAL"
 Onde: linhas 597-612
 Problema: a retirada única reduz saldoTotal mas não saldoInvestido. Depois
   de uma retirada grande, a linha azul (aportado) fica ACIMA da linha verde
@@ -142,7 +273,7 @@ Problema: a retirada única reduz saldoTotal mas não saldoInvestido. Depois
 Sugestão: aplicar a mesma regra da retirada mensal (consome juros primeiro,
   depois abate o investido).
 
-[2.5] [MÉDIO] MONTE CARLO: VOLATILIDADE MUDA DE SIGNIFICADO CONFORME O PERÍODO
+[2.5] [CORRIGIDO ✔ 05/07/2026] MONTE CARLO: VOLATILIDADE MUDA DE SIGNIFICADO CONFORME O PERÍODO
 Onde: aplicarMonteCarlo()
 Problema: sorteia-se UMA taxa anual por PONTO do gráfico. No período anual,
   1 ponto = 1 ano (correto). No período mensal, 1 ponto = 1 mês, então a
@@ -151,16 +282,16 @@ Problema: sorteia-se UMA taxa anual por PONTO do gráfico. No período anual,
 Sugestão: no período mensal, sortear retornos mensais com sigma_mensal =
   sigma_anual/√12.
 
-[2.6] [BAIXO] Monte Carlo/Atraso ignoram IPCA no aporte, aporte inteligente e
+[2.6] [CORRIGIDO ✔ 05/07/2026] Monte Carlo/Atraso ignoram IPCA no aporte, aporte inteligente e
   retiradas (usam sempre o aporte base constante). Com essas funções ativas,
   a linha simulada não é comparável à linha original. Sugestão: derivar as
   simulações do mesmo vetor de aportes do pipeline.
 
-[2.7] [BAIXO] Modo reverso ignora o IPCA no aporte: se "IPCA no aporte" está
+[2.7] [CORRIGIDO ✔ 05/07/2026] Modo reverso ignora o IPCA no aporte: se "IPCA no aporte" está
   ativo, o PMT necessário real é menor do que o sugerido (aportes crescem).
   Documentar ou incorporar.
 
-[2.8] [MÉDIO] PASTA files/ É UMA CÓPIA VELHA DA CALCULADORA (RISCO DE DRIFT)
+[2.8] [CORRIGIDO ✔ 05/07/2026 — pasta apagada] PASTA files/ ERA CÓPIA VELHA DA CALCULADORA
 Onde: files/main.js (5.065 linhas) vs calculadora/main.js (5.109 linhas)
 Problema: são 82 linhas divergentes — files/ está DESATUALIZADA (sem os fixes
   de renda do ponto 0, mesRuina, salário mínimo constante etc.). Nenhuma
@@ -173,7 +304,7 @@ Sugestão: apagar files/ (ou documentar por que existe).
 SEÇÃO 3 — FERRAMENTAS.HTML (calculadoras rápidas)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[3.1] [ALTO] JUROS COMPOSTOS COM CONVERSÃO DE TAXA DIFERENTE DA CALCULADORA
+[3.1] [CORRIGIDO ✔ 04/07/2026] JUROS COMPOSTOS COM CONVERSÃO DE TAXA DIFERENTE DA CALCULADORA
 Onde: ferramentas.html linha 491: const r = (taxaAnual/100)/12  (nominal)
       calculadora/main.js linha 524: Math.pow(1+taxa, 1/12)-1   (geométrica)
 Problema: as duas calculadoras do MESMO site dão resultados diferentes para
@@ -186,7 +317,7 @@ Problema: as duas calculadoras do MESMO site dão resultados diferentes para
 Sugestão: usar Math.pow(1+i,1/12)-1 também em ferramentas.html (juros e
   aposentadoria). Se preferir "taxa nominal", rotular explicitamente.
 
-[3.2] [BAIXO] Taxa 0% quebra as fórmulas (divisão por r=0 → NaN).
+[3.2] [CORRIGIDO ✔ 04/07/2026] Taxa 0% quebrava as fórmulas (divisão por r=0 → NaN).
   Sugestão: if (r===0) M = C + A*n.
 
 [3.3] [BAIXO] Aposentadoria: patrimônio-alvo = renda×12/taxa (perpetuidade
@@ -203,7 +334,7 @@ CAGR por TIR (correto p/ aportes recorrentes), guard de gaps nos retornos,
 caixa de espera com CDI, liquidação por fim de série patrimônio-neutra,
 drawdown sobre cota teórica, risk-free consistente. Poucos ajustes:
 
-[4.1] [BAIXO/MÉDIO] Variância calculada em torno da média GEOMÉTRICA
+[4.1] [CORRIGIDO ✔ 05/07/2026] Variância calculada em torno da média GEOMÉTRICA
 Onde: linhas 2210-2214
 Problema: usar a média geométrica no Sharpe é ok, mas a variância estatística
   deve ser medida em torno da média ARITMÉTICA da amostra. Centrar na
@@ -212,25 +343,25 @@ Problema: usar a média geométrica no Sharpe é ok, mas a variância estatísti
 Sugestão: calcular mediaAritm separadamente para a variância; manter a
   geométrica no numerador do Sharpe.
 
-[4.2] [BAIXO] Mês corrente incompleto conta como "fechamento do mês"
+[4.2] [CORRIGIDO ✔ 05/07/2026] Mês corrente incompleto conta como "fechamento do mês"
 Onde: histToMap() — pega o último preço disponível de cada mês, inclusive do
   mês em andamento. O último ponto da série mistura mês parcial com meses
   cheios (afeta marginalmente retorno/vol do último mês).
 Sugestão: descartar o mês corrente se ainda não terminou (ou sinalizar).
 
-[4.3] [BAIXO] Fallback de câmbio limitado a ~4 anos
+[4.3] [CORRIGIDO ✔ 05/07/2026] Fallback de câmbio limitado a ~4 anos
 Onde: fetchClientSideCambio() — AwesomeAPI /daily/1500 ≈ 1500 dias.
   Backtests longos de USDBRL/EURBRL sem arquivo local ficam truncados.
 
-[4.4] [BAIXO] IR estimado não aplica isenção de R$ 20 mil/mês em ações
+[4.4] [CORRIGIDO ✔ 05/07/2026] IR estimado não aplica isenção de R$ 20 mil/mês em ações
   (está documentado no código, mas o usuário só vê "IR estimado pago").
 Sugestão: nota visível na UI: "não considera isenção de 20k, come-cotas e
   corretagem".
 
-[4.5] [BAIXO] Banda de rebalanceamento fixa em 5% (REBAL_BAND) — poderia ser
+[4.5] [CORRIGIDO ✔ 05/07/2026] Banda de rebalanceamento fixa em 5% (REBAL_BAND) — poderia ser
   um controle do usuário (1%/5%/10%), já que muda bastante o giro e o IR.
 
-[4.6] [BAIXO] Variável `years` (linha 2215) calculada e nunca usada — restinho
+[4.6] [CORRIGIDO ✔ 05/07/2026] Variável `years` (linha 2215) calculada e nunca usada — restinho
   do CAGR antigo. Pode remover.
 
 
@@ -242,7 +373,7 @@ Nota: as correções [BUG-*] da análise de 15/06 foram bem aplicadas
 (ordenação de transações, câmbio, posição em 31/12, dedup...). Os pontos
 abaixo são novos ou remanescentes.
 
-[5.1] [ALTO] "DY" DO ATIVO NÃO É DY — É UMA MÉTRICA HÍBRIDA
+[5.1] [CORRIGIDO ✔ 05/07/2026] "DY" DO ATIVO NÃO É DY — É UMA MÉTRICA HÍBRIDA
 Onde: common.js, calcAtivos(): dy = proventos_desde_a_compra / valor_de_mercado_atual
 Problema: mistura proventos de TODO o histórico com o preço de HOJE. Não é
   DY (proventos 12m / preço atual) nem yield-on-cost (proventos 12m / custo).
@@ -253,7 +384,7 @@ Sugestão: coluna "DY 12m" = proventos dos últimos 12m / preço atual, e
   opcionalmente "YoC 12m" = proventos 12m / preço médio. Você já tem tudo em
   DIVIDENDOS_CACHE.
 
-[5.2] [ALTO] RENDA FIXA CORRIGIDA PELA TAXA DE HOJE, NÃO PELA HISTÓRICA
+[5.2] [CORRIGIDO ✔ 05/07/2026] RENDA FIXA CORRIGIDA PELA TAXA DE HOJE, NÃO PELA HISTÓRICA
 Onde: common.js, fatorRF()
 Problema: um CDB comprado em 2021 é corrigido aplicando o CDI/Selic/IPCA
   ATUAIS a TODOS os dias úteis desde a compra. Com a Selic saindo de 2% para
@@ -262,7 +393,7 @@ Sugestão: baixar a série histórica diária do CDI (API SGS do BCB, série 12)
   uma vez por dia para data/bcb_historico.json e acumular dia a dia. O mesmo
   vale para IPCA (série 433) em títulos IPCA+.
 
-[5.3] [ALTO] IMPORT B3 IGNORA DESDOBRAMENTO/GRUPAMENTO/BONIFICAÇÃO
+[5.3] [CORRIGIDO ✔ 05/07/2026 — desdobro/bonificação aplicados; grupamento gera aviso] IMPORT B3 IGNORAVA DESDOBRAMENTO/GRUPAMENTO/BONIFICAÇÃO
 Onde: common.js, processB3Rows() — só aceita movimentos com "liquid",
   "compra" ou "venda".
 Problema: se um ativo desdobrou (ex.: 1→10), o extrato B3 traz o evento
@@ -272,7 +403,7 @@ Sugestão: tratar eventos "Desdobro"/"Grupamento"/"Bonificação" ajustando
   qtd (e PM proporcional) na data do evento — ou ao menos AVISAR o usuário
   quando esses movimentos forem encontrados e pulados.
 
-[5.4] [MÉDIO] DOIS NÚMEROS DE IMPOSTO DIFERENTES NA MESMA PÁGINA DE IRPF
+[5.4] [CORRIGIDO ✔ 05/07/2026] DOIS NÚMEROS DE IMPOSTO DIFERENTES NA MESMA PÁGINA DE IRPF
 Onde: getGanhosRealizados() (common.js) vs calcImpostoEstimado() (irpf.html)
 Problema: o card "Ganho de Capital Realizado" soma ganhos SEM a isenção de
   R$ 20k/mês de ações (só aplica a de cripto), enquanto o painel "imposto
@@ -281,13 +412,13 @@ Problema: o card "Ganho de Capital Realizado" soma ganhos SEM a isenção de
 Sugestão: unificar — usar calcImpostoEstimado como fonte única e mostrar
   "ganho bruto" vs "ganho tributável" com rótulos claros.
 
-[5.5] [MÉDIO] IMPOSTO ESTIMADO NÃO COMPENSA PREJUÍZOS
+[5.5] [CORRIGIDO ✔ 05/07/2026] IMPOSTO ESTIMADO NÃO COMPENSA PREJUÍZOS
   A regra da Receita permite abater prejuízos de meses anteriores (mesma
   modalidade). Hoje meses com lucro pagam 15%/20% cheios e meses com prejuízo
   são ignorados — o imposto estimado tende a ficar MAIOR que o devido.
   Sugestão: carry-forward de prejuízo por classe (ações/FII/cripto).
 
-[5.6] [MÉDIO] COMPARAÇÃO COM IBOV/CDI ("ALFA") ENVIESADA QUANDO HÁ VENDAS
+[5.6] [CORRIGIDO ✔ 05/07/2026] COMPARAÇÃO COM IBOV/CDI ("ALFA") ENVIESADA QUANDO HÁ VENDAS
 Onde: rentabilidade.html, renderAlfa()/sim()
 Problema: o benchmark simulado só COMPRA (ap = max(0, ΔCusto)); quando você
   vende/saca, sua carteira devolve dinheiro mas o benchmark continua com tudo
@@ -297,21 +428,21 @@ Problema: o benchmark simulado só COMPRA (ap = max(0, ΔCusto)); quando você
 Sugestão: incluir os resgates no benchmark (vender unidades proporcionais)
   — ou trocar por comparação de TWR (retorno ponderado pelo tempo).
 
-[5.7] [BAIXO] Volatilidade por ativo usa variância populacional (÷n).
+[5.7] [CORRIGIDO ✔ 05/07/2026] Volatilidade por ativo usa variância populacional (÷n).
 Onde: rentabilidade.html, volAtivo(). Padrão amostral é ÷(n-1). Diferença
   pequena, mas o backtest usa (n-1) — vale alinhar.
 
-[5.8] [BAIXO] Proventos creditados pela posição na DATA DO PAGAMENTO
+[5.8] [CORRIGIDO ✔ 05/07/2026] Proventos creditados pela posição na DATA DO PAGAMENTO
   Sem data-com nos JSONs, quem vendeu entre a data-com e o pagamento não
   recebe o provento no site (na vida real recebe), e vice-versa.
   Sugestão: incluir data-com no fetch de dividendos (o simulador já tem
   infraestrutura _divComCache esperando isso).
 
-[5.9] [BAIXO] Evolução patrimonial usa cotação ATUAL para meses sem histórico
+[5.9] [CORRIGIDO ✔ 05/07/2026] Evolução patrimonial usa cotação ATUAL para meses sem histórico
   (documentado no código). Para ativos sem data/historico/, a curva passada
   fica "reta". Sugestão: sinalizar no gráfico quais meses usaram fallback.
 
-[5.10] [BAIXO] Projeção de metas usa só o DY como retorno (sem valorização)
+[5.10] [CORRIGIDO ✔ 05/07/2026] Projeção de metas usa só o DY como retorno (sem valorização)
 Onde: metas.html, objConclusao(). Conservador — ok, mas vale dizer isso no
   texto do card (hoje só diz "com proventos reinvestidos").
 
@@ -320,32 +451,32 @@ Onde: metas.html, objConclusao(). Conservador — ok, mas vale dizer isso no
 SEÇÃO 6 — CÓDIGO / INFRA / SEGURANÇA
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[6.1] [MÉDIO] Duplicações que convidam a erro:
+[6.1] [PARCIAL — files/ apagada ✔; resta analise.js ≈ api/analise.js] Duplicações que convidam a erro:
   - files/  ≈ calculadora/ (cópia velha — ver 2.8)
   - analise.js (raiz) ≈ api/analise.js
   Sugestão: manter uma fonte única de cada coisa.
 
-[6.2] [MÉDIO] Token do GitHub no Apps Script com escopo "repo" completo e
+[6.2] [PENDENTE — ação do Diego] Token do GitHub no Apps Script com escopo "repo" completo e
   sem expiração (INSTRUCOES.md). Se vazar, dá acesso total aos seus repos.
   Sugestão: fine-grained token restrito a ESTE repositório, só permissão
   Contents:write, com expiração e renovação anual.
 
-[6.3] [MÉDIO] Zero testes automatizados nos motores de cálculo.
+[6.3] [CORRIGIDO ✔ 05/07/2026] Zero testes automatizados nos motores de cálculo.
   Os bugs 2.1/2.2/3.1 teriam sido pegos por meia dúzia de asserts.
   Sugestão: extrair as funções puras (pipeline, runBacktest, calcPosicoes,
   fatorRF) para módulos testáveis e rodar um teste Node no GitHub Actions a
   cada push (ex.: "PMT do modo reverso aplicado no pipeline atinge a meta
   com erro < 0,1%").
 
-[6.4] [BAIXO] Todos os fetch usam ?t=Date.now() — mata qualquer cache HTTP e
+[6.4] [CORRIGIDO ✔ 05/07/2026] Todos os fetch usam ?t=Date.now() — mata qualquer cache HTTP e
   aumenta banda/latência. Sugestão: confiar no cache-control do GitHub Pages
   (max-age=600) ou versionar por updated_at.
 
-[6.5] [BAIXO] simulador.html tem 4.788 linhas (HTML+CSS+JS juntos);
+[6.5] [PENDENTE — sessão dedicada] simulador.html tem 4.788 linhas (HTML+CSS+JS juntos);
   calculadora/main.js tem 5.109. Funciona, mas dificulta manutenção.
   Sugestão: separar motor de cálculo / UI / estilos em arquivos próprios.
 
-[6.6] [BAIXO] console.log de produção em data.js e outros (a própria diretriz
+[6.6] [CORRIGIDO ✔ 05/07/2026] console.log de produção em data.js e outros (a própria diretriz
   do projeto pede para não ter).
 
 

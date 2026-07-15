@@ -3,7 +3,7 @@
    com fallback para cache quando estiver offline.
    Chamadas externas (Firebase, Google, fontes) passam direto, sem cache. */
 
-const CACHE = 'mv-pwa-v1';
+const CACHE = 'mv-pwa-v2';
 const SHELL = [
   '/index.html',
   '/style.css',
@@ -13,7 +13,22 @@ const SHELL = [
   '/favicon.png',
   '/manifest.json',
   '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  '/icons/icon-512.png',
+  // [S8] Carteira offline: pré-cacheia as páginas do consolidador. Os DADOS da
+  // carteira ficam offline via persistência do Firestore (IndexedDB) — juntos,
+  // shell + dados permitem abrir a carteira sem internet com o último estado.
+  '/carteira/resumo.html',
+  '/carteira/lancamentos.html',
+  '/carteira/rentabilidade.html',
+  '/carteira/patrimonio.html',
+  '/carteira/proventos.html',
+  '/carteira/aporte.html',
+  '/carteira/metas.html',
+  '/carteira/irpf.html',
+  '/carteira/analise.html',
+  '/carteira/common.js',
+  '/carteira/firebase.js',
+  '/carteira/common.css'
 ];
 
 self.addEventListener('install', (event) => {

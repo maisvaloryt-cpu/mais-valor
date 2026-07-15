@@ -124,7 +124,7 @@ let REITS = [...REITS_FALLBACK];
 
 async function loadData() {
   try {
-    const r = await fetch('data/stocks_us.json?t=' + Date.now());
+    const r = await fetch('data/stocks_us.json');
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
     // Filtra apenas REITs com preço disponível
@@ -134,7 +134,6 @@ async function loadData() {
       REITS = lista.map(s => ({...s, pvp: s.pvp ?? null, v12: s.v12 ?? 0}));
       const ts = document.getElementById('data-timestamp');
       if (ts) ts.textContent = '· Atualizado em ' + data.updated_at + ' (' + lista.length + ' REITs)';
-      console.log('stocks_us.json: ' + lista.length + ' REITs carregados');
     } else {
       throw new Error('Sem REITs válidos no JSON');
     }

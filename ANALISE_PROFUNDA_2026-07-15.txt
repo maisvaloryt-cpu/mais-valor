@@ -1,0 +1,379 @@
+================================================================================
+  ANÁLISE PROFUNDA — SITE MAIS VALOR (2ª análise geral)
+  Data: 15/07/2026
+  Arquivos analisados: calculadora/main.js, simulador.html, carteira/common.js,
+  carteira/rentabilidade.html, ferramentas.html, nav.js, data.js, sw.js,
+  carteira/firebase.js, index.html, ativo.html, tests/test_motores.js
+================================================================================
+
+  CONTEXTO: a análise de 04/07/2026 foi quase toda implementada (conferi no
+  código — as correções estão lá) e os 21 testes automáticos dos motores
+  PASSARAM hoje (rodei "node tests/test_motores.js": 21/21 ✓).
+  Este arquivo traz APENAS coisas NOVAS que encontrei agora, mais a lista de
+  melhorias de produto, visual e motion que você pediu.
+
+  IMPORTANTE: eu NÃO mudei nada no código. Tudo aqui é diagnóstico e sugestão.
+  Você decide o que quer que eu corrija.
+
+  LEGENDA DE GRAVIDADE:
+  [ALTO]   resultado financeiro errado em cenário comum
+  [MÉDIO]  errado em cenário específico, ou comparação enviesada
+  [BAIXO]  detalhe, aproximação aceitável ou risco futuro
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SEÇÃO 1 — CALCULADORA (calculadora/main.js)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[1.1] [MÉDIO] COMPARAÇÃO COM POUPANÇA USA APORTE FIXO (comparação injusta)
+Onde: main.js linha ~1338 (calcularDadosPoupanca) e linha ~992 (card corrente)
+O problema: quando "IPCA no aporte", "aporte inteligente" ou "retirada" estão
+ativos, a SUA carteira usa o cronograma real de aportes (que muda a cada ano),
+mas a linha da Poupança e da Conta Corrente continuam usando o aporte base
+fixo. Resultado: a comparação fica desigual — cada linha aporta um dinheiro
+diferente.
+Detalhe: o Monte Carlo e o Custo do Atraso JÁ foram corrigidos para usar
+baseDadosCalculados.aportesMensais (correção [2.6] da análise anterior).
+A poupança ficou de fora.
+Como corrigir: passar o mesmo cronograma (aportesMensais) para
+calcularDadosPoupanca e para o card da conta corrente.
+
+[1.2] [MÉDIO] RETIRADA PONTUAL: CAMPO DIZ "ANO" MAS NO PERÍODO MENSAL É "MÊS"
+Onde: main.js linhas ~620-623 (pipeline) e ~2727 (renderizarRetiradaUnica)
+O problema: o campo da retirada pontual tem o rótulo fixo "Ano". Só que, no
+período MENSAL, o código compara o valor digitado com o número do MÊS
+(r.ano === m). Ou seja: o usuário digita "5" achando que é ano 5, e a retirada
+acontece no mês 5.
+Como corrigir: trocar o rótulo do campo conforme o período (Ano/Mês), igual já
+é feito no labelTemporalSufixo — ou converter ano→mês no pipeline.
+
+[1.3] [BAIXO] MODO REVERSO SOME COM TAXA 0%
+Onde: main.js linha ~3213
+O problema: se a taxa for 0%, o resultado é escondido. Mas com taxa zero a
+conta existe e é simples: aporte = (meta − inicial) / (n−1 aportes).
+É um caso raro, mas o usuário não recebe nenhuma explicação do porquê sumiu.
+
+[1.4] [BAIXO] LINK COMPARTILHADO NÃO LEVA OS PARÂMETROS AVANÇADOS
+Onde: main.js ~2577 (compartilharSimulacao)
+O problema: o link só carrega inicial, mensal, taxa, período e modo. Se a
+simulação usava IPCA no aporte, retiradas, metas ou aporte inteligente, quem
+abrir o link vê um resultado DIFERENTE do que foi compartilhado.
+Como melhorar: incluir esses parâmetros na URL (ou avisar no botão que o link
+leva só o básico).
+
+[1.5] [BAIXO] APORTE INTELIGENTE "DESLIGA" O IPCA — confirmar se é intencional
+Onde: main.js linhas ~564-582
+O comportamento hoje: depois que o aporte inteligente começa, o novo aporte
+fica CONGELADO (o IPCA para de corrigir). Pode ser essa mesmo a intenção
+("novo aporte fixo"), mas nada na interface avisa isso. Se for intencional,
+sugiro um texto pequeno tipo "o novo aporte não é corrigido pelo IPCA".
+
+[1.6] [BAIXO] EXPORTAR PDF PODE FALHAR EM SILÊNCIO COM BLOQUEADOR DE POP-UP
+Onde: main.js ~2571 (window.open)
+O problema: se o navegador bloquear o pop-up, window.open devolve null e nada
+acontece — sem mensagem nenhuma. Basta checar o retorno e mostrar um toast
+("desbloqueie pop-ups para exportar").
+
+[1.7] [OBSERVAÇÃO] "Renda Anual" no Excel do período mensal = renda×12 (linear,
+sem juros compostos entre os meses). É aproximação aceitável, mas se quiser
+rigor, seria total × taxa anual equivalente. Só rotular já resolve.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SEÇÃO 2 — CONSOLIDADOR DE CARTEIRA (carteira/)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[2.1] [ALTO] RENDA FIXA COM VÁRIAS COMPRAS: CORREÇÃO USA A DATA DA 1ª COMPRA
+Onde: common.js calcAtivos linha ~986: a.pm * fatorRF(a.rf, a.data, ate)
+O problema: se você compra o MESMO título duas vezes (ex.: CDB em 2023 e um
+reforço em 2025), o preço médio junta os dois valores, mas a correção
+(CDI/IPCA/Selic) é aplicada sobre o total DESDE A PRIMEIRA DATA. O segundo
+aporte "rende" desde 2023 sem ter existido — o valor do título fica
+superestimado.
+Como corrigir: calcular a correção LOTE A LOTE (cada compra corrigida desde a
+sua própria data) e somar. A estrutura de lançamentos já tem a data de cada
+compra, então dá para fazer sem mudar dados.
+Impacto: qualquer carteira que reforça posição em RF/Tesouro ao longo do tempo.
+
+[2.2] [MÉDIO] "DY MÉDIO" DA CARTEIRA CONTA PROVENTOS DE ATIVOS JÁ VENDIDOS
+Onde: common.js getTotals (~1025): provAno = calcProventosUltimos12m()
+O problema: a soma dos proventos dos últimos 12 meses inclui tickers que você
+JÁ vendeu (a função percorre todos os tickers do histórico). Aí divide pelo
+patrimônio ATUAL. Se você vendeu um bom pagador de dividendos há 3 meses, o
+"DY médio" fica inflado por meses.
+Como corrigir: somar só os proventos 12m dos tickers com posição aberta hoje
+(ou rotular o card como "renda recebida 12m / patrimônio", que é outra métrica).
+
+[2.3] [MÉDIO] TWR: DOIS AJUSTES QUE DEIXARIAM A MÉTRICA BEM MAIS PRECISA
+Onde: rentabilidade.html calcTWR (~151)
+O TWR aproxima o fluxo do mês pela variação do CUSTO. Isso gera dois desvios:
+  a) Venda com lucro: sai da carteira o VALOR DE MERCADO, mas o custo cai só
+     pelo custo de aquisição → o mês da venda registra retorno distorcido.
+  b) Dividendo reinvestido: aparece como aumento de custo = "dinheiro novo",
+     então o TWR DESCONTA o dividendo do retorno. Quem reinveste proventos tem
+     o TWR subestimado — sendo que dividendo é justamente parte do retorno.
+Como corrigir (b) sem esforço: o site JÁ separa aporte próprio de dividendo
+reinvestido (calcSplitAporteDividendo). Basta usar split.proprio como fluxo
+externo em vez do custo total.
+
+[2.4] [MÉDIO — VERIFICAR] EVOLUÇÃO PATRIMONIAL USA CÂMBIO DE HOJE PARA MESES
+ANTIGOS
+Onde: common.js calcEvolucaoPatrimonio (~226): rate = getRate(a.moeda) (atual)
+O problema (se os históricos de stocks/REITs estiverem em USD): o preço
+histórico de cada mês é multiplicado pelo câmbio DE HOJE, não pelo câmbio
+daquele mês. A curva de evolução de ativos em dólar fica distorcida (dólar
+subiu → passado parece mais valioso do que era).
+Como corrigir: usar a série USDBRL histórica (o simulador já baixa isso) para
+converter mês a mês. Precisa confirmar antes em que moeda os JSONs de
+histórico dos ativos US estão salvos.
+
+[2.5] [BAIXO] ISENÇÃO DE CRIPTO NO LIMITE EXATO DE R$ 35.000
+Onde: common.js calcImpostoGanhos linha ~510: d.vendas < 35000
+O problema: ações usam <= 20000 (inclusivo, correto: "até R$ 20 mil") e cripto
+usa < 35000 (exclusivo). Vendas de exatamente R$ 35.000,00 no mês deveriam ser
+isentas. É literalmente 1 caractere (trocar < por <=).
+
+[2.6] [BAIXO] GRUPO DE IMPOSTO USA A CLASSE ATUAL DO TICKER
+Onde: common.js calcImpostoGanhos (~483)
+Se um ativo foi reclassificado depois (ex.: era "Ações", virou "FII" numa
+edição), as vendas antigas mudam de grupo de tributação junto. Caso raro, mas
+vale saber que existe.
+
+[2.7] [BAIXO] DATAS EM UTC PODEM "PULAR" 1 DIA À NOITE
+Onde: common.js (cutoffs com toISOString) — ex.: calcProventos12mTicker
+No Brasil (UTC-3), depois das 21h o toISOString() já devolve o dia seguinte.
+Efeito máximo: um provento entra/sai da janela de 12 meses com 1 dia de
+diferença. Cosmético, mas fácil de padronizar com uma função "hojeLocal()".
+
+[2.8] [BAIXO] PERFORMANCE: getQtdTickerAtDate É CHAMADA PARA CADA PROVENTO
+Onde: common.js (~293)
+Cada provento refaz a varredura de todos os lançamentos do ticker (O(n²)).
+Com anos de proventos + muitos lançamentos, as abas Proventos/Resumo podem
+ficar lentas. Sugestão: montar uma "linha do tempo de quantidade" por ticker
+uma vez e consultar por busca binária.
+
+[2.9] [BAIXO] FIRESTORE: CONFIRMAR AS REGRAS DE SEGURANÇA
+A apiKey no código é normal (é pública mesmo). O que protege os dados são as
+RULES do Firestore. Vale conferir no console do Firebase que está algo como:
+  match /carteiras/{uid} { allow read, write: if request.auth.uid == uid; }
+Sem isso, qualquer pessoa logada poderia ler carteira de outra.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SEÇÃO 3 — SIMULADOR / BACKTEST (simulador.html)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+O motor está bem sólido (a maioria dos problemas da 1ª análise foi corrigida e
+os invariantes passam nos testes). O que sobrou:
+
+[3.1] [MÉDIO] BURACO DE COTAÇÃO NO MEIO DA SÉRIE DERRUBA O PATRIMÔNIO
+Onde: simulador.html portValue (~1882)
+O problema: se um ativo fica UM mês sem preço no JSON (suspensão de negociação,
+falha de coleta), o portValue simplesmente ignora o ativo naquele mês. O
+patrimônio "despenca" (ex.: −40% falso) e "volta" no mês seguinte. Isso
+contamina retorno mensal, volatilidade, Sharpe e drawdown.
+Obs.: o retornoMensal dos índices já tem guarda contra gaps; a valorização das
+posições de ações/FIIs não tem.
+Como corrigir: carry-forward — usar o último preço conhecido do ativo quando o
+mês não tiver dado (e marcar no availability log).
+
+[3.2] [BAIXO] IR DA RESERVA-CDI: 15% TODO MÊS vs REGRA REAL
+Na vida real o IR de renda fixa é cobrado só no resgate, com tabela regressiva
+(22,5% → 15%). Cobrar 15% mês a mês é uma aproximação razoável e já está
+descrita como estimativa — só sugiro citar a tabela regressiva no tooltip.
+
+[3.3] [OBSERVAÇÃO] MÊS CORRENTE: só entra quando o mês fecha no último dia do
+CALENDÁRIO (histToMap). Mês que termina no fim de semana só aparece quando o
+mês vira. Conservador e correto — registrado aqui só para constar.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SEÇÃO 4 — FERRAMENTAS (ferramentas.html)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[4.1] [BAIXO] APOSENTADORIA USA CONVENÇÃO DIFERENTE DA CALCULADORA
+Onde: calcAp (~516)
+A calculadora de Juros Compostos segue a convenção do site ("mês 1 sem
+aporte"), mas a de Aposentadoria usa a fórmula clássica com n aportes cheios.
+Mesmos números dão resultados levemente diferentes nas duas páginas. Vale
+alinhar (era o mesmo problema do item 3.1 da análise anterior, que foi
+corrigido só na de juros).
+
+[4.2] [BAIXO] DARF NÃO TEM OPÇÃO "CRIPTO"
+Onde: calcDARF (~775)
+Hoje tem ações swing (15%, isenção 20k), day-trade (20%) e "outros" (20%).
+Cripto é 15% com isenção de R$ 35 mil/mês — cai errado nas opções atuais.
+O consolidador já trata cripto certo; é só espelhar aqui.
+
+[4.3] [BAIXO] BAZIN PEDE "DIVIDENDO MENSAL"
+Para ações que pagam irregular (2-4x por ano), multiplicar um "mensal" por 12
+induz erro. Sugestão: campo "proventos dos últimos 12 meses" direto (o site
+até já tem o div12m.json para preencher sozinho, se quiser integrar).
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SEÇÃO 5 — INFRA, SEO E PERFORMANCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[5.1] [MÉDIO] SEO QUASE ZERADO NAS PÁGINAS PÚBLICAS
+O index.html (e as demais páginas) não tem: meta description, Open Graph
+(og:title/og:image — o que aparece quando alguém cola o link no WhatsApp),
+Twitter card, canonical, robots.txt nem sitemap.xml. Para um site público com
+AdSense, isso é tráfego deixado na mesa. É trabalho braçal simples e rende:
+  - description única por página;
+  - og:image com a logo/print bonito;
+  - sitemap.xml gerado no workflow do GitHub Actions;
+  - dados estruturados (schema.org) nas páginas de ativo.
+
+[5.2] [MÉDIO] FAVICON.PNG COM 319 KB
+O favicon é maior que muitos JSONs de dados (319 KB!). Todo visitante baixa
+isso. Reduzir para 32x32/64x64 (< 10 KB) é ganho imediato.
+
+[5.3] [BAIXO] SERVICE WORKER: CACHE CRESCE SEM LIMITE
+sw.js guarda TODO GET do próprio site no cache (incluindo centenas de JSONs de
+histórico). Com o tempo o cache incha. Sugestões: não cachear data/historico/*
+(ou limitar), e no fallback offline devolver index.html só para navegações
+(request.mode === 'navigate'), não para CSS/JS quebrado.
+
+[5.4] [BAIXO] ARQUIVOS GIGANTES (pendência antiga, continua valendo)
+simulador.html (~5.000 linhas), calculadora/main.js (~5.200), nav.js 57 KB
+injetado em toda página. Modularizar não muda nada pro usuário, mas cada
+sessão de manutenção fica mais segura. Os testes de guarda já existem.
+
+[5.5] [BAIXO] DUPLICATA analise.js vs api/analise.js (pendência antiga)
+Continua a decisão pendente de qual é a fonte e apagar a outra.
+
+[5.6] [BAIXO] PEQUENOS DETALHES DE ROBUSTEZ
+  - navSearchGo: monta URL sem encodeURIComponent (busca com "&" quebra).
+  - Nome da empresa (d.n) entra no HTML da busca sem escape — o dado vem dos
+    seus próprios JSONs, então o risco é baixo, mas escapar custa nada.
+  - Imagens de listas sem loading="lazy".
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SEÇÃO 6 — MELHORIAS DE PRODUTO (sugestões, você escolhe)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CALCULADORA / SIMULADOR:
+  6.1  Poupança com o cronograma real de aportes (conserta o item 1.1 e ainda
+       vira feature: "comparação justa").
+  6.2  Opção "resultado líquido de IR" na calculadora (tabela regressiva ou
+       15% simples) — hoje tudo é bruto.
+  6.3  Presets de perfil: Conservador (CDI), Moderado, Agressivo — 1 clique
+       preenche taxa/volatilidade coerentes.
+  6.4  Salvar simulações nomeadas na calculadora (o backtest já salva; a
+       calculadora só tem o link).
+  6.5  Comparar 2 simulações lado a lado no mesmo gráfico (A vs B, com a
+       diferença em R$ no final).
+  6.6  Backtest: carry-forward de preços (item 3.1) + destacar no gráfico os
+       meses em que algum ativo ficou sem dado (faixinha cinza).
+  6.7  Backtest: benchmark customizado (ex.: 50% IBOV + 50% CDI) além dos
+       botões IBOV/CDI.
+  6.8  Projeção (bootstrap): além do leque P10/P50/P90, um mini-histograma da
+       distribuição final — ajuda a entender o risco.
+
+CONSOLIDADOR:
+  6.9  RF lote a lote (item 2.1) — é a correção financeira mais importante.
+  6.10 TWR com o split aporte próprio × dividendo reinvestido (item 2.3) —
+       o dado já existe no código.
+  6.11 Calendário de proventos FUTUROS estimado: com base no histórico de
+       data-com de cada ativo, mostrar "previsão de renda do mês que vem".
+  6.12 Metas: projeção que considere também a valorização média histórica da
+       carteira (hoje o texto já avisa que só considera aportes — dar a opção).
+  6.13 Grupamento automático no import B3 (hoje só avisa) — com confirmação do
+       usuário antes de aplicar.
+  6.14 Export Excel completo da carteira (posições + proventos + IR + metas em
+       abas separadas, igual já existe no backtest).
+  6.15 Snapshot mensal automático do patrimônio (guardar o valor no dia 1º) —
+       elimina de vez a aproximação "cotação de hoje para mês antigo" na
+       evolução.
+
+SITE (COTAÇÕES):
+  6.16 Alertas de preço na watchlist (notificação do PWA: "PETR4 bateu R$ X").
+  6.17 Página do ativo: gráfico de dividendos por ANO + payout + YoC se o
+       usuário tiver o ativo na carteira (cruzar com o consolidador).
+  6.18 Busca global com atalho de teclado "/" e agrupamento por tipo.
+  6.19 Comparador: normalizar em base 100 com dividendos reinvestidos
+       (total return) — hoje a comparação é só preço.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SEÇÃO 7 — MELHORIAS VISUAIS E DE MOTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+VISUAL:
+  7.1  UNIFICAR OS DOIS AMARELOS: o site usa dourado #F5A623 (--gold) e a
+       calculadora usa #FFCC00. São duas identidades. Sugiro escolher um e
+       criar tokens CSS únicos (variáveis compartilhadas em um único arquivo)
+       para cor, raio de borda e sombra — hoje style.css, calculadora/style.css
+       e carteira/common.css repetem valores parecidos-mas-diferentes.
+  7.2  CINZAS MUITO ESCUROS: vários textos secundários usam #5E5C58/#6b7280
+       sobre fundo #0f0f12 — contraste baixo (reprova WCAG AA). Clarear esses
+       cinzas um ou dois tons (SEM ir para branco — manter a hierarquia),
+       inclusive os ticks dos gráficos (#5E5C58) e os "subs" dos cards.
+  7.3  SKELETON LOADING: nas tabelas de cotações e cards da carteira, trocar
+       "Carregando..." por blocos cinza pulsando (shimmer). Percepção de
+       velocidade muda muito.
+  7.4  EMPTY STATES: carteira vazia, sem proventos, sem simulações — hoje é
+       texto seco. Um iconezinho + frase + botão de ação ("Adicionar primeiro
+       lançamento") deixa o produto mais acolhedor.
+  7.5  CONSISTÊNCIA DE ÍCONES: a carteira usa Tabler Icons; o nav usa emoji
+       (☰/✕/🚩). Padronizar tudo em Tabler dá acabamento profissional.
+  7.6  MOBILE: bottom-nav fixa nas abas da carteira (Resumo · Lançamentos ·
+       Proventos · Mais) — hoje as tabs rolam horizontalmente; alvos de toque
+       de pelo menos 44px.
+  7.7  TABELAS LONGAS: cabeçalho sticky + zebra sutil + coluna do ticker
+       congelada no scroll horizontal do mobile.
+
+MOTION (animações):
+  7.8  RESPEITAR prefers-reduced-motion: hoje NENHUM dos CSS tem essa media
+       query (chequei: 32 @keyframes no total, zero guardas). Quem configura o
+       sistema para reduzir movimento deve receber o site sem animações. É um
+       bloco de ~5 linhas de CSS que desliga tudo de uma vez.
+  7.9  NÚMEROS QUE CONTAM: a calculadora já tem animarKPI (contagem animada).
+       Levar o mesmo efeito para os cards do Resumo da carteira e do backtest
+       — dá vida na primeira carga.
+  7.10 GRÁFICO "DESENHANDO": Chart.js tem animação progressiva de linha
+       (animation: x/y com delay por ponto). Ativar SÓ na primeira renderização
+       (não nos updates, senão cansa) na calculadora e no backtest.
+  7.11 TRANSIÇÃO ENTRE ABAS DA CARTEIRA: o SPA da carteira troca de aba seco.
+       Um fade+slide de 150-200ms (ou View Transitions API, que já funciona no
+       Chrome/Edge) suaviza sem atrapalhar.
+  7.12 MICRO-INTERAÇÕES: hover dos cards com elevação sutil (transform:
+       translateY(-2px) + sombra), accordions com transição de altura,
+       toasts entrando com slide+fade padronizado (hoje cada página tem um
+       toast ligeiramente diferente).
+  7.13 LED/BADGES: o LED de status da calculadora poderia pulsar suavemente
+       quando há funções ativas (1 keyframe), reforçando "tem coisa ligada".
+  7.14 REGRA DE OURO: animação de entrada uma vez só, curta (150-300ms),
+       easing suave (ease-out), e nada de animação em loop infinito perto de
+       números que a pessoa precisa ler.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SEÇÃO 8 — RESUMO EXECUTIVO (o que eu atacaria primeiro)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Financeiro (correção):
+   1º  [2.1] RF lote a lote — único [ALTO]; afeta valor exibido da carteira.
+   2º  [3.1] Carry-forward de preço no backtest — protege vol/Sharpe/drawdown.
+   3º  [1.1] Poupança com cronograma real + [1.2] rótulo Ano/Mês da retirada.
+   4º  [2.2] DY médio sem ativos vendidos + [2.5] isenção 35k (1 caractere).
+
+  Produto/alcance:
+   5º  [5.1] SEO básico (description/OG/sitemap) + [5.2] favicon 319KB.
+
+  Visual/motion (rápidos e visíveis):
+   6º  [7.8] prefers-reduced-motion + [7.2] clarear cinzas escuros.
+   7º  [7.3] skeleton loading + [7.9] contagem animada na carteira.
+
+  Pendências antigas que continuam: token fine-grained do GitHub (ação sua),
+  modularização dos arquivos gigantes, duplicata analise.js.
+
+  Nada foi alterado no código. Me diga quais itens você quer que eu corrija
+  (pode citar pelos números, ex.: "2.1, 1.2 e 7.8") que eu faço um por um,
+  com teste antes e depois.
+
+================================================================================
+FIM — 15/07/2026
+================================================================================

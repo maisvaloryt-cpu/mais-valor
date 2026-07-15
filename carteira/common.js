@@ -124,11 +124,11 @@ async function atualizarCotacoes(){
   try{
     const base='../data/';
     const reqs=await Promise.allSettled([
-      fetch(base+'cotacoes.json?t='+Date.now()).then(r=>r.ok?r.json():{}),
-      fetch(base+'intraday/acoes-br.json?t='+Date.now()).then(r=>r.ok?r.json():{}),
-      fetch(base+'intraday/fiis.json?t='+Date.now()).then(r=>r.ok?r.json():{}),
-      fetch(base+'intraday/internacional.json?t='+Date.now()).then(r=>r.ok?r.json():{}),
-      fetch(base+'intraday/cripto-macro.json?t='+Date.now()).then(r=>r.ok?r.json():{}),
+      fetch(base+'cotacoes.json').then(r=>r.ok?r.json():{}),
+      fetch(base+'intraday/acoes-br.json').then(r=>r.ok?r.json():{}),
+      fetch(base+'intraday/fiis.json').then(r=>r.ok?r.json():{}),
+      fetch(base+'intraday/internacional.json').then(r=>r.ok?r.json():{}),
+      fetch(base+'intraday/cripto-macro.json').then(r=>r.ok?r.json():{}),
     ]);
     const [cotJson,iaJson,ifJson,iiJson,icJson]=reqs.map(r=>r.status==='fulfilled'?r.value:{});
     const add=(arr=[])=>arr.forEach(it=>{if(it&&it.ticker&&it.price>0)COTACOES[it.ticker]=it.price;});
@@ -139,7 +139,7 @@ async function atualizarCotacoes(){
     add(icJson.macro);
     // [BUG-D1 FIX] Tenta carregar taxa USD/BRL dos índices do site
     try{
-      const rIdx=await fetch(base+'indices.json?t='+Date.now());
+      const rIdx=await fetch(base+'indices.json');
       if(rIdx.ok){
         const jIdx=await rIdx.json();
         const usdbrl=jIdx?.USDBRL||jIdx?.['USD/BRL']||jIdx?.dolar||
@@ -150,13 +150,13 @@ async function atualizarCotacoes(){
     if(!TAXAS_CAMBIO['USD']&&COTACOES['USDBRL'])TAXAS_CAMBIO['USD']=COTACOES['USDBRL'];
     // Taxas do Banco Central (CDI diário) para corrigir a Renda Fixa
     try{
-      const rBcb=await fetch(base+'bcb.json?t='+Date.now());
+      const rBcb=await fetch(base+'bcb.json');
       if(rBcb.ok)BCB=await rBcb.json();
     }catch(e){}
     // Séries históricas do BCB (correção fiel da RF). Se o arquivo ainda não
     // existir (workflow não rodou), fatorRF usa o fallback com a taxa atual.
     try{
-      const rH=await fetch(base+'bcb_historico.json?t='+Date.now());
+      const rH=await fetch(base+'bcb_historico.json');
       if(rH.ok){
         const jH=await rH.json();
         if(jH&&jH.cdi_diario&&Object.keys(jH.cdi_diario).length>0){
@@ -181,7 +181,7 @@ async function fetchHistoricoTicker(ticker){
   const map={};
   try{
     // preços mensais
-    const r=await fetch('../data/historico/'+ticker+'.json?t='+Date.now());
+    const r=await fetch('../data/historico/'+ticker+'.json');
     if(r.ok){
       const j=await r.json();
       (j.history||[]).forEach(p=>{map[p.date.slice(0,7)]=p.close;});
@@ -189,7 +189,7 @@ async function fetchHistoricoTicker(ticker){
   }catch(e){}
   try{
     // preços diários recentes (sobrescreve o mês se tiver dado mais novo)
-    const r2=await fetch('../data/diario/'+ticker+'.json?t='+Date.now());
+    const r2=await fetch('../data/diario/'+ticker+'.json');
     if(r2.ok){
       const j2=await r2.json();
       (j2.history||[]).forEach(p=>{map[p.date.slice(0,7)]=p.close;});
@@ -221,7 +221,7 @@ function calcEvolucaoPatrimonio(nMeses=24){
     const fimMes=new Date(Date.UTC(yy,mm,0)).toISOString().slice(0,10);
     const hojeStr=new Date().toISOString().slice(0,10);
     const ateData=fimMes>hojeStr?hojeStr:fimMes;
-    let vt=0,custo=0;
+    let vt=0,custo=0,usouFallback=false; // [5.9] marca meses avaliados sem preço histórico
     posicoes.forEach(a=>{
       const rate=getRate(a.moeda);
       custo+=a.qtd*a.pm;
@@ -238,14 +238,14 @@ function calcEvolucaoPatrimonio(nMeses=24){
           if(anterior.length)price=hist[anterior[anterior.length-1]];
         }
         // Sem histórico: usa a cotação atual; se nem essa existir, o preço médio (empate, sem prejuízo falso).
-        if(!price)price=COTACOES[a.ticker]||a.cotacao||a.pm;
+        if(!price){price=COTACOES[a.ticker]||a.cotacao||a.pm;usouFallback=true;} // [5.9]
         valorUnit=price*rate;
       }
       vt+=a.qtd*valorUnit;
     });
     const [y,m]=ym.split('-');
     const nomes=['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    return{ym,label:nomes[parseInt(m)]+'/'+y.slice(2),vt:parseFloat(vt.toFixed(2)),custo:parseFloat(custo.toFixed(2))};
+    return{ym,label:nomes[parseInt(m)]+'/'+y.slice(2),vt:parseFloat(vt.toFixed(2)),custo:parseFloat(custo.toFixed(2)),fallback:usouFallback};
   });
 }
 
@@ -253,8 +253,31 @@ function calcEvolucaoPatrimonio(nMeses=24){
 async function fetchDividendosTicker(ticker){
   if(DIVIDENDOS_CACHE[ticker]!==undefined)return DIVIDENDOS_CACHE[ticker];
   try{
-    const r=await fetch('../data/dividendos/'+ticker+'.json?t='+Date.now());
-    DIVIDENDOS_CACHE[ticker]=r.ok?(await r.json()).dividendos||[]:[];
+    const r=await fetch('../data/dividendos/'+ticker+'.json');
+    const raw=r.ok?(await r.json()).dividendos||[]:[];
+    // Normaliza os DOIS formatos: novo {com,pag,value,tipo} e antigo {date,value}.
+    // Sem isto, os arquivos no formato novo eram ignorados (d.date undefined) e os
+    // proventos da carteira vinham ZERADOS. d.com fica disponível p/ data-com.
+    // Dedup por TOLERÂNCIA: o mesmo pagamento chega de fontes diferentes com
+    // pequenas variações (0.0845 vs 0.084538) — valores no mesmo dia que diferem
+    // menos de 0,5% (ou R$0,001) são o mesmo provento; fica a versão com data-com.
+    const arr=raw.map(d=>({
+      date:d.pag||d.date||d.com||'',
+      com:d.com||d.data_com||'',
+      value:parseFloat(d.value)||0,
+      tipo:d.tipo||''
+    })).filter(d=>d.date&&d.value>0)
+      .sort((a,b)=>a.date===b.date?a.value-b.value:(a.date<b.date?-1:1));
+    const dedup=[];
+    arr.forEach(d=>{
+      const ant=dedup[dedup.length-1];
+      if(ant&&ant.date===d.date&&Math.abs(d.value-ant.value)<=Math.max(0.001,ant.value*0.005)){
+        if(d.com&&!ant.com)dedup[dedup.length-1]=d;
+        return;
+      }
+      dedup.push(d);
+    });
+    DIVIDENDOS_CACHE[ticker]=dedup;
   }catch(e){DIVIDENDOS_CACHE[ticker]=[];}
   return DIVIDENDOS_CACHE[ticker];
 }
@@ -297,7 +320,7 @@ function calcProventosAtivo(ticker,dataCompra,_qtd){
     // [BUG-P1 FIX] Arredondamento intermediário para evitar acúmulo de erro de ponto flutuante
     return cache
       .filter(d=>d.date>=from)
-      .reduce((s,d)=>s+Math.round(d.value*getQtdTickerAtDate(ticker,d.date)*100)/100,0);
+      .reduce((s,d)=>s+Math.round(d.value*getQtdTickerAtDate(ticker,d.com||d.date)*100)/100,0);
   }
   // Fallback: proventos importados via Excel (só usados se site não tiver dados)
   return ativos
@@ -305,23 +328,27 @@ function calcProventosAtivo(ticker,dataCompra,_qtd){
     .reduce((s,a)=>s+Math.round(a.qtd*a.pm*100)/100,0);
 }
 
-function calcProventosUltimos12m(){
+/* [5.1] Proventos dos últimos 12 meses de UM ticker (qtd na data-com quando houver).
+   Base do DY 12m e do Yield on Cost por ativo. */
+function calcProventos12mTicker(ticker){
   const cutoff=new Date();
   cutoff.setFullYear(cutoff.getFullYear()-1);
   const cutoffStr=cutoff.toISOString().slice(0,10);
+  const cache=DIVIDENDOS_CACHE[ticker]||[];
+  if(cache.length>0){
+    return cache
+      .filter(d=>d.date>=cutoffStr)
+      .reduce((s,d)=>s+Math.round(d.value*getQtdTickerAtDate(ticker,d.com||d.date)*100)/100,0);
+  }
+  // Fallback: proventos importados
+  return ativos
+    .filter(a=>a.ticker===ticker&&a.tipo==='Provento'&&a.data&&a.data>=cutoffStr)
+    .reduce((s,a)=>s+Math.round(a.qtd*a.pm*100)/100,0);
+}
+
+function calcProventosUltimos12m(){
   const tickers=[...new Set(ativos.map(a=>a.ticker))];
-  return tickers.reduce((sum,ticker)=>{
-    const cache=DIVIDENDOS_CACHE[ticker]||[];
-    if(cache.length>0){
-      return sum+cache
-        .filter(d=>d.date>=cutoffStr)
-        .reduce((s,d)=>s+Math.round(d.value*getQtdTickerAtDate(ticker,d.date)*100)/100,0);
-    }
-    // Fallback: proventos importados
-    return sum+ativos
-      .filter(a=>a.ticker===ticker&&a.tipo==='Provento'&&a.data&&a.data>=cutoffStr)
-      .reduce((s,a)=>s+Math.round(a.qtd*a.pm*100)/100,0);
-  },0);
+  return tickers.reduce((sum,ticker)=>sum+calcProventos12mTicker(ticker),0);
 }
 
 /* retorna [{ym:'YYYY-MM', total, tickers:{TICKER:valor}}] últimos 13 meses */
@@ -341,7 +368,7 @@ function getDividendosPorMes(){
       cache.forEach(d=>{
         const ym=d.date.slice(0,7);
         if(!map[ym])return;
-        const qtd=getQtdTickerAtDate(ticker,d.date);
+        const qtd=getQtdTickerAtDate(ticker,d.com||d.date);
         if(qtd<=0)return;
         // [BUG-P1 FIX] Arredondamento intermediário
         const val=Math.round(d.value*qtd*100)/100;
@@ -375,7 +402,7 @@ function getDividendosTotalPorMes(){
     if(cache.length>0){
       cache.forEach(d=>{
         const ym=d.date.slice(0,7);
-        const qtd=getQtdTickerAtDate(ticker,d.date);
+        const qtd=getQtdTickerAtDate(ticker,d.com||d.date);
         if(qtd<=0)return;
         const val=Math.round(d.value*qtd*100)/100;
         map[ym]=(map[ym]||0)+val;
@@ -428,19 +455,28 @@ function calcProventosAno(ticker,ano){
   const cache=DIVIDENDOS_CACHE[ticker]||[];
   if(cache.length>0){
     return cache.filter(d=>d.date>=from&&d.date<=to)
-      .reduce((s,d)=>s+Math.round(d.value*getQtdTickerAtDate(ticker,d.date)*100)/100,0);
+      .reduce((s,d)=>s+Math.round(d.value*getQtdTickerAtDate(ticker,d.com||d.date)*100)/100,0);
   }
   return ativos.filter(a=>a.ticker===ticker&&a.tipo==='Provento'&&a.data&&a.data>=from&&a.data<=to)
     .reduce((s,a)=>s+Math.round(a.qtd*a.pm*100)/100,0);
 }
 
-/* [BUG-C5 FIX] Calcula ganhos realizados em ordem cronológica (PM sempre correto a cada venda).
-   [BUG-F3 FIX] Criptos com vendas mensais totais < R$35.000 são isentos de IR. */
-function getGanhosRealizados(ano){
+/* [5.4/5.5] CÁLCULO ÚNICO de ganho de capital + imposto estimado — usado pelo
+   card do IRPF, pelo painel de imposto e pela exportação (antes cada um fazia
+   uma conta diferente e os números se contradiziam na mesma página).
+   Regras aplicadas:
+   - PM em ordem cronológica (correto a cada venda);
+   - Isenção de AÇÕES: vendas até R$ 20 mil no mês;
+   - Isenção de CRIPTO: vendas até R$ 35 mil no mês;
+   - FII: 20% sem isenção; demais classes: 15%;
+   - COMPENSAÇÃO DE PREJUÍZOS: prejuízo acumulado por modalidade (ações, FII,
+     cripto, outros) abate lucros dos meses seguintes, inclusive de anos
+     anteriores, como permite a Receita.
+   Estimativa: não separa day-trade, exterior (Lei 14.754) nem come-cotas. */
+function calcImpostoGanhos(ano){
   const anoStr=String(ano);
   const posMap={};
-  let ganhoTotal=0;
-  const cryptoMes={};
+  const mesData={}; // 'YYYY-MM|grupo' → {ym,grupo,vendas,ganho}
   ativos.filter(a=>a.data).sort((a,b)=>a.data.localeCompare(b.data)).forEach(a=>{
     const t=a.ticker;
     if(!posMap[t])posMap[t]={qtd:0,custo:0,classe:a.classe};
@@ -449,22 +485,49 @@ function getGanhosRealizados(ano){
     if(tipo==='Compra'){posMap[t].qtd+=a.qtd;posMap[t].custo+=a.qtd*a.pm;}
     else if(tipo==='Venda'){
       const pm=posMap[t].qtd>0?posMap[t].custo/posMap[t].qtd:0;
-      const ganho=(a.pm-pm)*a.qtd;
+      const ganho=(a.pm-pm)*a.qtd, valorVenda=a.pm*a.qtd;
       const qtdR=Math.max(0,posMap[t].qtd-a.qtd);
       posMap[t].custo=qtdR*pm;posMap[t].qtd=qtdR;
-      if(a.data.slice(0,4)===anoStr){
-        if(posMap[t].classe==='Crypto'){
-          // [BUG-F3 FIX] Agrupa por mês para checar isenção mensal de R$35k
-          const ym=a.data.slice(0,7);
-          if(!cryptoMes[ym])cryptoMes[ym]={ganho:0,vendas:0};
-          cryptoMes[ym].ganho+=ganho;cryptoMes[ym].vendas+=a.pm*a.qtd;
-        }else{ganhoTotal+=ganho;}
-      }
+      const cl=posMap[t].classe;
+      const grupo=cl==='B3'?'acoes':cl==='Crypto'?'cripto':cl==='FII'?'fii':'outros';
+      const k=a.data.slice(0,7)+'|'+grupo;
+      if(!mesData[k])mesData[k]={ym:a.data.slice(0,7),grupo,vendas:0,ganho:0};
+      mesData[k].vendas+=valorVenda;mesData[k].ganho+=ganho;
     }
   });
-  // [BUG-F3 FIX] Isenção de cripto: só soma se total de vendas no mês >= R$35.000
-  Object.values(cryptoMes).forEach(m=>{if(m.vendas>=35000)ganhoTotal+=m.ganho;});
-  return parseFloat(ganhoTotal.toFixed(2));
+  const prej={acoes:0,cripto:0,fii:0,outros:0};
+  const tribAno={acoes:0,cripto:0,fii:0,outros:0};
+  let ganhoBrutoAno=0;
+  const acoesMes={}, cryptoMes={};
+  Object.keys(mesData).sort().forEach(k=>{
+    const d=mesData[k];
+    const doAno=d.ym.slice(0,4)===anoStr;
+    if(doAno&&d.grupo==='acoes')acoesMes[d.ym]={vendas:d.vendas,ganho:d.ganho};
+    if(doAno&&d.grupo==='cripto')cryptoMes[d.ym]={vendas:d.vendas,ganho:d.ganho};
+    if(doAno)ganhoBrutoAno+=d.ganho;
+    if(d.ganho<0){prej[d.grupo]+=-d.ganho;return;} // prejuízo acumula p/ compensar
+    if(d.grupo==='acoes'&&d.vendas<=20000)return;  // mês isento (ações)
+    if(d.grupo==='cripto'&&d.vendas<35000)return;  // mês isento (cripto)
+    const usado=Math.min(d.ganho,prej[d.grupo]);   // compensa prejuízo anterior
+    prej[d.grupo]-=usado;
+    const trib=d.ganho-usado;
+    if(doAno&&trib>0)tribAno[d.grupo]+=trib;
+  });
+  const impAcoes=tribAno.acoes*0.15, impFII=tribAno.fii*0.20,
+        impCrypto=tribAno.cripto*0.15, impOutros=tribAno.outros*0.15;
+  return{
+    ganhoBruto:parseFloat(ganhoBrutoAno.toFixed(2)),
+    ganhoTributavel:parseFloat((tribAno.acoes+tribAno.fii+tribAno.cripto+tribAno.outros).toFixed(2)),
+    acoesMes, cryptoMes, impAcoes, impFII, impCrypto, impOutros,
+    total:impAcoes+impFII+impCrypto+impOutros,
+    prejuizoRestante:prej
+  };
+}
+
+/* [5.4] Ganho de capital REALIZADO (bruto) do ano — delega ao cálculo unificado,
+   garantindo o MESMO número em card, painel de imposto e exportação. */
+function getGanhosRealizados(ano){
+  return calcImpostoGanhos(ano).ganhoBruto;
 }
 
 /* Remove um lançamento individual pelo índice no array ativos[] */
@@ -925,15 +988,19 @@ function calcAtivos(ate=null){
     const vt=a.qtd*cotacao;
     const custo=a.qtd*a.pm; // pm sempre em BRL conforme rótulo do formulário
     const res=vt-custo,resPct=custo>0?((vt-custo)/custo)*100:0;
-    const proventos=calcProventosAtivo(a.ticker,a.data,a.qtd);
-    // [BUG-C2 FIX] DY = proventos / valor de mercado (não / custo)
-    const dy=vt>0?(proventos/vt)*100:0;
+    const proventos=calcProventosAtivo(a.ticker,a.data,a.qtd); // desde a compra (histórico)
+    // [5.1] DY 12m padrão de mercado: proventos dos ÚLTIMOS 12 MESES ÷ valor de
+    // mercado (antes misturava proventos de todo o histórico com o preço de hoje).
+    // YoC (Yield on Cost): os mesmos proventos 12m ÷ custo de aquisição.
+    const prov12m=calcProventos12mTicker(a.ticker);
+    const dy=vt>0?(prov12m/vt)*100:0;
+    const yoc=custo>0?(prov12m/custo)*100:0;
     const lucroTotal=res+proventos;
     const rentTotal=custo>0?(lucroTotal/custo)*100:0;
     // [BUG-C4 FIX] CAGR anualizado pela data da primeira compra
     const anos=a.data?Math.max((Date.now()-new Date(a.data).getTime())/(365.25*24*3600*1000),1/12):1;
     const cagr=custo>0&&anos>0?(Math.pow(Math.max(0,1+lucroTotal/custo),1/anos)-1)*100:0;
-    return{...a,cotacao,vt,custo,res,resPct,proventos,dy,lucroTotal,rentTotal,cagr,anos:parseFloat(anos.toFixed(1))};
+    return{...a,cotacao,vt,custo,res,resPct,proventos,prov12m,dy,yoc,lucroTotal,rentTotal,cagr,anos:parseFloat(anos.toFixed(1))};
   });
 }
 function getTotals(){

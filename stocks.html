@@ -131,7 +131,7 @@ let STOCKS = [...STOCKS_FALLBACK];
 
 async function loadData() {
   try {
-    const r = await fetch('data/stocks_us.json?t=' + Date.now());
+    const r = await fetch('data/stocks_us.json');
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
     // Filtra apenas stocks (exclui REITs) com preço disponível
@@ -140,7 +140,6 @@ async function loadData() {
       STOCKS = lista;
       const ts = document.getElementById('data-timestamp');
       if (ts) ts.textContent = '· Atualizado em ' + data.updated_at + ' (' + lista.length + ' stocks)';
-      console.log('stocks_us.json: ' + lista.length + ' stocks carregados');
     } else {
       throw new Error('Sem dados válidos no JSON');
     }

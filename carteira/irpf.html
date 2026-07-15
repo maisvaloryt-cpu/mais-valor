@@ -81,11 +81,13 @@ function renderIRPF(){
   const custo=c.reduce((s,a)=>s+a.custo,0);
   // [BUG-F4 FIX] Proventos reais do ano-calendário (não all-time)
   const proventosAno=c.reduce((s,a)=>s+calcProventosAno(a.ticker,anoCalendario),0);
-  const ganhoRealizado=getGanhosRealizados(anoCalendario);
+  // [5.4] Fonte única: mesmo cálculo do painel de imposto (isenções + prejuízos)
+  const impostoInfo=calcImpostoGanhos(anoCalendario);
+  const ganhoRealizado=impostoInfo.ganhoBruto;
   document.getElementById('metrics-irpf').innerHTML=`
     <div class="mcard"><div class="mcard-label">Total Bens e Direitos</div><div class="mcard-value">${fmtR(custo)}</div><div class="mcard-sub">Custo de aquisição em 31/12/${anoCalendario}</div></div>
     <div class="mcard"><div class="mcard-label">Rendimentos Recebidos em ${anoCalendario}</div><div class="mcard-value positive">${fmtR(proventosAno)}</div><div class="mcard-sub">Proventos recebidos no ano-calendário</div></div>
-    <div class="mcard"><div class="mcard-label">Ganho de Capital Realizado</div><div class="mcard-value ${ganhoRealizado>=0?'positive':'negative'}">${ganhoRealizado>=0?'+':''}${fmtR(ganhoRealizado)}</div><div class="mcard-sub">Vendas efetivadas em ${anoCalendario}</div></div>
+    <div class="mcard"><div class="mcard-label">Ganho de Capital Realizado</div><div class="mcard-value ${ganhoRealizado>=0?'positive':'negative'}">${ganhoRealizado>=0?'+':''}${fmtR(ganhoRealizado)}</div><div class="mcard-sub">Bruto em ${anoCalendario} · Tributável (isenções + prejuízos): ${fmtR(impostoInfo.ganhoTributavel)}</div></div>
   `;
   // [BUG-F1 FIX] Grupo e Código IRPF corretos por classe
   document.getElementById('tbody-irpf').innerHTML=c.map(a=>`
@@ -112,42 +114,11 @@ function renderIRPF(){
   }).join('');
 }
 
-/* ---- Estimativa de imposto sobre ganho de capital realizado no ano ---- */
-function calcImpostoEstimado(ano){
-  const anoStr=String(ano);
-  const posMap={};
-  const acoesMes={};   // ações: isenção até R$20k de vendas/mês
-  const cryptoMes={};  // cripto: isenção até R$35k de vendas/mês
-  let ganhoFII=0, ganhoOutros=0;
-  ativos.filter(a=>a.data).sort((a,b)=>a.data.localeCompare(b.data)).forEach(a=>{
-    const t=a.ticker;
-    if(!posMap[t])posMap[t]={qtd:0,custo:0,classe:a.classe};
-    if(a.classe)posMap[t].classe=a.classe;
-    const tipo=a.tipo||'Compra';
-    if(tipo==='Compra'){posMap[t].qtd+=a.qtd;posMap[t].custo+=a.qtd*a.pm;}
-    else if(tipo==='Venda'){
-      const pm=posMap[t].qtd>0?posMap[t].custo/posMap[t].qtd:0;
-      const ganho=(a.pm-pm)*a.qtd;
-      const valorVenda=a.pm*a.qtd;
-      const qtdR=Math.max(0,posMap[t].qtd-a.qtd);
-      posMap[t].custo=qtdR*pm;posMap[t].qtd=qtdR;
-      if(a.data.slice(0,4)===anoStr){
-        const cl=posMap[t].classe, ym=a.data.slice(0,7);
-        if(cl==='B3'){ if(!acoesMes[ym])acoesMes[ym]={vendas:0,ganho:0}; acoesMes[ym].vendas+=valorVenda; acoesMes[ym].ganho+=ganho; }
-        else if(cl==='Crypto'){ if(!cryptoMes[ym])cryptoMes[ym]={vendas:0,ganho:0}; cryptoMes[ym].vendas+=valorVenda; cryptoMes[ym].ganho+=ganho; }
-        else if(cl==='FII'){ ganhoFII+=ganho; }
-        else { ganhoOutros+=ganho; }
-      }
-    }
-  });
-  let ganhoAcoesTrib=0; Object.values(acoesMes).forEach(m=>{ if(m.vendas>20000&&m.ganho>0)ganhoAcoesTrib+=m.ganho; });
-  let ganhoCryptoTrib=0; Object.values(cryptoMes).forEach(m=>{ if(m.vendas>=35000&&m.ganho>0)ganhoCryptoTrib+=m.ganho; });
-  const impAcoes=ganhoAcoesTrib*0.15;
-  const impFII=Math.max(0,ganhoFII)*0.20;
-  const impCrypto=ganhoCryptoTrib*0.15;
-  const impOutros=Math.max(0,ganhoOutros)*0.15;
-  return {acoesMes, impAcoes, impFII, impCrypto, impOutros, total:impAcoes+impFII+impCrypto+impOutros};
-}
+/* ---- Estimativa de imposto sobre ganho de capital realizado no ano ----
+   [5.4/5.5] Agora delega ao cálculo ÚNICO em common.js (calcImpostoGanhos):
+   mesmas isenções (20k ações / 35k cripto), FII a 20% e COMPENSAÇÃO DE
+   PREJUÍZOS de meses/anos anteriores por modalidade. */
+function calcImpostoEstimado(ano){ return calcImpostoGanhos(ano); }
 function renderImpostoIRPF(ano){
   const el=document.getElementById('irpf-imposto'); if(!el)return;
   const r=calcImpostoEstimado(ano);
@@ -159,7 +130,7 @@ function renderImpostoIRPF(ano){
     ${linha('Demais (15% aprox.)',r.impOutros)}
     <div style="display:flex;justify-content:space-between;border-top:1px solid var(--color-border-secondary);padding-top:9px;margin-top:4px">
       <span style="font-size:13px;font-weight:600">Total estimado</span><strong style="font-size:16px;color:#E24B4A">${fmtR(r.total)}</strong></div>
-    <div style="font-size:10px;color:var(--color-text-secondary);margin-top:9px">Estimativa simples sobre lucros de vendas em ${ano}. Não inclui JCP, come-cotas, day-trade nem regras específicas de exterior/fundos. Confirme com seu contador.</div>`;
+    <div style="font-size:10px;color:var(--color-text-secondary);margin-top:9px">Estimativa sobre lucros de vendas em ${ano}, já com isenções (R$20k ações / R$35k cripto) e compensação de prejuízos de meses anteriores por modalidade. Não inclui JCP, come-cotas, day-trade nem regras específicas de exterior/fundos. Confirme com seu contador.</div>`;
 }
 function renderAlerta20k(ano){
   const el=document.getElementById('irpf-alerta20k'); if(!el)return;

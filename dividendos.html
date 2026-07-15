@@ -257,7 +257,7 @@ async function init(){
   // Carrega dividendos: tenta JSON dedicado, fallback para DIVIDENDOS do data.js
   let divs = [];
   try {
-    const r = await fetch('data/dividendos.json?t=' + Date.now());
+    const r = await fetch('data/dividendos.json');
     if(r.ok){ const j = await r.json(); divs = j.dividendos || j || []; }
   } catch(e){}
 

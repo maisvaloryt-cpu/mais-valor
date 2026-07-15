@@ -139,7 +139,7 @@ const NAV_BASE = window.NAV_BASE_PATH || '';
 // ── BCB data ──────────────────────────────────────────────────────
 async function loadBCBNav() {
   try {
-    const r = await fetch(NAV_BASE + 'data/bcb.json?t=' + Date.now());
+    const r = await fetch(NAV_BASE + 'data/bcb.json');
     if (!r.ok) return;
     const j = await r.json();
     window.BCB_DATA = j;
@@ -204,7 +204,7 @@ function pillHtml(v) { return v?.val > 0 ? `<span class="pill ${chgClass(v)}">${
 
 async function loadIndicesNav() {
   const [jsonResult, liveResult] = await Promise.allSettled([
-    fetch(NAV_BASE + 'data/indices.json?t=' + Date.now()).then(r => r.ok ? r.json() : {}),
+    fetch(NAV_BASE + 'data/indices.json').then(r => r.ok ? r.json() : {}),
     fetchLiveIndices(),
   ]);
 
@@ -482,6 +482,7 @@ function renderNav() {
     <a href="${NAV_BASE}comparador.html" class="${page==='comparador.html'?'active':''}" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.comparador} Comparador</a>
     <a href="${NAV_BASE}analise.html" class="${page==='analise.html'?'active':''}" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.analise} Análise IA</a>
     <a href="${NAV_BASE}ferramentas.html" class="${page==='ferramentas.html'?'active':''}" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.outras} Outras</a>
+    <a href="${NAV_BASE}metodologia.html" class="${page==='metodologia.html'?'active':''}" onclick="toggleMobileMenu()">📐 Metodologia</a>
     <div class="mob-group-label">Conta</div>
     <a href="${NAV_BASE}watchlist.html" class="${watchActive?'active':''}" onclick="toggleMobileMenu()">★ Watchlist</a>
     <a href="${NAV_BASE}status.html" class="${statusActive?'active':''}" onclick="toggleMobileMenu()" style="color:var(--up)">● Status</a>
@@ -860,6 +861,8 @@ function renderFooter() {
     Não constitui recomendação de investimento.</p>
     <p style="margin-top:10px;font-size:13px">
       <a href="/sobre.html" style="color:var(--text2);text-decoration:none">Sobre</a>
+      <span style="color:var(--text3);margin:0 8px">·</span>
+      <a href="/metodologia.html" style="color:var(--text2);text-decoration:none">Metodologia</a>
       <span style="color:var(--text3);margin:0 8px">·</span>
       <a href="/contato.html" style="color:var(--text2);text-decoration:none">Contato</a>
       <span style="color:var(--text3);margin:0 8px">·</span>

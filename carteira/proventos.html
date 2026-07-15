@@ -78,12 +78,27 @@ function renderProventos(){
   const c=calcAtivos();
   const t=getTotals();
 
+  // [S8] Renda passiva projetada: a "bola de neve" do reinvestimento.
+  // Se TODOS os proventos forem reaplicados na carteira, a renda cresce a
+  // (1+DY)^anos — só pelo reinvestimento, SEM aportes novos e SEM valorização
+  // das cotas (projeção conservadora, DY constante).
+  const rendaMes=t.provAno/12;
+  const dyFrac=Math.max(0,(t.dyMed||0)/100);
+  const proj=(anos)=>rendaMes*Math.pow(1+dyFrac,anos);
+  const cardProjecao=(rendaMes>0&&dyFrac>0)?`
+    <div class="mcard" title="Se você reaplicar todos os proventos na carteira, cada pagamento compra mais cotas — que pagam mais proventos. Projeção conservadora: DY constante, sem aportes novos e sem valorização das cotas.">
+      <div class="mcard-label">Renda projetada (reinvestindo)</div>
+      <div class="mcard-value positive">${fmtR(proj(10))}/mês</div>
+      <div class="mcard-sub">em 10 anos · 5 anos: ${fmtR(proj(5))} · 20 anos: ${fmtR(proj(20))}</div>
+    </div>`:'';
+
   // Métricas reais
   document.getElementById('metrics-prov').innerHTML=`
     <div class="mcard"><div class="mcard-label">Proventos recebidos (total)</div><div class="mcard-value positive">${fmtR(t.proventosTotal)}</div><div class="mcard-sub">Desde a data de compra de cada ativo</div></div>
     <div class="mcard"><div class="mcard-label">Proventos (últimos 12M)</div><div class="mcard-value positive">${fmtR(t.provAno)}</div><div class="mcard-sub">Média mensal: ${fmtR(t.provAno/12)}</div></div>
     <div class="mcard"><div class="mcard-label">DY Médio (12M)</div><div class="mcard-value positive">${fmt(t.dyMed)}%</div><div class="mcard-sub">Sobre patrimônio atual</div></div>
     <div class="mcard"><div class="mcard-label">Renda Passiva / Dia</div><div class="mcard-value positive">${fmtR(t.provAno/365)}</div><div class="mcard-sub">Baseado nos últimos 12 meses</div></div>
+    ${cardProjecao}
   `;
 
   // Gráfico mensal — dados reais

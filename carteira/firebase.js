@@ -13,6 +13,14 @@ firebase.initializeApp(FIREBASE_CONFIG);
 const _auth = firebase.auth();
 const _db   = firebase.firestore();
 
+/* [S8] Carteira OFFLINE: guarda os dados do Firestore no navegador (IndexedDB).
+   Sem internet, a carteira abre com o último estado conhecido; alterações feitas
+   offline são sincronizadas quando a conexão volta. synchronizeTabs permite
+   várias abas abertas. Se o navegador não suportar, segue online normalmente. */
+try {
+  _db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+} catch (e) {}
+
 /* ---- login / logout ---- */
 function loginGoogle(){
   _auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())

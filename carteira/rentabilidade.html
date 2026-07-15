@@ -44,7 +44,7 @@
       <div class="card-title">Rentabilidade por Ativo</div>
       <div class="tbl-wrap">
       <table class="tbl">
-        <thead><tr><th>Ticker</th><th>Classe</th><th class="r">Preço Médio</th><th class="r">Cotação Atual</th><th class="r">Ganho Capital</th><th class="r">Proventos</th><th class="r">Rentabilidade %</th><th class="r">Rent. Total</th><th class="r">CAGR a.a.</th><th class="r">Risco a.a.</th></tr></thead>
+        <thead><tr><th>Ticker</th><th>Classe</th><th class="r">Preço Médio</th><th class="r">Cotação Atual</th><th class="r">Ganho Capital</th><th class="r">Proventos</th><th class="r" title="Proventos dos últimos 12 meses ÷ preço médio de compra">YoC 12m</th><th class="r">Rentabilidade %</th><th class="r">Rent. Total</th><th class="r">CAGR a.a.</th><th class="r">Risco a.a.</th></tr></thead>
         <tbody id="tbody-rent"></tbody>
       </table>
       </div>
@@ -94,6 +94,7 @@ function renderRentabilidade(){
     <td class="r">${fmtR(a.pm)}</td><td class="r">${fmtR(a.cotacao)}</td>
     <td class="r ${a.res>=0?'positive':'negative'}">${a.res>=0?'+':''}${fmtR(a.res)}</td>
     <td class="r positive">${fmtR(a.proventos)}</td>
+    <td class="r" style="color:${a.yoc>0?'#1D9E75':'var(--color-text-secondary)'}">${a.yoc>0?fmt(a.yoc)+'%':'—'}</td>
     <td class="r"><span class="pill ${a.rentTotal>=0?'pill-up':'pill-dn'}">${a.rentTotal>=0?'▲':'▼'} ${fmt(Math.abs(a.rentTotal))}%</span></td>
     <td class="r ${a.rentTotal>=0?'positive':'negative'}">${fmtP(a.rentTotal)}</td>
     <td class="r ${a.cagr>=0?'positive':'negative'}">${fmtP(a.cagr)}</td>
@@ -115,7 +116,8 @@ function volAtivo(ticker){
   }
   if(rets.length<3)return null;
   const media=rets.reduce((s,v)=>s+v,0)/rets.length;
-  const variancia=rets.reduce((s,v)=>s+(v-media)**2,0)/rets.length;
+  // [5.7] Variância AMOSTRAL (n-1) — mesmo padrão do backtest do simulador
+  const variancia=rets.reduce((s,v)=>s+(v-media)**2,0)/(rets.length-1);
   return Math.sqrt(variancia)*Math.sqrt(12)*100; // % ao ano
 }
 
@@ -140,13 +142,47 @@ function renderRankingRent(c){
 
 /* ---- Alfa: carteira vs CDI/IBOV (mesmos aportes simulados) ---- */
 var _benchCacheR=typeof _benchCacheR!=='undefined'?_benchCacheR:{}; // var (não const): a aba recarrega o script ao voltar; mantém o cache
+
+/* [S8] TWR — Time-Weighted Return (rentabilidade ponderada pelo tempo).
+   Remove o efeito de QUANDO você aportou/retirou: encadeia o retorno de cada
+   mês descontando o fluxo externo (aproximado pela variação do custo, no fim
+   do mês). É a métrica correta para comparar a carteira com IBOV/CDI —
+   a "Rentabilidade Total" clássica mistura retorno com timing dos aportes. */
+function calcTWR(evol){
+  const rets=[];
+  for(let i=1;i<evol.length;i++){
+    const vPrev=evol[i-1].vt, v=evol[i].vt;
+    const fluxo=(evol[i].custo||0)-(evol[i-1].custo||0);
+    if(!(vPrev>0))continue;
+    const r=(v-fluxo)/vPrev-1;
+    if(isFinite(r))rets.push(r);
+  }
+  const acum=rets.reduce((p,r)=>p*(1+r),1)-1;
+  const n=rets.length;
+  return{
+    acum,
+    anual:n>=12?Math.pow(1+acum,12/n)-1:null,          // anualizado (só com 12m+)
+    ult12:rets.slice(-12).reduce((p,r)=>p*(1+r),1)-1,   // TWR dos últimos 12 meses
+    n
+  };
+}
+/* Retorno de um índice entre dois meses (mesma janela da carteira) */
+function benchRet(serie,ymIni,ymFim){
+  if(!serie||!ymIni||!ymFim)return null;
+  const p0=_precoEmR(serie,ymIni),p1=_precoEmR(serie,ymFim);
+  return p0>0&&p1>0?p1/p0-1:null;
+}
+
 async function renderAlfa(){
   const el=document.getElementById('metrics-alfa'); if(!el)return;
   for(const idx of ['IBOV','CDI']){ if(!_benchCacheR[idx]){ try{_benchCacheR[idx]=await fetchHistoricoTicker(idx);}catch(e){_benchCacheR[idx]={};} } }
   const evol=calcEvolucaoPatrimonio(120).filter(m=>m.vt>0||m.custo>0);
   if(evol.length<2){ el.innerHTML=''; return; }
   const finalCart=evol[evol.length-1].vt;
-  const sim=(serie)=>{ let units=0,custoAnt=0,val=0; evol.forEach(m=>{const ap=Math.max(0,m.custo-custoAnt);custoAnt=m.custo;const p=_precoEmR(serie,m.ym);if(p>0)units+=ap/p;val=p>0?units*p:val;}); return val; };
+  // [5.6] O benchmark agora também VENDE: quando o custo acumulado cai (venda na
+  // carteira), resgata unidades proporcionais — sem isso, quem vendia era
+  // comparado com um benchmark que nunca vendeu (comparação enviesada).
+  const sim=(serie)=>{ let units=0,custoAnt=0,val=0; evol.forEach(m=>{const delta=(m.custo||0)-custoAnt;custoAnt=m.custo||0;const p=_precoEmR(serie,m.ym);if(p>0){units+=delta/p;if(units<0)units=0;}val=p>0?units*p:val;}); return val; };
   const card=(nome,benchVal)=>{
     if(!(benchVal>0))return '';
     const diff=finalCart-benchVal;
@@ -154,7 +190,23 @@ async function renderAlfa(){
     const pos=diff>=0;
     return `<div class="mcard"><div class="mcard-label">Sua carteira vs ${nome}</div><div class="mcard-value ${pos?'positive':'negative'}">${pos?'+':''}${fmt(pct)}%</div><div class="mcard-sub">${pos?'Ganhando':'Perdendo'} ${fmtR(Math.abs(diff))} ${pos?'do':'pro'} ${nome}</div></div>`;
   };
-  el.innerHTML=card('IBOV',sim(_benchCacheR.IBOV))+card('CDI',sim(_benchCacheR.CDI));
+  // [S8] Cards de TWR + comparação na MESMA janela de tempo da carteira
+  const twr=calcTWR(evol);
+  const ymBase=evol[0].ym, ymFim=evol[evol.length-1].ym;
+  const bIbov=benchRet(_benchCacheR.IBOV,ymBase,ymFim);
+  const bCdi=benchRet(_benchCacheR.CDI,ymBase,ymFim);
+  const twrCards=twr.n>=2?`
+    <div class="mcard" title="TWR (Time-Weighted Return): rentabilidade ponderada pelo tempo — remove o efeito de quando você aportou/retirou. É a métrica correta para comparar com índices. Fluxos aproximados pela variação do custo no fim de cada mês.">
+      <div class="mcard-label">Rentabilidade TWR — período (${twr.n} meses)</div>
+      <div class="mcard-value ${twr.acum>=0?'positive':'negative'}">${fmtP(twr.acum*100)}</div>
+      <div class="mcard-sub">${twr.anual!=null?('≈ '+fmtP(twr.anual*100)+' a.a.'):'período menor que 12m'}${bIbov!=null?(' · IBOV no período: '+fmtP(bIbov*100)):''}${bCdi!=null?(' · CDI: '+fmtP(bCdi*100)):''}</div>
+    </div>
+    <div class="mcard" title="TWR encadeado dos últimos 12 meses — sem efeito do timing dos aportes.">
+      <div class="mcard-label">Rentabilidade TWR — 12 meses</div>
+      <div class="mcard-value ${twr.ult12>=0?'positive':'negative'}">${fmtP(twr.ult12*100)}</div>
+      <div class="mcard-sub">quanto a carteira rendeu, independente dos aportes</div>
+    </div>`:'';
+  el.innerHTML=twrCards+card('IBOV',sim(_benchCacheR.IBOV))+card('CDI',sim(_benchCacheR.CDI));
 }
 function _precoEmR(serie,ym){
   if(!serie)return 0;

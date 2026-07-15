@@ -446,7 +446,7 @@ function calcVarPeriodo(dias){
 
 async function loadBCBData() {
   try {
-    const r = await fetch('data/bcb.json?t=' + Date.now());
+    const r = await fetch('data/bcb.json');
     if (!r.ok) return null;
     return await r.json();
   } catch { return null; }
@@ -582,7 +582,7 @@ function fmtRS(s){
 }
 async function renderFundExtra(){
   try{
-    const r=await fetch(`data/fundamentalistas/${TICKER}.json?t=${Date.now()}`);
+    const r=await fetch(`data/fundamentalistas/${TICKER}.json`);
     if(!r.ok) return;
     const d=await r.json();
     const osc=d.oscilacoes||{};
@@ -604,7 +604,7 @@ async function renderFundFull(){
   if(!cont) return;
   let d={};
   try{
-    const r=await fetch(`data/fundamentalistas/${TICKER}.json?t=${Date.now()}`);
+    const r=await fetch(`data/fundamentalistas/${TICKER}.json`);
     if(r.ok) d=await r.json();
   }catch(e){}
   const isFii=TIPO==='fii';
@@ -655,7 +655,7 @@ async function renderFundFull(){
 }
 async function renderDividendos(){
   try{
-    const r=await fetch(`data/dividendos/${TICKER}.json?t=${Date.now()}`);
+    const r=await fetch(`data/dividendos/${TICKER}.json`);
     if(!r.ok)throw new Error('sem dados');
     const j=await r.json();
     divData=j.dividendos||[];

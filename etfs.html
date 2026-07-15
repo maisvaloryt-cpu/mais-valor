@@ -186,7 +186,7 @@ let ETFS = [...ETFS_FALLBACK];
 
 async function loadData() {
   try {
-    const r = await fetch('data/etfs.json?t=' + Date.now());
+    const r = await fetch('data/etfs.json');
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
     const lista = (data.etfs || []).filter(e => e.p > 0).map(e => ({

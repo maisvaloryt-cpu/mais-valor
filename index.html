@@ -489,7 +489,7 @@ async function buildCarouselItems() {
   let fromJson = {}, fromLive = {};
   try {
     const [jsonRes, liveRes] = await Promise.allSettled([
-      fetch('data/indices.json?t=' + Date.now()).then(r => r.ok ? r.json() : {}),
+      fetch('data/indices.json').then(r => r.ok ? r.json() : {}),
       (typeof fetchLiveIndices === 'function' ? fetchLiveIndices() : Promise.resolve({})),
     ]);
     fromJson = jsonRes.status === 'fulfilled' ? (jsonRes.value || {}) : {};
@@ -579,7 +579,7 @@ async function startCarousel() {
 async function init() {
   await loadData();
   try {
-    const r = await fetch('data/bcb.json?t=' + Date.now());
+    const r = await fetch('data/bcb.json');
     if (r.ok) {
       const j = await r.json();
       if (j.cdi?.anual)         document.getElementById('mc-cdi').textContent  = j.cdi.anual.toFixed(2) + '%';

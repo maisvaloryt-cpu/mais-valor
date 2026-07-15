@@ -176,7 +176,7 @@ let BDRS = [...BDRS_FALLBACK];
 
 async function loadData() {
   try {
-    const r = await fetch('data/bdrs.json?t=' + Date.now());
+    const r = await fetch('data/bdrs.json');
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
     const lista = (data.bdrs || []).filter(b => b.p > 0).map(b => ({

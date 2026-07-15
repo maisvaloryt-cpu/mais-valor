@@ -553,6 +553,10 @@
         let aporteVigente = aporteMensalBase;
         let anoAnterior = 0;
         let mesRuina = null; // primeiro mês em que o patrimônio zera durante a retirada
+        // [2.6] Cronograma REAL de aporte de cada mês (já com IPCA, aporte inteligente
+        // e retiradas). Consumido por Monte Carlo e Custo do Atraso para que as
+        // simulações usem exatamente os mesmos aportes do pipeline.
+        const aportesEfetivos = [];
 
         for (let m = 1; m <= totalMeses; m++) {
             let anoAtual = Math.ceil(m / 12);
@@ -595,24 +599,32 @@
                 saldoTotal = (saldoTotal * (1 + taxaMensal)) + aporteEsteMes;
                 saldoInvestido += aporteEsteMes;
             }
+            const _emRetirada = (modoAtual === 'completo' && avancadoAtivo && retiradaAtiva && anoAtual >= anoInicioRetirada);
+            aportesEfetivos.push(_emRetirada ? 0 : aporteEsteMes);
 
+            // [2.4] Retirada única: consome os JUROS primeiro; o que passar disso
+            // abate o investido — assim a linha azul (aportado) nunca fica acima
+            // da verde (total) e os juros não "zeram" artificialmente.
+            const _aplicarRetiradaUnica = (valUnica) => {
+                if (!(valUnica > 0)) return;
+                const saque = Math.min(valUnica, saldoTotal);
+                const jurosDisp = Math.max(0, saldoTotal - saldoInvestido);
+                if (saque > jurosDisp) saldoInvestido = Math.max(0, saldoInvestido - (saque - jurosDisp));
+                saldoTotal -= saque;
+            };
             if (tipoPeriodo === 'anual' && m % 12 === 0) {
                 const anoParaCheck = m / 12;
                 retiradaUnicaList.forEach(r => {
-                    if (r.ano === anoParaCheck) {
-                        const valUnica = parseCurrencyValue(r.valorRaw || '');
-                        if (valUnica > 0) saldoTotal = Math.max(0, saldoTotal - valUnica);
-                    }
+                    if (r.ano === anoParaCheck) _aplicarRetiradaUnica(parseCurrencyValue(r.valorRaw || ''));
                 });
             } else if (tipoPeriodo === 'mensal') {
                 retiradaUnicaList.forEach(r => {
-                    if (r.ano === m) {
-                        const valUnica = parseCurrencyValue(r.valorRaw || '');
-                        if (valUnica > 0) saldoTotal = Math.max(0, saldoTotal - valUnica);
-                    }
+                    if (r.ano === m) _aplicarRetiradaUnica(parseCurrencyValue(r.valorRaw || ''));
                 });
             }
-            aporteVigentePerAno[anoAtual] = aporteVigente;
+            // [2.3] Durante a retirada os aportes ficam suspensos — o card do ano
+            // mostra "sem aportes mensais" em vez de um aporte que não acontece.
+            aporteVigentePerAno[anoAtual] = (modoAtual === 'completo' && avancadoAtivo && retiradaAtiva && anoAtual >= anoInicioRetirada) ? 0 : aporteVigente;
 
             if (saldoTotal < 0) saldoTotal = 0;
             let jurosAcumulados = Math.max(0, saldoTotal - saldoInvestido);
@@ -640,6 +652,7 @@
 
         baseDadosCalculados.final.total = saldoTotal;
         baseDadosCalculados.final.renda = baseDadosCalculados.anos[totalCiclosGrafico]?.renda || 0;
+        baseDadosCalculados.aportesMensais = aportesEfetivos; // [2.6] cronograma real
 
         // Alerta de sustentabilidade: patrimônio esgotado durante a retirada
         const ruinaEl = document.getElementById('alertaRuina');
@@ -2363,6 +2376,7 @@
         document.getElementById('inputTaxa').value = '12';
         document.getElementById('inputAnos').value = '5';
         executarPipelineCore();
+        aplicarParamsURL(); // [S8-17] link compartilhado sobrescreve os padrões
         initEasterEgg();
     }
 
@@ -2558,6 +2572,54 @@
         setTimeout(() => URL.revokeObjectURL(url), 15000);
     }
 
+    // ── [S8-17] COMPARTILHAR SIMULAÇÃO POR URL ──────────────────────────────
+    // Gera um link com os parâmetros principais; quem abrir vê a mesma simulação.
+    function compartilharSimulacao(btn) {
+        const p = new URLSearchParams();
+        p.set('i', String(parseCurrencyValue(document.getElementById('inputInicial').value) || 0));
+        p.set('m', String(parseCurrencyValue(document.getElementById('inputMensal').value) || 0));
+        p.set('t', document.getElementById('inputTaxa').value || '0');
+        p.set('tt', tipoTaxa === 'anual' ? 'a' : 'm');
+        p.set('n', document.getElementById('inputAnos').value || '1');
+        p.set('tp', tipoPeriodo === 'anual' ? 'a' : 'm');
+        p.set('md', modoAtual === 'completo' ? 'c' : 's');
+        const url = location.origin + location.pathname + '?' + p.toString();
+        const feedbackOk = () => {
+            if (!btn) return;
+            if (!btn.dataset.orig) btn.dataset.orig = btn.innerHTML;
+            btn.innerHTML = '✓ Link copiado!';
+            setTimeout(() => { btn.innerHTML = btn.dataset.orig; }, 2200);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(feedbackOk)
+                .catch(() => { window.prompt('Copie o link da simulação:', url); });
+        } else {
+            window.prompt('Copie o link da simulação:', url);
+        }
+    }
+
+    // Aplica os parâmetros da URL (link compartilhado) por cima dos padrões.
+    // Valores são validados; nada é aplicado se a URL não tiver parâmetros.
+    function aplicarParamsURL() {
+        const q = new URLSearchParams(location.search);
+        if (!q.has('i') && !q.has('m') && !q.has('t') && !q.has('n')) return;
+        const fmtBR = v => (parseFloat(v) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (q.get('md') === 'c') alternarModoExibicao('completo');
+        if (q.get('tt') === 'm') document.getElementById('btnTaxaMensal')?.click();
+        if (q.get('tp') === 'm') document.getElementById('btnPeriodoMeses')?.click();
+        if (q.has('i')) document.getElementById('inputInicial').value = fmtBR(q.get('i'));
+        if (q.has('m')) document.getElementById('inputMensal').value = fmtBR(q.get('m'));
+        if (q.has('t')) {
+            const t = parseFloat(String(q.get('t')).replace(',', '.'));
+            if (isFinite(t) && t >= 0 && t <= 1000) document.getElementById('inputTaxa').value = String(t);
+        }
+        if (q.has('n')) {
+            const n = parseInt(q.get('n'));
+            if (isFinite(n) && n >= 1 && n <= 1200) document.getElementById('inputAnos').value = String(n);
+        }
+        executarPipelineCore();
+    }
+
     function atualizarStatusLed() {
         const labelEl = document.getElementById('statusModoLabel');
         const funcoesEl = document.getElementById('statusFuncoesAtivas');
@@ -2608,7 +2670,8 @@
                 if (document.getElementById('chkRetirada')?.checked) {
                     const anoR = parseInt(document.getElementById('inputAnoInicioRetirada').value) || 0;
                     if (anoR > 0) {
-                        funcoes.push({ txt: `Retiradas a partir do ano ${anoR}` });
+                        // [2.3] deixa claro que os aportes param na fase de retirada
+                        funcoes.push({ txt: `Retiradas a partir do ano ${anoR} · aportes suspensos na retirada` });
                     }
                 }
             }
@@ -3158,23 +3221,64 @@
         const totalMeses = tipoPeriodo === 'anual' ? tempoInput * 12 : tempoInput;
 
         // Convenção do site: mês 1 SEM aporte (o 1º aporte já está no valor inicial).
-        // São (n-1) aportes, do mês 2 ao mês n:
-        // FV = PV*(1+r)^n + PMT * [((1+r)^(n-1) - 1)/r]
-        // PMT = (FV - PV*(1+r)^n) / [((1+r)^(n-1) - 1)/r]
-        const fatorComp = Math.pow(1 + taxaMensal, totalMeses);
-        const fvSemAporte = vInicial * fatorComp;
-        const fatorAnuidade = (Math.pow(1 + taxaMensal, totalMeses - 1) - 1) / taxaMensal;
-        if (fatorAnuidade <= 0) { resEl?.classList.add('hidden'); return; }
-        const aportNecessario = (patrimonioAlvo - fvSemAporte) / fatorAnuidade;
+        // [2.7] Se "IPCA no aporte" estiver ativo, o aporte cresce a cada virada de
+        // ano — não existe fórmula fechada simples, então resolvemos por busca
+        // binária usando EXATAMENTE o mesmo cronograma do pipeline.
+        const inflacaoAtiva = modoAtual === 'completo'
+            ? (document.getElementById('chkInflacaoAporte')?.checked || false)
+            : (document.getElementById('chkIpcaCalc')?.checked || false);
+        const taxaInfl = modoAtual === 'completo'
+            ? ((parseFloat(document.getElementById('inputInflacao')?.value) || 4.5) / 100)
+            : ((parseFloat(document.getElementById('inputIpcaCalcValor')?.value) || 4.5) / 100);
 
-        if (aportNecessario < 0) {
+        let aportNecessario, totalAportadoCalc, sufixoIpca = '';
+        if (inflacaoAtiva && taxaInfl > 0) {
+            const fvIpca = (pmt) => {
+                let s = vInicial, ap = pmt, anoAnt = 0;
+                for (let m = 1; m <= totalMeses; m++) {
+                    const ano = Math.ceil(m / 12);
+                    if (ano > anoAnt) { if (anoAnt > 0) ap *= (1 + taxaInfl); anoAnt = ano; }
+                    s = s * (1 + taxaMensal) + (m === 1 ? 0 : ap);
+                }
+                return s;
+            };
+            const somaIpca = (pmt) => {
+                let t = 0, ap = pmt, anoAnt = 0;
+                for (let m = 1; m <= totalMeses; m++) {
+                    const ano = Math.ceil(m / 12);
+                    if (ano > anoAnt) { if (anoAnt > 0) ap *= (1 + taxaInfl); anoAnt = ano; }
+                    if (m > 1) t += ap;
+                }
+                return t;
+            };
+            if (fvIpca(0) >= patrimonioAlvo) {
+                aportNecessario = 0;
+            } else {
+                let lo = 0, hi = 1;
+                while (fvIpca(hi) < patrimonioAlvo && hi < 1e9) hi *= 2;
+                for (let k = 0; k < 80; k++) { const mid = (lo + hi) / 2; if (fvIpca(mid) < patrimonioAlvo) lo = mid; else hi = mid; }
+                aportNecessario = hi;
+            }
+            totalAportadoCalc = vInicial + somaIpca(Math.ceil(aportNecessario));
+            sufixoIpca = ` · 1º aporte (cresce ${(taxaInfl*100).toFixed(1).replace('.',',')}%/ano com o IPCA)`;
+        } else {
+            // Sem IPCA: fórmula fechada com (n-1) aportes, do mês 2 ao mês n:
+            // PMT = (FV - PV*(1+r)^n) / [((1+r)^(n-1) - 1)/r]
+            const fatorComp = Math.pow(1 + taxaMensal, totalMeses);
+            const fvSemAporte = vInicial * fatorComp;
+            const fatorAnuidade = (Math.pow(1 + taxaMensal, totalMeses - 1) - 1) / taxaMensal;
+            if (fatorAnuidade <= 0) { resEl?.classList.add('hidden'); return; }
+            aportNecessario = (patrimonioAlvo - fvSemAporte) / fatorAnuidade;
+            totalAportadoCalc = vInicial + Math.ceil(Math.max(0, aportNecessario)) * (totalMeses - 1);
+        }
+
+        if (aportNecessario <= 0) {
             valEl.textContent = 'R$ 0,00';
             detEl.textContent = 'Seu capital inicial já ultrapassa a meta com os juros!';
         } else {
             valEl.textContent = formatCurrency(Math.ceil(aportNecessario));
-            const totalInvestido = vInicial + Math.ceil(aportNecessario) * (totalMeses - 1); // (n-1) aportes
-            const jurosGerados = patrimonioAlvo - totalInvestido;
-            detEl.textContent = `Total aportado: ${formatCurrency(totalInvestido)} · Juros gerados: ${formatCurrency(Math.max(0, jurosGerados))}`;
+            const jurosGerados = patrimonioAlvo - totalAportadoCalc;
+            detEl.textContent = `Total aportado: ${formatCurrency(totalAportadoCalc)} · Juros gerados: ${formatCurrency(Math.max(0, jurosGerados))}${sufixoIpca}`;
         }
         resEl?.classList.remove('hidden');
     }
@@ -3558,27 +3662,48 @@
         if (!monteCarloAtivo) return null;
         const volatilidade = (parseInt(document.getElementById('sliderVolatilidade')?.value) || 8) / 100;
         const n = labels.length;
-        const taxas = gerarTaxasAleatórias(n, taxaAnualBase, volatilidade);
+        // [2.6] Usa o cronograma REAL de aportes do pipeline (IPCA no aporte, aporte
+        // inteligente e retiradas respeitados). Fallback: aporte base fixo.
+        const aportes = baseDadosCalculados.aportesMensais || null;
+        const aporteDoMes = (mesAbs) => aportes ? (aportes[mesAbs - 1] ?? 0) : (mesAbs === 1 ? 0 : aporteMensal);
         const data = [Math.round(vInicial)];
         let saldo = vInicial;
-        for (let i = 1; i < n; i++) {
-            const taxaAnual = Math.max(-0.5, taxas[i]); // limitar queda a -50%
-            const taxaMensal = Math.pow(1 + taxaAnual, 1/12) - 1;
-            const steps = tipoPeriodo === 'anual' ? 12 : 1;
-            for (let s = 0; s < steps; s++) {
-                // Convenção do site: mês 1 sem aporte (o 1º aporte já está no valor inicial)
-                const mesAbs = (i - 1) * steps + s + 1;
-                saldo = saldo * (1 + taxaMensal) + (mesAbs === 1 ? 0 : aporteMensal);
-            }
-            data.push(Math.round(Math.max(0, saldo)));
-        }
-        // Info
         const infoEl = document.getElementById('monteCarloInfo');
-        if (infoEl) {
-            const taxaMin = (Math.min(...taxas) * 100).toFixed(1);
-            const taxaMax = (Math.max(...taxas) * 100).toFixed(1);
-            infoEl.innerHTML = `Pior ano: <strong style="color:#ef4444">${taxaMin}%</strong> · Melhor ano: <strong style="color:#34d399">${taxaMax}%</strong> · Resultado: ${formatCurrency(data[data.length-1])}`;
-            infoEl.classList.remove('hidden');
+        if (tipoPeriodo === 'anual') {
+            const taxas = gerarTaxasAleatórias(n, taxaAnualBase, volatilidade);
+            for (let i = 1; i < n; i++) {
+                const taxaAnual = Math.max(-0.5, taxas[i]); // limitar queda a -50%
+                const taxaMensal = Math.pow(1 + taxaAnual, 1/12) - 1;
+                for (let s = 0; s < 12; s++) {
+                    const mesAbs = (i - 1) * 12 + s + 1;
+                    saldo = saldo * (1 + taxaMensal) + aporteDoMes(mesAbs);
+                }
+                data.push(Math.round(Math.max(0, saldo)));
+            }
+            if (infoEl) {
+                const taxaMin = (Math.min(...taxas) * 100).toFixed(1);
+                const taxaMax = (Math.max(...taxas) * 100).toFixed(1);
+                infoEl.innerHTML = `Pior ano: <strong style="color:#ef4444">${taxaMin}%</strong> · Melhor ano: <strong style="color:#34d399">${taxaMax}%</strong> · Resultado: ${formatCurrency(data[data.length-1])}`;
+                infoEl.classList.remove('hidden');
+            }
+        } else {
+            // [2.5] Período mensal: sorteia retornos MENSAIS com σ_mensal = σ_anual/√12.
+            // Antes cada mês recebia um sorteio com dispersão ANUAL → o mesmo slider
+            // de volatilidade gerava riscos diferentes nos dois modos de período.
+            const mediaMensal = Math.pow(1 + taxaAnualBase, 1/12) - 1;
+            const volMensal = volatilidade / Math.sqrt(12);
+            const taxasM = gerarTaxasAleatórias(n, mediaMensal, volMensal);
+            for (let i = 1; i < n; i++) {
+                const taxaMensal = Math.max(-0.5, taxasM[i]);
+                saldo = saldo * (1 + taxaMensal) + aporteDoMes(i);
+                data.push(Math.round(Math.max(0, saldo)));
+            }
+            if (infoEl) {
+                const taxaMin = (Math.min(...taxasM) * 100).toFixed(2);
+                const taxaMax = (Math.max(...taxasM) * 100).toFixed(2);
+                infoEl.innerHTML = `Pior mês: <strong style="color:#ef4444">${taxaMin}%</strong> · Melhor mês: <strong style="color:#34d399">${taxaMax}%</strong> · Resultado: ${formatCurrency(data[data.length-1])}`;
+                infoEl.classList.remove('hidden');
+            }
         }
         return data;
     }
@@ -3630,10 +3755,15 @@
             ? (parseInt(document.getElementById('inputAnos').value) || 0) * 12
             : (parseInt(document.getElementById('inputAnos').value) || 0);
         const taxaMensal = tipoTaxa === 'anual' ? Math.pow(1 + taxaAnual, 1/12) - 1 : taxaAnual;
+        // [2.6] Usa o cronograma REAL de aportes do pipeline quando disponível
+        const aportes = baseDadosCalculados.aportesMensais || null;
         const calcFV = (meses) => {
             let s = vInicial;
             // Convenção do site: mês 1 sem aporte (o 1º aporte já está no valor inicial)
-            for (let i = 0; i < meses; i++) s = s * (1 + taxaMensal) + (i === 0 ? 0 : aporteMensal);
+            for (let i = 0; i < meses; i++) {
+                const ap = aportes ? (aportes[i] ?? 0) : (i === 0 ? 0 : aporteMensal);
+                s = s * (1 + taxaMensal) + ap;
+            }
             return s;
         };
         const hoje = calcFV(totalMeses);

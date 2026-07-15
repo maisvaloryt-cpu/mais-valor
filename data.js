@@ -135,10 +135,26 @@ function formatVM(v) {
   return 'R$' + (v/1e6).toFixed(0) + 'M';
 }
 
-const DY_MAX = 50;
+// [1.6] DY alto não é zerado às cegas: até 200% é mantido (proventos
+// extraordinários existem — a página do ativo já mostra alerta de DY alto).
+// Acima de 200% é considerado erro de dado e vira 0.
+const DY_MAX = 200;
 function sanitizeDY(v) {
   if (!v || v <= 0 || v > DY_MAX) return 0;
   return v;
+}
+
+// [1.7] Dividendos reais somados dos últimos 12 meses (R$/ação), pré-calculados
+// pelo Python em data/div12m.json. Base exata para o preço-teto de Bazin.
+// Se o arquivo não existir, cai na estimativa DY × preço.
+let DIV12M = {};
+async function loadDiv12m() {
+  try {
+    const r = await fetch('data/div12m.json');
+    if (!r.ok) return;
+    const j = await r.json();
+    DIV12M = j.div12m || {};
+  } catch(e) {}
 }
 
 // ─── Verificar se o JSON intraday é do pregão de hoje ────────────────────────
@@ -146,17 +162,19 @@ function sanitizeDY(v) {
 function intradayFresh(updatedAt) {
   if (!updatedAt) return false;
   try {
-    // Formato: "dd/MM/yyyy HH:mm"
+    // Formato: "dd/MM/yyyy HH:mm" — SEMPRE em horário de Brasília (UTC-3, sem
+    // horário de verão desde 2019). [1.5] Convertido para epoch UTC para que
+    // visitantes em qualquer fuso classifiquem o frescor corretamente.
     const [datePart, timePart] = updatedAt.split(' ');
     const [d, m, y] = datePart.split('/');
     const [h, min] = timePart.split(':');
-    const ts = new Date(y, m-1, d, h, min);
-    const agora = new Date();
-    const diffMin = (agora - ts) / 60000;
-    // Fresco se menos de 25 min (1 ciclo) OU gerado hoje durante pregão
-    const hoje = agora.toLocaleDateString('pt-BR');
-    const dataJSON = ts.toLocaleDateString('pt-BR');
-    return diffMin < 25 || (dataJSON === hoje && h >= 10 && h <= 18);
+    const ts = Date.UTC(+y, m-1, +d, +h, +min) + 3*3600*1000; // Brasília → UTC
+    const diffMin = (Date.now() - ts) / 60000;
+    // "Hoje" também em Brasília (não no fuso do visitante)
+    const hojeBrasilia = new Date(Date.now() - 3*3600*1000).toISOString().slice(0,10);
+    const dataJSON = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    // Fresco se menos de 25 min (1 ciclo) OU gerado hoje durante o pregão
+    return diffMin < 25 || (dataJSON === hojeBrasilia && +h >= 10 && +h <= 18);
   } catch(e) {
     return false;
   }
@@ -174,7 +192,7 @@ async function loadIntraday() {
 
   for (const { url, keys } of JSONs) {
     try {
-      const r = await fetch(url + '?t=' + Date.now());
+      const r = await fetch(url + '');
       if (!r.ok) continue;
       const j = await r.json();
       const fresh = intradayFresh(j.updated_at);
@@ -198,14 +216,13 @@ async function loadIntraday() {
 
   const total = Object.values(result).filter(v => typeof v === 'object' && v !== null)
     .reduce((s, o) => s + (typeof o === 'object' && !Array.isArray(o) ? Object.keys(o).length : 0), 0);
-  console.log(`📡 Intraday: ${total} ativos | Fresh: ${result.fresh} | ${result.updated_at || 'sem dados'}`);
   return result;
 }
 
 // ─── Funções de carregamento dos JSONs base ───────────────────────────────────
 async function loadFundamentus() {
   try {
-    const r = await fetch('data/fundamentus.json?t=' + Date.now());
+    const r = await fetch('data/fundamentus.json');
     if (!r.ok) return;
     const j = await r.json();
     FUNDAMENTUS = j.acoes || {};
@@ -214,7 +231,7 @@ async function loadFundamentus() {
 
 async function loadFiisFundamentus() {
   try {
-    const r = await fetch('data/fiis_fundamentus.json?t=' + Date.now());
+    const r = await fetch('data/fiis_fundamentus.json');
     if (!r.ok) return;
     const j = await r.json();
     FIIS_FUND = j.fiis || {};
@@ -223,7 +240,7 @@ async function loadFiisFundamentus() {
 
 async function loadIndices() {
   try {
-    const r = await fetch('data/indices.json?t=' + Date.now());
+    const r = await fetch('data/indices.json');
     if (!r.ok) return;
     const j = await r.json();
     IBOV  = j.ibov  || IBOV;
@@ -236,7 +253,7 @@ async function loadIndices() {
     // Atualizar IBOV/IFIX com dado intraday do macro se disponível
     // (o Apps Script da planilha cripto-macro inclui índices no campo macro)
     try {
-      const ri = await fetch('data/intraday/cripto-macro.json?t=' + Date.now());
+      const ri = await fetch('data/intraday/cripto-macro.json');
       if (ri.ok) {
         const ji = await ri.json();
         const fresh = intradayFresh(ji.updated_at);
@@ -286,11 +303,14 @@ function isDuplicado(ticker) {
 // ─── FUNÇÃO PRINCIPAL ─────────────────────────────────────────────────────────
 async function loadData() {
   try {
+    // [1.4] Permite chamar loadData() de novo (auto-refresh futuro) sem que o
+    // dedup considere tudo "duplicado" e esvazie as listas.
+    _vistos.clear();
     // Carrega tudo em paralelo
-    await Promise.all([loadFundamentus(), loadFiisFundamentus(), loadIndices()]);
+    await Promise.all([loadFundamentus(), loadFiisFundamentus(), loadIndices(), loadDiv12m()]);
 
     // 1. JSON de fechamento diário (base)
-    const resp = await fetch('data/cotacoes.json?t=' + Date.now());
+    const resp = await fetch('data/cotacoes.json');
     if (!resp.ok) throw new Error('Sem cotacoes.json');
     const json = await resp.json();
     DATA_UPDATED_AT = json.updated_at;
@@ -324,7 +344,8 @@ async function loadData() {
           _source:       'intraday',
         };
       } else if (live && live.price) {
-        // Intraday existe mas não é fresco → mesmo esquema, sem stale
+        // [1.3] Intraday existe mas NÃO é fresco → usa o preço, mas marca stale:true
+        // para o usuário ver (amarelo) que o dado está desatualizado.
         return {
           ...base,
           ticker,
@@ -335,7 +356,7 @@ async function loadData() {
           marketCap:     live.marketCap  || base.marketCap || 0,
           dividendYield: live.dividendYield ?? base.dividendYield ?? 0,
           fallback:      false,
-          stale:         false,
+          stale:         true,
           _source:       'intraday_stale',
         };
       } else if (base.price || base.fallback) {
@@ -351,11 +372,12 @@ async function loadData() {
         const cot = mergeCot(f.ticker, 'acoes');
         if (!cot || !cot.price) return null;
         const rawDY = f.dy ? f.dy : (cot.dividendYield || 0);
-        // div12m: dividendos absolutos em R$/ação nos últimos 12 meses
-        // Fundamentus retorna f.dy já em porcentagem (ex: 4.12 = 4,12%)
-        // Convertemos para fração (f.dy/100) × preço atual para obter o valor absoluto
-        // Este campo é a base correta para o cálculo do preço teto de Bazin
-        const div12m = f.dy > 0 ? (f.dy / 100) * cot.price : 0;
+        // div12m: dividendos absolutos em R$/ação nos últimos 12 meses.
+        // [1.7] Prioridade: soma REAL dos proventos (data/div12m.json). Fallback:
+        // estimativa DY × preço (Fundamentus retorna f.dy em %, ex: 4.12 = 4,12%).
+        const div12m = DIV12M[f.ticker] > 0
+          ? DIV12M[f.ticker]
+          : (f.dy > 0 ? (f.dy / 100) * cot.price : 0);
         return {
           t: f.ticker, n: cot.name || f.ticker,
           p: cot.price, v: cot.change || 0,
@@ -463,11 +485,10 @@ async function loadData() {
 
     // ── Dividendos ────────────────────────────────────────────────────────────
     try {
-      const dr = await fetch('data/dividendos.json?t=' + Date.now());
+      const dr = await fetch('data/dividendos.json');
       if (dr.ok) { const dj = await dr.json(); DIVIDENDOS = dj.dividendos || []; }
     } catch(e) {}
 
-    console.log(`✅ ${ACOES.length} ações + ${FIIS.length} FIIs | Intraday: ${intradayCount} ativos ao vivo`);
     return true;
   } catch(e) {
     console.warn('⚠️ Erro loadData:', e.message);
@@ -483,8 +504,8 @@ async function loadHistoricoCompleto(ticker) {
   const cache = window._histCache || (window._histCache = {});
   if (cache[ticker]) return cache[ticker];
   let mensal = [], diario = [];
-  try { const r=await fetch(`data/historico/${ticker}.json?t=${Date.now()}`); if(r.ok){const j=await r.json();mensal=j.history||[];} } catch(e){}
-  try { const r=await fetch(`data/diario/${ticker}.json?t=${Date.now()}`);    if(r.ok){const j=await r.json();diario=j.history||[];} } catch(e){}
+  try { const r=await fetch(`data/historico/${ticker}.json`); if(r.ok){const j=await r.json();mensal=j.history||[];} } catch(e){}
+  try { const r=await fetch(`data/diario/${ticker}.json`);    if(r.ok){const j=await r.json();diario=j.history||[];} } catch(e){}
   let resultado;
   if(!diario.length) resultado=mensal;
   else if(!mensal.length) resultado=diario;
@@ -507,7 +528,7 @@ async function loadIntradayChart(ticker) {
   const group = _getIntradayGroup(ticker);
   if (!group) return [];
   try {
-    const r = await fetch(`data/intraday/chart/${group}.json?t=${Date.now()}`);
+    const r = await fetch(`data/intraday/chart/${group}.json`);
     if (!r.ok) return [];
     const j = await r.json();
     // Verifica se é de hoje (formato yyyy-MM-dd)

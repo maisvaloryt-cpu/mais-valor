@@ -167,13 +167,13 @@ window.MV_LOGO_SVG = '<svg viewBox="0 0 530 530" xmlns="http://www.w3.org/2000/s
 <script src="nav.js"></script>
 <script>
 async function safeFetch(url) {
-  try { const r = await fetch(url + '?t=' + Date.now()); return r.ok ? await r.json() : null; }
+  try { const r = await fetch(url + ''); return r.ok ? await r.json() : null; }
   catch(e) { return null; }
 }
 
 async function loadStatus() {
   try {
-    const resp = await fetch('data/relatorio.json?t=' + Date.now());
+    const resp = await fetch('data/relatorio.json');
     if (!resp.ok) throw new Error('relatorio.json não encontrado');
     const r = await resp.json();
 

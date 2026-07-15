@@ -195,6 +195,28 @@ def _key(d):
     return f"{d.get('com','')}|{d.get('pag','')}|{d.get('value','')}"
 
 
+def _dedup(lista):
+    """[dedup na origem] O mesmo pagamento chega de fontes diferentes com pequenas
+    variacoes de arredondamento (0.0845 vs 0.084538) ou com 'com' vazio numa fonte.
+    Agrupa por data de pagamento e funde valores que diferem menos de 0,5%
+    (ou R$0,001), mantendo a entrada mais completa (com data-com)."""
+    out = []
+    for d in sorted(lista, key=lambda x: (x.get("pag") or "", float(x.get("value") or 0))):
+        try:
+            v = float(d.get("value") or 0)
+        except Exception:
+            v = 0.0
+        ant = out[-1] if out else None
+        if ant is not None and ant.get("pag") == d.get("pag"):
+            va = float(ant.get("value") or 0)
+            if va > 0 and abs(v - va) <= max(0.001, va * 0.005):
+                if d.get("com") and not ant.get("com"):
+                    out[-1] = d  # mantem a versao mais completa
+                continue
+        out.append(d)
+    return out
+
+
 def merge_dividendos(path, ticker, novos):
     """Merge incremental (chave = com|pag|valor). Nunca apaga; normaliza o formato antigo."""
     existente = []
@@ -207,7 +229,7 @@ def merge_dividendos(path, ticker, novos):
     existente = [_normalize(d) for d in existente]
     seen = {_key(d) for d in existente}
     adicionados = [d for d in novos if _key(d) not in seen]
-    merged = sorted(existente + adicionados, key=lambda x: (x.get("pag") or x.get("com") or ""))
+    merged = _dedup(sorted(existente + adicionados, key=lambda x: (x.get("pag") or x.get("com") or "")))
     now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-3))).strftime("%d/%m/%Y %H:%M")
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w") as f:
@@ -241,6 +263,40 @@ def main():
         time.sleep(0.25)
     print(f"\nConcluido! {ok}/{len(tickers)} ativos, {novos_total} pagamentos novos")
     print(f"Fontes usadas: {por_fonte}")
+
+    # div12m.json: soma REAL dos proventos por acao nos ultimos 12 meses (base do
+    # preco-teto de Bazin no site — substitui a estimativa DY x preco).
+    gerar_div12m()
+
+
+def gerar_div12m():
+    hoje = datetime.date.today()
+    corte = (hoje - datetime.timedelta(days=365)).isoformat()
+    out = {}
+    for arq in os.listdir("data/dividendos"):
+        if not arq.endswith(".json"):
+            continue
+        try:
+            with open(f"data/dividendos/{arq}") as fh:
+                divs = json.load(fh).get("dividendos", [])
+        except Exception:
+            continue
+        tk = arq[:-5]
+        total = 0.0
+        for d in _dedup([_normalize(x) for x in divs]):
+            pag = d.get("pag") or d.get("com") or ""
+            try:
+                v = float(d.get("value") or 0)
+            except Exception:
+                v = 0.0
+            if pag >= corte and v > 0:
+                total += v
+        if total > 0:
+            out[tk] = round(total, 6)
+    now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-3))).strftime("%d/%m/%Y %H:%M")
+    with open("data/div12m.json", "w") as fh:
+        json.dump({"updated_at": now, "div12m": out}, fh)
+    print(f"div12m.json: {len(out)} tickers com proventos em 12m")
 
 
 if __name__ == "__main__":

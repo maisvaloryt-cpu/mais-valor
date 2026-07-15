@@ -271,7 +271,7 @@ function updateMiniCards(){
 
 // ─── Fallback: carrega do JSON local (gerado pelo atualizar_criptos.py) ───────
 async function loadFromCache() {
-  const r = await fetch('data/cripto_market.json?t=' + Date.now());
+  const r = await fetch('data/cripto_market.json');
   if (!r.ok) throw new Error('Cache não encontrado');
   const json = await r.json();
   // Normaliza para o mesmo formato da API ao vivo

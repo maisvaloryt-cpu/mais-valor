@@ -119,7 +119,7 @@ var _setorCache=typeof _setorCache!=='undefined'?_setorCache:{}; // var (não co
 async function fetchSetor(ticker){
   if(_setorCache[ticker]!==undefined)return _setorCache[ticker];
   try{
-    const r=await fetch('../data/fundamentalistas/'+ticker+'.json?t='+Date.now());
+    const r=await fetch('../data/fundamentalistas/'+ticker+'.json');
     _setorCache[ticker]=r.ok?((await r.json()).setor||null):null;
   }catch(e){ _setorCache[ticker]=null; }
   return _setorCache[ticker];

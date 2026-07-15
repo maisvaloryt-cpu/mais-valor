@@ -128,7 +128,8 @@ function objConclusao(o,atual,falta){
   if(meses>=1200) return 'mais de 100 anos';
   const d=new Date(); d.setMonth(d.getMonth()+meses);
   const mm=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][d.getMonth()];
-  const obs=(o.tipo==='patrimonio'&&((getTotals().dyMed)||0)>0)?' (com proventos reinvestidos)':'';
+  // [5.10] deixa claro que a projeção usa SÓ o DY (conservadora — sem valorização de cota)
+  const obs=(o.tipo==='patrimonio'&&((getTotals().dyMed)||0)>0)?' (proventos reinvestidos; não considera valorização das cotas)':'';
   return mm+'/'+d.getFullYear()+' (~'+meses+' meses)'+obs;
 }
 function renderObjetivos(){

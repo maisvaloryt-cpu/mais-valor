@@ -1,0 +1,30 @@
+name: Testes dos motores de cálculo
+
+on:
+  push:
+    paths:
+      - 'simulador.html'
+      - 'calculadora/**'
+      - 'carteira/**'
+      - 'data.js'
+      - 'ferramentas.html'
+      - 'tests/**'
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Sintaxe dos JS principais
+        run: |
+          node --check data.js
+          node --check nav.js
+          node --check calculadora/main.js
+          node --check carteira/common.js
+      - name: Testes dos motores
+        run: node tests/test_motores.js

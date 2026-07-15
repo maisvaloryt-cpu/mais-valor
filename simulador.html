@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="mobile.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="chart_config.js"></script>
 <style>
 /* ── VARIÁVEIS LOCAIS: mapeiam tema do site para o simulador ── */
@@ -814,6 +815,12 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
             <option value="semiannual">Semestralmente</option>
             <option value="annual">Anualmente</option>
           </select>
+          <!-- [4.5] Banda de tolerância: só rebalanceia se algum ativo desviar mais que isto da meta -->
+          <select class="param-inp" id="rebalBand" style="width:100%;margin-top:6px" title="Só rebalanceia quando algum ativo desvia mais que isto do peso-alvo. Banda menor = mais giro (e mais IR no modo ativo).">
+            <option value="1">Banda de tolerância: 1%</option>
+            <option value="5" selected>Banda de tolerância: 5%</option>
+            <option value="10">Banda de tolerância: 10%</option>
+          </select>
         </div>
         <input type="hidden" id="rebalMode" value="passive">
       </div>
@@ -891,6 +898,8 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
         <div class="actions-bar">
           <div class="actions-bar-title" id="resultsTitle">Simulações</div>
           <div class="actions-bar-btns">
+            <button class="sim-ctrl-btn" style="flex:none;padding:6px 12px" onclick="exportarBacktestExcel()" title="Baixa a simulação ativa em Excel (resumo, série mensal e ativos)">📊 Excel</button>
+            <button class="sim-ctrl-btn" style="flex:none;padding:6px 12px" onclick="exportarBacktestPDF()" title="Gera um relatório imprimível da simulação ativa">📄 PDF</button>
             <button class="sim-ctrl-btn" style="flex:none;padding:6px 12px" onclick="exportarSims()">⬇ Exportar</button>
             <button class="sim-ctrl-btn" style="flex:none;padding:6px 12px" onclick="importarSims()">⬆ Importar</button>
           </div>
@@ -919,8 +928,30 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
                 <button class="chart-tab" onclick="showChart('monthly',this)">Mensal</button>
                 <button class="chart-tab" onclick="showChart('dividends',this)">Dividendos</button>
                 <button class="chart-tab" onclick="showChart('allocation',this)">Alocação</button>
+                <button class="chart-tab" id="tabProjecao" onclick="showChart('projection',this)">Projeção</button>
+              </div>
+              <!-- Comparações da aba Evolução: índices com os mesmos aportes + linha real -->
+              <div id="benchCtrls" style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+                <span style="font-size:11px;color:var(--sim-text2)">Comparar:</span>
+                <button class="chart-tab" id="benchBtnIBOV" onclick="toggleBench('IBOV')" title="Como ficaria se os MESMOS aportes fossem no IBOV">IBOV</button>
+                <button class="chart-tab" id="benchBtnCDI" onclick="toggleBench('CDI')" title="Como ficaria se os MESMOS aportes fossem no CDI">CDI</button>
+                <button class="chart-tab" id="benchBtnREAL" onclick="toggleBench('REAL')" title="Desconta a inflação (IPCA) mês a mês — patrimônio em poder de compra de hoje">Real (IPCA)</button>
+              </div>
+              <!-- Controles da Projeção (só aparecem na aba Projeção) -->
+              <div id="projCtrls" style="display:none;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+                <span style="font-size:11px;color:var(--sim-text2)">Horizonte:</span>
+                <select id="projHorizonte" class="param-inp" style="width:auto" onchange="showChart('projection',document.getElementById('tabProjecao'))">
+                  <option value="5">5 anos</option>
+                  <option value="10" selected>10 anos</option>
+                  <option value="20">20 anos</option>
+                  <option value="30">30 anos</option>
+                </select>
+                <span style="font-size:11px;color:var(--sim-text2)">Aporte futuro (R$/mês):</span>
+                <input id="projAporte" class="param-inp" type="number" min="0" step="50" style="width:110px" onchange="showChart('projection',document.getElementById('tabProjecao'))">
+                <button class="chart-tab" style="border:1px solid rgba(255,255,255,0.12)" onclick="showChart('projection',document.getElementById('tabProjecao'))" title="Sorteia 1.000 novos futuros a partir dos mesmos meses reais">↻ Re-sortear</button>
               </div>
               <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
+              <div id="projResumo" style="display:none;font-size:11px;color:var(--sim-text2);margin-top:8px;line-height:1.6"></div>
             </div>
 
             <!-- MÉTRICAS APÓS GRÁFICO -->
@@ -1264,7 +1295,26 @@ function histToMap(history) {
       if (!lastDate[m] || pt.date > lastDate[m]) { lastDate[m] = pt.date; map[m] = pt.close; }
     }
   });
+  // [4.2] Mês corrente ainda em andamento NÃO é fechamento de mês: misturava um
+  // mês parcial com meses cheios no último ponto da série. Só mantém se o
+  // último dado for do último dia do mês.
+  const agora = new Date();
+  const mesCorrente = agora.toISOString().slice(0,7);
+  if (map[mesCorrente] != null) {
+    const ultimoDia = new Date(Date.UTC(agora.getUTCFullYear(), agora.getUTCMonth()+1, 0)).toISOString().slice(0,10);
+    if ((lastDate[mesCorrente] || '') < ultimoDia) delete map[mesCorrente];
+  }
   return Object.keys(map).length > 0 ? map : null;
+}
+
+// [4.2] Mesma regra para os mapas montados pelos fallbacks client-side
+function trimMesCorrente(map) {
+  if (!map) return map;
+  const agora = new Date();
+  const mesCorrente = agora.toISOString().slice(0,7);
+  const ultimoDia = new Date(Date.UTC(agora.getUTCFullYear(), agora.getUTCMonth()+1, 0)).getUTCDate();
+  if (map[mesCorrente] != null && agora.getUTCDate() < ultimoDia) delete map[mesCorrente];
+  return map;
 }
 
 // Busca client-side para cripto (CoinGecko) como último recurso.
@@ -1298,30 +1348,46 @@ async function fetchClientSideCripto(ticker) {
     Object.entries(por_mes).forEach(([k, v]) => {
       if (v != null) map[k] = round(v, 2);
     });
+    trimMesCorrente(map);
     return Object.keys(map).length > 0 ? map : null;
   } catch { return null; }
 }
 
-// Busca client-side para câmbio (AwesomeAPI) como último recurso
+// Busca client-side para câmbio (AwesomeAPI) como último recurso.
+// [4.3] Antes: uma única chamada /daily/1500 (~4 anos) — backtests longos ficavam
+// truncados. Agora busca em JANELAS de 4 anos desde DATA_MINIMA (1995) até hoje;
+// só roda quando não existe o arquivo local, então o custo extra é raro.
 async function fetchClientSideCambio(ticker) {
   const pairMap = { 'USDBRL': 'USD-BRL', 'EURBRL': 'EUR-BRL' };
   const pair = pairMap[ticker];
   if (!pair) return null;
   try {
-    const r = await fetch(`https://economia.awesomeapi.com.br/json/daily/${pair}/1500`);
-    if (!r.ok) return null;
-    const data = await r.json();
-    const por_mes = {};
-    data.forEach(d => {
-      const ts = d.timestamp;
-      const bid = parseFloat(d.bid ?? d.ask ?? 0); // ?? em vez de || para não tratar '0' como ausente
-      if (!ts || !bid) return;
-      const dt = new Date(parseInt(ts) * 1000);
-      const chave = `${dt.getUTCFullYear()}-${String(dt.getUTCMonth()+1).padStart(2,'0')}`;
-      por_mes[chave] = bid;
-    });
+    const por_mes = {}; // chave YYYY-MM → {ts, bid} (mantém o ÚLTIMO tick do mês)
+    const hoje = new Date();
+    const fmtD = d => d.toISOString().slice(0,10).replace(/-/g,'');
+    let ano = parseInt(DATA_MINIMA.slice(0,4));
+    while (ano <= hoje.getUTCFullYear()) {
+      const ini = new Date(Date.UTC(ano, 0, 1));
+      const fim = new Date(Math.min(Date.UTC(ano + 3, 11, 31), hoje.getTime()));
+      try {
+        const r = await fetch(`https://economia.awesomeapi.com.br/json/daily/${pair}/1500?start_date=${fmtD(ini)}&end_date=${fmtD(fim)}`);
+        if (r.ok) {
+          const data = await r.json();
+          (Array.isArray(data) ? data : []).forEach(d => {
+            const ts = parseInt(d.timestamp);
+            const bid = parseFloat(d.bid ?? d.ask ?? 0); // ?? p/ não tratar '0' como ausente
+            if (!ts || !bid) return;
+            const dt = new Date(ts * 1000);
+            const chave = `${dt.getUTCFullYear()}-${String(dt.getUTCMonth()+1).padStart(2,'0')}`;
+            if (!por_mes[chave] || ts > por_mes[chave].ts) por_mes[chave] = { ts, bid };
+          });
+        }
+      } catch {}
+      ano += 4;
+    }
     const map = {};
-    Object.entries(por_mes).forEach(([k, v]) => { map[k] = round(v, 4); });
+    Object.entries(por_mes).forEach(([k, v]) => { map[k] = round(v.bid, 4); });
+    trimMesCorrente(map);
     return Object.keys(map).length > 0 ? map : null;
   } catch { return null; }
 }
@@ -1347,7 +1413,7 @@ async function _loadRealPricesImpl(ticker) {
 
   // 1. Tenta arquivo local do site
   try {
-    const r = await fetch(`data/historico/${ticker}.json?t=${Date.now()}`);
+    const r = await fetch(`data/historico/${ticker}.json`);
     if (r.ok) {
       const j = await r.json();
       const map = histToMap(j.history);
@@ -1404,20 +1470,36 @@ async function _loadRealPricesImpl(ticker) {
 async function loadRealDividends(ticker) {
   if (ticker in _divCache) return _divCache[ticker];
   try {
-    const r = await fetch(`data/dividendos/${ticker}.json?t=${Date.now()}`);
+    const r = await fetch(`data/dividendos/${ticker}.json`);
     if (!r.ok) throw new Error('not found');
     const j = await r.json();
     const map = {};
     const comMap = {};
-    (j.dividendos || []).forEach(d => {
-      if (d.date && d.value) {
-        const m = d.date.slice(0,7);
-        map[m] = (map[m] || 0) + parseFloat(d.value || 0);
-        // Data-com (ex-date): aceita várias chaves possíveis no JSON. Se ausente,
-        // simplesmente não é registrada — o cálculo cai na regra conservadora.
-        const dataCom = d.data_com || d.dataCom || d.date_com || d.ex_date || d.exDate || d.com || null;
-        if (dataCom) comMap[m] = dataCom;
+    // Formato NOVO {com,pag,value,tipo} ou antigo {date,value} — os dois funcionam.
+    // (sem isto, arquivos no formato novo eram ignorados e o backtest ficava sem dividendos)
+    // Dedup por TOLERÂNCIA: o mesmo pagamento chega de fontes diferentes com
+    // pequenas variações (0.0845 vs 0.084538) — valores no mesmo dia que diferem
+    // menos de 0,5% (ou R$0,001) contam uma vez só.
+    const norm = (j.dividendos || []).map(d => ({
+      pag: d.pag || d.date || d.com || '',
+      com: d.com || d.data_com || d.dataCom || d.date_com || d.ex_date || d.exDate || '',
+      val: parseFloat(d.value || 0)
+    })).filter(d => d.pag && d.val > 0)
+      .sort((a,b) => a.pag === b.pag ? a.val - b.val : (a.pag < b.pag ? -1 : 1));
+    const dedup = [];
+    norm.forEach(d => {
+      const ant = dedup[dedup.length - 1];
+      if (ant && ant.pag === d.pag && Math.abs(d.val - ant.val) <= Math.max(0.001, ant.val * 0.005)) {
+        if (d.com && !ant.com) dedup[dedup.length - 1] = d;
+        return;
       }
+      dedup.push(d);
+    });
+    dedup.forEach(d => {
+      const m = d.pag.slice(0,7);
+      map[m] = (map[m] || 0) + d.val;
+      // Data-com (ex-date): se ausente, o cálculo cai na regra conservadora.
+      if (d.com) comMap[m] = d.com;
     });
     _divCache[ticker] = map;
     _divComCache[ticker] = comMap;
@@ -1684,9 +1766,9 @@ function runBacktest(config, allPrices, allDividends) {
   const mode = config.dividendMode || 'none';
   const rebalFreq = config.rebalance || 'none';
   const rebalMode = config.rebalMode || 'passive'; // 'passive' | 'active'
-  // Banda de tolerância do rebalanceamento ativo: só rebalanceia quando um ativo
-  // desvia mais que isto da meta (5%). Evita girar a carteira por ruído mínimo.
-  const REBAL_BAND = 0.05;
+  // [4.5] Banda de tolerância do rebalanceamento: só rebalanceia quando um ativo
+  // desvia mais que isto da meta. Configurável na sidebar (1/5/10%; padrão 5%).
+  const REBAL_BAND = (config.rebalBand != null ? config.rebalBand : 5) / 100;
 
   // Normaliza pesos-alvo
   const totalW = assets.reduce((s,a) => s + a.weight, 0);
@@ -2203,6 +2285,9 @@ function runBacktest(config, allPrices, allDividends) {
     ? series.filter(s => s.date > primeiroMesComDado).map(s => s.monthReturn)
     : series.map(s => s.monthReturn).filter((_,i) => i > 0);
   const n = monthlyReturns.length;
+  // [4.1] Média ARITMÉTICA: é o centro estatístico correto para a variância
+  // amostral (centrar na geométrica, sempre menor, inflava um pouco a vol).
+  const avgArit = n > 0 ? monthlyReturns.reduce((s,r) => s + r, 0) / n : 0;
   // Média geométrica dos retornos mensais da carteira — correto para o Sharpe.
   // A média aritmética é sempre >= geométrica; em carteiras voláteis (cripto,
   // small caps) a diferença pode ser ~2%/mês, inflando o Sharpe artificialmente.
@@ -2210,9 +2295,8 @@ function runBacktest(config, allPrices, allDividends) {
   const _produtoReturns = n > 0 ? monthlyReturns.reduce((p,r) => p * (1 + r), 1) : 1;
   // Guard: produto negativo (perda > 100%) causaria NaN na raiz. Retorna -1 (perda total).
   const avg = n > 0 ? (_produtoReturns > 0 ? Math.pow(_produtoReturns, 1/n) - 1 : -1) : 0;
-  const variance = n > 1 ? monthlyReturns.reduce((s,r) => s+(r-avg)**2, 0) / (n-1) : 0;
+  const variance = n > 1 ? monthlyReturns.reduce((s,r) => s+(r-avgArit)**2, 0) / (n-1) : 0;
   const vol = Math.sqrt(variance * 12);
-  const years = months.length / 12;
 
   // ── CAGR via TIR (IRR) ──
   // A fórmula antiga (finalValue/totalInvested)^(1/anos)-1 só vale para aporte
@@ -3502,7 +3586,8 @@ async function simular() {
       weight: a.weight / assets.reduce((s,x) => s+x.weight, 0)
     })), allPrices, months);
 
-    const config = { assets, startDate, endDate, initialAmount, monthlyAmount, rebalance, rebalMode, dividendMode: state.dividendMode, considerarIR: !!state.irSim, cdiRef };
+    const rebalBand = parseFloat(document.getElementById('rebalBand')?.value) || 5; // [4.5]
+    const config = { assets, startDate, endDate, initialAmount, monthlyAmount, rebalance, rebalMode, rebalBand, dividendMode: state.dividendMode, considerarIR: !!state.irSim, cdiRef };
     const result = runBacktest(config, allPrices, allDividends);
 
     const simName = document.getElementById('simName').value.trim() || `Simulação ${simulations.length + 1}`;
@@ -3620,6 +3705,7 @@ function loadSimIntoSidebar(idx) {
   const freqWrapL = document.getElementById('rebalFreqWrap'); if(freqWrapL) freqWrapL.style.display = wasRebal ? 'block' : 'none';
   if (wasRebal) {
     if (document.getElementById('rebalance')) document.getElementById('rebalance').value = sim.config.rebalance;
+    if (document.getElementById('rebalBand')) document.getElementById('rebalBand').value = String(sim.config.rebalBand ?? 5); // [4.5]
     document.querySelectorAll('#rebalPassivoBtn,#rebalAtivoBtn').forEach(b => b.classList.remove('active'));
     document.getElementById(state.rebalModeVal === 'active' ? 'rebalAtivoBtn' : 'rebalPassivoBtn')?.classList.add('active');
   } else {
@@ -4080,7 +4166,7 @@ function renderSingleView(idx) {
     <div class="metric-card"><div class="metric-label">Máx. Drawdown</div><div class="metric-value red">${pct(metrics.maxDrawdown)}</div></div>
     <div class="metric-card"><div class="metric-label">Meses</div><div class="metric-value">${metrics.months}</div></div>
     <div class="metric-card"><div class="metric-label">Estratégia Div.</div><div class="metric-value" style="font-size:11px;color:var(--sim-text2);font-family:var(--sim-font)">${divModeLabel[dividendMode]}</div></div>
-    ${(metrics.irPago || 0) > 0.005 ? `<div class="metric-card"><div class="metric-label">IR estimado pago</div><div class="metric-value red">${brl(metrics.irPago)}</div><div class="metric-sub">Vendas do rebal + reserva</div></div>` : ''}
+    ${(metrics.irPago || 0) > 0.005 ? `<div class="metric-card" title="Estimativa simplificada: não considera a isenção de R$ 20 mil/mês em ações, come-cotas nem corretagem."><div class="metric-label">IR estimado pago</div><div class="metric-value red">${brl(metrics.irPago)}</div><div class="metric-sub">Vendas do rebal + reserva · estimativa simplificada</div></div>` : ''}
     ${metrics.melhorAno ? `<div class="metric-card"><div class="metric-label">Melhor ano</div><div class="metric-value green">${pct(metrics.melhorAno.retorno)}</div><div class="metric-sub">${metrics.melhorAno.ano}</div></div>` : ''}
     ${metrics.piorAno ? `<div class="metric-card"><div class="metric-label">Pior ano</div><div class="metric-value ${metrics.piorAno.retorno<0?'red':''}">${pct(metrics.piorAno.retorno)}</div><div class="metric-sub">${metrics.piorAno.ano}</div></div>` : ''}
     <div class="metric-card"><div class="metric-label">Meses positivos</div><div class="metric-value">${pct(metrics.pctMesesPositivos)}</div><div class="metric-sub">Consistência</div></div>
@@ -4216,6 +4302,140 @@ function chartOpts(unit) {
   };
 }
 
+// ── [S8] BENCHMARKS E LINHA REAL NA ABA EVOLUÇÃO ──────────────────────────
+const _benchState = { IBOV: false, CDI: false, REAL: false };
+const _benchSeries = {}; // ticker → mapa mensal {YYYY-MM: valor}
+
+function toggleBench(qual) {
+  _benchState[qual] = !_benchState[qual];
+  document.getElementById('benchBtn' + qual)?.classList.toggle('active', _benchState[qual]);
+  const tk = qual === 'REAL' ? 'IPCA' : qual;
+  if (_benchState[qual] && !_benchSeries[tk]) {
+    loadRealPrices(tk).then(m => {
+      _benchSeries[tk] = m || {};
+      showChart('evolution', document.querySelector('.chart-tab'));
+    });
+    return;
+  }
+  showChart('evolution', document.querySelector('.chart-tab'));
+}
+
+// Simula os MESMOS aportes da carteira comprando o índice: cada real que entrou
+// na carteira (delta do totalInvested) compra "unidades" do índice no mês; mês
+// sem preço, o aporte espera em caixa até o próximo mês com dado.
+function simulaBenchmark(serie, priceMap) {
+  if (!priceMap) return null;
+  let units = 0, prevInv = 0, caixa = 0, last = null;
+  return serie.map(s => {
+    const aporte = (s.totalInvested || 0) - prevInv;
+    prevInv = s.totalInvested || 0;
+    caixa += Math.max(0, aporte);
+    const p = priceMap[s.date];
+    if (p > 0) { units += caixa / p; caixa = 0; last = units * p; }
+    return last != null ? last + caixa : (caixa > 0 ? caixa : null);
+  });
+}
+
+// Deflaciona o patrimônio pelo IPCA acumulado desde o início da simulação:
+// "quanto isso vale em poder de compra do primeiro mês".
+function serieRealIPCA(serie, ipcaMap) {
+  if (!ipcaMap) return null;
+  let base = null, fator = 1;
+  return serie.map(s => {
+    const v = ipcaMap[s.date];
+    if (v > 0) { if (base == null) base = v; fator = v / base; }
+    return fator > 0 ? s.portfolioValue / fator : s.portfolioValue;
+  });
+}
+
+// ── [S8] EXPORT DO BACKTEST (Excel + PDF) ─────────────────────────────────
+function exportarBacktestExcel() {
+  const sim = simulations[activeSimIdx];
+  if (!sim) { showErr('Rode uma simulação primeiro.', document.getElementById('btnSimular')); return; }
+  if (typeof XLSX === 'undefined') { alert('Biblioteca de Excel não carregada — verifique a conexão.'); return; }
+  const m = sim.result.metrics;
+  const resumo = [
+    ['Simulação', sim.name],
+    ['Período', sim.config.startDate + ' a ' + sim.config.endDate],
+    ['Valor final (R$)', +m.finalValue.toFixed(2)],
+    ['Total aportado (R$)', +m.totalInvested.toFixed(2)],
+    ['Lucro (R$)', +m.profit.toFixed(2)],
+    ['Retorno total (%)', +(m.totalReturn * 100).toFixed(2)],
+    ['CAGR (% a.a.)', isNaN(m.cagr) ? 'N/D' : +(m.cagr * 100).toFixed(2)],
+    ['Volatilidade (% a.a.)', +(m.volatility * 100).toFixed(2)],
+    ['Sharpe', +(m.sharpeRatio || 0).toFixed(2)],
+    ['Máx. drawdown (%)', +(m.maxDrawdown * 100).toFixed(2)],
+    ['Dividendos (R$)', +(m.totalDividends || 0).toFixed(2)],
+    ['IR estimado (R$)', +(m.irPago || 0).toFixed(2)],
+  ];
+  const mensal = [['Mês', 'Patrimônio (R$)', 'Aportado (R$)', 'Retorno (%)', 'Dividendos do mês (R$)']]
+    .concat(sim.result.series.map(s => [s.date, +s.portfolioValue.toFixed(2), +s.totalInvested.toFixed(2), +((s.monthReturn || 0) * 100).toFixed(3), +((s.dividendsMonth || 0)).toFixed(2)]));
+  const ativos = [['Ticker', 'Classe', 'Peso alvo (%)', 'Valor final (R$)', '% da carteira', 'Dividendos (R$)', 'Cotas (fim)', 'Preço médio (R$)', 'Yield on cost (%)']]
+    .concat(sim.result.breakdown.map(b => [b.ticker, b.assetClass, +(b.targetWeight * 100).toFixed(1), +b.finalValue.toFixed(2), +(b.contribution * 100).toFixed(1), +(b.totalDividends || 0).toFixed(2), +(b.cotasFim || 0).toFixed(4), +(b.precoMedio || 0).toFixed(2), +((b.yieldOnCost || 0) * 100).toFixed(2)]));
+  const wb = XLSX.utils.book_new();
+  const wsR = XLSX.utils.aoa_to_sheet(resumo);  wsR['!cols'] = [{ wch: 24 }, { wch: 22 }];
+  const wsM = XLSX.utils.aoa_to_sheet(mensal);  wsM['!cols'] = mensal[0].map(() => ({ wch: 20 }));
+  const wsA = XLSX.utils.aoa_to_sheet(ativos);  wsA['!cols'] = ativos[0].map(() => ({ wch: 16 }));
+  XLSX.utils.book_append_sheet(wb, wsR, 'Resumo');
+  XLSX.utils.book_append_sheet(wb, wsM, 'Mensal');
+  XLSX.utils.book_append_sheet(wb, wsA, 'Ativos');
+  XLSX.writeFile(wb, 'Backtest_' + String(sim.name || 'MaisValor').replace(/[^\wÀ-ú-]+/g, '_') + '.xlsx');
+}
+
+function exportarBacktestPDF() {
+  const sim = simulations[activeSimIdx];
+  if (!sim) { showErr('Rode uma simulação primeiro.', document.getElementById('btnSimular')); return; }
+  const m = sim.result.metrics;
+  const hoje = new Date().toLocaleDateString('pt-BR');
+  const met = (lbl, val, cor) => `<div style="background:#16161a;border:1px solid #24242b;border-radius:10px;padding:10px 16px;min-width:150px"><div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.05em">${lbl}</div><div style="font-size:16px;font-weight:bold;color:${cor || '#fff'}">${val}</div></div>`;
+  const anosRows = (sim.result.yearly?.consolidado || []).map((y, i) => `
+    <tr style="background:${i % 2 === 0 ? '#0f0f18' : '#13131f'};color:#d1d5db">
+      <td style="padding:5px 10px">${y.ano}</td>
+      <td style="padding:5px 10px;text-align:right;color:#32CD32;font-weight:bold">${brl(y.valor)}</td>
+      <td style="padding:5px 10px;text-align:right;color:#00BFFF">${brl(y.aporte)}</td>
+      <td style="padding:5px 10px;text-align:right;color:#FFCC00">${brl(y.dividendos)}</td>
+      <td style="padding:5px 10px;text-align:right;color:${y.retorno >= 0 ? '#32CD32' : '#ef4444'}">${(y.retorno * 100).toFixed(2)}%</td>
+    </tr>`).join('');
+  const ativosRows = sim.result.breakdown.map((b, i) => `
+    <tr style="background:${i % 2 === 0 ? '#0f0f18' : '#13131f'};color:#d1d5db">
+      <td style="padding:5px 10px">${b.ticker}</td>
+      <td style="padding:5px 10px">${b.assetClass}</td>
+      <td style="padding:5px 10px;text-align:right">${(b.targetWeight * 100).toFixed(1)}%</td>
+      <td style="padding:5px 10px;text-align:right;color:#32CD32">${brl(b.finalValue)}</td>
+      <td style="padding:5px 10px;text-align:right;color:#FFCC00">${brl(b.totalDividends || 0)}</td>
+    </tr>`).join('');
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Backtest — ${sim.name}</title>
+    <style>body{background:#0f0f12;color:#e5e7eb;font-family:sans-serif;padding:32px}
+    h1{color:#FFCC00;font-size:22px;margin-bottom:4px}
+    .sub{color:#9ca3af;font-size:12px;margin-bottom:22px}
+    table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:26px}
+    th{background:#1a1a2e;color:#FFCC00;padding:6px 10px;text-align:right}th:first-child,th.l{text-align:left}
+    h2{color:#FFCC00;font-size:14px;margin:18px 0 10px}
+    @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body>
+    <h1>MAIS VALOR · Backtest — ${sim.name}</h1>
+    <div class="sub">Período ${sim.config.startDate} a ${sim.config.endDate} · gerado em ${hoje} · dados reais de mercado</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px">
+      ${met('Valor final', brl(m.finalValue), '#32CD32')}
+      ${met('Total aportado', brl(m.totalInvested), '#00BFFF')}
+      ${met('Retorno total', (m.totalReturn * 100).toFixed(1) + '%', m.totalReturn >= 0 ? '#32CD32' : '#ef4444')}
+      ${met('CAGR (TIR)', isNaN(m.cagr) ? 'N/D' : (m.cagr * 100).toFixed(2) + '% a.a.')}
+      ${met('Volatilidade', (m.volatility * 100).toFixed(1) + '% a.a.')}
+      ${met('Máx. drawdown', (m.maxDrawdown * 100).toFixed(1) + '%', '#ef4444')}
+      ${met('Dividendos', brl(m.totalDividends || 0), '#FFCC00')}
+      ${(m.irPago || 0) > 0 ? met('IR estimado', brl(m.irPago), '#ef4444') : ''}
+    </div>
+    <h2>📋 Resumo ano a ano</h2>
+    <table><thead><tr><th class="l">Ano</th><th>Patrimônio</th><th>Aportado</th><th>Dividendos</th><th>Retorno</th></tr></thead><tbody>${anosRows}</tbody></table>
+    <h2>📦 Ativos</h2>
+    <table><thead><tr><th class="l">Ticker</th><th class="l">Classe</th><th>Peso alvo</th><th>Valor final</th><th>Dividendos</th></tr></thead><tbody>${ativosRows}</tbody></table>
+    <div style="font-size:10px;color:#6b7280">Backtest com dados reais; dividendos pela regra conservadora; IR estimado simplificado. Rentabilidade passada não garante retorno futuro.</div>
+    <script>window.onload=()=>window.print()<\/script></body></html>`;
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  window.open(url, '_blank');
+  setTimeout(() => URL.revokeObjectURL(url), 15000);
+}
+
 function showChart(type, el) {
   document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
   if (el) el.classList.add('active');
@@ -4225,6 +4445,14 @@ function showChart(type, el) {
   const ctx = document.getElementById('mainChart').getContext('2d');
   const labels = series.map(s => monthLabel(s.date));
   const color = sim.color;
+  // Controles e resumo da Projeção só aparecem na aba Projeção;
+  // comparadores (IBOV/CDI/Real) só na aba Evolução.
+  const _pc = document.getElementById('projCtrls');
+  const _pr = document.getElementById('projResumo');
+  const _bc = document.getElementById('benchCtrls');
+  if (_pc) _pc.style.display = type === 'projection' ? 'flex' : 'none';
+  if (_pr) _pr.style.display = type === 'projection' ? 'block' : 'none';
+  if (_bc) _bc.style.display = type === 'evolution' ? 'flex' : 'none';
 
   if (type === 'evolution') {
     const datasets = [];
@@ -4256,6 +4484,10 @@ function showChart(type, el) {
       const darkColor = darken(s.color, 0.7); // 30% mais escuro, preservando o matiz
       datasets.push({ label:'Aportado ' + s.name, data:aporData, borderColor:darkColor, borderWidth:1.2, borderDash:[4,4], fill:false, tension:.1, pointRadius:0, order:10+i, spanGaps:false, pointStyle:'circle' });
     });
+    // [S8] Benchmarks com os MESMOS aportes + patrimônio real (IPCA)
+    if (_benchState.IBOV && _benchSeries.IBOV) datasets.push({ label:'IBOV (mesmos aportes)', data:simulaBenchmark(series,_benchSeries.IBOV), borderColor:'#8ab4f8', borderWidth:1.6, borderDash:[6,4], fill:false, tension:.2, pointRadius:0, order:20, spanGaps:true });
+    if (_benchState.CDI && _benchSeries.CDI) datasets.push({ label:'CDI (mesmos aportes)', data:simulaBenchmark(series,_benchSeries.CDI), borderColor:'#c9a86a', borderWidth:1.6, borderDash:[6,4], fill:false, tension:.2, pointRadius:0, order:21, spanGaps:true });
+    if (_benchState.REAL && _benchSeries.IPCA) datasets.push({ label:'Patrimônio real (IPCA)', data:serieRealIPCA(series,_benchSeries.IPCA), borderColor:'#b48ef0', borderWidth:1.8, borderDash:[2,3], fill:false, tension:.2, pointRadius:0, order:22 });
     const evolutionOpts = chartOpts('R$');
     evolutionOpts.plugins.tooltip = { enabled: false };
     evolutionOpts.animation = false;
@@ -4288,6 +4520,65 @@ function showChart(type, el) {
       cores.push('#6b7280'); // cinza neutro para distinguir dos ativos
     }
     chartInst = new Chart(ctx, { type:'doughnut', data:{ labels, datasets:[{ data, backgroundColor:cores, borderColor:'#0E0E11', borderWidth:2 }]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'right',labels:{color:'#8A8884',font:{size:11},padding:14}}, tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.raw}%`}} }}});
+  } else if (type === 'projection') {
+    // ── PROJEÇÃO (bootstrap) ─────────────────────────────────────────────
+    // Sorteia meses REAIS do próprio backtest (com reposição) para gerar
+    // 1.000 futuros possíveis a partir do patrimônio final. Não é previsão:
+    // é "e se o futuro repetir meses parecidos com os que aconteceram?".
+    const pm = sim.result.metrics.primeiroMesComDado;
+    const pool = series
+      .filter(s => !pm || s.date > pm)
+      .map(s => s.monthReturn)
+      .filter(r => isFinite(r));
+    const resumoEl = document.getElementById('projResumo');
+    if (pool.length < 24) {
+      if (resumoEl) resumoEl.innerHTML = 'Período do backtest muito curto para projetar: são necessários pelo menos 24 meses de retornos reais (este tem ' + pool.length + '). Aumente o período da simulação.';
+      return;
+    }
+    const anosH = parseInt(document.getElementById('projHorizonte')?.value) || 10;
+    const H = anosH * 12;
+    const inpA = document.getElementById('projAporte');
+    if (inpA && inpA.value === '') inpA.value = String(sim.config.monthlyAmount || 0); // padrão = aporte da simulação
+    const aporteFut = Math.max(0, parseFloat(inpA?.value) || 0);
+    const start = sim.result.metrics.finalValue || 0;
+    const NSIM = 1000;
+    // Simula os 1.000 caminhos guardando o valor de cada mês
+    const buckets = new Array(H);
+    for (let h = 0; h < H; h++) buckets[h] = new Float64Array(NSIM);
+    for (let i = 0; i < NSIM; i++) {
+      let v = start;
+      for (let h = 0; h < H; h++) {
+        const r = pool[(Math.random() * pool.length) | 0]; // sorteia um mês real
+        v = Math.max(0, v * (1 + r) + aporteFut);
+        buckets[h][i] = v;
+      }
+    }
+    // Percentis por mês: P10 (difícil), P50 (mediano), P90 (bom)
+    const p10 = new Array(H), p50 = new Array(H), p90 = new Array(H);
+    for (let h = 0; h < H; h++) {
+      const a = Array.from(buckets[h]).sort((x, y) => x - y);
+      p10[h] = a[Math.floor(0.10 * NSIM)];
+      p50[h] = a[Math.floor(0.50 * NSIM)];
+      p90[h] = a[Math.floor(0.90 * NSIM)];
+    }
+    // Rótulos dos meses futuros a partir do fim do backtest
+    let [fy, fmM] = series[series.length - 1].date.split('-').map(Number);
+    const futLabels = [];
+    for (let h = 0; h < H; h++) {
+      fmM++; if (fmM > 12) { fmM = 1; fy++; }
+      futLabels.push(monthLabel(`${fy}-${String(fmM).padStart(2, '0')}`));
+    }
+    chartInst = new Chart(ctx, { type: 'line', data: { labels: futLabels, datasets: [
+      { label: 'Cenário bom (P90)',     data: p90, borderColor: '#1FC96E', borderWidth: 1.4, borderDash: [5, 4], pointRadius: 0, tension: .25, fill: '+2', backgroundColor: 'rgba(31,201,110,0.10)' },
+      { label: 'Caminho do meio (P50)', data: p50, borderColor: color,     borderWidth: 2.4, pointRadius: 0, tension: .25, fill: false },
+      { label: 'Cenário difícil (P10)', data: p10, borderColor: '#e05c5c', borderWidth: 1.4, borderDash: [5, 4], pointRadius: 0, tension: .25, fill: false },
+    ]}, options: chartOpts('R$') });
+    const totalAportadoFut = aporteFut * H;
+    if (resumoEl) resumoEl.innerHTML =
+      `Partindo de <strong>${brl(start)}</strong> hoje, aportando <strong>${brl(aporteFut)}/mês</strong> por <strong>${anosH} anos</strong> (${brl(totalAportadoFut)} no total): ` +
+      `cenário difícil <strong style="color:#e05c5c">${brl(p10[H-1])}</strong> · caminho do meio <strong style="color:${color}">${brl(p50[H-1])}</strong> · cenário bom <strong style="color:#1FC96E">${brl(p90[H-1])}</strong>.<br>` +
+      `Como funciona: cada futuro é montado sorteando, mês a mês, um dos <strong>${pool.length} meses reais</strong> desta carteira no backtest (crises incluídas) — ${NSIM.toLocaleString('pt-BR')} futuros no total. ` +
+      `Em 10% deles o resultado ficou abaixo do cenário difícil; em 10%, acima do bom. <em>Não é previsão — é o passado embaralhado.</em>`;
   }
 }
 
