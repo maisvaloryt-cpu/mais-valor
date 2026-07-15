@@ -1,150 +1,125 @@
 {
-  "gerado_em": "04/07/2026 05:00",
+  "gerado_em": "15/07/2026 19:07",
   "historico_mensal": {
-    "total": 1374,
-    "ok": 1356,
-    "poucos_dados": 18,
+    "total": 1375,
+    "ok": 1365,
+    "poucos_dados": 10,
     "lista_poucos": [
       {
         "ticker": "ADSH11",
-        "pontos": 6
+        "pontos": 9
       },
       {
         "ticker": "ARTE11",
-        "pontos": 6
-      },
-      {
-        "ticker": "AUAU3",
-        "pontos": 8
-      },
-      {
-        "ticker": "AZUL3",
-        "pontos": 8
+        "pontos": 9
       },
       {
         "ticker": "BFCC11",
-        "pontos": 8
-      },
-      {
-        "ticker": "CYRE4",
-        "pontos": 7
+        "pontos": 9
       },
       {
         "ticker": "FDXF",
         "pontos": 5
       },
       {
+        "ticker": "FTCA11",
+        "pontos": 4
+      },
+      {
         "ticker": "HIRE11",
-        "pontos": 8
+        "pontos": 9
       },
       {
         "ticker": "HONA",
         "pontos": 2
       },
       {
-        "ticker": "ICNE11",
-        "pontos": 9
-      },
-      {
         "ticker": "MATICBRL",
         "pontos": 5
       },
       {
-        "ticker": "MIDW11",
-        "pontos": 8
-      },
-      {
-        "ticker": "OBTC3",
-        "pontos": 9
-      },
-      {
-        "ticker": "OXRL11",
-        "pontos": 9
-      },
-      {
         "ticker": "PASS3",
-        "pontos": 4
-      },
-      {
-        "ticker": "PMRL11",
-        "pontos": 9
+        "pontos": 7
       },
       {
         "ticker": "REME11",
-        "pontos": 4
-      },
-      {
-        "ticker": "RMBS11",
-        "pontos": 8
+        "pontos": 7
       }
     ]
   },
   "historico_diario": {
-    "total": 946,
-    "atualizados": 939,
-    "desatualizados": 7,
+    "total": 957,
+    "atualizados": 949,
+    "desatualizados": 8,
     "lista_desatualizados": [
       {
         "ticker": "BREV11",
         "ultimo": "2026-06-20",
-        "dias_atras": 14
+        "dias_atras": 25
       },
       {
         "ticker": "BRIM11",
         "ultimo": "2026-06-11",
-        "dias_atras": 23
+        "dias_atras": 34
       },
       {
         "ticker": "GLOG11",
         "ultimo": "2026-06-21",
-        "dias_atras": 13
+        "dias_atras": 24
       },
       {
         "ticker": "HGPO11",
         "ultimo": "2026-06-08",
-        "dias_atras": 26
+        "dias_atras": 37
+      },
+      {
+        "ticker": "NEOE3",
+        "ultimo": "2026-07-04",
+        "dias_atras": 11
       },
       {
         "ticker": "PLOG11",
         "ultimo": "2026-06-21",
-        "dias_atras": 13
+        "dias_atras": 24
       },
       {
         "ticker": "SPG211",
         "ultimo": "2026-06-10",
-        "dias_atras": 24
+        "dias_atras": 35
       },
       {
         "ticker": "TKNO4",
         "ultimo": "2026-06-21",
-        "dias_atras": 13
+        "dias_atras": 24
       }
     ]
   },
   "cotacoes": {
-    "atualizado_em": "04/07/2026 04:32",
-    "total_acoes": 459,
-    "total_fiis": 487,
-    "fallbacks": 8,
+    "atualizado_em": "15/07/2026 18:49",
+    "total_acoes": 460,
+    "total_fiis": 497,
+    "fallbacks": 10,
     "tickers_fallback": [
-      "MRSA6B",
+      "NEOE3",
       "TKNO4",
       "BREV11",
       "BRIM11",
       "GLOG11",
       "HGPO11",
+      "ONEF11",
+      "OURE11",
       "PLOG11",
       "SPG211"
     ]
   },
   "fundamentus": {
-    "atualizado_em": "03/07/2026 05:38",
+    "atualizado_em": "15/07/2026 18:49",
     "total_acoes": 994,
     "total_fiis": 553,
-    "atualizado_fiis": "03/07/2026 05:38"
+    "atualizado_fiis": "15/07/2026 18:49"
   },
   "criptos": {
-    "atualizado_em": "03/07/2026 21:44 UTC",
+    "atualizado_em": "15/07/2026 19:14 UTC",
     "total_moedas": 100,
     "com_dados": 100,
     "sem_dados": 0,
@@ -154,9 +129,9 @@
     "historico_falhou_lista": []
   },
   "resumo": {
-    "acoes_com_historico": 1356,
-    "fiis_com_historico": 367,
-    "cotacoes_atuais": 946,
+    "acoes_com_historico": 1365,
+    "fiis_com_historico": 372,
+    "cotacoes_atuais": 957,
     "indicadores_fundamentus": 1547,
     "criptos_atuais": 100,
     "status_geral": "✅ OK"
