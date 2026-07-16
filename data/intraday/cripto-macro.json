@@ -1,5 +1,5 @@
 {
-  "updated_at": "16/07/2026 16:44",
+  "updated_at": "16/07/2026 17:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,19 +1128,19 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 173669.27,
-      "changePct": -0.013300000000000001,
+      "price": 173627.06,
+      "changePct": -0.013500000000000002,
       "high": 176011.31,
-      "low": 173617.81
+      "low": 173536.56
     },
     {
       "ticker": "INDEXBVMF:IFIX",
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3845.95,
-      "changePct": 0.0018,
-      "high": 3846.23,
+      "price": 3848.15,
+      "changePct": 0.0023,
+      "high": 3848.15,
       "low": 3835.18
     },
     {
@@ -1158,8 +1158,8 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 12495.47,
-      "changePct": -0.008,
+      "price": 12491.04,
+      "changePct": -0.0084,
       "high": 12597.68,
       "low": 12467.37
     },
@@ -1188,28 +1188,28 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7513.16,
-      "changePct": -0.0078000000000000005,
+      "price": 7533.77,
+      "changePct": -0.0051,
       "high": 7570.74,
-      "low": 7509.56
+      "low": 7504.02
     },
     {
       "ticker": "INDEXNASDAQ:.IXIC",
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 25809.99,
-      "changePct": -0.0175,
+      "price": 25881.95,
+      "changePct": -0.0147,
       "high": 26165.37,
-      "low": 25809.99
+      "low": 25765.45
     },
     {
       "ticker": "INDEXDJX:.DJI",
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 52404.1,
-      "changePct": -0.0048,
+      "price": 52552.97,
+      "changePct": -0.002,
       "high": 52924.86,
       "low": 52367.42
     },
@@ -1218,10 +1218,10 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2967.46,
-      "changePct": -0.003,
+      "price": 2972.95,
+      "changePct": -0.0011,
       "high": 2996.28,
-      "low": 2966.26
+      "low": 2963.51
     },
     {
       "ticker": "CBOE:VIX",
