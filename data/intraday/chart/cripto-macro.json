@@ -154,7 +154,14 @@
       "INDEXDB:DAX": 24830.98,
       "INDEXNIKKEI:NI225": 64141.12,
       "INDEXHANGSENG:HSI": 24562.24
+    },
+    {
+      "t": "15:44",
+      "INDEXNASDAQ:.IXIC": 25525.34,
+      "INDEXRUSSELL:RUT": 2958.55,
+      "INDEXNIKKEI:NI225": 64141.12,
+      "INDEXHANGSENG:HSI": 24562.24
     }
   ],
-  "updated_at": "17/07/2026 15:14"
+  "updated_at": "17/07/2026 15:44"
 }
