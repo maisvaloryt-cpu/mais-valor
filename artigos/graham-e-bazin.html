@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="../favicon.png">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fórmulas de Graham e Bazin: como achar ações baratas — Mais Valor</title>
+<meta name="description" content="Aprenda as fórmulas de Benjamin Graham e Décio Bazin com exemplos numéricos passo a passo: número de Graham, margem de segurança e preço-teto por dividendos.">
+<link rel="canonical" href="https://canalmaisvalor.com.br/artigos/graham-e-bazin.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Mais Valor">
+<meta property="og:title" content="Fórmulas de Graham e Bazin: como achar ações baratas">
+<meta property="og:description" content="Número de Graham e preço-teto de Bazin explicados com exemplos numéricos passo a passo.">
+<meta property="og:url" content="https://canalmaisvalor.com.br/artigos/graham-e-bazin.html">
+<meta property="og:image" content="https://canalmaisvalor.com.br/logo.png">
+<meta name="twitter:card" content="summary">
+<script>window.NAV_BASE_PATH="../";</script>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../mobile.css">
+<link rel="stylesheet" href="artigos.css">
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<div class="page-hero fade-in">
+  <h1>GRAHAM & <em>BAZIN</em></h1>
+  <p>Os dois métodos clássicos para encontrar ações baratas — com a matemática explicada passo a passo.</p>
+</div>
+
+<div class="container">
+<article class="art fade-in-1">
+
+  <div class="art-meta">
+    <span class="art-tag nivel-2">Intermediário</span>
+    <span class="art-tag tempo">⏱ 9 min de leitura</span>
+  </div>
+
+  <p>Benjamin Graham foi o professor de Warren Buffett e é considerado o pai do value investing. Décio Bazin foi um jornalista financeiro brasileiro cujo livro virou referência de quem investe por dividendos — o próprio Luiz Barsi, maior investidor pessoa física da B3, cita o método. Os dois criaram <strong>filtros matemáticos simples para separar ações baratas de ações caras</strong> — e ambos estão automatizados nos <a href="../rankings.html">rankings</a> do Mais Valor. Este artigo explica como cada fórmula funciona, com exemplos numéricos completos.</p>
+
+  <h2>O método de <em>Graham</em></h2>
+
+  <p>A ideia central de Graham é a <strong>margem de segurança</strong>: pagar bem menos do que o negócio vale, para que até um erro de análise não destrua o investimento. Entre os vários filtros que ele propôs no clássico <em>O Investidor Inteligente</em>, o mais usado combina os dois múltiplos que você já conhece do nosso artigo de <a href="indicadores-fundamentalistas.html">indicadores</a>:</p>
+
+  <div class="art-box">
+    <p><strong>P/L × P/VP ≤ 22,5</strong></p>
+    <p>Graham considerava razoável pagar até P/L 15 e P/VP 1,5. Multiplicando os dois limites: 15 × 1,5 = <strong>22,5</strong>. Uma ação cujo produto fica abaixo disso passa no filtro; acima, é considerada cara pelos critérios dele.</p>
+  </div>
+
+  <h3>Exemplo passo a passo</h3>
+
+  <table class="art-table">
+    <thead><tr><th>Empresa (fictícia)</th><th class="r">P/L</th><th class="r">P/VP</th><th class="r">P/L × P/VP</th><th class="r">Passa no filtro?</th></tr></thead>
+    <tbody>
+      <tr><td>Energética S.A.</td><td class="r">7,0</td><td class="r">1,4</td><td class="r">9,8</td><td class="r" style="color:var(--up)">✓ Sim, com folga</td></tr>
+      <tr><td>Banco Sólido</td><td class="r">8,5</td><td class="r">2,2</td><td class="r">18,7</td><td class="r" style="color:var(--up)">✓ Sim</td></tr>
+      <tr><td>Varejo Popular</td><td class="r">14,0</td><td class="r">1,9</td><td class="r">26,6</td><td class="r" style="color:var(--dn)">✕ Não</td></tr>
+      <tr><td>Tech Crescimento</td><td class="r">32,0</td><td class="r">6,5</td><td class="r">208,0</td><td class="r" style="color:var(--dn)">✕ Muito longe</td></tr>
+    </tbody>
+  </table>
+
+  <p>Repare na Tech Crescimento: reprovar no filtro de Graham <strong>não significa que a empresa é ruim</strong> — significa que ela não é uma "ação de valor" nos critérios dele. Empresas de crescimento acelerado quase nunca passam, e tudo bem: o método foi desenhado para outro perfil de oportunidade.</p>
+
+  <h3>Existe também o "número de Graham"</h3>
+
+  <p>Uma variação popular transforma o filtro num preço-alvo: <strong>√(22,5 × LPA × VPA)</strong>, onde LPA é o lucro por ação e VPA o valor patrimonial por ação. Se uma empresa lucra R$ 4,00 por ação e tem VPA de R$ 20,00: √(22,5 × 4 × 20) = √1.800 ≈ <strong>R$ 42,43</strong>. Abaixo desse preço, a ação estaria dentro da margem de Graham; acima, fora.</p>
+
+  <h2>O método de <em>Bazin</em></h2>
+
+  <p>Bazin olhava para uma única coisa: <strong>dividendos</strong>. Para ele, ação boa é ação que paga — e o preço justo é aquele que garante um retorno mínimo de <strong>6% ao ano em dividendos</strong> (o "cash yield" que ele exigia). Daí nasce o preço-teto:</p>
+
+  <div class="art-box">
+    <p><strong>Preço-teto = dividendos por ação dos últimos 12 meses ÷ 0,06</strong></p>
+    <p>Se a ação paga R$ 1,80 por ano, o teto de Bazin é 1,80 ÷ 0,06 = <strong>R$ 30,00</strong>. Abaixo de R$ 30, comprando, você "trava" um yield de pelo menos 6% ao ano (se os dividendos se mantiverem). Acima, o retorno em dividendos fica menor do que o mínimo exigido.</p>
+  </div>
+
+  <h3>Exemplo completo</h3>
+
+  <table class="art-table">
+    <thead><tr><th>Empresa (fictícia)</th><th class="r">Div./ação (12m)</th><th class="r">Preço-teto</th><th class="r">Preço atual</th><th class="r">Veredito de Bazin</th></tr></thead>
+    <tbody>
+      <tr><td>Elétrica Estável</td><td class="r">R$ 2,40</td><td class="r">R$ 40,00</td><td class="r">R$ 31,50</td><td class="r" style="color:var(--up)">✓ 21% abaixo do teto</td></tr>
+      <tr><td>Banco Sólido</td><td class="r">R$ 1,50</td><td class="r">R$ 25,00</td><td class="r">R$ 24,10</td><td class="r" style="color:var(--up)">✓ No limite</td></tr>
+      <tr><td>Indústria Cíclica</td><td class="r">R$ 0,90</td><td class="r">R$ 15,00</td><td class="r">R$ 22,80</td><td class="r" style="color:var(--dn)">✕ 52% acima do teto</td></tr>
+    </tbody>
+  </table>
+
+  <p>Além do preço-teto, Bazin tinha regras qualitativas: evitar empresas endividadas, fugir de setores problemáticos e <strong>vender quando os dividendos deixarem de ser bons</strong> — o método não é "comprar e esquecer".</p>
+
+  <h2>As <em>limitações</em> (importantes) dos dois métodos</h2>
+
+  <ul>
+    <li><strong>Ambos olham pelo retrovisor:</strong> usam lucro e dividendos passados. Uma empresa pode passar nos filtros hoje e ter o negócio deteriorando — os números demoram a mostrar.</li>
+    <li><strong>Graham foi criado em outra época:</strong> nos anos 1930-70, os balanços eram dominados por ativos físicos. Empresas de software e serviços "reprovam" no P/VP sem estarem necessariamente caras.</li>
+    <li><strong>Bazin depende da sustentabilidade do dividendo:</strong> se o pagamento dos últimos 12 meses incluiu um extraordinário, o teto sai inflado — exatamente a armadilha que mostramos no <a href="guia-de-dividendos.html">guia de dividendos</a>.</li>
+    <li><strong>Filtro não é análise:</strong> os métodos reduzem o universo de 400+ ações para uma lista curta de candidatas. O passo seguinte — entender o negócio, a dívida, o setor — continua com você.</li>
+  </ul>
+
+  <h2>Use os dois <em>agora</em>, sem calculadora</h2>
+
+  <p>O Mais Valor calcula tudo automaticamente, com os dados atualizados diariamente:</p>
+
+  <ol>
+    <li>Na página de <a href="../acoes.html">Ações</a>, clique no ranking <strong>"Mais Baratas - Graham"</strong> para ordenar pelo produto P/L × P/VP, ou em <strong>"Abaixo do Bazin"</strong> para ver quem negocia abaixo do preço-teto (e com quanto de folga).</li>
+    <li>Na página de <a href="../rankings.html">Rankings</a>, cruze com outros critérios — menor P/L, maior ROE, maior DY.</li>
+    <li>Antes de decidir, confira os fundamentos completos da empresa na página do ativo e gere um relatório na <a href="../analise.html">Análise</a>.</li>
+  </ol>
+
+  <div class="art-cta">
+    <a href="../acoes.html">🎯 Ver ações abaixo do Bazin</a>
+    <a class="sec" href="../rankings.html">🏆 Explorar os rankings</a>
+  </div>
+
+  <div class="art-aviso">⚠️ Este artigo tem caráter educativo e não é recomendação de investimento. As empresas dos exemplos são fictícias; filtros quantitativos são ponto de partida de estudo, não decisão de compra.</div>
+
+  <div class="art-nav">
+    <a href="index.html">← Todos os artigos</a>
+    <a href="indicadores-fundamentalistas.html">Leia também: Indicadores fundamentalistas →</a>
+  </div>
+
+</article>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="../nav.js"></script>
+</body>
+</html>

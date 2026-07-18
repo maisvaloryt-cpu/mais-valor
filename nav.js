@@ -42,6 +42,7 @@ const NAV_LINKS = [
   { href: 'dividendos.html',   label: 'Dividendos' },
   { href: 'rankings.html',     label: 'Rankings' },
   { href: 'comparador.html',   label: 'Comparador' },
+  { href: 'artigos/index.html', label: '📚 Artigos' },
   { href: 'ferramentas.html',  label: 'Ferramentas' },
   { href: 'analise.html',      label: '✦ Análise' },
   { href: 'watchlist.html',    label: '★ Watchlist' },
@@ -417,6 +418,7 @@ function renderNav() {
   const watchActive       = page === 'watchlist.html';
   const carteiraActive    = inConsolidador;
   const statusActive      = page === 'status.html';
+  const artigosActive     = location.pathname.includes('/artigos/');
 
   const dropBtnStyle = (active) =>
     `cursor:pointer;font-size:12.5px;font-weight:600;letter-spacing:0.2px;white-space:nowrap;` +
@@ -482,6 +484,7 @@ function renderNav() {
     <a href="${NAV_BASE}comparador.html" class="${page==='comparador.html'?'active':''}" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.comparador} Comparador</a>
     <a href="${NAV_BASE}analise.html" class="${page==='analise.html'?'active':''}" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.analise} Análise IA</a>
     <a href="${NAV_BASE}ferramentas.html" class="${page==='ferramentas.html'?'active':''}" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.outras} Outras</a>
+    <a href="${NAV_BASE}artigos/index.html" class="${location.pathname.includes('/artigos/')?'active':''}" onclick="toggleMobileMenu()">📚 Artigos</a>
     <a href="${NAV_BASE}metodologia.html" class="${page==='metodologia.html'?'active':''}" onclick="toggleMobileMenu()">📐 Metodologia</a>
     <div class="mob-group-label">Conta</div>
     <a href="${NAV_BASE}watchlist.html" class="${watchActive?'active':''}" onclick="toggleMobileMenu()">★ Watchlist</a>
@@ -503,6 +506,7 @@ function renderNav() {
         <a href="${NAV_BASE}carteira/index.html" class="${carteiraActive?'active':''}">${WALLET_ICON} Carteira</a>
         <span id="mv-ativos-btn" style="${dropBtnStyle(ativosActive)}">Ativos ▾</span>
         <span id="mv-ferramentas-btn" style="${dropBtnStyle(ferramentasActive)}">Ferramentas ▾</span>
+        <a href="${NAV_BASE}artigos/index.html" class="${artigosActive?'active':''}">📚 Artigos</a>
         <a href="${NAV_BASE}watchlist.html" class="${watchActive?'active':''}">★ Watchlist</a>
         <a href="${NAV_BASE}status.html" class="${statusActive?'active':''}" style="color:var(--up);font-size:11px">● Status</a>
       </div>
@@ -861,6 +865,8 @@ function renderFooter() {
     Não constitui recomendação de investimento.</p>
     <p style="margin-top:10px;font-size:13px">
       <a href="/sobre.html" style="color:var(--text2);text-decoration:none">Sobre</a>
+      <span style="color:var(--text3);margin:0 8px">·</span>
+      <a href="/artigos/" style="color:var(--text2);text-decoration:none">Artigos</a>
       <span style="color:var(--text3);margin:0 8px">·</span>
       <a href="/metodologia.html" style="color:var(--text2);text-decoration:none">Metodologia</a>
       <span style="color:var(--text3);margin:0 8px">·</span>
