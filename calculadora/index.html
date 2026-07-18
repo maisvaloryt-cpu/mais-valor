@@ -1010,6 +1010,46 @@
                 </div>
             </div>
 
+            <!-- COMO FUNCIONA — bloco educativo (aprovado: fica após os botões de export) -->
+            <style>
+            .cf-wrap{margin-top:18px}
+            .cf-box{background:#16161a;border:1px solid #24242b;border-radius:15px;overflow:hidden}
+            .cf-box summary{cursor:pointer;padding:13px 18px;font-size:13px;font-weight:700;color:#e5e7eb;list-style:none;display:flex;align-items:center;gap:10px}
+            .cf-box summary::-webkit-details-marker{display:none}
+            .cf-box summary .cf-chev{margin-left:auto;color:#FFCC00;font-size:15px;transition:transform .2s}
+            .cf-box[open] summary .cf-chev{transform:rotate(180deg)}
+            .cf-body{padding:0 18px 16px;display:flex;flex-direction:column;gap:10px}
+            .cf-body>p{font-size:12.5px;color:#a1a1aa;line-height:1.7;max-width:880px}
+            .cf-body strong{color:#e5e7eb}
+            .cf-passos{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px}
+            .cf-passo{display:flex;gap:10px;align-items:flex-start;background:#1e1e26;border:1px solid #24242b;border-radius:10px;padding:10px 12px}
+            .cf-num{width:20px;height:20px;border-radius:50%;background:rgba(255,204,0,0.12);border:1px solid rgba(255,204,0,0.4);color:#FFCC00;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+            .cf-txt{font-size:11.5px;color:#a1a1aa;line-height:1.55}
+            .cf-txt b{color:#e5e7eb}
+            .cf-modos{display:flex;gap:8px;flex-wrap:wrap}
+            .cf-chip{flex:1;min-width:240px;background:#1e1e26;border:1px solid #24242b;border-radius:10px;padding:10px 12px;font-size:11.5px;color:#a1a1aa;line-height:1.55}
+            .cf-chip b{color:#FFCC00}
+            .cf-aviso{font-size:10.5px;color:#6b7280;line-height:1.5}
+            </style>
+            <div class="cf-wrap">
+              <details class="cf-box" open>
+                <summary>💡 Como funciona esta calculadora? <span class="cf-chev">▾</span></summary>
+                <div class="cf-body">
+                  <p>Descubra <strong>quanto seu dinheiro pode render ao longo dos anos</strong> com o poder dos juros compostos. Informe quanto você tem hoje, quanto pretende aportar por mês e a rentabilidade esperada — a calculadora projeta a evolução do seu patrimônio ano a ano, separando o que é <strong>aporte</strong> do que é <strong>juros</strong>, e mostra a renda mensal que esse patrimônio poderia gerar.</p>
+                  <div class="cf-passos">
+                    <div class="cf-passo"><div class="cf-num">1</div><div class="cf-txt"><b>Preencha os campos</b> — valor inicial, aporte mensal, rentabilidade anual e por quantos anos vai investir.</div></div>
+                    <div class="cf-passo"><div class="cf-num">2</div><div class="cf-txt"><b>Veja o resultado na hora</b> — os cartões e o gráfico atualizam automaticamente a cada mudança.</div></div>
+                    <div class="cf-passo"><div class="cf-num">3</div><div class="cf-txt"><b>Explore</b> — clique nos pontos do gráfico, teste metas e use o modo reverso ("quanto preciso aportar?").</div></div>
+                  </div>
+                  <div class="cf-modos">
+                    <div class="cf-chip"><b>Modo Calculadora</b> — o essencial: juros compostos, aportes com correção pela inflação e meta reversa. Ideal pra começar.</div>
+                    <div class="cf-chip"><b>Modo Simulador</b> — opções avançadas: inspeção ano a ano, cenários, eventos de vida real e muito mais. Pra quem quer ir fundo.</div>
+                  </div>
+                  <div class="cf-aviso">Projeções são estimativas matemáticas, não promessas de retorno. Ferramenta educativa — não é recomendação de investimento.</div>
+                </div>
+              </details>
+            </div>
+
         </div>
 
     </div>
