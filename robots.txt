@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /carteira/
+Disallow: /data/
+
+Sitemap: https://canalmaisvalor.com.br/sitemap.xml

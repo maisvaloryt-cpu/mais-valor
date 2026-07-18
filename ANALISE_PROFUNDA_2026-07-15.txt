@@ -22,6 +22,118 @@
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STATUS DAS CORREÇÕES — atualizado em 17/07/2026
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TODOS os itens [ALTO] e [MÉDIO] foram corrigidos em 17/07/2026, a pedido do
+Diego. Verificação: os 21 testes originais dos motores continuam passando
+(node tests/test_motores.js → 21/21 ✓) + 8 testes numéricos novos escritos
+para validar cada correção (8/8 ✓) + checagem de sintaxe dos arquivos.
+
+  ✔ 2.1 [ALTO]  RF LOTE A LOTE — nova função valorRFPorLotes() em common.js:
+        cada compra rende desde a SUA data; venda consome os lotes mais
+        antigos primeiro (FIFO). Usada no calcAtivos (posição atual) e na
+        evolução patrimonial. Compra única continua idêntica ao modelo antigo
+        (que segue como fallback). Teste: 2 lotes (2020 e 2025) a 12% a.a. —
+        valor novo = lote1 + lote2, cada um corrigido da própria data; o
+        modelo antigo inflava o total em mais de R$ 1.000 nesse exemplo.
+
+  ✔ 2.2 [MÉDIO] DY MÉDIO — agora divide só os proventos 12m das POSIÇÕES
+        ABERTAS pelo patrimônio atual. O card "Proventos (últimos 12M)"
+        continua contando tudo que foi recebido (inclusive de vendidos),
+        porque ali a métrica é "dinheiro recebido" mesmo.
+
+  ✔ 2.3 [MÉDIO] TWR — fluxo externo agora é o REAL (compras − vendas do mês,
+        a preço de transação) e os dividendos do mês entram como retorno:
+        R = (V1 + Div − Fluxo) / V0 − 1. Dividendo reinvestido deixou de ser
+        tratado como aporte externo. Teste: mês com dividendo + mês com aporte
+        externo → TWR encadeado bate a fórmula de referência com erro < 1e-9.
+
+  ✔ 2.4 [MÉDIO] CÂMBIO HISTÓRICO NA EVOLUÇÃO — confirmei que os históricos de
+        stocks/REITs estão em USD (ex.: KO fecha a 81,29 = preço em dólar).
+        Nova função getRateHist(moeda, ym) usa a série USDBRL/EURBRL do
+        próprio site (mês a mês, com fallback pro câmbio atual), e
+        loadAllHistorico passou a baixar a série de câmbio quando a carteira
+        tem ativo em moeda estrangeira.
+
+  ✔ 1.1 [MÉDIO] POUPANÇA COM CRONOGRAMA REAL — o pipeline agora publica
+        também baseDadosCalculados.retiradasMensais (retirada mensal
+        pretendida + retiradas pontuais). As linhas Poupança/Conta Corrente do
+        gráfico E os cards de comparação usam os MESMOS aportes
+        (aportesMensais, com IPCA/aporte inteligente/suspensão) e o MESMO
+        plano de retiradas. Comparação justa: mesmo dinheiro entra e sai das
+        três linhas.
+
+  ✔ 1.2 [MÉDIO] RÓTULO ANO/MÊS DA RETIRADA PONTUAL — o campo agora mostra
+        "Ano" no período anual e "Mês" no mensal, e re-renderiza ao trocar o
+        período. (O comportamento do cálculo não mudou — só ficou honesto.)
+
+  ✔ 3.1 [MÉDIO] CARRY-FORWARD NO BACKTEST — mês sem cotação usa o último
+        preço conhecido para VALORIZAR a posição (compras e rebalanceamento
+        continuam exigindo preço real do mês). Os pesos exibidos também usam o
+        carry. Teste: preço constante com um buraco de 1 mês no meio →
+        drawdown 0, volatilidade 0 e patrimônio estável no mês do buraco
+        (antes: queda falsa de 100% da posição naquele mês).
+
+  ✔ 5.1 [MÉDIO] SEO BÁSICO — 24 páginas públicas ganharam meta description,
+        canonical, Open Graph (og:title/description/url/image) e Twitter card,
+        com o domínio canalmaisvalor.com.br. Criados robots.txt (bloqueando
+        /carteira/ e /data/) e sitemap.xml com as 22 URLs principais.
+        → AÇÃO SUA (opcional): cadastrar o sitemap no Google Search Console.
+
+  ✔ 5.2 [MÉDIO] FAVICON — favicon.png e calculadora/favicon.png reduzidos de
+        319 KB (530×470) para 3,1 KB (64×64), sem distorção.
+
+  O QUE FICOU DE FORA (só os [BAIXO], intactos): 1.3-1.7, 2.5-2.9, 3.2, 4.1-4.3,
+  5.3-5.6 — além das melhorias das Seções 6 e 7, que dependem de você escolher.
+
+  Observação honesta sobre o 1.1: a poupança espelha o PLANO de retiradas
+  (valor pretendido). Se a carteira esgotar antes da poupança, cada linha
+  para de sacar quando o próprio saldo acaba — comportamento correto.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+O QUE DEPENDE DE VOCÊ (checklist — nada disso é código)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  1. PUBLICAR: fazer commit e push das mudanças de 17/07 (10 arquivos:
+     carteira/common.js, carteira/rentabilidade.html, calculadora/main.js,
+     simulador.html, favicon.png, calculadora/favicon.png, robots.txt,
+     sitemap.xml + as 24 páginas com SEO). Depois do push, conferir no GitHub
+     Actions se o workflow "Testes dos motores de cálculo" fica verde.
+
+  2. TESTAR NO NAVEGADOR (os testes cobrem a matemática, não a interface):
+     a) Calculadora: ligar IPCA no aporte + retirada + comparação com poupança
+        e ver se as 3 linhas do gráfico e os cards fazem sentido;
+     b) Calculadora: alternar Anos/Meses e conferir o rótulo "Ano/Mês" no
+        campo da retirada pontual;
+     c) Carteira: abrir Resumo, Rentabilidade (cards TWR) e Patrimônio
+        (evolução) com a sua carteira real e ver se os números parecem certos
+        — especialmente se você tem RF com mais de uma compra no mesmo título
+        (o valor deve ter DIMINUÍDO um pouco: antes estava inflado).
+
+  3. GOOGLE SEARCH CONSOLE (para o SEO valer de verdade):
+     a) search.google.com/search-console → adicionar canalmaisvalor.com.br
+        (se ainda não tiver);
+     b) Sitemaps → enviar: https://canalmaisvalor.com.br/sitemap.xml
+
+  4. FIREBASE (5 minutos, importante): conferir as RULES do Firestore no
+     console (Firestore → Regras). Deve ter algo como:
+        match /carteiras/{uid} {
+          allow read, write: if request.auth != null && request.auth.uid == uid;
+        }
+     Sem isso, um usuário logado conseguiria ler a carteira de outro.
+
+  5. PENDÊNCIA ANTIGA que continua: trocar o token clássico do GitHub no
+     Apps Script por um fine-grained (passos na análise de 04/07) e revogar
+     o antigo.
+
+  6. AVISAR OS USUÁRIOS (opcional): quem tem RF com múltiplas compras vai ver
+     o valor do título mudar (para menos). Não é bug — é a correção 2.1.
+     Se alguém perguntar, a explicação está na seção STATUS acima.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SEÇÃO 1 — CALCULADORA (calculadora/main.js)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 

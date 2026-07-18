@@ -145,16 +145,31 @@ var _benchCacheR=typeof _benchCacheR!=='undefined'?_benchCacheR:{}; // var (não
 
 /* [S8] TWR — Time-Weighted Return (rentabilidade ponderada pelo tempo).
    Remove o efeito de QUANDO você aportou/retirou: encadeia o retorno de cada
-   mês descontando o fluxo externo (aproximado pela variação do custo, no fim
-   do mês). É a métrica correta para comparar a carteira com IBOV/CDI —
-   a "Rentabilidade Total" clássica mistura retorno com timing dos aportes. */
+   mês descontando o fluxo externo. É a métrica correta para comparar a
+   carteira com IBOV/CDI.
+   [2.3 FIX] O fluxo externo agora é o REAL: compras − vendas do mês, a preço
+   de transação (antes era a variação do CUSTO — venda com lucro "saía pelo
+   custo" e distorcia o mês). E os dividendos do mês entram no numerador como
+   retorno: R = (V1 + Div − Fluxo) / V0 − 1. Assim, dividendo reinvestido não
+   é mais tratado como aporte externo (era descontado do retorno de quem
+   reinveste proventos). */
 function calcTWR(evol){
+  const divMes=getDividendosTotalPorMes();
+  const fluxoMes={}; // 'YYYY-MM' → compras − vendas (R$ à época da transação)
+  ativos.forEach(a=>{
+    if(!a.data)return;
+    const ym=a.data.slice(0,7);
+    const tipo=a.tipo||'Compra';
+    if(tipo==='Compra')fluxoMes[ym]=(fluxoMes[ym]||0)+a.qtd*a.pm;
+    else if(tipo==='Venda')fluxoMes[ym]=(fluxoMes[ym]||0)-a.qtd*a.pm;
+  });
   const rets=[];
   for(let i=1;i<evol.length;i++){
     const vPrev=evol[i-1].vt, v=evol[i].vt;
-    const fluxo=(evol[i].custo||0)-(evol[i-1].custo||0);
     if(!(vPrev>0))continue;
-    const r=(v-fluxo)/vPrev-1;
+    const fluxo=fluxoMes[evol[i].ym]||0;
+    const div=divMes[evol[i].ym]||0;
+    const r=(v+div-fluxo)/vPrev-1;
     if(isFinite(r))rets.push(r);
   }
   const acum=rets.reduce((p,r)=>p*(1+r),1)-1;
@@ -196,7 +211,7 @@ async function renderAlfa(){
   const bIbov=benchRet(_benchCacheR.IBOV,ymBase,ymFim);
   const bCdi=benchRet(_benchCacheR.CDI,ymBase,ymFim);
   const twrCards=twr.n>=2?`
-    <div class="mcard" title="TWR (Time-Weighted Return): rentabilidade ponderada pelo tempo — remove o efeito de quando você aportou/retirou. É a métrica correta para comparar com índices. Fluxos aproximados pela variação do custo no fim de cada mês.">
+    <div class="mcard" title="TWR (Time-Weighted Return): rentabilidade ponderada pelo tempo — remove o efeito de quando você aportou/retirou. É a métrica correta para comparar com índices. Fluxos = compras − vendas do mês (a preço de transação); dividendos contam como retorno.">
       <div class="mcard-label">Rentabilidade TWR — período (${twr.n} meses)</div>
       <div class="mcard-value ${twr.acum>=0?'positive':'negative'}">${fmtP(twr.acum*100)}</div>
       <div class="mcard-sub">${twr.anual!=null?('≈ '+fmtP(twr.anual*100)+' a.a.'):'período menor que 12m'}${bIbov!=null?(' · IBOV no período: '+fmtP(bIbov*100)):''}${bCdi!=null?(' · CDI: '+fmtP(bCdi*100)):''}</div>

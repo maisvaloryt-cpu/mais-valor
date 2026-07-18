@@ -5,6 +5,16 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Simulador de Carteiras — Mais Valor</title>
+<!-- SEO [5.1] -->
+<meta name="description" content="Backtest de carteira com dados reais da B3: simule aportes mensais, dividendos reinvestidos, rebalanceamento e compare com IBOV e CDI.">
+<link rel="canonical" href="https://canalmaisvalor.com.br/simulador.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Mais Valor">
+<meta property="og:title" content="Simulador de Carteiras — Mais Valor">
+<meta property="og:description" content="Backtest de carteira com dados reais da B3: simule aportes mensais, dividendos reinvestidos, rebalanceamento e compare com IBOV e CDI.">
+<meta property="og:url" content="https://canalmaisvalor.com.br/simulador.html">
+<meta property="og:image" content="https://canalmaisvalor.com.br/logo.png">
+<meta name="twitter:card" content="summary">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="mobile.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -1879,9 +1889,16 @@ function runBacktest(config, allPrices, allDividends) {
     }
     return allPrices[ticker]?.[month] ?? null;
   };
+  // [3.1 FIX] Carry-forward de preço para VALORIZAÇÃO: se um ativo fica um mês
+  // sem cotação (suspensão/falha de coleta), usa o último preço conhecido em
+  // vez de sumir com a posição — antes o patrimônio "despencava" no mês sem
+  // dado e "voltava" no seguinte, contaminando retorno mensal, volatilidade,
+  // Sharpe e drawdown. Compras/rebalanceamento continuam exigindo preço real
+  // do mês (getPrice) — o carry vale só para avaliar o que já se tem.
+  const lastKnownPrice = {};
   const portValue = (month) => normAssets.reduce((s,a) => {
     if (INDICES_ACUMULADOS.has(a.ticker)) return s + holdings[a.ticker]; // saldo direto
-    const p = getPrice(a.ticker, month);
+    const p = getPrice(a.ticker, month) ?? lastKnownPrice[a.ticker];
     return p != null ? s + holdings[a.ticker] * p : s;
   }, 0);
 
@@ -1913,6 +1930,13 @@ function runBacktest(config, allPrices, allDividends) {
 
   for (let i = 0; i < months.length; i++) {
     const month = months[i];
+
+    // [3.1] Atualiza o último preço conhecido de cada ativo (carry-forward)
+    normAssets.forEach(a => {
+      if (INDICES_ACUMULADOS.has(a.ticker)) return;
+      const p = getPrice(a.ticker, month);
+      if (p != null) lastKnownPrice[a.ticker] = p;
+    });
 
     // Pesos efetivos neste mês (redistribuição proporcional)
     const effW = calcEffectiveWeights(normAssets, allPrices, month);
@@ -2265,7 +2289,9 @@ function runBacktest(config, allPrices, allDividends) {
       : 0;
     const weights = {};
     normAssets.forEach(a => {
-      const p = getPrice(a.ticker, month);
+      // [3.1] Peso também usa o carry-forward — senão, num mês sem dado o
+      // ativo apareceria com 0% enquanto o pv inclui o valor carregado.
+      const p = getPrice(a.ticker, month) ?? lastKnownPrice[a.ticker];
       // Pesos calculados sobre os ATIVOS (pv), não sobre o patrimônio total —
       // assim "ação = 50%" continua sendo dentro da parte investida nos ativos.
       weights[a.ticker] = p && pv > 0 ? (holdings[a.ticker]*p)/pv : 0;

@@ -230,6 +230,15 @@
     function calcularDadosPoupanca(labels, vInicial, aporteMensal, isCorrente) {
         const taxaAnual = isCorrente ? 0 : (parseFloat(document.getElementById('inputTaxaPoupanca')?.value) || POUPANCA_TAXA_PADRAO) / 100;
         const taxaMensal = isCorrente ? 0 : Math.pow(1 + taxaAnual, 1/12) - 1;
+        // [1.1 FIX] Comparação JUSTA: usa o MESMO cronograma de aportes do
+        // pipeline (com IPCA no aporte, aporte inteligente e suspensão na
+        // retirada) e o mesmo plano de retiradas. Antes a poupança aportava o
+        // valor base fixo — com IPCA/retirada ativos, cada linha recebia um
+        // dinheiro diferente. Fallback: aporte base (mês 1 sem aporte).
+        const aportes = baseDadosCalculados.aportesMensais || null;
+        const retiradas = baseDadosCalculados.retiradasMensais || null;
+        const apDoMes = (m) => aportes ? (aportes[m-1] ?? 0) : (m === 1 ? 0 : aporteMensal);
+        const retDoMes = (m) => retiradas ? (retiradas[m-1] ?? 0) : 0;
         const data = [];
         let saldo = vInicial;
         for (let i = 0; i < labels.length; i++) {
@@ -238,9 +247,10 @@
             const curMeses = tipoPeriodo === 'anual' ? parseInt(labels[i]) * 12 : parseInt(labels[i]);
             const steps = curMeses - prevMeses;
             for (let s = 0; s < steps; s++) {
-                // Convenção do site: mês 1 sem aporte (o 1º aporte já está no valor inicial)
                 const mesAbs = prevMeses + s + 1;
-                saldo = saldo * (1 + taxaMensal) + (mesAbs === 1 ? 0 : aporteMensal);
+                saldo = saldo * (1 + taxaMensal) + apDoMes(mesAbs);
+                const ret = retDoMes(mesAbs);
+                if (ret > 0) saldo = Math.max(0, saldo - ret);
             }
             data.push(Math.round(saldo));
         }
@@ -557,6 +567,10 @@
         // e retiradas). Consumido por Monte Carlo e Custo do Atraso para que as
         // simulações usem exatamente os mesmos aportes do pipeline.
         const aportesEfetivos = [];
+        // [1.1] Plano de retiradas de cada mês (retirada mensal pretendida +
+        // retiradas pontuais). Espelhado na comparação com Poupança/Corrente
+        // para a comparação usar o MESMO dinheiro entrando e saindo.
+        const retiradasPlanejadas = [];
 
         for (let m = 1; m <= totalMeses; m++) {
             let anoAtual = Math.ceil(m / 12);
@@ -612,16 +626,20 @@
                 if (saque > jurosDisp) saldoInvestido = Math.max(0, saldoInvestido - (saque - jurosDisp));
                 saldoTotal -= saque;
             };
+            let retiradaUnicaMes = 0; // [1.1] soma p/ espelhar na poupança
             if (tipoPeriodo === 'anual' && m % 12 === 0) {
                 const anoParaCheck = m / 12;
                 retiradaUnicaList.forEach(r => {
-                    if (r.ano === anoParaCheck) _aplicarRetiradaUnica(parseCurrencyValue(r.valorRaw || ''));
+                    if (r.ano === anoParaCheck) { const v = parseCurrencyValue(r.valorRaw || ''); retiradaUnicaMes += Math.max(0, v); _aplicarRetiradaUnica(v); }
                 });
             } else if (tipoPeriodo === 'mensal') {
                 retiradaUnicaList.forEach(r => {
-                    if (r.ano === m) _aplicarRetiradaUnica(parseCurrencyValue(r.valorRaw || ''));
+                    if (r.ano === m) { const v = parseCurrencyValue(r.valorRaw || ''); retiradaUnicaMes += Math.max(0, v); _aplicarRetiradaUnica(v); }
                 });
             }
+            // [1.1] Registra o plano de saída do mês (valor pretendido, não o
+            // efetivamente sacado — a poupança aplica o mesmo plano ao saldo dela)
+            retiradasPlanejadas.push((_emRetirada ? valorRetiradaPretendida : 0) + retiradaUnicaMes);
             // [2.3] Durante a retirada os aportes ficam suspensos — o card do ano
             // mostra "sem aportes mensais" em vez de um aporte que não acontece.
             aporteVigentePerAno[anoAtual] = (modoAtual === 'completo' && avancadoAtivo && retiradaAtiva && anoAtual >= anoInicioRetirada) ? 0 : aporteVigente;
@@ -653,6 +671,7 @@
         baseDadosCalculados.final.total = saldoTotal;
         baseDadosCalculados.final.renda = baseDadosCalculados.anos[totalCiclosGrafico]?.renda || 0;
         baseDadosCalculados.aportesMensais = aportesEfetivos; // [2.6] cronograma real
+        baseDadosCalculados.retiradasMensais = retiradasPlanejadas; // [1.1] plano de saídas
 
         // Alerta de sustentabilidade: patrimônio esgotado durante a retirada
         const ruinaEl = document.getElementById('alertaRuina');
@@ -981,15 +1000,25 @@
             const vIni = parseCurrencyValue(document.getElementById('inputInicial').value);
 
             document.getElementById('kpiPoupInvest').textContent = formatCurrency(d.total);
+            // [1.1 FIX] Cards usam o MESMO cronograma de aportes/retiradas do
+            // pipeline (igual às linhas do gráfico) — comparação justa.
+            const _apArr = baseDadosCalculados.aportesMensais || null;
+            const _retArr = baseDadosCalculados.retiradasMensais || null;
+            const _apM = (m) => _apArr ? (_apArr[m-1] ?? 0) : (m === 1 ? 0 : aporte);
+            const _retM = (m) => _retArr ? (_retArr[m-1] ?? 0) : 0;
             const diffP = poupancaAtivaPoupanca ? (() => {
                 const taxaP = (parseFloat(document.getElementById('inputTaxaPoupanca')?.value) || POUPANCA_TAXA_PADRAO) / 100;
                 const taxaMP = Math.pow(1 + taxaP, 1/12) - 1;
                 let sP = vIni;
-                for (let m = 1; m <= mesesPeriodo; m++) sP = sP * (1 + taxaMP) + (m === 1 ? 0 : aporte);
+                for (let m = 1; m <= mesesPeriodo; m++) { sP = sP * (1 + taxaMP) + _apM(m); const rt = _retM(m); if (rt > 0) sP = Math.max(0, sP - rt); }
                 return Math.round(sP);
             })() : null;
 
-            const diffC = poupancaAtivaCorrente ? Math.round(vIni + aporte * Math.max(0, mesesPeriodo - 1)) : null;
+            const diffC = poupancaAtivaCorrente ? (() => {
+                let sC = vIni;
+                for (let m = 1; m <= mesesPeriodo; m++) { sC += _apM(m); const rt = _retM(m); if (rt > 0) sC = Math.max(0, sC - rt); }
+                return Math.round(sC);
+            })() : null;
 
             const cardP = document.getElementById('cardPoupPoupanca');
             const cardC = document.getElementById('cardPoupCorrente');
@@ -2018,6 +2047,7 @@
             const a = document.getElementById('btnPeriodoAnos'), b = document.getElementById('btnPeriodoMeses');
             a.className = "px-2 py-0.5 rounded-md text-toggle-active transition btn-toggle-ativo"; a.style.background = '';
             b.className = "px-2 py-0.5 rounded-md text-gray-400 transition";                      b.style.background = '';
+            renderizarRetiradaUnica(); // [1.2] rótulo Ano/Mês acompanha o período
             executarPipelineCore();
         });
         document.getElementById('btnPeriodoMeses').addEventListener('click', () => {
@@ -2026,6 +2056,7 @@
             const a = document.getElementById('btnPeriodoMeses'), b = document.getElementById('btnPeriodoAnos');
             a.className = "px-2 py-0.5 rounded-md text-toggle-active transition btn-toggle-ativo"; a.style.background = '';
             b.className = "px-2 py-0.5 rounded-md text-gray-400 transition";                      b.style.background = '';
+            renderizarRetiradaUnica(); // [1.2] rótulo Ano/Mês acompanha o período
             executarPipelineCore();
         });
 
@@ -2724,7 +2755,7 @@
             row.className = 'flex items-center gap-1.5';
             row.innerHTML = `
                 <div class="relative flex-1">
-                    <span class="absolute left-2 top-1.5 text-gray-500 text-xs">Ano</span>
+                    <span class="absolute left-2 top-1.5 text-gray-500 text-xs">${tipoPeriodo === 'anual' ? 'Ano' : 'Mês'}</span>
                     <input type="number" min="1" value="${r.ano}" placeholder="—"
                         class="input-field w-full rounded-lg pl-8 pr-2 py-1.5 font-bold text-right text-xs focus:outline-none"
                         style="color:${r.ano?'#fff':'#6b7280'};"

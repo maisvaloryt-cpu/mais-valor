@@ -118,6 +118,19 @@ const DIVIDENDOS_CACHE={};  // ticker → [{date, value}]  (carregado do site a 
 // [BUG-D1 FIX] Taxas de câmbio: moeda → multiplicador para BRL (USD/BRL carregado de indices.json)
 const TAXAS_CAMBIO={'BRL':1};
 function getRate(moeda){if(!moeda||moeda==='BRL')return 1;return TAXAS_CAMBIO[moeda]||1;}
+/* [2.4 FIX] Câmbio HISTÓRICO de um mês (YYYY-MM) usando a série do site
+   (data/historico/USDBRL.json etc.). Sem dado do mês, usa o último anterior;
+   sem série carregada, cai no câmbio atual (comportamento antigo). */
+function getRateHist(moeda,ym){
+  if(!moeda||moeda==='BRL')return 1;
+  const serie=HISTORICO_CACHE[moeda+'BRL'];
+  if(serie&&Object.keys(serie).length){
+    if(serie[ym])return serie[ym];
+    const ant=Object.keys(serie).filter(k=>k<=ym).sort();
+    if(ant.length)return serie[ant[ant.length-1]];
+  }
+  return getRate(moeda);
+}
 
 /* -- preços atuais ----------------------------------------------------------- */
 async function atualizarCotacoes(){
@@ -201,6 +214,10 @@ async function fetchHistoricoTicker(ticker){
 
 async function loadAllHistorico(){
   const tickers=[...new Set(ativos.map(a=>a.ticker))];
+  // [2.4 FIX] Carrega também a série de câmbio das moedas usadas na carteira
+  // (USDBRL, EURBRL...) para a evolução usar o câmbio de cada mês.
+  [...new Set(ativos.map(a=>a.moeda).filter(m=>m&&m!=='BRL'))]
+    .forEach(m=>{const t=m+'BRL';if(!tickers.includes(t))tickers.push(t);});
   await Promise.allSettled(tickers.map(t=>fetchHistoricoTicker(t)));
 }
 
@@ -223,13 +240,17 @@ function calcEvolucaoPatrimonio(nMeses=24){
     const ateData=fimMes>hojeStr?hojeStr:fimMes;
     let vt=0,custo=0,usouFallback=false; // [5.9] marca meses avaliados sem preço histórico
     posicoes.forEach(a=>{
-      const rate=getRate(a.moeda);
+      // [2.4 FIX] Câmbio do MÊS (série histórica), não o de hoje — sem isso a
+      // curva de ativos em dólar era distorcida pelo câmbio atual.
+      const rate=getRateHist(a.moeda,ym);
       custo+=a.qtd*a.pm;
       // Valor de mercado do mês — mesma lógica do calcAtivos, para o lucro/prejuízo refletir SÓ preço/correção:
       let valorUnit;
       if(RF_CLASSES.has(a.classe)){
         // Renda Fixa / Tesouro: valor corrigido (CDI/prefixado) até o fim do mês — nunca "prejuízo falso".
-        valorUnit=a.pm*fatorRF(a.rf,a.data,ateData);
+        // [2.1 FIX] Lote a lote, com as transações até o mês avaliado.
+        const lr=valorRFPorLotes(a.ticker,a.rf,ateData,txAte);
+        valorUnit=(lr&&a.qtd>0)?lr.valor/a.qtd:a.pm*fatorRF(a.rf,a.data,ateData);
       }else{
         const hist=HISTORICO_CACHE[a.ticker]||{};
         let price=hist[ym];
@@ -975,6 +996,33 @@ function fatorRF(rf,dataAplic,ate){
   return 1;
 }
 
+/* [2.1 FIX] Valor corrigido da Renda Fixa LOTE A LOTE: cada compra rende desde
+   a SUA data. Antes, o PM inteiro era corrigido desde a data da 1ª compra —
+   um reforço no mesmo título "rendia" retroativamente o período em que o
+   dinheiro nem existia, superestimando o valor. Vendas consomem os lotes mais
+   antigos primeiro (FIFO). Retorna null quando não há lotes (cai no cálculo
+   antigo, que continua exato para compra única). */
+function valorRFPorLotes(ticker,rf,ate,txArray){
+  const txs=(txArray||ativos).filter(a=>a.ticker===ticker&&a.data&&(!ate||a.data<=ate))
+    .slice().sort((a,b)=>{
+      if(a.data!==b.data)return a.data<b.data?-1:1;
+      return (a.tipo==='Venda'?1:0)-(b.tipo==='Venda'?1:0);
+    });
+  const lotes=[];let temCompra=false;
+  txs.forEach(a=>{
+    const tipo=a.tipo||'Compra';
+    if(tipo==='Compra'){lotes.push({data:a.data,qtd:a.qtd,pm:a.pm});temCompra=true;}
+    else if(tipo==='Venda'){
+      let rest=a.qtd;
+      for(const l of lotes){if(rest<=0)break;const usa=Math.min(l.qtd,rest);l.qtd-=usa;rest-=usa;}
+    }
+  });
+  if(!temCompra)return null;
+  let qtd=0,valor=0;
+  lotes.forEach(l=>{if(l.qtd>0.0000001){qtd+=l.qtd;valor+=l.qtd*l.pm*fatorRF(rf,l.data,ate);}});
+  return qtd>0?{qtd,valor}:null;
+}
+
 // [BUG-C7 FIX] Parâmetro 'ate' (YYYY-MM-DD) para calcular posição em data específica (ex: IRPF 31/12)
 function calcAtivos(ate=null){
   const posicoes=ate?calcPosicoes(ativos.filter(a=>a.data&&a.data<=ate)):calcPosicoes();
@@ -982,9 +1030,14 @@ function calcAtivos(ate=null){
     // [BUG-D1 FIX] Aplica taxa de câmbio para ativos em moeda estrangeira
     const rate=getRate(a.moeda);
     // Renda Fixa: valor corrigido pelo CDI/Prefixado em dias úteis. Demais: cotação de mercado.
-    const cotacao=RF_CLASSES.has(a.classe)
-      ?a.pm*fatorRF(a.rf,a.data,ate)
-      :(COTACOES[a.ticker]||a.cotacao||0)*rate;
+    // [2.1 FIX] RF corrigida lote a lote (cada compra rende desde a sua data).
+    let cotacao;
+    if(RF_CLASSES.has(a.classe)){
+      const lr=valorRFPorLotes(a.ticker,a.rf,ate);
+      cotacao=(lr&&a.qtd>0)?lr.valor/a.qtd:a.pm*fatorRF(a.rf,a.data,ate);
+    }else{
+      cotacao=(COTACOES[a.ticker]||a.cotacao||0)*rate;
+    }
     const vt=a.qtd*cotacao;
     const custo=a.qtd*a.pm; // pm sempre em BRL conforme rótulo do formulário
     const res=vt-custo,resPct=custo>0?((vt-custo)/custo)*100:0;
@@ -1023,7 +1076,11 @@ function getTotals(){
   const lucroTotal=res+proventosTotal;
   const rentTotal=custo>0?(lucroTotal/custo)*100:0;
   const provAno=calcProventosUltimos12m();
-  const dyMed=total>0?(provAno/total)*100:0;
+  // [2.2 FIX] DY médio usa só os proventos 12m de POSIÇÕES ABERTAS ÷ patrimônio
+  // atual. Antes incluía proventos de tickers já vendidos, inflando o DY por
+  // meses após vender um bom pagador. provAno segue completo (é "recebido 12M").
+  const provAnoAbertos=c.reduce((s,a)=>s+(a.prov12m||0),0);
+  const dyMed=total>0?(provAnoAbertos/total)*100:0;
   return{total,custo,res,resPct,proventosTotal,lucroTotal,rentTotal,provAno,dyMed};
 }
 function byClasse(c){
