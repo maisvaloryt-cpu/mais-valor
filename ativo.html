@@ -824,7 +824,17 @@ async function loadDivData(){
   if(_divLoaded)return divData;
   try{
     const r=await fetch(`data/dividendos/${TICKER}.json`);
-    if(r.ok){const j=await r.json();divData=j.dividendos||[];}
+    if(r.ok){
+      const j=await r.json();
+      const raw=j.dividendos||[];
+      // Normaliza (o JSON usa 'pag'/'com', não 'date') e remove duplicados do mesmo pagamento
+      const seen=new Set();
+      divData=raw
+        .map(d=>({date:String(d.pag||d.com||d.date||'').slice(0,10),value:+d.value||0,tipo:d.tipo||''}))
+        .filter(d=>d.date&&d.value>0)
+        .filter(d=>{const k=d.date+'|'+d.value.toFixed(4);if(seen.has(k))return false;seen.add(k);return true;})
+        .sort((a,b)=>a.date<b.date?-1:1);
+    }
   }catch(e){}
   _divLoaded=true;
   return divData;
