@@ -763,10 +763,27 @@ function _mvEnsureGateEls(){
   const login=document.createElement('div');
   login.id='mv-gate-login';
   login.style.cssText='display:none;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:14px;text-align:center;color:var(--color-text-secondary);font-size:14px';
-  login.innerHTML=`<div>Faça login para ver sua carteira.</div>
-    <button class="btn btn-primary" style="padding:8px 16px;font-size:13px" onclick="loginGoogle()">
-      <i class="ti ti-brand-google" aria-hidden="true"></i> Entrar com Google
-    </button>`;
+  login.innerHTML=`
+    <div class="gate-welcome">
+      <div class="gw-icon">💼</div>
+      <div class="gw-title">Bem-vindo à sua Carteira</div>
+      <div class="gw-desc">
+        Acompanhe <strong>todos os seus investimentos em um só lugar</strong>: ações, FIIs, BDRs, ETFs e criptos.
+        A Carteira calcula automaticamente seu patrimônio, sua rentabilidade e os proventos recebidos,
+        com cotações atualizadas — e ainda organiza os dados que você precisa na hora do
+        <strong>Imposto de Renda</strong>.
+      </div>
+      <div class="gw-passos">
+        <div class="gw-passo"><div class="gw-num">1</div><div class="gw-txt"><b>Entre com sua conta Google</b> — grátis, seus dados ficam salvos com segurança e disponíveis em qualquer dispositivo.</div></div>
+        <div class="gw-passo"><div class="gw-num">2</div><div class="gw-txt"><b>Registre seus lançamentos</b> — adicione suas compras e vendas com data, quantidade e preço.</div></div>
+        <div class="gw-passo"><div class="gw-num">3</div><div class="gw-txt"><b>Acompanhe tudo automaticamente</b> — patrimônio, evolução mês a mês, proventos e rentabilidade real.</div></div>
+        <div class="gw-passo"><div class="gw-num">4</div><div class="gw-txt"><b>Explore as abas</b> — Proventos, Rentabilidade, Metas e IRPF mostram cada detalhe da sua jornada.</div></div>
+      </div>
+      <button class="btn btn-primary gw-btn" onclick="loginGoogle()">
+        <i class="ti ti-brand-google" aria-hidden="true"></i> Entrar com Google
+      </button>
+      <div class="gw-priv">Seus dados são privados e visíveis apenas para você. Ferramenta gratuita criada pelo canal Mais Valor.</div>
+    </div>`;
   // Insere logo antes da .app (depois da navegação), para não empurrar a barra/título do site.
   const appEl=document.querySelector('.app');
   document.body.insertBefore(login,appEl);
