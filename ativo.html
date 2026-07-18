@@ -58,6 +58,10 @@ if (!new URLSearchParams(location.search).get('t')) location.replace('acoes.html
 .section-box h3::before{content:'';width:3px;height:14px;background:var(--gold);border-radius:2px;box-shadow:0 0 8px var(--gold-glow)}
 .tab-content{display:none}
 .tab-content.active{display:block}
+/* Tooltip instantâneo dos botões do card */
+.aq-btns .tipwrap{position:relative}
+.aq-btns .tip{position:absolute;top:calc(100% + 7px);right:0;background:var(--bg4);border:1px solid var(--border3);color:var(--text);font-size:11px;font-weight:600;padding:5px 10px;border-radius:7px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .1s;z-index:50;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.aq-btns .tipwrap:hover .tip{opacity:1}
 /* ── NOVO CABEÇALHO: quadrado + retângulo ─────────────────── */
 .ativo-hgrid{max-width:1380px;margin:1.5rem auto 0;display:flex;gap:14px;align-items:stretch}
 .ativo-quadrado{width:300px;min-height:300px;flex-shrink:0;position:relative;background:linear-gradient(150deg,var(--bg2),var(--bg3));border:1px solid var(--border3);border-radius:16px;padding:18px;display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--shadow)}
@@ -104,9 +108,9 @@ if (!new URLSearchParams(location.search).get('t')) location.replace('acoes.html
     <div class="aq-topo">
       <div id="ativo-logo-wrap"></div>
       <div class="aq-btns">
-        <button class="watchlist-btn" id="watchlist-btn" onclick="toggleWatchlist()" title="Favoritar">☆</button>
-        <a id="comparar-btn" href="comparador.html" title="Comparar" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);color:var(--text2);font-size:16px;font-weight:700;text-decoration:none;font-family:var(--font-body)">⇄</a>
-        <a id="analise-btn" href="analise.html" title="Análise IA" style="padding:6px 10px;border-radius:8px;background:var(--gold-dim);border:1px solid var(--border2);color:var(--gold);font-size:16px;font-weight:700;text-decoration:none;font-family:var(--font-body)">✦</a>
+        <span class="tipwrap"><button class="watchlist-btn" id="watchlist-btn" onclick="toggleWatchlist(event)" aria-label="Favoritar">☆</button><span class="tip" id="watchlist-tip">Favoritar na watchlist</span></span>
+        <span class="tipwrap"><a id="comparar-btn" href="comparador.html" aria-label="Comparar" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);color:var(--text2);font-size:16px;font-weight:700;text-decoration:none;font-family:var(--font-body)">⇄</a><span class="tip">Comparar com outro ativo</span></span>
+        <span class="tipwrap"><a id="analise-btn" href="analise.html" aria-label="Análise IA" style="padding:6px 10px;border-radius:8px;background:var(--gold-dim);border:1px solid var(--border2);color:var(--gold);font-size:16px;font-weight:700;text-decoration:none;font-family:var(--font-body)">✦</a><span class="tip">Gerar análise com IA</span></span>
       </div>
     </div>
     <div class="aq-ticker">
@@ -290,37 +294,45 @@ async function saveWatchlist(w){
   if(ref) try{ await ref.set({tickers:w},{merge:true}); }catch(e){console.warn('wl save:',e);}
 }
 
-function _showLoginToast(){
-  let t=document.getElementById('wl-login-toast');
-  if(!t){
-    t=document.createElement('div');
-    t.id='wl-login-toast';
-    t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:12px;font-size:13px;color:var(--text1);z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.4);white-space:nowrap';
-    t.innerHTML=`<span>⭐ Faça login para favoritar ativos</span>
-      <button onclick="navLoginGoogle()" style="padding:5px 14px;border-radius:8px;background:var(--gold);color:#000;border:none;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--font-body)">Entrar com Google</button>
-      <button onclick="this.closest('#wl-login-toast').remove()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;line-height:1">×</button>`;
-    document.body.appendChild(t);
-  }
+function _showLoginToast(ev){
+  document.getElementById('wl-login-toast')?.remove();
+  const t=document.createElement('div');
+  t.id='wl-login-toast';
+  t.style.cssText='position:fixed;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;font-size:13px;color:var(--text);z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.55);white-space:nowrap;animation:fadeIn .15s ease';
+  t.innerHTML=`<span>Faça login para favoritar ativos</span>
+    <button onclick="navLoginGoogle()" style="padding:5px 14px;border-radius:8px;background:var(--gold);color:#000;border:none;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--font-body)">Entrar com Google</button>
+    <button onclick="this.closest('#wl-login-toast').remove()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;line-height:1">×</button>`;
+  document.body.appendChild(t);
+  // Posiciona logo abaixo do ponto do clique (ou do botão), sem sair da tela
+  const btn=document.getElementById('watchlist-btn');
+  const r=btn?btn.getBoundingClientRect():null;
+  const px=ev&&ev.clientX?ev.clientX:(r?r.left+r.width/2:innerWidth/2);
+  const py=ev&&ev.clientY?ev.clientY:(r?r.bottom:80);
+  const tw=t.offsetWidth, th=t.offsetHeight;
+  let x=px-tw/2, y=py+14;
+  x=Math.max(10,Math.min(x,innerWidth-tw-10));
+  if(y+th>innerHeight-10)y=py-th-14;
+  t.style.left=x+'px'; t.style.top=y+'px';
   clearTimeout(t._timer);
-  t._timer=setTimeout(()=>t.remove(),5000);
+  t._timer=setTimeout(()=>t.remove(),6000);
 }
 
-async function toggleWatchlist(){
+async function toggleWatchlist(ev){
   if(typeof firebase==='undefined'||!firebase.auth().currentUser){
-    _showLoginToast(); return;
+    _showLoginToast(ev); return;
   }
   let w=getWatchlist().slice();
   const btn=document.getElementById('watchlist-btn');
-  if(w.includes(TICKER)){w=w.filter(t=>t!==TICKER);btn.textContent='☆';btn.title='Favoritar';btn.classList.remove('saved');}
-  else{w.push(TICKER);btn.textContent='★';btn.title='Favoritado';btn.classList.add('saved');}
+  if(w.includes(TICKER)){w=w.filter(t=>t!==TICKER);btn.textContent='☆';const _wt1=document.getElementById('watchlist-tip');if(_wt1)_wt1.textContent='Favoritar na watchlist';btn.classList.remove('saved');}
+  else{w.push(TICKER);btn.textContent='★';const _wt2=document.getElementById('watchlist-tip');if(_wt2)_wt2.textContent='Remover dos favoritos';btn.classList.add('saved');}
   await saveWatchlist(w);
 }
 
 function _updateWlBtn(w){
   const btn=document.getElementById('watchlist-btn');
   if(!btn) return;
-  if(w.includes(TICKER)){btn.textContent='★';btn.title='Favoritado';btn.classList.add('saved');}
-  else{btn.textContent='☆';btn.title='Favoritar';btn.classList.remove('saved');}
+  if(w.includes(TICKER)){btn.textContent='★';const _wt2=document.getElementById('watchlist-tip');if(_wt2)_wt2.textContent='Remover dos favoritos';btn.classList.add('saved');}
+  else{btn.textContent='☆';const _wt1=document.getElementById('watchlist-tip');if(_wt1)_wt1.textContent='Favoritar na watchlist';btn.classList.remove('saved');}
 }
 
 function initWatchlist(){
