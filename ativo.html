@@ -152,6 +152,16 @@ html:not([data-theme="light"]) .section-box{background:#0B0B0D}
   <div id="tab-overview" class="tab-content active" style="padding-top:1.5rem">
     <div id="oportunidades" style="margin-bottom:1rem"></div>
     <div class="ind-grid" id="ind-grid" style="display:none"></div>
+
+    <!-- PREÇO JUSTO — Graham & Bazin (só ações) -->
+    <div class="section-box" id="preco-justo-box" style="display:none">
+      <h3>Preço Justo — Graham &amp; Bazin</h3>
+      <div class="ind-grid" id="preco-justo-grid"></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.6">
+        Cálculos automáticos com os dados mais recentes. Métodos clássicos são ponto de partida de estudo, não recomendação de investimento.
+        <a href="artigos/graham-e-bazin.html" style="color:var(--gold)">Entenda como os métodos funcionam →</a>
+      </div>
+    </div>
     <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem">
       <div>
         <div class="section-box">
@@ -778,6 +788,43 @@ function renderSameSetor(d){
     </div>`).join('')||'<div style="color:var(--text3);font-size:12px">Nenhum outro ativo neste setor</div>';
 }
 
+function renderPrecoJusto(d){
+  if(TIPO==='fii')return;
+  const box=document.getElementById('preco-justo-box');
+  if(!box)return;
+  const p=d.p;
+  const fmtR2=v=>'R$ '+v.toFixed(2).replace('.',',');
+  const cards=[];
+  // Bazin: preço-teto = dividendos 12m ÷ 6%
+  if(d.div12m>0&&p>0){
+    const teto=d.div12m/0.06;
+    const up=(teto-p)/p*100;
+    const ok=up>=0;
+    cards.push(`<div class="ind-card"><div class="ind-label">Preço-Teto Bazin</div><div class="ind-val ${ok?'up':'dn'}">${fmtR2(teto)}</div><div class="ind-desc" style="color:${ok?'var(--up)':'var(--dn)'}">${ok?'▲ '+up.toFixed(1)+'% de folga até o teto':'▼ '+Math.abs(up).toFixed(1)+'% acima do teto'}</div><div class="ind-desc">dividendos 12m ÷ 6%</div></div>`);
+  }
+  if(d.pl>0&&d.pvp>0&&p>0){
+    const lpa=p/d.pl, vpa=p/d.pvp;
+    // Número de Graham: √(22,5 × LPA × VPA)
+    const graham=Math.sqrt(22.5*lpa*vpa);
+    const marg=(graham-p)/p*100;
+    const gok=marg>=0;
+    cards.push(`<div class="ind-card"><div class="ind-label">Preço Justo Graham</div><div class="ind-val ${gok?'up':'dn'}">${fmtR2(graham)}</div><div class="ind-desc" style="color:${gok?'var(--up)':'var(--dn)'}">${gok?'▲ margem de segurança de '+marg.toFixed(1)+'%':'▼ preço '+Math.abs(marg).toFixed(1)+'% acima do justo'}</div><div class="ind-desc">√(22,5 × LPA × VPA)</div></div>`);
+    // Filtro de Graham: P/L × P/VP ≤ 22,5
+    const prod=d.pl*d.pvp;
+    const pass=prod<=22.5;
+    cards.push(`<div class="ind-card"><div class="ind-label">Filtro Graham (P/L × P/VP)</div><div class="ind-val ${pass?'up':'dn'}">${prod.toFixed(1)}</div><div class="ind-desc" style="color:${pass?'var(--up)':'var(--dn)'}">${pass?'✓ dentro do limite de 22,5':'✗ acima do limite de 22,5'}</div><div class="ind-desc">abaixo de 22,5 = barata p/ Graham</div></div>`);
+    // LPA e VPA derivados
+    cards.push(`<div class="ind-card"><div class="ind-label">LPA</div><div class="ind-val">${fmtR2(lpa)}</div><div class="ind-desc">lucro por ação (preço ÷ P/L)</div></div>`);
+    cards.push(`<div class="ind-card"><div class="ind-label">VPA</div><div class="ind-val">${fmtR2(vpa)}</div><div class="ind-desc">patrimônio por ação (preço ÷ P/VP)</div></div>`);
+    // Earnings Yield
+    const ey=100/d.pl;
+    cards.push(`<div class="ind-card"><div class="ind-label">Earnings Yield</div><div class="ind-val">${ey.toFixed(1)}%</div><div class="ind-desc">lucro anual sobre o preço (1 ÷ P/L)</div></div>`);
+  }
+  if(!cards.length)return;
+  document.getElementById('preco-justo-grid').innerHTML=cards.join('');
+  box.style.display='';
+}
+
 function renderAbout(d){
   document.getElementById('about-content').innerHTML=`
     <div style="margin-bottom:.75rem"><strong style="color:var(--text)">Ticker:</strong> ${d.t}</div>
@@ -877,6 +924,7 @@ async function init(){
   renderIndicadores(ativo);
   renderFundFull();
   renderAbout(ativo);
+  renderPrecoJusto(ativo);
   renderSameSetor(ativo);
   initWatchlist();
   await renderChart();
