@@ -58,6 +58,28 @@ if (!new URLSearchParams(location.search).get('t')) location.replace('acoes.html
 .section-box h3::before{content:'';width:3px;height:14px;background:var(--gold);border-radius:2px;box-shadow:0 0 8px var(--gold-glow)}
 .tab-content{display:none}
 .tab-content.active{display:block}
+/* ── NOVO CABEÇALHO: quadrado + retângulo ─────────────────── */
+.ativo-hgrid{max-width:1380px;margin:1.5rem auto 0;display:flex;gap:14px;align-items:stretch}
+.ativo-quadrado{width:300px;min-height:300px;flex-shrink:0;position:relative;background:linear-gradient(150deg,var(--bg2),var(--bg3));border:1px solid var(--border3);border-radius:16px;padding:18px;display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--shadow)}
+.ativo-quadrado::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),transparent 70%)}
+.aq-topo{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.aq-btns{display:flex;gap:6px;align-items:center}
+.aq-ticker{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
+.aq-ticker h1{font-family:var(--font-display);font-size:34px;font-weight:400;letter-spacing:.5px;line-height:1}
+.aq-nome{font-size:13.5px;color:var(--text2);font-weight:600;margin-top:6px}
+.aq-setor{font-size:11px;color:var(--text3);margin-top:3px}
+.aq-preco-bloco{margin-top:auto;border-top:1px solid var(--border);padding-top:10px}
+.aq-plabel{font-size:9.5px;font-weight:700;letter-spacing:1.2px;color:var(--text3);text-transform:uppercase;margin-bottom:2px}
+.aq-preco-bloco .preco{font-family:var(--font-mono);font-size:34px;font-weight:700;line-height:1.15}
+.aq-var{font-size:13px;font-family:var(--font-mono);margin-top:5px}
+.ativo-retangulo{flex:1;min-width:0;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:1.25rem 1.5rem;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.ativo-retangulo h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.ativo-retangulo h3::before{content:'';width:3px;height:14px;background:var(--gold);border-radius:2px;box-shadow:0 0 8px var(--gold-glow)}
+.ativo-tabsbar{max-width:1380px;margin:14px auto 0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:0 1rem}
+.ativo-tabsbar .ativo-tabs{margin-top:0;border-bottom:none}
+@media(max-width:1420px){.ativo-hgrid,.ativo-tabsbar{margin-left:2rem;margin-right:2rem}}
+@media(max-width:820px){.ativo-hgrid{flex-direction:column}.ativo-quadrado{width:100%;min-height:0}.aq-preco-bloco{margin-top:14px}}
+@media(max-width:600px){.ativo-hgrid,.ativo-tabsbar{margin-left:1rem;margin-right:1rem}}
 .watchlist-btn{padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-size:12px;font-weight:700;font-family:var(--font-body);transition:all .15s;display:flex;align-items:center;gap:6px}
 .watchlist-btn.saved{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
 .score-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:4px}
@@ -75,33 +97,40 @@ if (!new URLSearchParams(location.search).get('t')) location.replace('acoes.html
 <body>
 <div id="nav-placeholder"></div>
 
-<div class="ativo-hero" id="ativo-hero">
-  <div class="ativo-header">
-    <!-- Esquerda: logo + nome -->
-    <div class="ativo-logo-wrap">
+<div class="ativo-hgrid">
+
+  <!-- QUADRADO: identidade + preço -->
+  <div class="ativo-quadrado">
+    <div class="aq-topo">
       <div id="ativo-logo-wrap"></div>
-      <div class="ativo-info">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <h1 id="ativo-titulo">—</h1>
-          <div id="ativo-score-badge"></div>
-        </div>
-        <div style="font-size:14px;color:var(--text2)" id="ativo-nome">Carregando...</div>
-        <div style="font-size:12px;color:var(--text3)" id="ativo-setor"></div>
-      </div>
-    </div>
-    <!-- Direita: preço + botões ícone -->
-    <div style="display:flex;align-items:center;gap:1.5rem">
-      <div style="text-align:right">
-        <div class="preco" id="ativo-preco">—</div>
-        <div style="font-size:14px;font-family:var(--font-mono);margin-top:2px" id="ativo-var">—</div>
-      </div>
-      <div style="display:flex;gap:6px;align-items:center">
+      <div class="aq-btns">
         <button class="watchlist-btn" id="watchlist-btn" onclick="toggleWatchlist()" title="Favoritar">☆</button>
         <a id="comparar-btn" href="comparador.html" title="Comparar" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);color:var(--text2);font-size:16px;font-weight:700;text-decoration:none;font-family:var(--font-body)">⇄</a>
         <a id="analise-btn" href="analise.html" title="Análise IA" style="padding:6px 10px;border-radius:8px;background:var(--gold-dim);border:1px solid var(--border2);color:var(--gold);font-size:16px;font-weight:700;text-decoration:none;font-family:var(--font-body)">✦</a>
       </div>
     </div>
+    <div class="aq-ticker">
+      <h1 id="ativo-titulo">—</h1>
+      <div id="ativo-score-badge"></div>
+    </div>
+    <div class="aq-nome" id="ativo-nome">Carregando...</div>
+    <div class="aq-setor" id="ativo-setor"></div>
+    <div class="aq-preco-bloco">
+      <div class="aq-plabel">Cotação</div>
+      <div class="preco" id="ativo-preco">—</div>
+      <div class="aq-var" id="ativo-var">—</div>
+    </div>
   </div>
+
+  <!-- RETÂNGULO: Sobre -->
+  <div class="ativo-retangulo">
+    <h3>Sobre</h3>
+    <div id="about-content" style="font-size:13px;color:var(--text2);line-height:1.7;display:flex;flex-direction:column;flex:1"></div>
+  </div>
+
+</div>
+
+<div class="ativo-tabsbar">
   <div class="ativo-tabs">
     <div class="ativo-tab active" onclick="switchTab('overview',this)">Visão Geral</div>
     <div class="ativo-tab" onclick="switchTab('indicadores',this)">Indicadores</div>
@@ -146,10 +175,6 @@ if (!new URLSearchParams(location.search).get('t')) location.replace('acoes.html
         </div>
       </div>
       <div>
-        <div class="section-box">
-          <h3>Sobre</h3>
-          <div id="about-content" style="font-size:13px;color:var(--text2);line-height:1.7"></div>
-        </div>
         <div class="section-box">
           <h3>Mesmo Setor</h3>
           <div id="same-sector"></div>
@@ -286,16 +311,16 @@ async function toggleWatchlist(){
   }
   let w=getWatchlist().slice();
   const btn=document.getElementById('watchlist-btn');
-  if(w.includes(TICKER)){w=w.filter(t=>t!==TICKER);btn.textContent='☆ Favoritar';btn.classList.remove('saved');}
-  else{w.push(TICKER);btn.textContent='★ Favoritado';btn.classList.add('saved');}
+  if(w.includes(TICKER)){w=w.filter(t=>t!==TICKER);btn.textContent='☆';btn.title='Favoritar';btn.classList.remove('saved');}
+  else{w.push(TICKER);btn.textContent='★';btn.title='Favoritado';btn.classList.add('saved');}
   await saveWatchlist(w);
 }
 
 function _updateWlBtn(w){
   const btn=document.getElementById('watchlist-btn');
   if(!btn) return;
-  if(w.includes(TICKER)){btn.textContent='★ Favoritado';btn.classList.add('saved');}
-  else{btn.textContent='☆ Favoritar';btn.classList.remove('saved');}
+  if(w.includes(TICKER)){btn.textContent='★';btn.title='Favoritado';btn.classList.add('saved');}
+  else{btn.textContent='☆';btn.title='Favoritar';btn.classList.remove('saved');}
 }
 
 function initWatchlist(){
@@ -736,7 +761,7 @@ function renderAbout(d){
     <div style="margin-bottom:.75rem"><strong style="color:var(--text)">${TIPO==='fii'?'Segmento':'Setor'}:</strong> ${d.setor}</div>
     ${d.vm&&d.vm!=='—'?`<div style="margin-bottom:.75rem"><strong style="color:var(--text)">Valor de Mercado:</strong> ${d.vm}</div>`:''}
     ${d.qtd_imoveis?`<div style="margin-bottom:.75rem"><strong style="color:var(--text)">Qtd. Imóveis:</strong> ${d.qtd_imoveis}</div>`:''}
-    <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);font-size:11px;color:var(--text3)">
+    <div style="margin-top:auto;padding-top:1rem;border-top:1px solid var(--border);font-size:11px;color:var(--text3)">
       Dados via Fundamentus.com.br e Yahoo Finance · Atualizado diariamente · Não constitui recomendação de investimento.
     </div>`;
 }
