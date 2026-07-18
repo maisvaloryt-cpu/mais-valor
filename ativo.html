@@ -168,7 +168,7 @@ html:not([data-theme="light"]) .section-box{background:#0B0B0D}
       <h3>Se você tivesse investido R$ 1.000...</h3>
       <div class="ind-grid" id="investido-grid" style="grid-template-columns:repeat(3,1fr)"></div>
       <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.6">
-        Cálculo real com o histórico de preços; a linha "reinvestindo proventos" recompra cotas a cada pagamento. Rentabilidade passada não garante resultados futuros.
+        Cálculo real com o histórico de preços; a linha principal usa a cotação ajustada por proventos (dividendos reinvestidos). Rentabilidade passada não garante resultados futuros.
         <a href="simulador.html" style="color:var(--gold)">Simule uma carteira completa no Simulador →</a>
       </div>
     </div>
@@ -844,7 +844,6 @@ async function loadDivData(){
 async function renderInvestido(){
   const box=document.getElementById('investido-box');
   if(!box||!histData?.length)return;
-  await loadDivData();
   const last=histData[histData.length-1];
   if(!(last?.close>0))return;
   const hoje=new Date();
@@ -857,24 +856,25 @@ async function renderInvestido(){
     if(!(base?.close>0))continue;
     const baseDt=base.date.length===7?base.date+'-01':base.date;
     if((alvo-new Date(baseDt+'T00:00:00Z'))/86400000>95)continue; // dado velho demais
-    // Sem reinvestir: só a variação do preço
+    // Sem reinvestir: só a variação do preço (série padrão)
     const simples=1000*last.close/base.close;
-    // Reinvestindo: recompra cotas a cada provento
-    let cotas=1000/base.close;
-    for(const dv of divData){
-      if(dv.date>baseDt&&dv.value>0){
-        const px=_priceAt(dv.date);
-        if(px?.close>0)cotas+=cotas*dv.value/px.close;
-      }
-    }
-    const reinv=cotas*last.close;
+    // Com proventos: usa a série AJUSTADA por dividendos (mesma do modo "Ajustado" do gráfico)
+    const adjL=last.adj>0?last.adj:null, adjB=base.adj>0?base.adj:null;
+    const reinv=(adjL&&adjB)?1000*adjL/adjB:null;
     const pct=v=>((v-1000)/10);
     const cor=v=>v>=1000?'up':'dn';
     const fmtV=v=>'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
-    cards.push(`<div class="ind-card"><div class="ind-label">${rot}</div>
-      <div class="ind-val ${cor(reinv)}">${fmtV(reinv)}</div>
-      <div class="ind-desc" style="color:${reinv>=1000?'var(--up)':'var(--dn)'}">${pct(reinv)>=0?'+':''}${pct(reinv).toFixed(0)}% reinvestindo proventos</div>
-      <div class="ind-desc">só preço: ${fmtV(simples)} (${pct(simples)>=0?'+':''}${pct(simples).toFixed(0)}%)</div></div>`);
+    if(reinv!=null){
+      cards.push(`<div class="ind-card"><div class="ind-label">${rot}</div>
+        <div class="ind-val ${cor(reinv)}">${fmtV(reinv)}</div>
+        <div class="ind-desc" style="color:${reinv>=1000?'var(--up)':'var(--dn)'}">${pct(reinv)>=0?'+':''}${pct(reinv).toFixed(0)}% com dividendos reinvestidos</div>
+        <div class="ind-desc">só preço: ${fmtV(simples)} (${pct(simples)>=0?'+':''}${pct(simples).toFixed(0)}%)</div></div>`);
+    } else {
+      cards.push(`<div class="ind-card"><div class="ind-label">${rot}</div>
+        <div class="ind-val ${cor(simples)}">${fmtV(simples)}</div>
+        <div class="ind-desc" style="color:${simples>=1000?'var(--up)':'var(--dn)'}">${pct(simples)>=0?'+':''}${pct(simples).toFixed(0)}% (variação do preço)</div>
+        <div class="ind-desc">sem dado ajustado por proventos neste período</div></div>`);
+    }
   }
   if(!cards.length)return;
   document.getElementById('investido-grid').innerHTML=cards.join('');
