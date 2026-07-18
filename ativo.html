@@ -498,7 +498,7 @@ function renderIndVsSetor(){
       </tbody></table></div>`;
 }
 
-function renderFundExtra(){
+async function renderFundExtra(){
   try{
     const r=await fetch(`data/fundamentalistas/${TICKER}.json`);
     if(!r.ok) return;
