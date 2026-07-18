@@ -498,6 +498,172 @@ function renderIndVsSetor(){
       </tbody></table></div>`;
 }
 
+async function renderChart(){
+  histData=await loadHistoricoCompleto(TICKER);
+  await drawChartWithCDI();
+}
+
+/* Variação REAL de N dias a partir do histórico carregado (mensal+diário).
+   Substitui os antigos v7/v30 aleatórios. Retorna null se não houver dado
+   próximo o suficiente da data-alvo (aí a UI mostra "—"). */
+function calcVarPeriodo(dias){
+  if(!histData?.length) return null;
+  const last=histData[histData.length-1];
+  if(!(last?.close>0)) return null;
+  const alvo=new Date(); alvo.setDate(alvo.getDate()-dias);
+  const alvoStr=alvo.toISOString().slice(0,10);
+  let base=null;
+  for(let i=histData.length-1;i>=0;i--){
+    const dt=histData[i].date.length===7?histData[i].date+'-01':histData[i].date;
+    if(dt<=alvoStr){ base=histData[i]; break; }
+  }
+  if(!(base?.close>0)) return null;
+  // Exige que o ponto-base esteja razoavelmente perto da data-alvo:
+  // 7d precisa de dado diário (folga máx. 5 dias); 30d aceita folga de até 40 dias.
+  const baseDt=base.date.length===7?base.date+'-01':base.date;
+  const folga=(alvo-new Date(baseDt+'T00:00:00Z'))/86400000;
+  if(dias<=7&&folga>5) return null;
+  if(folga>40) return null;
+  return (last.close/base.close-1)*100;
+}
+
+
+async function loadBCBData() {
+  try {
+    const r = await fetch('data/bcb.json');
+    if (!r.ok) return null;
+    return await r.json();
+  } catch { return null; }
+}
+
+async function drawChartWithCDI() {
+  const filt = filterByRange(histData, currentRange);
+  let pts, labels;
+  if (filt && filt.length > 2) {
+    // Padrão = preço sem dividendos (close). Ajustado = com proventos (adj).
+    // Se o ponto não tiver 'adj' (dado antigo/diário), cai pro close.
+    pts = filt.map(p => chartMode === 'ajustado' ? (p.adj ?? p.close) : p.close);
+    labels = filt.map(p => p.date);
+    const mn = Math.min(...pts), mx = Math.max(...pts);
+    document.getElementById('ch-min').textContent = 'R$ ' + mn.toFixed(2);
+    document.getElementById('ch-max').textContent = 'R$ ' + mx.toFixed(2);
+    const ret = ((pts[pts.length-1] - pts[0]) / pts[0] * 100);
+    const el = document.getElementById('ch-ret');
+    el.textContent = (ret >= 0 ? '+' : '') + ret.toFixed(1) + '%';
+    el.className = 'ind-val ' + (ret >= 0 ? 'up' : 'dn');
+  } else {
+    // Sem histórico real: NÃO desenha gráfico sintético — mostra aviso e sai.
+    ['ch-min','ch-max','ch-ret'].forEach(id => document.getElementById(id).textContent = '—');
+    if (mainChart) { mainChart.destroy(); mainChart = null; }
+    const cvEl = document.getElementById('mainChart');
+    let semHist = document.getElementById('chart-sem-hist');
+    if (!semHist && cvEl?.parentElement) {
+      semHist = document.createElement('div');
+      semHist.id = 'chart-sem-hist';
+      semHist.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:13px;';
+      cvEl.parentElement.style.position = 'relative';
+      cvEl.parentElement.appendChild(semHist);
+    }
+    if (semHist) { semHist.textContent = 'Histórico indisponível para este ativo'; semHist.style.display = 'flex'; }
+    return;
+  }
+  document.getElementById('chart-sem-hist')?.style.setProperty('display','none');
+
+  const isUp = (ativo?.v || 0) >= 0;
+  const color = isUp ? '#F5A623' : '#E8503A';
+
+  // Tenta carregar CDI para comparação
+  const bcb = window.BCB_DATA || await loadBCBData();
+  if (bcb) window.BCB_DATA = bcb;
+
+  // Monta datasets
+  const datasets = [{
+    label: TICKER,
+    data: pts,
+    borderColor: color,
+    borderWidth: 2,
+    pointRadius: 0,
+    fill: true,
+    backgroundColor: isUp ? 'rgba(245,166,35,0.06)' : 'rgba(232,80,58,0.06)',
+    tension: 0.35,
+    yAxisID: 'y'
+  }];
+
+  // Adiciona CDI normalizado se houver histórico e período for <= 1A
+  if (bcb?.cdi?.acumulado && ['1M','6M','1A'].includes(currentRange) && pts.length > 0) {
+    const cdiAcum = filterByRange(
+      bcb.cdi.acumulado.map(d => ({date: d.date.split('/').reverse().join('-'), close: d.value})),
+      currentRange
+    );
+    if (cdiAcum?.length > 2) {
+      // Normaliza CDI para começar no mesmo preço do ativo
+      const cdiBase = cdiAcum[0].close;
+      const ativoBase = pts[0];
+      const cdiNorm = cdiAcum.map(d => +(d.close / cdiBase * ativoBase).toFixed(2));
+      datasets.push({
+        label: 'CDI (normalizado)',
+        data: cdiNorm,
+        borderColor: 'rgba(245,166,35,0.6)',
+        borderWidth: 1.5,
+        borderDash: [5, 5],
+        pointRadius: 0,
+        fill: false,
+        tension: 0.35,
+        yAxisID: 'y'
+      });
+    }
+  }
+
+  if (mainChart) mainChart.destroy();
+  const canvasEl = document.getElementById('mainChart');
+  mainChart = new Chart(canvasEl, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          display: datasets.length > 1,
+          labels: { color: '#9B9896', font: { size: 11 }, boxWidth: 20 }
+        },
+        tooltip: { enabled: false }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#5E5C58', font: { size: 10 }, maxTicksLimit: 10 } },
+        y: { grace: '5%', grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#5E5C58', font: { size: 10 }, callback: v => 'R$' + v.toFixed(0) } }
+      }
+    }
+  });
+  addChartOverlay(mainChart, canvasEl, labels, pts, color, 'brl');
+}
+
+function setRange(r,el){
+  currentRange=r;
+  // só desativa os botões de período (mesma classe do toggle, mas IDs cm-* ficam de fora)
+  document.querySelectorAll('.range-btn').forEach(b=>{ if(!b.id||!b.id.startsWith('cm-'))b.classList.remove('active'); });
+  el.classList.add('active');
+  drawChartWithCDI();
+}
+function setChartMode(m,el){
+  chartMode=m;
+  ['cm-padrao','cm-ajustado'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
+  el.classList.add('active');
+  drawChartWithCDI();
+}
+
+function fmtRS(s){
+  if(!s) return '—';
+  var n=parseFloat(String(s).replace(/\./g,'').replace(',','.'));
+  if(isNaN(n)) return s;
+  var neg=n<0; n=Math.abs(n); var o;
+  if(n>=1e9) o=(n/1e9).toFixed(2).replace('.',',')+' bi';
+  else if(n>=1e6) o=(n/1e6).toFixed(1).replace('.',',')+' mi';
+  else if(n>=1e3) o=(n/1e3).toFixed(0)+' mil';
+  else o=n.toFixed(0);
+  return 'R$ '+(neg?'-':'')+o;
+}
 async function renderFundExtra(){
   try{
     const r=await fetch(`data/fundamentalistas/${TICKER}.json`);
