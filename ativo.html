@@ -162,6 +162,23 @@ html:not([data-theme="light"]) .section-box{background:#0B0B0D}
         <a href="artigos/graham-e-bazin.html" style="color:var(--gold)">Entenda como os métodos funcionam →</a>
       </div>
     </div>
+
+    <!-- SE VOCÊ TIVESSE INVESTIDO -->
+    <div class="section-box" id="investido-box" style="display:none">
+      <h3>Se você tivesse investido R$ 1.000...</h3>
+      <div class="ind-grid" id="investido-grid" style="grid-template-columns:repeat(3,1fr)"></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.6">
+        Cálculo real com o histórico de preços; a linha "reinvestindo proventos" recompra cotas a cada pagamento. Rentabilidade passada não garante resultados futuros.
+        <a href="simulador.html" style="color:var(--gold)">Simule uma carteira completa no Simulador →</a>
+      </div>
+    </div>
+
+    <!-- CHECKLIST BUY & HOLD -->
+    <div class="section-box" id="checklist-box" style="display:none">
+      <h3>Checklist Buy &amp; Hold <span id="checklist-score" style="margin-left:auto;font-family:var(--font-mono);font-size:13px;color:var(--gold)"></span></h3>
+      <div id="checklist-content"></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:10px">Critérios objetivos calculados automaticamente — um roteiro de estudo, não recomendação de compra ou venda.</div>
+    </div>
     <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem">
       <div>
         <div class="section-box">
@@ -235,6 +252,11 @@ html:not([data-theme="light"]) .section-box{background:#0B0B0D}
 
   <!-- DIVIDENDOS -->
   <div id="tab-dividendos" class="tab-content" style="padding-top:1.5rem">
+    <div class="section-box" id="radar-box" style="display:none">
+      <h3>Radar de Dividendos</h3>
+      <div class="ind-grid" id="radar-grid"></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:10px">Estimativas baseadas no padrão histórico de pagamentos — a empresa pode alterar datas e valores a qualquer momento.</div>
+    </div>
     <div class="section-box">
       <h3>Histórico de Dividendos / Rendimentos</h3>
       <div id="div-grafico" style="margin-bottom:1.5rem"></div>
@@ -284,7 +306,7 @@ function switchTab(id,el){
   document.querySelectorAll('.ativo-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
   el.classList.add('active');
-  if(id==='dividendos') renderDividendos();
+  if(id==='dividendos'){renderDividendos().then(()=>renderRadar());}
   if(id==='analise') renderAnalise();
   if(id==='indicadores'){ renderIndVsSetor(); renderFundExtra(); }
 }
@@ -452,206 +474,31 @@ function renderIndicadores(d){
 function renderIndVsSetor(){
   const all=TIPO==='fii'?FIIS:ACOES;
   const peers=all.filter(a=>a.setor===ativo.setor&&a.t!==ativo.t);
-  if(!peers.length){document.getElementById('ind-vs-setor').innerHTML='<div style="color:var(--text3)">Sem outros ativos no mesmo setor para comparar.</div>';return;}
-
-  const avg=(arr,fn)=>{const vs=arr.map(fn).filter(v=>v!=null&&v>0);return vs.length?vs.reduce((a,b)=>a+b)/vs.length:null;};
-  const metrics=[
-    {label:'DY 12m',fn:a=>a.dy,fmt:v=>fmtPct(v),higher:true},
-    {label:'P/L',fn:a=>a.pl&&a.pl>0?a.pl:null,fmt:v=>fmt(v,'x'),higher:false},
-    {label:'P/VP',fn:a=>a.pvp,fmt:v=>fmt(v),higher:false},
-    {label:'ROE',fn:a=>a.roe,fmt:v=>fmtPct(v),higher:true},
-    {label:'Mrg. Líq.',fn:a=>a.mrg_liq,fmt:v=>fmtPct(v),higher:true},
-  ];
-
-  document.getElementById('ind-vs-setor').innerHTML=`
-    <div style="font-size:12px;color:var(--text3);margin-bottom:1rem">Comparando com ${peers.length} ativos do setor ${ativo.setor}</div>
-    ${metrics.map(m=>{
-      const mv=m.fn(ativo); const avgV=avg(peers,m.fn);
-      if(mv==null||avgV==null) return '';
-      const better=m.higher?mv>avgV:mv<avgV;
-      const pct=avgV?Math.abs((mv-avgV)/avgV*100):0;
-      return `<div style="margin-bottom:1rem">
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-          <span style="font-size:13px;font-weight:600">${m.label}</span>
-          <div style="display:flex;gap:16px;font-family:'DM Mono',monospace;font-size:12px">
-            <span style="color:${better?'var(--up)':'var(--dn)'};font-weight:700">${m.fmt(mv)} (este)</span>
-            <span style="color:var(--text3)">Média: ${m.fmt(avgV)}</span>
-          </div>
-        </div>
-        <div style="font-size:11px;color:${better?'var(--up)':'var(--dn)'}">
-          ${better?'▲ Melhor':'▼ Abaixo'} da média do setor em ${pct.toFixed(1)}%
-        </div>
-      </div>`;
-    }).join('')}`;
+  const el=document.getElementById('ind-vs-setor');
+  if(!peers.length){el.innerHTML='<div style="color:var(--text3)">Sem outros ativos no mesmo setor para comparar.</div>';return;}
+  const top=[...peers].sort((a,b)=>(b.mcap||0)-(a.mcap||0)).slice(0,6);
+  const linhas=[ativo,...top];
+  const fmtMc=v=>{if(!v)return '—';if(v>=1e12)return (v/1e12).toFixed(2)+' T';if(v>=1e9)return (v/1e9).toFixed(1)+' B';if(v>=1e6)return (v/1e6).toFixed(0)+' M';return String(v);};
+  const cell=(v,suf)=>v!=null&&v!==0?(typeof v==='number'?v.toFixed(suf==='%'?1:2):v)+(suf||''):'—';
+  el.innerHTML=`
+    <div style="font-size:12px;color:var(--text3);margin-bottom:.75rem">${ativo.t} contra os ${top.length} maiores do setor ${ativo.setor} — clique para abrir</div>
+    <div class="table-wrap"><table class="data-table">
+      <thead><tr><th>Ativo</th><th class="r">Preço</th><th class="r">P/L</th><th class="r">P/VP</th><th class="r">DY 12m</th><th class="r">Marg. Líq.</th><th class="r">Val. Mercado</th></tr></thead>
+      <tbody>${linhas.map(a=>{
+        const eu=a.t===ativo.t;
+        return `<tr onclick="if(!${eu})location.href='ativo.html?t=${a.t}&tipo=${TIPO}'" style="cursor:${eu?'default':'pointer'};${eu?'background:var(--gold-dim);':''}">
+          <td><span style="font-weight:800;font-family:var(--font-mono);font-size:12.5px;${eu?'color:var(--gold)':''}">${a.t}</span><div style="font-size:10.5px;color:var(--text3)">${(a.n||'').slice(0,24)}</div></td>
+          <td class="r" style="font-family:var(--font-mono);font-size:12px">R$ ${a.p.toFixed(2)}</td>
+          <td class="r">${a.pl>0?a.pl.toFixed(1):'—'}</td>
+          <td class="r">${a.pvp>0?a.pvp.toFixed(2):'—'}</td>
+          <td class="r" style="color:var(--gold)">${a.dy>0?a.dy.toFixed(1)+'%':'—'}</td>
+          <td class="r">${a.ml>0?a.ml.toFixed(1)+'%':'—'}</td>
+          <td class="r" style="color:var(--text2)">${fmtMc(a.mcap)}</td>
+        </tr>`;}).join('')}
+      </tbody></table></div>`;
 }
 
-async function renderChart(){
-  histData=await loadHistoricoCompleto(TICKER);
-  await drawChartWithCDI();
-}
-
-/* Variação REAL de N dias a partir do histórico carregado (mensal+diário).
-   Substitui os antigos v7/v30 aleatórios. Retorna null se não houver dado
-   próximo o suficiente da data-alvo (aí a UI mostra "—"). */
-function calcVarPeriodo(dias){
-  if(!histData?.length) return null;
-  const last=histData[histData.length-1];
-  if(!(last?.close>0)) return null;
-  const alvo=new Date(); alvo.setDate(alvo.getDate()-dias);
-  const alvoStr=alvo.toISOString().slice(0,10);
-  let base=null;
-  for(let i=histData.length-1;i>=0;i--){
-    const dt=histData[i].date.length===7?histData[i].date+'-01':histData[i].date;
-    if(dt<=alvoStr){ base=histData[i]; break; }
-  }
-  if(!(base?.close>0)) return null;
-  // Exige que o ponto-base esteja razoavelmente perto da data-alvo:
-  // 7d precisa de dado diário (folga máx. 5 dias); 30d aceita folga de até 40 dias.
-  const baseDt=base.date.length===7?base.date+'-01':base.date;
-  const folga=(alvo-new Date(baseDt+'T00:00:00Z'))/86400000;
-  if(dias<=7&&folga>5) return null;
-  if(folga>40) return null;
-  return (last.close/base.close-1)*100;
-}
-
-
-async function loadBCBData() {
-  try {
-    const r = await fetch('data/bcb.json');
-    if (!r.ok) return null;
-    return await r.json();
-  } catch { return null; }
-}
-
-async function drawChartWithCDI() {
-  const filt = filterByRange(histData, currentRange);
-  let pts, labels;
-  if (filt && filt.length > 2) {
-    // Padrão = preço sem dividendos (close). Ajustado = com proventos (adj).
-    // Se o ponto não tiver 'adj' (dado antigo/diário), cai pro close.
-    pts = filt.map(p => chartMode === 'ajustado' ? (p.adj ?? p.close) : p.close);
-    labels = filt.map(p => p.date);
-    const mn = Math.min(...pts), mx = Math.max(...pts);
-    document.getElementById('ch-min').textContent = 'R$ ' + mn.toFixed(2);
-    document.getElementById('ch-max').textContent = 'R$ ' + mx.toFixed(2);
-    const ret = ((pts[pts.length-1] - pts[0]) / pts[0] * 100);
-    const el = document.getElementById('ch-ret');
-    el.textContent = (ret >= 0 ? '+' : '') + ret.toFixed(1) + '%';
-    el.className = 'ind-val ' + (ret >= 0 ? 'up' : 'dn');
-  } else {
-    // Sem histórico real: NÃO desenha gráfico sintético — mostra aviso e sai.
-    ['ch-min','ch-max','ch-ret'].forEach(id => document.getElementById(id).textContent = '—');
-    if (mainChart) { mainChart.destroy(); mainChart = null; }
-    const cvEl = document.getElementById('mainChart');
-    let semHist = document.getElementById('chart-sem-hist');
-    if (!semHist && cvEl?.parentElement) {
-      semHist = document.createElement('div');
-      semHist.id = 'chart-sem-hist';
-      semHist.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:13px;';
-      cvEl.parentElement.style.position = 'relative';
-      cvEl.parentElement.appendChild(semHist);
-    }
-    if (semHist) { semHist.textContent = 'Histórico indisponível para este ativo'; semHist.style.display = 'flex'; }
-    return;
-  }
-  document.getElementById('chart-sem-hist')?.style.setProperty('display','none');
-
-  const isUp = (ativo?.v || 0) >= 0;
-  const color = isUp ? '#F5A623' : '#E8503A';
-
-  // Tenta carregar CDI para comparação
-  const bcb = window.BCB_DATA || await loadBCBData();
-  if (bcb) window.BCB_DATA = bcb;
-
-  // Monta datasets
-  const datasets = [{
-    label: TICKER,
-    data: pts,
-    borderColor: color,
-    borderWidth: 2,
-    pointRadius: 0,
-    fill: true,
-    backgroundColor: isUp ? 'rgba(245,166,35,0.06)' : 'rgba(232,80,58,0.06)',
-    tension: 0.35,
-    yAxisID: 'y'
-  }];
-
-  // Adiciona CDI normalizado se houver histórico e período for <= 1A
-  if (bcb?.cdi?.acumulado && ['1M','6M','1A'].includes(currentRange) && pts.length > 0) {
-    const cdiAcum = filterByRange(
-      bcb.cdi.acumulado.map(d => ({date: d.date.split('/').reverse().join('-'), close: d.value})),
-      currentRange
-    );
-    if (cdiAcum?.length > 2) {
-      // Normaliza CDI para começar no mesmo preço do ativo
-      const cdiBase = cdiAcum[0].close;
-      const ativoBase = pts[0];
-      const cdiNorm = cdiAcum.map(d => +(d.close / cdiBase * ativoBase).toFixed(2));
-      datasets.push({
-        label: 'CDI (normalizado)',
-        data: cdiNorm,
-        borderColor: 'rgba(245,166,35,0.6)',
-        borderWidth: 1.5,
-        borderDash: [5, 5],
-        pointRadius: 0,
-        fill: false,
-        tension: 0.35,
-        yAxisID: 'y'
-      });
-    }
-  }
-
-  if (mainChart) mainChart.destroy();
-  const canvasEl = document.getElementById('mainChart');
-  mainChart = new Chart(canvasEl, {
-    type: 'line',
-    data: { labels, datasets },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      animation: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: {
-          display: datasets.length > 1,
-          labels: { color: '#9B9896', font: { size: 11 }, boxWidth: 20 }
-        },
-        tooltip: { enabled: false }
-      },
-      scales: {
-        x: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#5E5C58', font: { size: 10 }, maxTicksLimit: 10 } },
-        y: { grace: '5%', grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#5E5C58', font: { size: 10 }, callback: v => 'R$' + v.toFixed(0) } }
-      }
-    }
-  });
-  addChartOverlay(mainChart, canvasEl, labels, pts, color, 'brl');
-}
-
-function setRange(r,el){
-  currentRange=r;
-  // só desativa os botões de período (mesma classe do toggle, mas IDs cm-* ficam de fora)
-  document.querySelectorAll('.range-btn').forEach(b=>{ if(!b.id||!b.id.startsWith('cm-'))b.classList.remove('active'); });
-  el.classList.add('active');
-  drawChartWithCDI();
-}
-function setChartMode(m,el){
-  chartMode=m;
-  ['cm-padrao','cm-ajustado'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
-  el.classList.add('active');
-  drawChartWithCDI();
-}
-
-function fmtRS(s){
-  if(!s) return '—';
-  var n=parseFloat(String(s).replace(/\./g,'').replace(',','.'));
-  if(isNaN(n)) return s;
-  var neg=n<0; n=Math.abs(n); var o;
-  if(n>=1e9) o=(n/1e9).toFixed(2).replace('.',',')+' bi';
-  else if(n>=1e6) o=(n/1e6).toFixed(1).replace('.',',')+' mi';
-  else if(n>=1e3) o=(n/1e3).toFixed(0)+' mil';
-  else o=n.toFixed(0);
-  return 'R$ '+(neg?'-':'')+o;
-}
-async function renderFundExtra(){
+function renderFundExtra(){
   try{
     const r=await fetch(`data/fundamentalistas/${TICKER}.json`);
     if(!r.ok) return;
@@ -725,12 +572,7 @@ async function renderFundFull(){
   cont.innerHTML=html;
 }
 async function renderDividendos(){
-  try{
-    const r=await fetch(`data/dividendos/${TICKER}.json`);
-    if(!r.ok)throw new Error('sem dados');
-    const j=await r.json();
-    divData=j.dividendos||[];
-  }catch{divData=[];}
+  await loadDivData();
 
   if(!divData.length){
     document.getElementById('div-grafico').innerHTML='<div style="color:var(--text3);font-size:13px;padding:1rem 0">Histórico de dividendos não disponível ainda. Execute o modo "dividendos" no GitHub Actions.</div>';
@@ -786,6 +628,153 @@ function renderSameSetor(d){
         <div class="mover-chg ${p.v>=0?'up':'dn'}">${p.v>=0?'+':''}${p.v.toFixed(2)}%</div>
       </div>
     </div>`).join('')||'<div style="color:var(--text3);font-size:12px">Nenhum outro ativo neste setor</div>';
+}
+
+/* Converte strings do Fundamentus ("24,2%", "1.234,56", "-") em número */
+function parseFundNum(s){
+  if(s==null)return null;
+  if(typeof s==='number')return s;
+  let t=String(s).replace(/[%\sRr$]/g,'').trim();
+  if(!t||t==='-'||t==='—')return null;
+  t=t.replace(/\./g,'').replace(',','.');
+  const v=parseFloat(t);
+  return isNaN(v)?null:v;
+}
+
+/* Preço de fechamento mais próximo (<=) de uma data */
+function _priceAt(dateStr){
+  if(!histData?.length)return null;
+  let best=null;
+  for(let i=histData.length-1;i>=0;i--){
+    const dt=histData[i].date.length===7?histData[i].date+'-01':histData[i].date;
+    if(dt<=dateStr){best=histData[i];break;}
+  }
+  return best;
+}
+
+/* Carrega dividendos (compartilhado entre abas) */
+let _divLoaded=false;
+async function loadDivData(){
+  if(_divLoaded)return divData;
+  try{
+    const r=await fetch(`data/dividendos/${TICKER}.json`);
+    if(r.ok){const j=await r.json();divData=j.dividendos||[];}
+  }catch(e){}
+  _divLoaded=true;
+  return divData;
+}
+
+/* ── SE VOCÊ TIVESSE INVESTIDO R$ 1.000 ── */
+async function renderInvestido(){
+  const box=document.getElementById('investido-box');
+  if(!box||!histData?.length)return;
+  await loadDivData();
+  const last=histData[histData.length-1];
+  if(!(last?.close>0))return;
+  const hoje=new Date();
+  const periodos=[[1,'Há 1 ano'],[5,'Há 5 anos'],[10,'Há 10 anos']];
+  const cards=[];
+  for(const [anos,rot] of periodos){
+    const alvo=new Date(hoje);alvo.setFullYear(alvo.getFullYear()-anos);
+    const alvoStr=alvo.toISOString().slice(0,10);
+    const base=_priceAt(alvoStr);
+    if(!(base?.close>0))continue;
+    const baseDt=base.date.length===7?base.date+'-01':base.date;
+    if((alvo-new Date(baseDt+'T00:00:00Z'))/86400000>95)continue; // dado velho demais
+    // Sem reinvestir: só a variação do preço
+    const simples=1000*last.close/base.close;
+    // Reinvestindo: recompra cotas a cada provento
+    let cotas=1000/base.close;
+    for(const dv of divData){
+      if(dv.date>baseDt&&dv.value>0){
+        const px=_priceAt(dv.date);
+        if(px?.close>0)cotas+=cotas*dv.value/px.close;
+      }
+    }
+    const reinv=cotas*last.close;
+    const pct=v=>((v-1000)/10);
+    const cor=v=>v>=1000?'up':'dn';
+    const fmtV=v=>'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+    cards.push(`<div class="ind-card"><div class="ind-label">${rot}</div>
+      <div class="ind-val ${cor(reinv)}">${fmtV(reinv)}</div>
+      <div class="ind-desc" style="color:${reinv>=1000?'var(--up)':'var(--dn)'}">${pct(reinv)>=0?'+':''}${pct(reinv).toFixed(0)}% reinvestindo proventos</div>
+      <div class="ind-desc">só preço: ${fmtV(simples)} (${pct(simples)>=0?'+':''}${pct(simples).toFixed(0)}%)</div></div>`);
+  }
+  if(!cards.length)return;
+  document.getElementById('investido-grid').innerHTML=cards.join('');
+  box.style.display='';
+}
+
+/* ── CHECKLIST BUY & HOLD (ações) ── */
+async function renderChecklist(){
+  if(TIPO==='fii')return;
+  const box=document.getElementById('checklist-box');
+  if(!box)return;
+  let f={};
+  try{const r=await fetch(`data/fundamentalistas/${TICKER}.json`);if(r.ok)f=await r.json();}catch(e){}
+  await loadDivData();
+  const roe=parseFundNum(f.roe);
+  const dle=parseFundNum(f.div_liq_ebitda);
+  const cagr=parseFundNum(f.cagr_rec_5a);
+  const liq=parseFundNum(f.liq_corrente);
+  const lucro=parseFundNum(f.lucro_liq);
+  const anosDiv=divData.length?Math.floor((new Date()-new Date((divData[0].date.length===7?divData[0].date+'-01':divData[0].date)+'T00:00:00Z'))/31557600000):null;
+  const itens=[
+    {ok:ativo.pl>0&&(lucro==null||lucro>0),lab:'Empresa lucrativa',det:ativo.pl>0?'P/L positivo de '+ativo.pl.toFixed(1):'sem lucro nos últimos 12m'},
+    {ok:roe!=null?roe>10:null,lab:'ROE acima de 10%',det:roe!=null?'ROE de '+roe.toFixed(1)+'%':'sem dado'},
+    {ok:ativo.dy>4,lab:'Dividend Yield acima de 4%',det:'DY 12m de '+(ativo.dy||0).toFixed(1)+'%'},
+    {ok:anosDiv!=null?anosDiv>=5:null,lab:'Paga proventos há 5+ anos',det:anosDiv!=null?'histórico de ~'+anosDiv+' anos':'sem histórico'},
+    {ok:dle!=null?dle<3:null,lab:'Dívida controlada (Dív.Líq/EBITDA < 3)',det:dle!=null?'atual: '+dle.toFixed(2)+'x':'sem dado'},
+    {ok:ativo.ml>10,lab:'Margem líquida acima de 10%',det:'margem de '+(ativo.ml||0).toFixed(1)+'%'},
+    {ok:cagr!=null?cagr>0:null,lab:'Receita crescendo (5 anos)',det:cagr!=null?'CAGR de '+cagr.toFixed(1)+'% a.a.':'sem dado'},
+    {ok:liq!=null?liq>1:null,lab:'Liquidez corrente acima de 1',det:liq!=null?'atual: '+liq.toFixed(2):'sem dado'},
+  ];
+  const validos=itens.filter(i=>i.ok!=null);
+  const passa=validos.filter(i=>i.ok).length;
+  document.getElementById('checklist-score').textContent=passa+'/'+validos.length+' critérios';
+  document.getElementById('checklist-content').innerHTML=itens.map(i=>{
+    const cor=i.ok==null?'var(--text3)':(i.ok?'var(--up)':'var(--dn)');
+    const sim=i.ok==null?'—':(i.ok?'✓':'✗');
+    return `<div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)">
+      <span style="width:22px;height:22px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid ${cor};color:${cor};font-size:12px;font-weight:800">${sim}</span>
+      <span style="flex:1;font-size:13px;font-weight:600">${i.lab}</span>
+      <span style="font-size:12px;color:var(--text3)">${i.det}</span>
+    </div>`;
+  }).join('');
+  box.style.display='';
+}
+
+/* ── RADAR DE DIVIDENDOS ── */
+function renderRadar(){
+  const box=document.getElementById('radar-box');
+  if(!box||divData.length<4)return;
+  const hoje=new Date();
+  const corte=new Date(hoje);corte.setFullYear(corte.getFullYear()-3);
+  const rec=divData.filter(d=>new Date((d.date.length===7?d.date+'-01':d.date)+'T00:00:00Z')>=corte);
+  if(rec.length<3)return;
+  const anosCobertos=Math.max(1,Math.min(3,(hoje-new Date((rec[0].date.length===7?rec[0].date+'-01':rec[0].date)+'T00:00:00Z'))/31557600000));
+  const porAno=rec.length/anosCobertos;
+  // meses típicos
+  const nomes=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  const freq={};
+  rec.forEach(d=>{const m=parseInt(d.date.slice(5,7),10)-1;freq[m]=(freq[m]||0)+1;});
+  const tipicos=Object.entries(freq).filter(([m,c])=>c>=2).map(([m])=>parseInt(m,10)).sort((a,b)=>a-b);
+  const mesAtual=hoje.getMonth();
+  let proximo=null;
+  if(tipicos.length){
+    proximo=tipicos.find(m=>m>mesAtual);
+    if(proximo==null)proximo=tipicos[0];
+  }
+  const ult=divData[divData.length-1];
+  const media4=divData.slice(-4).reduce((a,b)=>a+b.value,0)/Math.min(4,divData.length);
+  const cards=[
+    `<div class="ind-card"><div class="ind-label">Frequência média</div><div class="ind-val">${porAno.toFixed(1).replace('.',',')}/ano</div><div class="ind-desc">pagamentos nos últimos 3 anos</div></div>`,
+    tipicos.length?`<div class="ind-card"><div class="ind-label">Meses típicos</div><div class="ind-val" style="font-size:16px">${tipicos.map(m=>nomes[m]).join(' · ')}</div><div class="ind-desc">meses com pagamentos recorrentes</div></div>`:'',
+    proximo!=null?`<div class="ind-card"><div class="ind-label">Próximo provável</div><div class="ind-val up">~${nomes[proximo]}</div><div class="ind-desc">estimativa pelo padrão histórico</div></div>`:'',
+    ult?`<div class="ind-card"><div class="ind-label">Último pagamento</div><div class="ind-val gold" style="color:var(--gold)">R$ ${ult.value.toFixed(4).replace('.',',')}</div><div class="ind-desc">${ult.date} · média últimos 4: R$ ${media4.toFixed(4).replace('.',',')}</div></div>`:'',
+  ].filter(Boolean);
+  document.getElementById('radar-grid').innerHTML=cards.join('');
+  box.style.display='';
 }
 
 function renderPrecoJusto(d){
@@ -928,6 +917,8 @@ async function init(){
   renderSameSetor(ativo);
   initWatchlist();
   await renderChart();
+  renderInvestido();
+  renderChecklist();
   // v7/v30 REAIS a partir do histórico (substituem os nulos da listagem) e
   // re-renderiza indicadores + score com os dados verdadeiros.
   ativo.v7=calcVarPeriodo(7);
