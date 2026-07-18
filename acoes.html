@@ -28,6 +28,12 @@
 </div>
 
 <div class="container">
+
+  <!-- Introdução editorial [AdSense/SEO] -->
+  <div class="intro-seo fade-in">
+    <p>Acompanhe as <strong>cotações e os indicadores fundamentalistas</strong> das ações da B3, atualizados diariamente: P/L, P/VP, Dividend Yield, margem líquida e valor de mercado. Use os rankings prontos — como a fórmula de Graham e o preço-teto de Bazin — para encontrar ações descontadas, ou filtre por setor para comparar empresas semelhantes.</p>
+  </div>
+
   <div class="main-grid">
     <div class="fade-in-1">
 
@@ -119,6 +125,39 @@
       </div>
     </div>
   </div>
+
+  <!-- Seção educativa [AdSense/SEO] -->
+  <div class="edu-seo fade-in">
+    <h2>Entenda os <em>indicadores</em></h2>
+    <p>Os indicadores fundamentalistas ajudam a avaliar se uma ação está cara ou barata em relação ao que a empresa realmente entrega de lucro e patrimônio. Nenhum indicador deve ser usado sozinho: o ideal é <strong>comparar empresas do mesmo setor</strong> e observar a evolução ao longo do tempo. Clique em cada pergunta para saber mais:</p>
+
+    <details>
+      <summary>O que é P/L (Preço/Lucro)?</summary>
+      <p>O P/L divide o preço da ação pelo lucro que a empresa gera por ação. Na prática, indica quantos anos de lucro seriam necessários para "pagar" o preço atual. Um P/L de 5 sugere que a ação está mais descontada que um P/L de 20 — mas P/L muito baixo também pode indicar que o mercado espera queda nos lucros. Por isso, compare sempre com empresas do mesmo setor.</p>
+    </details>
+
+    <details>
+      <summary>O que é P/VP (Preço/Valor Patrimonial)?</summary>
+      <p>Mostra quanto o mercado paga por cada real de patrimônio líquido da empresa. Abaixo de 1, a ação negocia por menos do que a empresa "vale no papel" — o que pode ser oportunidade ou sinal de desconfiança do mercado. Bancos e seguradoras costumam ser avaliados principalmente por esse indicador.</p>
+    </details>
+
+    <details>
+      <summary>O que é um bom Dividend Yield?</summary>
+      <p>O Dividend Yield (DY) mostra quanto a empresa distribuiu de dividendos nos últimos 12 meses em relação ao preço da ação. No Brasil, yields entre 6% e 12% são comuns em setores maduros como energia elétrica e bancos. Desconfie de yields muito altos: podem vir de um pagamento extraordinário que não vai se repetir, ou de uma forte queda no preço da ação.</p>
+    </details>
+
+    <details>
+      <summary>O que são os rankings de Graham e Bazin?</summary>
+      <p>São dois métodos clássicos de filtrar ações. A fórmula de <strong>Graham</strong> multiplica P/L por P/VP: resultados abaixo de 22,5 sugerem preço razoável. O método de <strong>Bazin</strong> calcula um "preço-teto" dividindo os dividendos dos últimos 12 meses por 6% — se a ação está abaixo do teto, ela pagaria pelo menos 6% ao ano em dividendos ao preço atual. Nossos rankings aplicam os dois automaticamente.</p>
+    </details>
+
+    <details>
+      <summary>De onde vêm os dados e com que frequência são atualizados?</summary>
+      <p>As cotações e os indicadores são coletados de fontes públicas do mercado e atualizados diariamente, após o fechamento do pregão da B3. O horário da última atualização aparece no topo da página.</p>
+    </details>
+
+    <div class="edu-aviso">⚠️ As informações desta página têm caráter educativo e não são recomendação de investimento. Rentabilidade passada não garante resultados futuros.</div>
+  </div>
 </div>
 
 <div id="footer-placeholder"></div>
@@ -140,6 +179,27 @@ window.MV_LOGO_SVG = '<svg viewBox="0 0 530 530" xmlns="http://www.w3.org/2000/s
 .th-arrow{margin-left:4px;font-size:10px;color:var(--gold);opacity:0}
 .sortable-th.th-active .th-arrow{opacity:1}
 .sortable-th.th-active{color:var(--gold)}
+
+/* ── Blocos editoriais [AdSense/SEO] ─────────────────────────── */
+.intro-seo{border:1.5px dashed var(--gold);border-radius:var(--radius-lg);padding:16px 18px 14px;margin:18px 0 6px}
+.intro-seo p{color:var(--text2);font-size:13.5px;line-height:1.65;max-width:900px}
+.intro-seo strong{color:var(--text)}
+.edu-seo{border:1.5px dashed var(--gold);border-radius:var(--radius-lg);padding:22px 22px 18px;margin-top:34px}
+.edu-seo h2{font-family:var(--font-display);font-size:26px;font-weight:400;margin-bottom:4px}
+.edu-seo h2 em{color:var(--gold);font-style:italic}
+.edu-seo>p{color:var(--text2);font-size:13.5px;line-height:1.65;margin:10px 0}
+.edu-seo strong{color:var(--text)}
+.edu-seo details{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);margin-top:10px;overflow:hidden}
+.edu-seo summary{cursor:pointer;padding:13px 16px;font-size:13.5px;font-weight:600;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center}
+.edu-seo summary::-webkit-details-marker{display:none}
+.edu-seo summary::after{content:'+';color:var(--gold);font-size:18px;font-weight:400}
+.edu-seo details[open] summary::after{content:'–'}
+.edu-seo details p{padding:0 16px 14px;color:var(--text2);font-size:13px;line-height:1.65}
+.edu-aviso{margin-top:16px;padding:12px 16px;background:var(--gold-dim);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text2);font-size:12px;line-height:1.6}
+html:not([data-theme="light"]) .intro-seo p,
+html:not([data-theme="light"]) .edu-seo>p,
+html:not([data-theme="light"]) .edu-seo details p,
+html:not([data-theme="light"]) .edu-aviso{color:#A8A6A0}
 </style>
 <script>
 let data = [];
