@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/png" href="favicon.png">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script>
+/* Sem ticker na URL → redireciona para a lista de ações (evita página vazia / soft 404) */
+if (!new URLSearchParams(location.search).get('t')) location.replace('acoes.html');
+</script>
 <title id="page-title">Ativo — Mais Valor</title>
 <!-- SEO [5.1] -->
 <meta name="description" content="Cotação, gráfico histórico, dividendos e indicadores fundamentalistas completos do ativo na B3.">

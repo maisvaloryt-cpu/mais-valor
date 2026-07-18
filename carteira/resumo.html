@@ -10,6 +10,24 @@
 <link rel="stylesheet" href="../mobile.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
 <script>window.NAV_BASE_PATH = "../"; window.NAV_SLIM = true;</script>
+<style>
+/* ── Boas-vindas carteira vazia ── */
+#welcome-carteira{display:none;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:40px 16px 20px;max-width:640px;margin:0 auto}
+#welcome-carteira .w-icon{font-size:42px;opacity:.3}
+#welcome-carteira .w-title{font-size:20px;font-weight:700;color:var(--text,#ECEAE4)}
+#welcome-carteira .w-desc{font-size:13px;color:var(--text2,#8A8884);line-height:1.75;max-width:560px}
+#welcome-carteira .w-desc strong{color:var(--text,#ECEAE4)}
+#welcome-carteira .w-passos{display:flex;flex-direction:column;gap:8px;width:100%;max-width:500px;margin-top:4px;text-align:left}
+#welcome-carteira .w-passo{display:flex;gap:12px;align-items:flex-start;background:var(--bg3,#141418);border:1px solid var(--border,rgba(255,255,255,0.06));border-radius:8px;padding:11px 14px}
+#welcome-carteira .w-num{width:22px;height:22px;border-radius:50%;background:var(--gold-dim,rgba(245,166,35,0.12));border:1px solid rgba(245,166,35,0.35);color:var(--gold,#F5A623);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+#welcome-carteira .w-txt{font-size:12.5px;color:var(--text2,#8A8884);line-height:1.6}
+#welcome-carteira .w-txt b{color:var(--text,#ECEAE4)}
+#welcome-carteira .w-btn{margin-top:8px;background:var(--gold,#F5A623);color:#000;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer}
+#welcome-carteira .w-btn:hover{filter:brightness(1.1)}
+#welcome-carteira .w-priv{font-size:11px;color:var(--text3,#7C7A75);line-height:1.6;max-width:500px}
+html:not([data-theme="light"]) #welcome-carteira .w-desc,
+html:not([data-theme="light"]) #welcome-carteira .w-txt{color:#A8A6A0}
+</style>
 </head>
 <body>
 <div id="nav-placeholder"></div>
@@ -24,6 +42,28 @@
   <div class="tabs" id="tabs"></div>
 
   <div id="tab-resumo">
+
+    <!-- Boas-vindas: aparece apenas quando não há lançamentos -->
+    <div id="welcome-carteira">
+      <div class="w-icon">💼</div>
+      <div class="w-title">Bem-vindo à sua Carteira</div>
+      <div class="w-desc">
+        Acompanhe <strong>todos os seus investimentos em um só lugar</strong>: ações, FIIs, BDRs, ETFs e criptos.
+        A Carteira calcula automaticamente seu patrimônio, sua rentabilidade e os proventos recebidos,
+        com cotações atualizadas — e ainda organiza os dados que você precisa na hora do
+        <strong>Imposto de Renda</strong>.
+      </div>
+      <div class="w-passos">
+        <div class="w-passo"><div class="w-num">1</div><div class="w-txt"><b>Entre com sua conta</b> — faça login para seus dados ficarem salvos com segurança e disponíveis em qualquer dispositivo.</div></div>
+        <div class="w-passo"><div class="w-num">2</div><div class="w-txt"><b>Registre seus lançamentos</b> — adicione suas compras e vendas com data, quantidade e preço. Comece pelos ativos que você tem hoje.</div></div>
+        <div class="w-passo"><div class="w-num">3</div><div class="w-txt"><b>Acompanhe tudo automaticamente</b> — patrimônio, evolução mês a mês, proventos recebidos e rentabilidade real da carteira.</div></div>
+        <div class="w-passo"><div class="w-num">4</div><div class="w-txt"><b>Explore as abas</b> — Proventos, Rentabilidade, Metas e IRPF mostram cada detalhe da sua jornada como investidor.</div></div>
+      </div>
+      <button class="w-btn" onclick="openModal()">+ Adicionar meu primeiro lançamento</button>
+      <div class="w-priv">Seus dados são privados e visíveis apenas para você. Ferramenta gratuita criada pelo canal Mais Valor.</div>
+    </div>
+
+    <div id="dash-resumo">
     <div class="metrics" id="metrics-resumo"></div>
     <div id="resumo-extra" style="margin-bottom:1.25rem"></div>
     <div class="charts-row">
@@ -49,6 +89,7 @@
     </div>
     <div class="section-title"><i class="ti ti-stack" aria-hidden="true"></i>Meus Ativos <span id="total-count" style="font-size:12px;color:var(--color-text-secondary);font-weight:400"></span></div>
     <div id="grupos-ativos"></div>
+    </div><!-- /dash-resumo -->
   </div>
 </div>
 
@@ -450,6 +491,10 @@ function renderCardRebalanceamento(){
 }
 
 function renderAll(){
+  // Carteira vazia → mostra boas-vindas no lugar do dashboard
+  const temAtivos = calcAtivos().length > 0;
+  document.getElementById('welcome-carteira').style.display = temAtivos ? 'none' : 'flex';
+  document.getElementById('dash-resumo').style.display = temAtivos ? '' : 'none';
   renderMetricsResumo();
   renderResumoExtra();
   renderEvolucao();

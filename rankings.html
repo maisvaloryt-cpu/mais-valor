@@ -32,6 +32,12 @@
   <p>Os melhores e piores desempenhos por diferentes critérios.</p>
 </div>
 <div class="container">
+
+  <!-- Introdução editorial [AdSense/SEO] -->
+  <div class="intro-seo fade-in">
+    <p>Veja os <strong>rankings das ações e FIIs da B3</strong> por diferentes critérios: maior Dividend Yield, menor P/L, menor P/VP, maior ROE, maiores altas e baixas do dia e crescimento. Uma forma rápida de filtrar o mercado e encontrar candidatos para estudar mais a fundo.</p>
+  </div>
+
   <div class="tabs fade-in-1">
     <button class="tab active" onclick="render('dy-acoes',this)">DY Ações</button>
     <button class="tab" onclick="render('dy-fiis',this)">DY FIIs</button>
@@ -74,6 +80,36 @@
     </div>
   </div>
 </div>
+
+<!-- Seção educativa [AdSense/SEO] -->
+<div class="container">
+  <div class="edu-seo fade-in">
+    <h2>Como usar os <em>rankings</em></h2>
+    <p>Rankings são um ponto de partida, não um veredito. Um ativo no topo de uma lista merece investigação — nunca compra automática. Entenda o que cada critério revela (e o que ele esconde):</p>
+    <details>
+      <summary>Por que "menor P/L" pode enganar?</summary>
+      <p>Um P/L muito baixo pode indicar tanto uma ação barata quanto uma empresa em dificuldade: se o mercado espera queda forte nos lucros, o preço cai antes e o P/L parece atraente. Vale conferir se o lucro recente não foi inflado por eventos não recorrentes, como venda de ativos.</p>
+    </details>
+    <details>
+      <summary>O que é ROE e por que ele importa?</summary>
+      <p>O ROE (Return on Equity) mede quanto lucro a empresa gera para cada real de patrimônio dos acionistas. ROE alto e consistente costuma indicar negócio de qualidade e boa gestão. Mas atenção: dívida elevada pode inflar o ROE artificialmente — confira também o endividamento.</p>
+    </details>
+    <details>
+      <summary>Como usar o ranking de Dividend Yield?</summary>
+      <p>O DY olha para o passado: mostra o que foi pago nos últimos 12 meses, não o que será pago. Use-o para identificar boas pagadoras e depois confirme se os pagamentos são recorrentes e se o negócio segue saudável. Yields anormalmente altos merecem desconfiança em dobro.</p>
+    </details>
+    <details>
+      <summary>Maiores altas e baixas do dia servem pra quê?</summary>
+      <p>Mostram onde está o movimento — resultados divulgados, fatos relevantes, rumores. Para o investidor de longo prazo, servem mais como radar de notícias do que como sinal de compra ou venda: oscilação diária diz pouco sobre o valor de um negócio.</p>
+    </details>
+    <details>
+      <summary>De onde vêm os dados e com que frequência são atualizados?</summary>
+      <p>Os rankings são recalculados diariamente a partir das cotações e indicadores coletados após o fechamento do pregão da B3.</p>
+    </details>
+    <div class="edu-aviso">⚠️ As informações desta página têm caráter educativo e não são recomendação de investimento. Rentabilidade passada não garante resultados futuros.</div>
+  </div>
+</div>
+
 <div id="footer-placeholder"></div>
 <script>
 /* Mais Valor — logo SVG global para uso pelo nav.js */

@@ -432,8 +432,16 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
   min-height: calc(100vh - 160px); text-align: center; gap: 12px;
 }
 .empty-icon { font-size: 42px; opacity: .25; }
-.empty-title { font-size: 18px; font-weight: 700; color: var(--sim-text); }
+.empty-title { font-size: 20px; font-weight: 700; color: var(--sim-text); }
 .empty-sub { font-size: 13px; color: var(--sim-text3); max-width: 340px; line-height: 1.7; }
+.empty-desc { font-size: 13px; color: var(--sim-text2); max-width: 520px; line-height: 1.75; }
+.empty-desc strong { color: var(--sim-text); }
+.empty-passos { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 460px; margin-top: 4px; text-align: left; }
+.empty-passo { display: flex; gap: 12px; align-items: flex-start; background: var(--sim-surf2); border: 1px solid var(--sim-border); border-radius: 8px; padding: 11px 14px; }
+.empty-passo-num { width: 22px; height: 22px; border-radius: 50%; background: var(--sim-accent-d); border: 1px solid var(--sim-accent-g); color: var(--sim-accent); font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.empty-passo-txt { font-size: 12.5px; color: var(--sim-text2); line-height: 1.6; }
+.empty-passo-txt b { color: var(--sim-text); }
+.empty-aviso { font-size: 11px; color: var(--sim-text3); line-height: 1.6; max-width: 460px; margin-top: 4px; }
 
 /* ── ABAS EXCEL STYLE ── */
 .excel-tab-bar {
@@ -896,9 +904,21 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
       <!-- Empty state -->
       <div class="empty-state" id="emptyState">
         <div class="empty-icon">📊</div>
-        <div class="empty-title">Simule sua carteira</div>
-        <div class="empty-sub">Configure os parâmetros na sidebar e clique em <strong>Simular</strong>. Compare até 5 carteiras lado a lado.</div>
+        <div class="empty-title">Simulador de Carteiras — Backtest</div>
+        <div class="empty-desc">
+          Descubra como sua carteira <strong>teria se comportado no passado</strong>, usando dados reais da B3.
+          O simulador aplica seus aportes mês a mês, reinveste os dividendos e compara o resultado com o
+          <strong>IBOV</strong> e o <strong>CDI</strong> — pra você testar estratégias antes de arriscar dinheiro de verdade.
+          Monte até 5 carteiras e compare lado a lado.
+        </div>
+        <div class="empty-passos">
+          <div class="empty-passo"><div class="empty-passo-num">1</div><div class="empty-passo-txt"><b>Período</b> — escolha as datas de início e fim do teste (ex: 01/2015 até 12/2025) e confirme.</div></div>
+          <div class="empty-passo"><div class="empty-passo-num">2</div><div class="empty-passo-txt"><b>Aportes</b> — informe quanto você investiria no início e quanto aportaria por mês.</div></div>
+          <div class="empty-passo"><div class="empty-passo-num">3</div><div class="empty-passo-txt"><b>Monte a carteira</b> — distribua os percentuais entre classes (ações, FIIs, etc.) e escolha os ativos de cada uma.</div></div>
+          <div class="empty-passo"><div class="empty-passo-num">4</div><div class="empty-passo-txt"><b>Simular</b> — veja a evolução do patrimônio, os dividendos recebidos e o comparativo com IBOV e CDI.</div></div>
+        </div>
         <button class="sim-ctrl-btn" style="flex:none;padding:7px 16px;font-size:11px" onclick="importarSims()">⬆ Importar simulações salvas</button>
+        <div class="empty-aviso">Rentabilidade passada não garante resultados futuros. Ferramenta educativa — não é recomendação de investimento.</div>
       </div>
 
       <!-- Results -->
