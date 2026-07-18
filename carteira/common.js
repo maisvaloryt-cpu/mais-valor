@@ -765,7 +765,7 @@ function _mvEnsureGateEls(){
   login.style.cssText='display:none;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:14px;text-align:center;color:var(--color-text-secondary);font-size:14px';
   login.innerHTML=`
     <div class="gate-welcome">
-      <div class="gw-icon">💼</div>
+      <div class="gw-icon"><svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M4 7h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M4 7h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z" stroke="#F5A623" stroke-width="1.5"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="#F5A623" stroke-width="1.5"/><path d="M12 12v.01" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M12 12v.01" stroke="#F5A623" stroke-width="1.5"/><path d="M3 13a20 20 0 0 0 18 0" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M3 13a20 20 0 0 0 18 0" stroke="#F5A623" stroke-width="1.5"/></svg></div>
       <div class="gw-title">Bem-vindo à sua Carteira</div>
       <div class="gw-desc">
         Acompanhe <strong>todos os seus investimentos em um só lugar</strong>: ações, FIIs, BDRs, ETFs e criptos.
