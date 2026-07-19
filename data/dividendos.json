@@ -1,18 +1,9 @@
 {
-  "updated_at": "18/07/2026 06:03",
-  "total": 1353,
+  "updated_at": "19/07/2026 07:02",
+  "total": 1352,
   "total_registros": 68024,
   "total_ativos": 1094,
   "dividendos": [
-    {
-      "t": "FGAA11",
-      "n": "FG/AGRO Fundo de Investimento nas Cadeias Produtivas Agroindustriais Fiagro Imobiliario",
-      "tipo": "Amortização",
-      "com": "2025-05-08",
-      "pag": "2026-06-13",
-      "val": 0.06,
-      "dy": "8.74%"
-    },
     {
       "t": "HILG11",
       "n": "FII HIRE LOGCI  ER",
