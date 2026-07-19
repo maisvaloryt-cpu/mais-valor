@@ -65,3 +65,21 @@ html:not([data-theme="light"]) .art-card p{color:#A8A6A0}
 .art-card .meta{display:flex;gap:6px;flex-wrap:wrap}
 .art-card .ler{font-size:12.5px;font-weight:700;color:var(--gold)}
 .art-card.breve{opacity:.55;pointer-events:none}
+
+/* ── Motion reveal dos gráficos ao rolar a página ──────────────
+   Sem estado padrão "escondido": só entra em ação depois que o
+   motion.js confirma suporte do navegador e preferência do usuário,
+   via body.mv-ready. Sem JS ou com "reduzir movimento" ligado, os
+   gráficos aparecem estáticos e completos, como sempre apareceram. */
+body.mv-ready .art-fig{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+body.mv-ready .art-fig.mv-in{opacity:1;transform:translateY(0)}
+
+body.mv-ready .art-fig svg .mv-bar-h,
+body.mv-ready .art-fig svg .mv-bar-v{transition:transform .9s cubic-bezier(.16,.85,.24,1)}
+body.mv-ready .art-fig svg .mv-bar-h{transform-box:fill-box;transform-origin:left center;transform:scaleX(0)}
+body.mv-ready .art-fig svg .mv-bar-v{transform-box:fill-box;transform-origin:bottom center;transform:scaleY(0)}
+body.mv-ready .art-fig.mv-in svg .mv-bar-h,
+body.mv-ready .art-fig.mv-in svg .mv-bar-v{transform:none}
+
+body.mv-ready .art-fig svg .mv-dot{transform-box:fill-box;transform-origin:center;opacity:0;transform:scale(0);transition:opacity .35s ease .5s,transform .35s ease .5s}
+body.mv-ready .art-fig.mv-in svg .mv-dot{opacity:1;transform:scale(1)}

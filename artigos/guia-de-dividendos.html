@@ -59,10 +59,10 @@
   <figure class="art-fig">
     <svg viewBox="0 0 640 150" role="img" aria-label="Linha do tempo de um provento: anúncio, data-com, data-ex e pagamento">
       <line x1="50" y1="70" x2="590" y2="70" stroke="rgba(245,166,35,0.4)" stroke-width="2"/>
-      <circle cx="80"  cy="70" r="7" fill="#8A8884"/>
-      <circle cx="250" cy="70" r="7" fill="#F5A623"/>
-      <circle cx="330" cy="70" r="7" fill="#E8503A"/>
-      <circle cx="560" cy="70" r="7" fill="#1FC96E"/>
+      <circle class="mv-dot" cx="80"  cy="70" r="7" fill="#8A8884"/>
+      <circle class="mv-dot" cx="250" cy="70" r="7" fill="#F5A623"/>
+      <circle class="mv-dot" cx="330" cy="70" r="7" fill="#E8503A"/>
+      <circle class="mv-dot" cx="560" cy="70" r="7" fill="#1FC96E"/>
       <text x="80"  y="45" fill="#B3B1AB" font-size="11" text-anchor="middle" font-weight="bold">Anúncio</text>
       <text x="250" y="45" fill="#F5A623" font-size="11" text-anchor="middle" font-weight="bold">Data-com</text>
       <text x="330" y="120" fill="#E8503A" font-size="11" text-anchor="middle" font-weight="bold">Data-ex</text>
@@ -99,14 +99,14 @@
       <text x="396" y="278" fill="#7C7A75" font-size="10" text-anchor="middle">15a</text>
       <text x="508" y="278" fill="#7C7A75" font-size="10" text-anchor="middle">20a</text>
       <text x="620" y="278" fill="#7C7A75" font-size="10" text-anchor="middle">25a</text>
-      <polyline points="82,257 105,253 127,249 150,245 172,241 194,236 217,231 239,225 262,219 284,212 306,205 329,198 351,189 374,181 396,171 418,160 441,149 463,137 486,124 508,110 530,94 553,78 575,60 598,41 620,20" fill="none" stroke="#F5A623" stroke-width="2.5"/>
-      <polyline points="82,257 105,254 127,250 150,247 172,244 194,241 217,238 239,235 262,231 284,228 306,225 329,222 351,219 374,216 396,212 418,209 441,206 463,203 486,200 508,197 530,193 553,190 575,187 598,184 620,181" fill="none" stroke="#8A8884" stroke-width="2" stroke-dasharray="5,4"/>
-      <circle cx="620" cy="20" r="4" fill="#F5A623"/>
+      <polyline class="mv-draw" points="82,257 105,253 127,249 150,245 172,241 194,236 217,231 239,225 262,219 284,212 306,205 329,198 351,189 374,181 396,171 418,160 441,149 463,137 486,124 508,110 530,94 553,78 575,60 598,41 620,20" fill="none" stroke="#F5A623" stroke-width="2.5"/>
+      <polyline class="mv-draw" points="82,257 105,254 127,250 150,247 172,244 194,241 217,238 239,235 262,231 284,228 306,225 329,222 351,219 374,216 396,212 418,209 441,206 463,203 486,200 508,197 530,193 553,190 575,187 598,184 620,181" fill="none" stroke="#8A8884" stroke-width="2" stroke-dasharray="5,4"/>
+      <circle class="mv-dot" cx="620" cy="20" r="4" fill="#F5A623"/>
       <text x="612" y="14" fill="#F5A623" font-size="11" font-weight="bold" text-anchor="end">R$ 5.848/mês</text>
       <text x="612" y="175" fill="#8A8884" font-size="11" text-anchor="end">R$ 1.930/mês</text>
-      <rect x="70" y="30" width="12" height="3" fill="#F5A623"/>
+      <rect class="mv-bar-h" x="70" y="30" width="12" height="3" fill="#F5A623"/>
       <text x="88" y="35" fill="#B3B1AB" font-size="10">Reinvestindo os proventos</text>
-      <rect x="70" y="48" width="12" height="3" fill="#8A8884"/>
+      <rect class="mv-bar-h" x="70" y="48" width="12" height="3" fill="#8A8884"/>
       <text x="88" y="53" fill="#B3B1AB" font-size="10">Gastando os proventos</text>
     </svg>
     <figcaption>Renda mensal gerada por aportes de R$ 1.000/mês numa carteira com yield de 8% a.a. Cálculo próprio, ilustrativo, sem considerar valorização das cotas, inflação ou impostos.</figcaption>
@@ -162,6 +162,7 @@
 </div>
 
 <div id="footer-placeholder"></div>
+<script src="motion.js" defer></script>
 <script src="../nav.js"></script>
 </body>
 </html>
