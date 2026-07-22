@@ -152,6 +152,22 @@ nav {
 .nav-bottom-row .nav-search-wrap { margin-left: 0; }
 .nav-right { display: none; }
 
+/* ── Logo à esquerda das abas, tudo numa linha (desktop) ─────────── */
+@media (min-width: 769px) {
+  nav {
+    position: relative; display: flex; flex-direction: row;
+    align-items: flex-end; justify-content: center; gap: 14px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px; margin-bottom: 10px;
+  }
+  .nav-top-row, .nav-bottom-row { display: contents; }
+  .nav-logo { order: 1; padding: 0 !important; margin: 0 !important; align-items: flex-end; }
+  .nav-logo svg { height: 88px !important; width: auto !important; border-radius: 0 !important; }
+  .nav-links { order: 2; display: flex; align-items: flex-end; gap: 4px; }
+  #nav-auth-area { order: 4; position: absolute !important; right: 0; left: auto; bottom: 12px; }
+  .nav-search-wrap { order: 3; position: absolute !important; right: 116px !important; left: auto !important; bottom: 12px; }
+}
+
 /* Theme toggle button */
 .theme-toggle {
   background: var(--bg3); border: 1px solid var(--border);
