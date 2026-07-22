@@ -1,5 +1,5 @@
 {
-  "updated_at": "17/07/2026 17:44",
+  "updated_at": "21/07/2026 17:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,20 +1128,20 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 173714.08,
-      "changePct": -0.0006,
-      "high": 174504.63,
-      "low": 173285.28
+      "price": 173325.66,
+      "changePct": -0.0003,
+      "high": 173719.5,
+      "low": 172218.88
     },
     {
       "ticker": "INDEXBVMF:IFIX",
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3847.2,
-      "changePct": 0.0002,
-      "high": 3853.38,
-      "low": 3846.04
+      "price": 3827.72,
+      "changePct": -0.0026,
+      "high": 3841.73,
+      "low": 3823.04
     },
     {
       "ticker": "INDEXBVMF:SMLL",
@@ -1158,10 +1158,10 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 12477.78,
-      "changePct": -0.0028000000000000004,
-      "high": 12549.23,
-      "low": 12446.54
+      "price": 12523.45,
+      "changePct": 0.0055000000000000005,
+      "high": 12527.39,
+      "low": 12402.83
     },
     {
       "ticker": "INDEXBVMF:IMAB",
@@ -1188,40 +1188,40 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7457.69,
-      "changePct": -0.0101,
-      "high": 7498.47,
-      "low": 7431.26
+      "price": 7509.2,
+      "changePct": 0.0089,
+      "high": 7515.31,
+      "low": 7467.86
     },
     {
       "ticker": "INDEXNASDAQ:.IXIC",
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 25520.24,
-      "changePct": -0.013999999999999999,
-      "high": 25703.01,
-      "low": 25250.63
+      "price": 25837.21,
+      "changePct": 0.0129,
+      "high": 25880.34,
+      "low": 25672.83
     },
     {
       "ticker": "INDEXDJX:.DJI",
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 52146.42,
-      "changePct": -0.0077,
-      "high": 52610.97,
-      "low": 51986.74
+      "price": 52224.64,
+      "changePct": 0.0074,
+      "high": 52370.65,
+      "low": 51890.1
     },
     {
       "ticker": "INDEXRUSSELL:RUT",
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2962.22,
-      "changePct": -0.0042,
-      "high": 2979.32,
-      "low": 2934.12
+      "price": 2987.4,
+      "changePct": 0.015300000000000001,
+      "high": 2988.43,
+      "low": 2949.44
     },
     {
       "ticker": "CBOE:VIX",
@@ -1238,20 +1238,20 @@
       "stale": false,
       "descricao": "FTSE 100 (Reino Unido)",
       "tipo": "Índice Global",
-      "price": 10600.37,
-      "changePct": 0.0027,
-      "high": 10623.69,
-      "low": 10527.65
+      "price": 10585.91,
+      "changePct": 0.0058,
+      "high": 10585.91,
+      "low": 10483.14
     },
     {
       "ticker": "INDEXDB:DAX",
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 24830.98,
-      "changePct": -0.0034000000000000002,
-      "high": 24850.75,
-      "low": 24651.34
+      "price": 25011.35,
+      "changePct": 0.0066,
+      "high": 25011.35,
+      "low": 24817.34
     },
     {
       "ticker": "INDEXEURO:SX5E",
@@ -1268,20 +1268,20 @@
       "stale": false,
       "descricao": "Nikkei 225 (Japão)",
       "tipo": "Índice Global",
-      "price": 64141.12,
-      "changePct": -0.0403,
-      "high": 66441.77,
-      "low": 62704.6
+      "price": 66232.19,
+      "changePct": 0.0326,
+      "high": 66232.19,
+      "low": 64203.47
     },
     {
       "ticker": "INDEXHANGSENG:HSI",
       "stale": false,
       "descricao": "Hang Seng (HK)",
       "tipo": "Índice Global",
-      "price": 24562.24,
-      "changePct": -0.0178,
-      "high": 25166.56,
-      "low": 24332.51
+      "price": 25132.29,
+      "changePct": -0.0004,
+      "high": 25253.65,
+      "low": 24991.39
     },
     {
       "ticker": "SHA:000001",
