@@ -94,7 +94,7 @@ nav {
   display: flex; align-items: center; gap: 9px;
   flex-shrink: 0; text-decoration: none;
 }
-.nav-logo img, .nav-logo svg { width: 125px !important; height: 125px !important; object-fit: contain; border-radius: 18px; flex-shrink: 0; }
+.nav-logo img, .nav-logo svg { height: 120px !important; width: auto !important; flex-shrink: 0; }
 .nav-logo span {
   font-family: var(--font-display);
   font-size: 125px !important; font-weight: 400;
