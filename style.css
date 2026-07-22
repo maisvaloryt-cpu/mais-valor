@@ -158,14 +158,14 @@ nav {
     position: relative; display: flex; flex-direction: row;
     align-items: flex-end; justify-content: center; gap: 14px;
     border-bottom: 1px solid var(--border);
-    padding-bottom: 10px; margin-bottom: 10px;
+    padding-top: 18px; padding-bottom: 10px; margin-bottom: 10px;
   }
   .nav-top-row, .nav-bottom-row { display: contents; }
   .nav-logo { order: 1; padding: 0 !important; margin: 0 !important; align-items: flex-end; }
-  .nav-logo svg { height: 88px !important; width: auto !important; border-radius: 0 !important; }
+  .nav-logo svg { height: 123px !important; width: auto !important; border-radius: 0 !important; }
   .nav-links { order: 2; display: flex; align-items: flex-end; gap: 4px; }
-  #nav-auth-area { order: 4; position: absolute !important; right: 0; left: auto; bottom: 12px; }
-  .nav-search-wrap { order: 3; position: absolute !important; right: 116px !important; left: auto !important; bottom: 12px; }
+  .nav-search-wrap { order: 3; position: relative !important; right: auto !important; left: auto !important; bottom: auto !important; }
+  #nav-auth-area { order: 4; position: static !important; right: auto; left: auto; bottom: auto; }
 }
 
 /* Theme toggle button */
