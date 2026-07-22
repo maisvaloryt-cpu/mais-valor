@@ -28,7 +28,7 @@
   gtag('config', 'G-MXYNF830JM');
 })();
 
-const LOGO_SVG_HTML = `<svg preserveAspectRatio="xMidYMid meet" viewBox="0 0 577 549" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="display:block;fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><defs>
+const LOGO_SVG_BASE = `<svg preserveAspectRatio="xMidYMid meet" viewBox="0 0 577 549" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="display:block;fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><defs>
   <linearGradient id="mvSilver" x1="0%" y1="0%" x2="100%" y2="100%">
     <stop offset="0%"  stop-color="#8E9294"/>
     <stop offset="12%" stop-color="#F7F8F8"/>
@@ -67,6 +67,9 @@ const LOGO_SVG_HTML = `<svg preserveAspectRatio="xMidYMid meet" viewBox="0 0 577
         </g>
     </g>
 </svg>`;
+
+// IDs únicos por instância: gradientes/clip não podem colidir (o 1º #mvSilver ficava no menu mobile display:none e não pintava)
+function LOGO_SVG(sfx){ return LOGO_SVG_BASE.replace(/mvSilver/g,'mvSilver_'+sfx).replace(/mvGold/g,'mvGold_'+sfx).replace(/_clip1/g,'mvclip_'+sfx); }
 
 const NAV_LINKS = [
   { href: 'index.html',        label: 'Home' },
@@ -429,7 +432,7 @@ function renderNavSlim() {
   </style>
   <div class="nav-slim">
     <div style="display:flex;align-items:center;flex:1;min-width:0">
-      <a class="nav-slim-logo" href="${NAV_BASE}index.html">${LOGO_SVG_HTML}</a>
+      <a class="nav-slim-logo" href="${NAV_BASE}index.html">${LOGO_SVG('slim')}</a>
       <div class="nav-slim-links">${links}</div>
     </div>
     <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Alternar tema" style="flex-shrink:0;background:transparent;border:none;cursor:pointer;font-size:16px;padding:4px 8px;margin-left:1rem;color:var(--text2)">☀️</button>
@@ -494,7 +497,7 @@ function renderNav() {
   <div id="nav-mobile-menu">
     <div class="mob-header">
       <a href="${NAV_BASE}index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;border:none;padding:0">
-        ${LOGO_SVG_HTML}
+        ${LOGO_SVG('mob')}
       </a>
       <button class="mob-close" onclick="toggleMobileMenu()">✕</button>
     </div>
@@ -529,7 +532,7 @@ function renderNav() {
   <nav>
     <div class="nav-top-row">
       <a class="nav-logo" href="${NAV_BASE}index.html">
-        ${LOGO_SVG_HTML}
+        ${LOGO_SVG('main')}
       </a>
       <div id="nav-auth-area"></div>
       <button id="nav-hamburger" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
