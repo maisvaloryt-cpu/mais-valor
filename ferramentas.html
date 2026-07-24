@@ -58,7 +58,7 @@
   <div id="tool-juros" class="fade-in-2">
     <div class="tool-grid">
       <div class="calc-box">
-        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">💰 Juros Compostos</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path stroke-width="5" stroke-opacity=".22" d="M4 16l5-5 4 4 7-8 M16 7h4v4"/><path stroke-width="1.5" d="M4 16l5-5 4 4 7-8 M16 7h4v4"/></svg>Juros Compostos</div>
         <label class="calc-label">Capital inicial (R$)</label>
         <input class="calc-input" type="number" id="j-cap" value="10000" oninput="calcJuros()">
         <label class="calc-label">Aporte mensal (R$)</label>
@@ -82,8 +82,8 @@
         <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Evolução do patrimônio</div>
         <div style="position:relative;height:280px"><canvas id="jurosChart"></canvas></div>
         <div style="margin-top:1rem;font-size:12px;color:var(--text3);line-height:1.8">
-          <div>📌 Não inclui IR sobre rendimentos</div>
-          <div>📌 Rentabilidade passada não garante retornos futuros</div>
+          <div>• Não inclui IR sobre rendimentos</div>
+          <div>• Rentabilidade passada não garante retornos futuros</div>
         </div>
       </div>
     </div>
@@ -93,7 +93,7 @@
   <div id="tool-carteira" style="display:none">
     <div class="tool-grid">
       <div class="calc-box">
-        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">📊 Minha Carteira</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path stroke-width="5" stroke-opacity=".22" d="M3 7h15a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h12 M16 12h2"/><path stroke-width="1.5" d="M3 7h15a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h12 M16 12h2"/></svg>Minha Carteira</div>
         <div style="display:flex;gap:8px;margin-bottom:1rem">
           <input class="calc-input" id="cart-ticker" placeholder="Ticker (ex: MXRF11)" style="flex:1;margin:0">
           <input class="calc-input" id="cart-qtd" type="number" placeholder="Qtd" style="width:90px;margin:0">
@@ -187,7 +187,7 @@
   <div id="tool-dy-calc" style="display:none">
     <div class="tool-grid">
       <div class="calc-box">
-        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">📈 Calculadora de DY</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path stroke-width="5" stroke-opacity=".22" d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z M9 15l6-6 M9.5 9.5h.01 M14.5 14.5h.01"/><path stroke-width="1.5" d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z M9 15l6-6 M9.5 9.5h.01 M14.5 14.5h.01"/></svg>Calculadora de DY</div>
         <label class="calc-label">Preço pago (compra) (R$)</label>
         <input class="calc-input" type="number" id="dy-preco-pago" value="9.50" step="0.01" oninput="calcDY()">
         <label class="calc-label">Preço atual (R$)</label>
@@ -226,9 +226,9 @@
         <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Projeção da renda mensal (com/sem reinvestimento)</div>
         <div style="position:relative;height:280px"><canvas id="dyChart"></canvas></div>
         <div style="margin-top:1rem;font-size:12px;color:var(--text3);line-height:1.8">
-          <div>📌 <strong style="color:var(--text2)">DY</strong>: rendimento sobre o preço atual de mercado</div>
-          <div>📌 <strong style="color:var(--text2)">Yield on Cost</strong>: rendimento sobre o preço que você pagou — mostra o "DY real" da sua posição</div>
-          <div>📌 A projeção assume preço e dividendo por cota constantes — é uma simplificação</div>
+          <div>• <strong style="color:var(--text2)">DY</strong>: rendimento sobre o preço atual de mercado</div>
+          <div>• <strong style="color:var(--text2)">Yield on Cost</strong>: rendimento sobre o preço que você pagou — mostra o "DY real" da sua posição</div>
+          <div>• A projeção assume preço e dividendo por cota constantes — é uma simplificação</div>
         </div>
       </div>
     </div>
@@ -237,7 +237,7 @@
   <div id="tool-dcf" style="display:none">
     <div class="tool-grid">
       <div class="calc-box">
-        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">💰 Valuation por DCF Simplificado</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path stroke-width="5" stroke-opacity=".22" d="M7 3h8l4 4v14H7z M14 3v4h4 M10 12h5 M10 16h5 M10 8h2"/><path stroke-width="1.5" d="M7 3h8l4 4v14H7z M14 3v4h4 M10 12h5 M10 16h5 M10 8h2"/></svg>Valuation por DCF Simplificado</div>
         <label class="calc-label">Lucro por ação (LPA) atual — R$</label>
         <input class="calc-input" type="number" id="dcf-lpa" value="5.00" step="0.01" oninput="calcDCF()">
         <label class="calc-label">Taxa de crescimento anual (%)</label>
@@ -278,7 +278,7 @@
         <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Fluxo de caixa descontado por ano</div>
         <div style="position:relative;height:260px"><canvas id="dcfChart"></canvas></div>
         <div style="margin-top:1.25rem;padding:1rem;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.8">
-          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">📌 Como interpretar:</div>
+          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">• Como interpretar:</div>
           <div>• <strong style="color:var(--text)">Valor justo</strong>: VP dos fluxos futuros + valor terminal</div>
           <div>• <strong style="color:var(--text)">Margem de segurança</strong>: desconto para proteger contra incertezas</div>
           <div>• <strong style="color:var(--text)">WACC</strong>: custo médio ponderado de capital (use 10-15%)</div>
@@ -292,7 +292,7 @@
   <div id="tool-bazin" style="display:none">
     <div class="tool-grid">
       <div class="calc-box">
-        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">🎯 Preço Teto (Método Bazin)</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path stroke-width="5" stroke-opacity=".22" d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10z M12 11.5a.5 .5 0 1 0 0 1 .5 .5 0 0 0 0-1z"/><path stroke-width="1.5" d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10z M12 11.5a.5 .5 0 1 0 0 1 .5 .5 0 0 0 0-1z"/></svg>Preço Teto (Método Bazin)</div>
         <label class="calc-label">Dividendo médio mensal por cota/ação (R$)</label>
         <input class="calc-input" type="number" id="bz-div-men" value="0.10" step="0.01" oninput="calcBazin()">
         <label class="calc-label">Yield mínimo exigido (% a.a.)</label>
@@ -315,11 +315,11 @@
         <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Preço atual vs. Preço Teto</div>
         <div style="position:relative;height:260px"><canvas id="bazinChart"></canvas></div>
         <div style="margin-top:1.25rem;padding:1rem;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.8">
-          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">📌 Como funciona o Método Bazin:</div>
+          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">• Como funciona o Método Bazin:</div>
           <div>• Preço teto = Dividendo anual esperado ÷ Yield mínimo exigido</div>
           <div>• Decio Bazin sugeria um yield mínimo de <strong style="color:var(--text)">6% a.a.</strong> para ações boas pagadoras de dividendos</div>
           <div>• Comprar abaixo do preço teto tende a garantir o yield mínimo desejado a partir do preço pago</div>
-          <div>• ⚠️ Não considera crescimento, dívida ou qualidade do negócio — combine com outras análises</div>
+          <div>• Não considera crescimento, dívida ou qualidade do negócio — combine com outras análises</div>
         </div>
       </div>
     </div>
@@ -329,7 +329,7 @@
   <div id="tool-graham" style="display:none">
     <div class="tool-grid">
       <div class="calc-box">
-        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">📐 Número de Graham</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path stroke-width="5" stroke-opacity=".22" d="M3 8l5-5 13 13-5 5z M8.5 8.5l1.5 1.5 M11.5 5.5l1.5 1.5 M14.5 8.5l1.5 1.5 M6 13l1.5 1.5"/><path stroke-width="1.5" d="M3 8l5-5 13 13-5 5z M8.5 8.5l1.5 1.5 M11.5 5.5l1.5 1.5 M14.5 8.5l1.5 1.5 M6 13l1.5 1.5"/></svg>Número de Graham</div>
         <label class="calc-label">LPA — Lucro por ação (R$)</label>
         <input class="calc-input" type="number" id="gh-lpa" value="2.00" step="0.01" oninput="calcGraham()">
         <label class="calc-label">VPA — Valor patrimonial por ação (R$)</label>
@@ -352,11 +352,11 @@
         <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Preço atual vs. Valor justo (Graham)</div>
         <div style="position:relative;height:260px"><canvas id="grahamChart"></canvas></div>
         <div style="margin-top:1.25rem;padding:1rem;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.8">
-          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">📌 Como funciona:</div>
+          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">• Como funciona:</div>
           <div>• Fórmula: Valor justo = √(22,5 × LPA × VPA)</div>
           <div>• O fator 22,5 vem de um P/L máximo de 15 × um P/VP máximo de 1,5 — limites que Graham considerava razoáveis</div>
           <div>• Funciona melhor para empresas maduras, lucrativas e com VPA positivo (ex: bancos, utilities, consumo)</div>
-          <div>• ⚠️ Pouco indicado para empresas de crescimento, com prejuízo ou de setores com contabilidade muito particular</div>
+          <div>• Pouco indicado para empresas de crescimento, com prejuízo ou de setores com contabilidade muito particular</div>
         </div>
       </div>
     </div>
@@ -366,7 +366,7 @@
   <div id="tool-darf" style="display:none">
     <div class="tool-grid">
       <div class="calc-box">
-        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">🧾 Calculadora de IR / DARF</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path stroke-width="5" stroke-opacity=".22" d="M6 3h12v18l-2-1-2 1-2-1-2 1-2-1-2 1V3z M9 8h6 M9 12h6 M9 16h4"/><path stroke-width="1.5" d="M6 3h12v18l-2-1-2 1-2-1-2 1-2-1-2 1V3z M9 8h6 M9 12h6 M9 16h4"/></svg>Calculadora de IR / DARF</div>
         <label class="calc-label">Tipo de operação</label>
         <select class="calc-input" id="darf-tipo" onchange="calcDARF()">
           <option value="acoes-swing">Ações — operações comuns (Swing Trade)</option>
@@ -398,14 +398,14 @@
         <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Composição do resultado</div>
         <div style="position:relative;height:230px"><canvas id="darfChart"></canvas></div>
         <div style="margin-top:1.25rem;padding:1rem;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.8">
-          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">📌 Regras gerais (pessoa física):</div>
+          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">• Regras gerais (pessoa física):</div>
           <div>• <strong style="color:var(--text)">Ações (swing trade)</strong>: 15% sobre o lucro, isento se as vendas do mês somarem até R$ 20.000</div>
           <div>• <strong style="color:var(--text)">ETF de ações</strong>: 15% sobre o lucro, mas <strong style="color:var(--text)">sem</strong> a isenção de R$ 20.000 (só ação individual tem)</div>
           <div>• <strong style="color:var(--text)">Day trade</strong>: 20% sobre o lucro, sem isenção · o prejuízo de day trade só compensa lucro de day trade</div>
           <div>• <strong style="color:var(--text)">FIIs</strong>: 20% sobre o ganho na venda de cotas, sem isenção (rendimentos mensais distribuídos costumam ser isentos, mas o ganho de capital na venda não)</div>
           <div>• DARF abaixo de R$ 10 não precisa ser pago — some ao mês seguinte</div>
           <div>• Vencimento: último dia útil do mês seguinte · código DARF usual 6015</div>
-          <div>• ⚠️ Ferramenta educativa — não substitui orientação de um contador</div>
+          <div>• Ferramenta educativa — não substitui orientação de um contador</div>
         </div>
       </div>
     </div>
@@ -415,7 +415,7 @@
   <div id="tool-rebalance" style="display:none">
     <div class="tool-grid">
       <div class="calc-box">
-        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">⚖️ Rebalanceamento de Carteira</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path stroke-width="5" stroke-opacity=".22" d="M12 4v16 M7 20h10 M12 6l-7 2.5 M12 6l7 2.5 M2 9a3 3 0 0 0 6 0 M16 9a3 3 0 0 0 6 0"/><path stroke-width="1.5" d="M12 4v16 M7 20h10 M12 6l-7 2.5 M12 6l7 2.5 M2 9a3 3 0 0 0 6 0 M16 9a3 3 0 0 0 6 0"/></svg>Rebalanceamento de Carteira</div>
         <div class="tabs" style="margin-bottom:1rem">
           <button class="tab active" id="reb-tab-passivo" onclick="setRebModo('passivo')">Passivo (com aportes)</button>
           <button class="tab" id="reb-tab-ativo" onclick="setRebModo('ativo')">Ativo (comprar/vender)</button>
@@ -443,7 +443,7 @@
         <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Alocação atual vs. alvo</div>
         <div style="position:relative;height:260px"><canvas id="rebChart"></canvas></div>
         <div style="margin-top:1.25rem;padding:1rem;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.8">
-          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">📌 Passivo vs. Ativo:</div>
+          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">• Passivo vs. Ativo:</div>
           <div>• <strong style="color:var(--text)">Passivo</strong>: direciona o novo aporte para os ativos mais abaixo do alvo, sem vender nada — evita gerar impostos</div>
           <div>• <strong style="color:var(--text)">Ativo</strong>: mostra o quanto comprar/vender de cada ativo para zerar o desvio imediatamente</div>
           <div>• A soma dos % alvo deve ser 100% para o resultado ficar correto</div>
@@ -456,7 +456,7 @@
   <div id="tool-inflacao" style="display:none">
     <div class="tool-grid">
       <div class="calc-box">
-        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">💸 Conversor de Inflação (IPCA)</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path stroke-width="5" stroke-opacity=".22" d="M4 7l6 6 4-4 6 6 M16 15h4v-4"/><path stroke-width="1.5" d="M4 7l6 6 4-4 6 6 M16 15h4v-4"/></svg>Conversor de Inflação (IPCA)</div>
         <label class="calc-label">Valor (R$)</label>
         <input class="calc-input" type="number" id="inf-valor" value="100" step="0.01" oninput="calcInflacao()">
         <label class="calc-label">Ano de referência (poder de compra no passado)</label>
@@ -484,8 +484,8 @@
         <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Inflação acumulada (IPCA ano a ano)</div>
         <div style="position:relative;height:280px"><canvas id="inflacaoChart"></canvas></div>
         <div style="margin-top:1rem;font-size:12px;color:var(--text3);line-height:1.8">
-          <div>📌 Série IPCA anual aproximada (IBGE) — ajuste no array IPCA_HIST caso queira valores oficiais atualizados</div>
-          <div>📌 A projeção futura usa uma taxa média constante informada por você</div>
+          <div>• Série IPCA anual aproximada (IBGE) — ajuste no array IPCA_HIST caso queira valores oficiais atualizados</div>
+          <div>• A projeção futura usa uma taxa média constante informada por você</div>
         </div>
       </div>
     </div>
@@ -1061,10 +1061,10 @@ function calcBazin(){
   if(preco>0 && teto>0){
     const dif=(teto-preco)/preco*100;
     if(preco<=teto){
-      sitEl.textContent='✅ Preço abaixo do teto ('+dif.toFixed(1)+'% de margem)';
+      sitEl.textContent='Preço abaixo do teto ('+dif.toFixed(1)+'% de margem)';
       sitEl.style.color='var(--up)';
     } else {
-      sitEl.textContent='⚠️ Preço acima do teto ('+Math.abs(dif).toFixed(1)+'% acima)';
+      sitEl.textContent='Preço acima do teto ('+Math.abs(dif).toFixed(1)+'% acima)';
       sitEl.style.color='var(--dn)';
     }
   } else {
@@ -1101,10 +1101,10 @@ function calcGraham(){
     margemEl.textContent=margem.toFixed(1)+'%';
     margemEl.style.color=margem>=0?'var(--up)':'var(--dn)';
     if(preco<=valorJusto){
-      sitEl.textContent='✅ Abaixo do valor justo';
+      sitEl.textContent='Abaixo do valor justo';
       sitEl.style.color='var(--up)';
     } else {
-      sitEl.textContent='⚠️ Acima do valor justo';
+      sitEl.textContent='Acima do valor justo';
       sitEl.style.color='var(--dn)';
     }
   } else {
