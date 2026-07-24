@@ -870,7 +870,7 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
 
       <!-- 6b. Impostos (opcional, não bloqueia a cascata) -->
       <div class="param-group etapa" id="etapaImpostos" style="display:none">
-        <div class="param-group-label" title="Estimativa simplificada de imposto de renda. Aplica 15% sobre o rendimento da reserva/caixa em CDI e 15% sobre o ganho em vendas do rebalanceamento ativo (20% para FIIs). Não considera a isenção de R$ 20 mil/mês na venda de ações, a tabela regressiva, o come-cotas nem custos de corretagem — tende a estimar um pouco mais de imposto que a realidade." style="cursor:help">Impostos (estimativa)</div>
+        <div class="param-group-label" title="Estimativa simplificada de imposto de renda. Na reserva-CDI (tratada como fundo DI) aplica o come-cotas: 15% sobre o rendimento do semestre, em maio e novembro. Também aplica 15% sobre o ganho em vendas do rebalanceamento ativo (20% para FIIs). Não considera a isenção de R$ 20 mil/mês na venda de ações, a tabela regressiva nas vendas nem custos de corretagem." style="cursor:help">Impostos (estimativa)</div>
         <div class="divmode-row" style="margin-bottom:0">
           <div class="divmode-btn divmode-ir active" id="irNaoBtn" onclick="selectIR(false,this)" title="Simula o retorno bruto, sem descontar impostos.">
             <div class="divmode-btn-title">Sem IR</div>
@@ -1836,8 +1836,9 @@ function runBacktest(config, allPrices, allDividends) {
 
   // ── IR ESTIMADO (opcional) ──
   // Quando config.considerarIR: 15% sobre o ganho em vendas do rebalanceamento
-  // ativo (20% para FIIs) e 15% sobre o rendimento da reserva/caixa em CDI.
-  // Estimativa simplificada: não considera isenção de R$20 mil/mês, come-cotas
+  // ativo (20% para FIIs); na reserva-CDI o IR entra via COME-COTAS (15% sobre
+  // o rendimento do semestre, em maio e novembro — ver bloco no loop mensal).
+  // Estimativa simplificada: não considera isenção de R$20 mil/mês nas vendas
   // nem custos de corretagem.
   const considerarIR = !!config.considerarIR;
   const IR_RESERVA = 0.15;
@@ -1873,6 +1874,8 @@ function runBacktest(config, allPrices, allDividends) {
   // é SEPARADA dos ativos — não rebalanceia e não distorce os pesos. O patrimônio
   // total passa a ser: reservaCDI + valor dos ativos.
   let reservaCDI = 0;
+  // Base de cálculo do come-cotas da reserva (aportes/dividendos já tributados).
+  let reservaBaseCC = 0;
   // Retornos mensais do CDI de referência (close[t]/close[t-1]-1), para remunerar
   // a reserva. Independente de o CDI estar ou não entre os ativos da carteira.
   const cdiRetMensal = {};
@@ -1975,11 +1978,24 @@ function runBacktest(config, allPrices, allDividends) {
     if (reservaCDI > 0 || caixaEspera > 0) {
       const rCdi = cdiRetMensal[month];
       if (rCdi != null) {
-        const rLiq = considerarIR && rCdi > 0 ? rCdi * (1 - IR_RESERVA) : rCdi;
-        if (considerarIR && rCdi > 0) irPago += (reservaCDI + caixaEspera) * rCdi * IR_RESERVA;
-        reservaCDI *= (1 + rLiq);
-        caixaEspera *= (1 + rLiq);
+        // Caixa de espera (transitório): mantém a estimativa mensal simples.
+        const rLiqCaixa = considerarIR && rCdi > 0 ? rCdi * (1 - IR_RESERVA) : rCdi;
+        if (considerarIR && rCdi > 0) irPago += caixaEspera * rCdi * IR_RESERVA;
+        caixaEspera *= (1 + rLiqCaixa);
+        // Reserva-CDI (fundo DI): rende o CDI cheio; o IR entra via come-cotas.
+        reservaCDI *= (1 + rCdi);
       }
+    }
+    // ── COME-COTAS (IR antecipado dos fundos, em maio e novembro) ──
+    // A reserva-CDI é tratada como um fundo DI de longo prazo: no fim de maio e
+    // de novembro o Leão antecipa 15% sobre o rendimento acumulado do semestre,
+    // descontado direto do saldo (come-cotas). Mais fiel que cobrar todo mês.
+    // Base = aportes/dividendos que entraram desde a última cobrança; o
+    // rendimento tributado é o saldo atual menos essa base.
+    if (considerarIR && (month.endsWith('-05') || month.endsWith('-11'))) {
+      const rendCC = reservaCDI - reservaBaseCC;
+      if (rendCC > 0) { const cc = rendCC * IR_RESERVA; reservaCDI -= cc; irPago += cc; }
+      reservaBaseCC = reservaCDI;
     }
 
     // ── LIQUIDAÇÃO POR FIM DE SÉRIE ──
@@ -2136,6 +2152,7 @@ function runBacktest(config, allPrices, allDividends) {
         // é o saldo que efetivamente rende e compõe o patrimônio.
         dividendsCash += totalDivMes;
         reservaCDI += totalDivMes;
+        reservaBaseCC += totalDivMes;
       } else if (mode === 'reinvest_same') {
         normAssets.forEach(a => {
           const verba = divByTicker[a.ticker];
@@ -2143,7 +2160,7 @@ function runBacktest(config, allPrices, allDividends) {
           const ok = comprar(a.ticker, verba, month);
           // Pagador sem preço neste mês: a verba vai para a reserva-CDI em vez
           // de ser destruída (antes era silenciosamente descartada).
-          if (ok === 0) reservaCDI += verba;
+          if (ok === 0) { reservaCDI += verba; reservaBaseCC += verba; }
         });
       } else if (mode === 'reinvest_class') {
         normAssets.forEach(payer => {
@@ -4212,7 +4229,7 @@ function renderSingleView(idx) {
     <div class="metric-card"><div class="metric-label">Máx. Drawdown</div><div class="metric-value red">${pct(metrics.maxDrawdown)}</div></div>
     <div class="metric-card"><div class="metric-label">Meses</div><div class="metric-value">${metrics.months}</div></div>
     <div class="metric-card"><div class="metric-label">Estratégia Div.</div><div class="metric-value" style="font-size:11px;color:var(--sim-text2);font-family:var(--sim-font)">${divModeLabel[dividendMode]}</div></div>
-    ${(metrics.irPago || 0) > 0.005 ? `<div class="metric-card" title="Estimativa simplificada: não considera a isenção de R$ 20 mil/mês em ações, come-cotas nem corretagem."><div class="metric-label">IR estimado pago</div><div class="metric-value red">${brl(metrics.irPago)}</div><div class="metric-sub">Vendas do rebal + reserva · estimativa simplificada</div></div>` : ''}
+    ${(metrics.irPago || 0) > 0.005 ? `<div class="metric-card" title="Inclui o come-cotas da reserva-CDI (15% do rendimento em maio/novembro) e 15% sobre o ganho em vendas do rebalanceamento (20% para FIIs). Não considera a isenção de R$ 20 mil/mês em ações nem corretagem."><div class="metric-label">IR estimado pago</div><div class="metric-value red">${brl(metrics.irPago)}</div><div class="metric-sub">Come-cotas da reserva + vendas do rebal</div></div>` : ''}
     ${metrics.melhorAno ? `<div class="metric-card"><div class="metric-label">Melhor ano</div><div class="metric-value green">${pct(metrics.melhorAno.retorno)}</div><div class="metric-sub">${metrics.melhorAno.ano}</div></div>` : ''}
     ${metrics.piorAno ? `<div class="metric-card"><div class="metric-label">Pior ano</div><div class="metric-value ${metrics.piorAno.retorno<0?'red':''}">${pct(metrics.piorAno.retorno)}</div><div class="metric-sub">${metrics.piorAno.ano}</div></div>` : ''}
     <div class="metric-card"><div class="metric-label">Meses positivos</div><div class="metric-value">${pct(metrics.pctMesesPositivos)}</div><div class="metric-sub">Consistência</div></div>
