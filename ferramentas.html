@@ -35,6 +35,10 @@
     <button class="tab" onclick="show('graham',this)">Número de Graham</button>
     <button class="tab" onclick="show('darf',this)">IR / DARF</button>
     <button class="tab" onclick="show('rebalance',this)">Rebalanceamento</button>
+    <button class="tab" onclick="show('rendafixa',this)">Comparador Renda Fixa</button>
+    <button class="tab" onclick="show('reserva',this)">Reserva de Emergência</button>
+    <button class="tab" onclick="show('comecotas',this)">Come-cotas</button>
+    <button class="tab" onclick="show('conversor',this)">Conversor de Moedas</button>
     <button class="tab" onclick="show('inflacao',this)">Conversor de Inflação</button>
     <a href="calculadora/index.html" target="_blank"
       style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:9px;
@@ -117,26 +121,62 @@
   <div id="tool-aposentadoria" style="display:none">
     <div class="tool-grid">
       <div class="calc-box">
-        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">🏖️ Simulador de Aposentadoria</div>
-        <label class="calc-label">Sua idade atual</label>
-        <input class="calc-input" type="number" id="ap-idade" value="30" oninput="calcAp()">
-        <label class="calc-label">Idade de aposentadoria</label>
-        <input class="calc-input" type="number" id="ap-apos" value="60" oninput="calcAp()">
-        <label class="calc-label">Renda mensal desejada (R$)</label>
-        <input class="calc-input" type="number" id="ap-renda" value="5000" oninput="calcAp()">
-        <label class="calc-label">Taxa de retorno anual (%)</label>
-        <input class="calc-input" type="number" id="ap-taxa" value="10" step="0.1" oninput="calcAp()">
-        <div class="calc-result">
-          <div><div class="calc-result-label">Patrimônio necessário</div><div class="calc-result-val" id="ap-pat">—</div></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
-            <div><div class="calc-result-label">Aporte mensal necessário</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--up)" id="ap-aporte">—</div></div>
-            <div><div class="calc-result-label">Anos até a meta</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono)" id="ap-anos">—</div></div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:1rem;color:var(--gold)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path stroke-width="5" stroke-opacity=".22" d="M4 20c2-5 5-7 8-7s6 2 8 7 M12 13V5 M9 8l3-3 3 3"/><path stroke-width="1.5" d="M4 20c2-5 5-7 8-7s6 2 8 7 M12 13V5 M9 8l3-3 3 3"/></svg>Aposentadoria &amp; Independência</div>
+        <div class="tabs" style="margin-bottom:1rem">
+          <button class="tab active" id="ap-tab-idade" onclick="setApModo('idade')">Por idade</button>
+          <button class="tab" id="ap-tab-fire" onclick="setApModo('fire')">Independência (FIRE)</button>
+        </div>
+        <div id="ap-modo-idade">
+          <label class="calc-label">Sua idade atual</label>
+          <input class="calc-input" type="number" id="ap-idade" value="30" oninput="calcAp()">
+          <label class="calc-label">Idade de aposentadoria</label>
+          <input class="calc-input" type="number" id="ap-apos" value="60" oninput="calcAp()">
+          <label class="calc-label">Renda mensal desejada (R$)</label>
+          <input class="calc-input" type="number" id="ap-renda" value="5000" oninput="calcAp()">
+          <label class="calc-label">Taxa de retorno anual (%)</label>
+          <input class="calc-input" type="number" id="ap-taxa" value="10" step="0.1" oninput="calcAp()">
+          <div class="calc-result">
+            <div><div class="calc-result-label">Patrimônio necessário</div><div class="calc-result-val" id="ap-pat">—</div></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+              <div><div class="calc-result-label">Aporte mensal necessário</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--up)" id="ap-aporte">—</div></div>
+              <div><div class="calc-result-label">Anos até a meta</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono)" id="ap-anos">—</div></div>
+            </div>
+          </div>
+        </div>
+        <div id="ap-modo-fire" style="display:none">
+          <label class="calc-label">Gasto mensal hoje (R$)</label>
+          <input class="calc-input" type="number" id="fire-gasto" value="5000" step="100" oninput="calcApFire()">
+          <label class="calc-label">Patrimônio que você já tem (R$)</label>
+          <input class="calc-input" type="number" id="fire-atual" value="50000" step="1000" oninput="calcApFire()">
+          <label class="calc-label">Aporte mensal (R$)</label>
+          <input class="calc-input" type="number" id="fire-aporte" value="2000" step="100" oninput="calcApFire()">
+          <label class="calc-label">Retorno real ao ano (%) — já descontada a inflação</label>
+          <input class="calc-input" type="number" id="fire-retorno" value="6" step="0.1" oninput="calcApFire()">
+          <label class="calc-label">Taxa de retirada segura ao ano (%)</label>
+          <input class="calc-input" type="number" id="fire-swr" value="4" step="0.1" oninput="calcApFire()">
+          <div class="calc-result">
+            <div><div class="calc-result-label">Seu número da liberdade (patrimônio-alvo)</div><div class="calc-result-val" id="fire-num">—</div></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+              <div><div class="calc-result-label">Tempo até viver de renda</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--up)" id="fire-anos">—</div></div>
+              <div><div class="calc-result-label">Você já andou</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--gold)" id="fire-pct">—</div></div>
+            </div>
+            <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+              <div class="calc-result-label">Renda passiva que o alvo gera (por mês)</div>
+              <div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--up)" id="fire-renda">—</div>
+            </div>
           </div>
         </div>
       </div>
       <div class="calc-box">
         <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Acumulação ao longo dos anos</div>
         <div style="position:relative;height:280px"><canvas id="apChart"></canvas></div>
+        <div id="ap-fire-nota" style="display:none;margin-top:1.25rem;padding:1rem;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.8">
+          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">O que é FIRE:</div>
+          <div>• FIRE (Financial Independence, Retire Early) = juntar patrimônio suficiente para viver da renda dele.</div>
+          <div>• O "número da liberdade" costuma ser 25× seu gasto anual — o que equivale a sacar 4% ao ano (a "regra dos 4%").</div>
+          <div>• Use o <strong style="color:var(--text)">retorno real</strong> (acima da inflação), porque seus gastos também sobem com a inflação.</div>
+          <div>• É uma estimativa de longo prazo — o mercado oscila e a regra dos 4% é um ponto de partida, não garantia.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -327,7 +367,8 @@
         <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)">🧾 Calculadora de IR / DARF</div>
         <label class="calc-label">Tipo de operação</label>
         <select class="calc-input" id="darf-tipo" onchange="calcDARF()">
-          <option value="acoes-swing">Ações / ETFs — operações comuns (Swing Trade)</option>
+          <option value="acoes-swing">Ações — operações comuns (Swing Trade)</option>
+          <option value="etf-swing">ETF de ações — Swing Trade (sem isenção)</option>
           <option value="acoes-day">Ações / ETFs — Day Trade</option>
           <option value="fii">Fundos Imobiliários (FIIs) — venda de cotas</option>
         </select>
@@ -356,8 +397,9 @@
         <div style="position:relative;height:230px"><canvas id="darfChart"></canvas></div>
         <div style="margin-top:1.25rem;padding:1rem;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.8">
           <div style="font-weight:700;color:var(--gold);margin-bottom:6px">📌 Regras gerais (pessoa física):</div>
-          <div>• <strong style="color:var(--text)">Ações/ETFs (swing trade)</strong>: 15% sobre o lucro, isento se as vendas do mês somarem até R$ 20.000</div>
-          <div>• <strong style="color:var(--text)">Day trade</strong>: 20% sobre o lucro, sem isenção</div>
+          <div>• <strong style="color:var(--text)">Ações (swing trade)</strong>: 15% sobre o lucro, isento se as vendas do mês somarem até R$ 20.000</div>
+          <div>• <strong style="color:var(--text)">ETF de ações</strong>: 15% sobre o lucro, mas <strong style="color:var(--text)">sem</strong> a isenção de R$ 20.000 (só ação individual tem)</div>
+          <div>• <strong style="color:var(--text)">Day trade</strong>: 20% sobre o lucro, sem isenção · o prejuízo de day trade só compensa lucro de day trade</div>
           <div>• <strong style="color:var(--text)">FIIs</strong>: 20% sobre o ganho na venda de cotas, sem isenção (rendimentos mensais distribuídos costumam ser isentos, mas o ganho de capital na venda não)</div>
           <div>• DARF abaixo de R$ 10 não precisa ser pago — some ao mês seguinte</div>
           <div>• Vencimento: último dia útil do mês seguinte · código DARF usual 6015</div>
@@ -447,6 +489,162 @@
     </div>
   </div>
 
+  <!-- COMPARADOR DE RENDA FIXA -->
+  <div id="tool-rendafixa" style="display:none">
+    <div class="tool-grid">
+      <div class="calc-box">
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path stroke-width="5" stroke-opacity=".22" d="M4 20h16 M7 20V11 M12 20V5 M17 20V14"/><path stroke-width="1.5" d="M4 20h16 M7 20V11 M12 20V5 M17 20V14"/></svg>Comparador de Renda Fixa</div>
+        <label class="calc-label">Valor a investir (R$)</label>
+        <input class="calc-input" type="number" id="rf-valor" value="10000" step="100" oninput="calcRendaFixa()">
+        <label class="calc-label">Prazo (meses)</label>
+        <input class="calc-input" type="number" id="rf-meses" value="24" oninput="calcRendaFixa()">
+        <label class="calc-label">CDI ao ano (%)</label>
+        <input class="calc-input" type="number" id="rf-cdi" value="14.15" step="0.05" oninput="calcRendaFixa()">
+        <label class="calc-label">Selic ao ano (%) — para o Tesouro Selic</label>
+        <input class="calc-input" type="number" id="rf-selic" value="14.25" step="0.05" oninput="calcRendaFixa()">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><label class="calc-label">CDB — % do CDI</label><input class="calc-input" type="number" id="rf-cdb-pct" value="100" step="1" oninput="calcRendaFixa()"></div>
+          <div><label class="calc-label">LCI/LCA — % do CDI</label><input class="calc-input" type="number" id="rf-lci-pct" value="90" step="1" oninput="calcRendaFixa()"></div>
+        </div>
+        <div class="calc-result" style="margin-top:1rem">
+          <div class="calc-result-label" style="margin-bottom:.5rem">Resultado líquido no vencimento</div>
+          <div id="rf-tabela"></div>
+        </div>
+      </div>
+      <div class="calc-box">
+        <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Quanto sobra no bolso (líquido de IR)</div>
+        <div style="position:relative;height:280px"><canvas id="rendafixaChart"></canvas></div>
+        <div style="margin-top:1.25rem;padding:1rem;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.8">
+          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">Como funciona:</div>
+          <div>• <strong style="color:var(--text)">CDB e Tesouro Selic</strong> pagam IR pela tabela regressiva: 22,5% até 180 dias, 20% até 360, 17,5% até 720 e 15% acima de 720 dias.</div>
+          <div>• <strong style="color:var(--text)">LCI/LCA e Poupança</strong> são isentas de IR para pessoa física.</div>
+          <div>• Poupança rende 0,5% ao mês + TR quando a Selic está acima de 8,5% ao ano (é o piso atual).</div>
+          <div>• Não considera IOF (resgates com menos de 30 dias) nem o come-cotas — aqui é renda fixa que paga IR só no vencimento.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESERVA DE EMERGÊNCIA -->
+  <div id="tool-reserva" style="display:none">
+    <div class="tool-grid">
+      <div class="calc-box">
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path stroke-width="5" stroke-opacity=".22" d="M12 3l7 3v5c0 4.2-3 7.4-7 9-4-1.6-7-4.8-7-9V6z"/><path stroke-width="1.5" d="M12 3l7 3v5c0 4.2-3 7.4-7 9-4-1.6-7-4.8-7-9V6z"/></svg>Reserva de Emergência</div>
+        <label class="calc-label">Gasto mensal essencial (R$)</label>
+        <input class="calc-input" type="number" id="res-gasto" value="4000" step="100" oninput="calcReserva()">
+        <label class="calc-label">Meses de segurança desejados</label>
+        <select class="calc-input" id="res-meses" onchange="calcReserva()">
+          <option value="3">3 meses — CLT estável</option>
+          <option value="6" selected>6 meses — recomendado</option>
+          <option value="9">9 meses</option>
+          <option value="12">12 meses — autônomo / PJ</option>
+        </select>
+        <label class="calc-label">Quanto você já tem guardado (R$)</label>
+        <input class="calc-input" type="number" id="res-atual" value="0" step="100" oninput="calcReserva()">
+        <label class="calc-label">Quanto consegue guardar por mês (R$)</label>
+        <input class="calc-input" type="number" id="res-aporte" value="800" step="50" oninput="calcReserva()">
+        <label class="calc-label">Rendimento da reserva ao ano (%) — líquido</label>
+        <input class="calc-input" type="number" id="res-taxa" value="11" step="0.1" oninput="calcReserva()">
+        <div class="calc-result">
+          <div><div class="calc-result-label">Reserva ideal</div><div class="calc-result-val" id="res-ideal">—</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+            <div><div class="calc-result-label">Ainda falta guardar</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--gold)" id="res-falta">—</div></div>
+            <div><div class="calc-result-label">Tempo para completar</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono)" id="res-tempo">—</div></div>
+          </div>
+          <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+            <div class="calc-result-label">Quando pronta, ela rende (por mês)</div>
+            <div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--up)" id="res-renda">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="calc-box">
+        <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Evolução até a reserva ideal</div>
+        <div style="position:relative;height:280px"><canvas id="reservaChart"></canvas></div>
+        <div style="margin-top:1.25rem;padding:1rem;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.8">
+          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">Dica:</div>
+          <div>• A reserva serve para imprevistos (desemprego, saúde, conserto) — não é para investir buscando lucro.</div>
+          <div>• Deixe em algo com liquidez diária e baixo risco: Tesouro Selic, CDB de liquidez diária ou fundo DI.</div>
+          <div>• 6 meses de gastos é o padrão; autônomos e PJ costumam mirar 12 meses por terem renda menos previsível.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COME-COTAS -->
+  <div id="tool-comecotas" style="display:none">
+    <div class="tool-grid">
+      <div class="calc-box">
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path stroke-width="5" stroke-opacity=".22" d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z M12 8v4l3 2"/><path stroke-width="1.5" d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z M12 8v4l3 2"/></svg>Come-cotas em Fundos</div>
+        <label class="calc-label">Valor investido (R$)</label>
+        <input class="calc-input" type="number" id="cc-valor" value="10000" step="100" oninput="calcComeCotas()">
+        <label class="calc-label">Rentabilidade bruta ao ano (%)</label>
+        <input class="calc-input" type="number" id="cc-taxa" value="12" step="0.1" oninput="calcComeCotas()">
+        <label class="calc-label">Prazo (anos)</label>
+        <input class="calc-input" type="number" id="cc-anos" value="10" oninput="calcComeCotas()">
+        <label class="calc-label">Tipo de fundo</label>
+        <select class="calc-input" id="cc-tipo" onchange="calcComeCotas()">
+          <option value="lp" selected>Longo prazo — come-cotas de 15%</option>
+          <option value="cp">Curto prazo — come-cotas de 20%</option>
+        </select>
+        <div class="calc-result">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+            <div><div class="calc-result-label">Com come-cotas (líquido)</div><div class="calc-result-val" id="cc-com">—</div></div>
+            <div><div class="calc-result-label">Sem come-cotas (líquido)</div><div style="font-size:22px;font-weight:800;font-family:var(--font-mono);color:var(--up)" id="cc-sem">—</div></div>
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:1rem">
+            <div class="calc-result-label">Quanto o come-cotas custou a você</div>
+            <div style="font-size:20px;font-weight:800;font-family:var(--font-mono);color:var(--dn)" id="cc-dif">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="calc-box">
+        <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Com come-cotas x Sem come-cotas</div>
+        <div style="position:relative;height:280px"><canvas id="comecotasChart"></canvas></div>
+        <div style="margin-top:1.25rem;padding:1rem;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.8">
+          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">O que é o come-cotas:</div>
+          <div>• É a antecipação do IR nos fundos abertos (renda fixa, multimercado, DI) em maio e novembro de cada ano.</div>
+          <div>• O Leão cobra a menor alíquota (15% em fundos de longo prazo, 20% nos de curto prazo) direto em cotas do fundo.</div>
+          <div>• Como você paga imposto antes da hora, sobra menos dinheiro rendendo — é essa diferença que o gráfico mostra.</div>
+          <div>• Ações, ETFs, ações no exterior e a maioria dos ETFs de renda fixa <strong style="color:var(--text)">não têm come-cotas</strong> (o "sem come-cotas" representa esse caso).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONVERSOR DE MOEDAS E CRIPTO -->
+  <div id="tool-conversor" style="display:none">
+    <div class="tool-grid">
+      <div class="calc-box">
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path stroke-width="5" stroke-opacity=".22" d="M4 8h13l-3-3 M20 16H7l3 3"/><path stroke-width="1.5" d="M4 8h13l-3-3 M20 16H7l3 3"/></svg>Conversor de Moedas e Cripto</div>
+        <label class="calc-label">Valor</label>
+        <input class="calc-input" type="number" id="conv-valor" value="100" step="0.01" oninput="calcConversor()">
+        <label class="calc-label">De</label>
+        <select class="calc-input" id="conv-de" onchange="calcConversor()"></select>
+        <label class="calc-label">Para</label>
+        <select class="calc-input" id="conv-para" onchange="calcConversor()"></select>
+        <div style="text-align:center;margin:.5rem 0">
+          <button onclick="inverterConversor()" style="background:var(--bg3);color:var(--gold);border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body)">↑↓ Inverter</button>
+        </div>
+        <div class="calc-result">
+          <div><div class="calc-result-label">Resultado</div><div class="calc-result-val" id="conv-result">—</div></div>
+          <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+            <div class="calc-result-label">Cotação usada</div>
+            <div style="font-size:14px;font-weight:700;font-family:var(--font-mono);color:var(--text2)" id="conv-taxa">—</div>
+          </div>
+        </div>
+        <div id="conv-status" style="margin-top:.75rem;font-size:11px;color:var(--text3)">Carregando cotações...</div>
+      </div>
+      <div class="calc-box">
+        <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Principais cotações em Real (R$)</div>
+        <div id="conv-lista" style="font-size:13px"></div>
+        <div style="margin-top:1.25rem;padding:1rem;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.8">
+          <div>• Cotações ao vivo via AwesomeAPI (mercado à vista, cotação de compra).</div>
+          <div>• Valores de referência — corretoras e casas de câmbio cobram spread e impostos (IOF).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <div id="footer-placeholder"></div>
@@ -473,7 +671,7 @@ const CHART_OPTS = {
 };
 
 function show(id,el){
-  ['juros','carteira','aposentadoria','dy-calc','dcf','bazin','graham','darf','rebalance','inflacao'].forEach(t=>{
+  ['juros','carteira','aposentadoria','dy-calc','dcf','bazin','graham','darf','rebalance','rendafixa','reserva','comecotas','conversor','inflacao'].forEach(t=>{
     const el2=document.getElementById('tool-'+t);
     if(el2){ el2.style.display='none'; el2.classList.remove('fade-in-2'); }
   });
@@ -490,6 +688,10 @@ function show(id,el){
   if(id==='graham')calcGraham();
   if(id==='darf')calcDARF();
   if(id==='rebalance')calcRebalance();
+  if(id==='rendafixa')calcRendaFixa();
+  if(id==='reserva')calcReserva();
+  if(id==='comecotas')calcComeCotas();
+  if(id==='conversor')initConversor();
   if(id==='inflacao')calcInflacao();
 }
 
@@ -542,6 +744,51 @@ function calcAp(){
   apChart=new Chart(document.getElementById('apChart'),{type:'line',
     data:{labels,datasets:[{data,borderColor:'#1FC96E',borderWidth:2,pointRadius:0,fill:true,backgroundColor:'rgba(31,201,110,0.07)',tension:0.4}]},
     options:{...CHART_OPTS,plugins:{legend:{display:false}},scales:{...CHART_OPTS.scales,y:{...CHART_OPTS.scales.y,ticks:{...CHART_OPTS.scales.y.ticks,callback:v=>'R$'+Math.round(v/1000)+'k'}}}}
+  });
+}
+
+let apModo='idade';
+function setApModo(modo){
+  apModo=modo;
+  document.getElementById('ap-tab-idade').classList.toggle('active',modo==='idade');
+  document.getElementById('ap-tab-fire').classList.toggle('active',modo==='fire');
+  document.getElementById('ap-modo-idade').style.display=(modo==='idade')?'':'none';
+  document.getElementById('ap-modo-fire').style.display=(modo==='fire')?'':'none';
+  document.getElementById('ap-fire-nota').style.display=(modo==='fire')?'':'none';
+  if(modo==='fire') calcApFire(); else calcAp();
+}
+function calcApFire(){
+  const gasto=+document.getElementById('fire-gasto').value||0;
+  const atual=+document.getElementById('fire-atual').value||0;
+  const aporte=+document.getElementById('fire-aporte').value||0;
+  const retReal=(+document.getElementById('fire-retorno').value||0)/100;
+  const swr=(+document.getElementById('fire-swr').value||4)/100;
+  const gastoAnual=gasto*12;
+  const numero=swr>0?gastoAnual/swr:0;
+  document.getElementById('fire-num').textContent=numero>0?fmt(numero):'—';
+  document.getElementById('fire-renda').textContent=fmt(numero*swr/12);
+  const pct=numero>0?Math.min(100,atual/numero*100):0;
+  document.getElementById('fire-pct').textContent=pct.toFixed(0)+'%';
+  const r=Math.pow(1+retReal,1/12)-1;
+  // simula acumulação mensal até atingir o número
+  const serie=[atual]; let saldo=atual, m=0; const cap=1200;
+  if(atual<numero && (aporte>0||r>0)){ while(saldo<numero && m<cap){ saldo=saldo*(1+r)+aporte; m++; serie.push(saldo); } }
+  let anosTxt;
+  if(atual>=numero) anosTxt='Você já chegou!';
+  else if(aporte<=0 && r<=0) anosTxt='Aumente o aporte';
+  else if(m>=cap) anosTxt='100+ anos';
+  else anosTxt=(m/12).toFixed(1).replace('.',',')+' anos';
+  document.getElementById('fire-anos').textContent=anosTxt;
+  const passo=Math.max(1,Math.ceil(serie.length/50)), labels=[], data=[];
+  for(let i=0;i<serie.length;i+=passo){ labels.push((i/12).toFixed(i<12?1:0)+'a'); data.push(Math.round(serie[i])); }
+  labels.push((m/12).toFixed(1)+'a'); data.push(Math.round(serie[serie.length-1]));
+  if(apChart) apChart.destroy();
+  apChart=new Chart(document.getElementById('apChart'),{type:'line',
+    data:{labels,datasets:[
+      {label:'Seu patrimônio',data,borderColor:'#1FC96E',borderWidth:2,pointRadius:0,fill:true,backgroundColor:'rgba(31,201,110,0.07)',tension:0.3},
+      {label:'Número da liberdade',data:labels.map(()=>Math.round(numero)),borderColor:'#F5A623',borderWidth:1.5,borderDash:[5,5],pointRadius:0,fill:false}
+    ]},
+    options:{...CHART_OPTS,scales:{...CHART_OPTS.scales,y:{...CHART_OPTS.scales.y,ticks:{...CHART_OPTS.scales.y.ticks,callback:v=>'R$'+Math.round(v/1000)+'k'}}}}
   });
 }
 
@@ -798,6 +1045,8 @@ function calcDARF(){
   if(tipo==='acoes-swing'){
     aliquota=0.15;
     isento=(venda<=20000 && resultadoBruto>0);
+  } else if(tipo==='etf-swing'){
+    aliquota=0.15; // ETF de ações NÃO tem a isenção de R$ 20 mil
   } else if(tipo==='acoes-day'){
     aliquota=0.20;
   } else {
@@ -815,12 +1064,12 @@ function calcDARF(){
     novoPrejuizo=prejuizoAcum+prejuizoMes;
     ir=0;
   } else if(isento){
-    isencaoEl.textContent='✅ Sim (vendas até R$ 20.000)';
+    isencaoEl.textContent='Sim — vendas até R$ 20.000';
     isencaoEl.style.color='var(--up)';
     novoPrejuizo=prejuizoAcum;
     ir=0;
   } else {
-    isencaoEl.textContent='❌ Não';
+    isencaoEl.textContent='Não';
     isencaoEl.style.color='var(--dn)';
     const base=Math.max(0,resultadoBruto-prejuizoAcum);
     novoPrejuizo=Math.max(0,prejuizoAcum-resultadoBruto);
@@ -1001,6 +1250,174 @@ function calcInflacao(){
   });
 }
 function anos0(){ return Object.keys(IPCA_HIST).map(Number).sort((a,b)=>a-b)[0]; }
+
+// ===================== IR REGRESSIVO (tabela renda fixa) =====================
+function irRegressivo(dias){
+  if(dias<=180) return 0.225;
+  if(dias<=360) return 0.20;
+  if(dias<=720) return 0.175;
+  return 0.15;
+}
+
+// ===================== COMPARADOR DE RENDA FIXA =====================
+let rendafixaChart=null;
+function calcRendaFixa(){
+  const V=+document.getElementById('rf-valor').value||0;
+  const meses=+document.getElementById('rf-meses').value||0;
+  const cdi=(+document.getElementById('rf-cdi').value||0)/100;
+  const selic=(+document.getElementById('rf-selic').value||0)/100;
+  const cdbPct=(+document.getElementById('rf-cdb-pct').value||0)/100;
+  const lciPct=(+document.getElementById('rf-lci-pct').value||0)/100;
+  const tabEl=document.getElementById('rf-tabela');
+  if(meses<=0||V<=0){ tabEl.innerHTML='<div style="color:var(--text3);font-size:12px">Preencha valor e prazo.</div>'; return; }
+  const anos=meses/12, dias=Math.round(meses*30.4), aliqIR=irRegressivo(dias);
+  const poupAA = selic>0.085 ? Math.pow(1.005,12)-1 : selic*0.70;
+  const produtos=[
+    {nome:'CDB '+(cdbPct*100).toFixed(0)+'% CDI', taxa:cdi*cdbPct, ir:aliqIR, cor:'#F5A623'},
+    {nome:'Tesouro Selic', taxa:selic, ir:aliqIR, cor:'#5E8EE0'},
+    {nome:'LCI/LCA '+(lciPct*100).toFixed(0)+'% CDI', taxa:cdi*lciPct, ir:0, cor:'#1FC96E'},
+    {nome:'Poupança', taxa:poupAA, ir:0, cor:'#A78BFA'}
+  ];
+  const res=produtos.map(p=>{
+    const bruto=V*Math.pow(1+p.taxa,anos), rend=bruto-V, imposto=rend*p.ir, liq=bruto-imposto;
+    return {...p, imposto, liq, rentLiq:(liq-V)/V*100};
+  }).sort((a,b)=>b.liq-a.liq);
+  tabEl.innerHTML=res.map((p,i)=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:.55rem 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="width:9px;height:9px;border-radius:50%;background:${p.cor};display:inline-block;flex:none"></span>
+        <div><div style="font-weight:700;font-size:13px">${p.nome}${i===0?' <span style="color:var(--gold);font-size:10px">★ melhor</span>':''}</div>
+        <div style="font-size:11px;color:var(--text3)">IR: ${p.ir>0?fmt(p.imposto):'isento'}</div></div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:var(--font-mono);font-weight:800;color:${i===0?'var(--up)':'var(--text2)'}">${fmt(p.liq)}</div>
+        <div style="font-size:11px;color:var(--text3)">+${p.rentLiq.toFixed(1)}% líq.</div>
+      </div>
+    </div>`).join('');
+  if(rendafixaChart) rendafixaChart.destroy();
+  rendafixaChart=new Chart(document.getElementById('rendafixaChart'),{type:'bar',
+    data:{labels:res.map(p=>p.nome),datasets:[{data:res.map(p=>+(p.liq-V).toFixed(2)),backgroundColor:res.map(p=>p.cor+'99'),borderColor:res.map(p=>p.cor),borderWidth:1,borderRadius:6}]},
+    options:{...CHART_OPTS,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'Ganho líquido: '+fmt(ctx.parsed.x)}}},
+      scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#7C7A75',font:{size:10},callback:v=>'R$'+Math.round(v)}},y:{grid:{display:false},ticks:{color:'#8A8884',font:{size:10}}}}}
+  });
+}
+
+// ===================== RESERVA DE EMERGÊNCIA =====================
+let reservaChart=null;
+function calcReserva(){
+  const gasto=+document.getElementById('res-gasto').value||0;
+  const nMeses=+document.getElementById('res-meses').value||6;
+  const atual=+document.getElementById('res-atual').value||0;
+  const aporte=+document.getElementById('res-aporte').value||0;
+  const taxaAA=(+document.getElementById('res-taxa').value||0)/100;
+  const r=Math.pow(1+taxaAA,1/12)-1;
+  const ideal=gasto*nMeses, falta=Math.max(0,ideal-atual);
+  document.getElementById('res-ideal').textContent=fmt(ideal);
+  document.getElementById('res-falta').textContent=fmt(falta);
+  document.getElementById('res-renda').textContent=fmt(ideal*r);
+  const serie=[atual]; let saldo=atual, m=0; const cap=1200;
+  if(falta>0 && (aporte>0||r>0)){ while(saldo<ideal && m<cap){ saldo=saldo*(1+r)+aporte; m++; serie.push(saldo); } }
+  let tempoTxt;
+  if(falta<=0) tempoTxt='Concluída';
+  else if(aporte<=0 && r<=0) tempoTxt='Aumente o aporte';
+  else if(m>=cap) tempoTxt='100+ anos';
+  else tempoTxt = m<12? m+' meses' : (m/12).toFixed(1).replace('.',',')+' anos';
+  document.getElementById('res-tempo').textContent=tempoTxt;
+  const passo=Math.max(1,Math.ceil(serie.length/50)), labels=[], data=[];
+  for(let i=0;i<serie.length;i+=passo){ labels.push(i<12?i+'m':(i/12).toFixed(1)+'a'); data.push(Math.round(serie[i])); }
+  labels.push(m<12?m+'m':(m/12).toFixed(1)+'a'); data.push(Math.round(serie[serie.length-1]));
+  if(reservaChart) reservaChart.destroy();
+  reservaChart=new Chart(document.getElementById('reservaChart'),{type:'line',
+    data:{labels,datasets:[
+      {label:'Sua reserva',data,borderColor:'#F5A623',borderWidth:2,pointRadius:0,fill:true,backgroundColor:'rgba(245,166,35,0.08)',tension:0.25},
+      {label:'Meta',data:labels.map(()=>Math.round(ideal)),borderColor:'#1FC96E',borderWidth:1.5,borderDash:[5,5],pointRadius:0,fill:false}
+    ]},
+    options:{...CHART_OPTS,scales:{...CHART_OPTS.scales,y:{...CHART_OPTS.scales.y,ticks:{...CHART_OPTS.scales.y.ticks,callback:v=>'R$'+Math.round(v/1000)+'k'}}}}
+  });
+}
+
+// ===================== COME-COTAS =====================
+let comecotasChart=null;
+function calcComeCotas(){
+  const V=+document.getElementById('cc-valor').value||0;
+  const taxaAA=(+document.getElementById('cc-taxa').value||0)/100;
+  const anos=+document.getElementById('cc-anos').value||0;
+  const ccRate=document.getElementById('cc-tipo').value==='cp'?0.20:0.15;
+  const meses=Math.round(anos*12), r=Math.pow(1+taxaAA,1/12)-1;
+  if(meses<=0||V<=0) return;
+  let saldoCom=V, custoBase=V, saldoSem=V;
+  const labels=[],serieCom=[],serieSem=[];
+  for(let m=1;m<=meses;m++){
+    saldoCom*=(1+r); saldoSem*=(1+r);
+    if(m%6===0){ const rend=saldoCom-custoBase; if(rend>0){ saldoCom-=rend*ccRate; custoBase=saldoCom; } }
+    if(m%12===0||m===meses){ labels.push((m/12).toFixed(m%12===0?0:1)+'a'); serieCom.push(Math.round(saldoCom)); serieSem.push(Math.round(saldoSem)); }
+  }
+  const aliqFinal=irRegressivo(meses*30.4);
+  const liqSem=saldoSem-(saldoSem-V)*aliqFinal;
+  const rendResid=saldoCom-custoBase;
+  const complemento=rendResid>0? rendResid*Math.max(0,aliqFinal-ccRate):0;
+  const liqCom=saldoCom-complemento;
+  const dif=Math.max(0,liqSem-liqCom);
+  document.getElementById('cc-com').textContent=fmt(liqCom);
+  document.getElementById('cc-sem').textContent=fmt(liqSem);
+  document.getElementById('cc-dif').textContent='− '+fmt(dif);
+  if(comecotasChart) comecotasChart.destroy();
+  comecotasChart=new Chart(document.getElementById('comecotasChart'),{type:'line',
+    data:{labels,datasets:[
+      {label:'Sem come-cotas',data:serieSem,borderColor:'#1FC96E',borderWidth:2,pointRadius:0,fill:false,tension:0.3},
+      {label:'Com come-cotas',data:serieCom,borderColor:'#F5A623',borderWidth:2,pointRadius:0,fill:true,backgroundColor:'rgba(245,166,35,0.06)',tension:0.3}
+    ]},
+    options:{...CHART_OPTS,scales:{...CHART_OPTS.scales,y:{...CHART_OPTS.scales.y,ticks:{...CHART_OPTS.scales.y.ticks,callback:v=>'R$'+Math.round(v/1000)+'k'}}}}
+  });
+}
+
+// ===================== CONVERSOR DE MOEDAS E CRIPTO =====================
+let convRates=null;
+const CONV_MOEDAS=[['BRL','Real'],['USD','Dólar'],['EUR','Euro'],['GBP','Libra'],['ARS','Peso arg.'],['JPY','Iene'],['BTC','Bitcoin'],['ETH','Ethereum']];
+async function initConversor(){
+  const de=document.getElementById('conv-de'), para=document.getElementById('conv-para');
+  if(de && !de.options.length){
+    CONV_MOEDAS.forEach(m=>{ de.appendChild(new Option(m[0]+' — '+m[1],m[0])); para.appendChild(new Option(m[0]+' — '+m[1],m[0])); });
+    de.value='USD'; para.value='BRL';
+  }
+  if(!convRates){
+    try{
+      const pares=CONV_MOEDAS.filter(m=>m[0]!=='BRL').map(m=>m[0]+'-BRL').join(',');
+      const resp=await fetch('https://economia.awesomeapi.com.br/json/last/'+pares);
+      const data=await resp.json();
+      convRates={BRL:1}; let hora='';
+      Object.values(data).forEach(o=>{ convRates[o.code]=parseFloat(o.bid); hora=o.create_date||hora; });
+      document.getElementById('conv-status').textContent='Cotações ao vivo · atualizado em '+(hora||'agora');
+    }catch(e){
+      convRates={BRL:1,USD:5.45,EUR:5.90,GBP:6.95,ARS:0.0045,JPY:0.037,BTC:340000,ETH:18000};
+      document.getElementById('conv-status').textContent='Sem conexão ao vivo — usando valores de referência.';
+    }
+  }
+  renderConvLista(); calcConversor();
+}
+function renderConvLista(){
+  if(!convRates) return;
+  document.getElementById('conv-lista').innerHTML=CONV_MOEDAS.filter(m=>m[0]!=='BRL').map(m=>{
+    const v=convRates[m[0]]; if(!v) return '';
+    const casas=v<1?4:2;
+    const vTxt='R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:casas});
+    return `<div style="display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border)"><span style="color:var(--text2)">${m[0]} · ${m[1]}</span><span style="font-family:var(--font-mono);font-weight:700">${vTxt}</span></div>`;
+  }).join('');
+}
+function calcConversor(){
+  if(!convRates) return;
+  const val=+document.getElementById('conv-valor').value||0;
+  const de=document.getElementById('conv-de').value, para=document.getElementById('conv-para').value;
+  const rDe=convRates[de], rPara=convRates[para];
+  if(!rDe||!rPara) return;
+  const result=(val*rDe)/rPara, casas=result<1?6:2;
+  document.getElementById('conv-result').textContent=result.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:casas})+' '+para;
+  document.getElementById('conv-taxa').textContent='1 '+de+' = '+(rDe/rPara).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:6})+' '+para;
+}
+function inverterConversor(){
+  const de=document.getElementById('conv-de'), para=document.getElementById('conv-para');
+  const t=de.value; de.value=para.value; para.value=t; calcConversor();
+}
 
 async function init(){ await loadData(); calcJuros(); populateInflacaoSelect(); }
 init();
