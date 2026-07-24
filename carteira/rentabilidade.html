@@ -45,7 +45,7 @@
       <div class="card-title">Rentabilidade por Ativo</div>
       <div class="tbl-wrap">
       <table class="tbl">
-        <thead><tr><th>Ticker</th><th>Classe</th><th class="r">Preço Médio</th><th class="r">Cotação Atual</th><th class="r">Ganho Capital</th><th class="r">Proventos</th><th class="r" title="Proventos dos últimos 12 meses ÷ preço médio de compra">YoC 12m</th><th class="r">Rentabilidade %</th><th class="r">Rent. Total</th><th class="r">CAGR a.a.</th><th class="r">Risco a.a.</th></tr></thead>
+        <thead><tr><th>Ticker</th><th>Classe</th><th class="r">Preço Médio</th><th class="r">Cotação Atual</th><th class="r">Ganho Capital</th><th class="r">Proventos</th><th class="r" title="Proventos dos últimos 12 meses ÷ preço médio de compra">YoC 12m</th><th class="r" title="Payback: anos para recuperar o dinheiro investido só com os proventos, no ritmo dos últimos 12 meses">Payback</th><th class="r">Rentabilidade %</th><th class="r">Rent. Total</th><th class="r">CAGR a.a.</th><th class="r">Risco a.a.</th></tr></thead>
         <tbody id="tbody-rent"></tbody>
       </table>
       </div>
@@ -70,10 +70,14 @@ function renderRentabilidade(){
   const t=getTotals();
   const melhor=c.slice().sort((a,b)=>b.rentTotal-a.rentTotal)[0];
   const pior=c.slice().sort((a,b)=>a.rentTotal-b.rentTotal)[0];
+  const capRecup=t.custo>0?(t.proventosTotal/t.custo*100):0;
+  const restanteCap=Math.max(0,t.custo-t.proventosTotal);
+  const anosPayback=t.provAno>0?(restanteCap/t.provAno):null;
   document.getElementById('metrics-rent').innerHTML=`
     <div class="mcard"><div class="mcard-label">Rentabilidade Total (c/ proventos)</div><div class="mcard-value ${t.rentTotal>=0?'positive':'negative'}">${fmtP(t.rentTotal)}</div><div class="mcard-sub">Só capital: ${fmtP(t.resPct)}</div></div>
     <div class="mcard"><div class="mcard-label">Melhor Ativo</div><div class="mcard-value positive" style="display:flex;align-items:center;gap:8px">${melhor?logoAtivo(melhor,22):''}<span>${melhor?_rotuloAtivoTexto(melhor):'-'}</span></div><div class="mcard-sub">${fmtP(melhor?.rentTotal||0)}</div></div>
     <div class="mcard"><div class="mcard-label">Pior Ativo</div><div class="mcard-value negative" style="display:flex;align-items:center;gap:8px">${pior?logoAtivo(pior,22):''}<span>${pior?_rotuloAtivoTexto(pior):'-'}</span></div><div class="mcard-sub">${fmtP(pior?.rentTotal||0)}</div></div>
+    <div class="mcard" title="Payback via dividendos: quanto do capital investido já voltou pro seu bolso na forma de proventos, e em quanto tempo o restante volta no ritmo dos últimos 12 meses."><div class="mcard-label">Capital de volta via proventos</div><div class="mcard-value positive">${fmt(capRecup)}%</div><div class="mcard-sub">${anosPayback!=null?('faltam ~'+fmt(anosPayback,1)+' anos no ritmo atual'):'sem proventos nos últimos 12m'}</div></div>
   `;
   const bcc={};
   c.forEach(a=>{if(!bcc[a.classe])bcc[a.classe]={vt:0,custo:0,prov:0};bcc[a.classe].vt+=a.vt;bcc[a.classe].custo+=a.custo;bcc[a.classe].prov+=a.proventos;});
@@ -96,6 +100,7 @@ function renderRentabilidade(){
     <td class="r ${a.res>=0?'positive':'negative'}">${a.res>=0?'+':''}${fmtR(a.res)}</td>
     <td class="r positive">${fmtR(a.proventos)}</td>
     <td class="r" style="color:${a.yoc>0?'#1D9E75':'var(--color-text-secondary)'}">${a.yoc>0?fmt(a.yoc)+'%':'—'}</td>
+    <td class="r" style="color:${a.prov12m>0?(a.custo/a.prov12m<=15?'#1D9E75':a.custo/a.prov12m<=30?'#BA7517':'var(--color-text-secondary)'):'var(--color-text-secondary)'}">${a.prov12m>0?fmt(a.custo/a.prov12m,1)+' anos':'—'}</td>
     <td class="r"><span class="pill ${a.rentTotal>=0?'pill-up':'pill-dn'}">${a.rentTotal>=0?'▲':'▼'} ${fmt(Math.abs(a.rentTotal))}%</span></td>
     <td class="r ${a.rentTotal>=0?'positive':'negative'}">${fmtP(a.rentTotal)}</td>
     <td class="r ${a.cagr>=0?'positive':'negative'}">${fmtP(a.cagr)}</td>

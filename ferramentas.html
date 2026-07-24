@@ -39,6 +39,8 @@
     <button class="tab" onclick="show('reserva',this)">Reserva de Emergência</button>
     <button class="tab" onclick="show('comecotas',this)">Come-cotas</button>
     <button class="tab" onclick="show('conversor',this)">Conversor de Moedas</button>
+    <button class="tab" onclick="show('imovel',this)">Financiar x Alugar</button>
+    <button class="tab" onclick="show('salario',this)">Salário CLT x PJ</button>
     <button class="tab" onclick="show('inflacao',this)">Conversor de Inflação</button>
     <a href="calculadora/index.html" target="_blank"
       style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:9px;
@@ -645,6 +647,100 @@
     </div>
   </div>
 
+  <!-- FINANCIAR x ALUGAR x INVESTIR -->
+  <div id="tool-imovel" style="display:none">
+    <div class="tool-grid">
+      <div class="calc-box">
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path stroke-width="5" stroke-opacity=".22" d="M4 11l8-6 8 6 M6 10v9h12v-9 M10 19v-5h4v5"/><path stroke-width="1.5" d="M4 11l8-6 8 6 M6 10v9h12v-9 M10 19v-5h4v5"/></svg>Financiar x Alugar &amp; Investir</div>
+        <label class="calc-label">Valor do imóvel (R$)</label>
+        <input class="calc-input" type="number" id="im-valor" value="400000" step="10000" oninput="calcImovel()">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><label class="calc-label">Entrada (R$)</label><input class="calc-input" type="number" id="im-entrada" value="80000" step="5000" oninput="calcImovel()"></div>
+          <div><label class="calc-label">Sistema</label><select class="calc-input" id="im-sistema" onchange="calcImovel()"><option value="SAC">SAC (parcela cai)</option><option value="PRICE">Price (parcela fixa)</option></select></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><label class="calc-label">Juros do financiamento (% a.a.)</label><input class="calc-input" type="number" id="im-juros" value="11.5" step="0.1" oninput="calcImovel()"></div>
+          <div><label class="calc-label">Prazo (anos)</label><input class="calc-input" type="number" id="im-anos" value="30" oninput="calcImovel()"></div>
+        </div>
+        <label class="calc-label">Aluguel de um imóvel equivalente (R$/mês)</label>
+        <input class="calc-input" type="number" id="im-aluguel" value="1800" step="50" oninput="calcImovel()">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><label class="calc-label">Valorização do imóvel (% a.a.)</label><input class="calc-input" type="number" id="im-valoriz" value="6" step="0.1" oninput="calcImovel()"></div>
+          <div><label class="calc-label">Reajuste do aluguel (% a.a.)</label><input class="calc-input" type="number" id="im-reajuste" value="5" step="0.1" oninput="calcImovel()"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><label class="calc-label">Rendimento dos investimentos (% a.a.)</label><input class="calc-input" type="number" id="im-rend" value="10" step="0.1" oninput="calcImovel()"></div>
+          <div><label class="calc-label">IPTU + manutenção do dono (% a.a.)</label><input class="calc-input" type="number" id="im-custodono" value="1.5" step="0.1" oninput="calcImovel()"></div>
+        </div>
+        <label class="calc-label">Custos de compra — ITBI + cartório (% do imóvel)</label>
+        <input class="calc-input" type="number" id="im-custoaq" value="5" step="0.5" oninput="calcImovel()">
+        <div class="calc-result">
+          <div><div class="calc-result-label">No fim do prazo, sai na frente</div><div style="font-size:16px;font-weight:800" id="im-veredito">—</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+            <div><div class="calc-result-label">Patrimônio comprando</div><div style="font-size:18px;font-weight:800;font-family:var(--font-mono);color:var(--gold)" id="im-pat-comprar">—</div></div>
+            <div><div class="calc-result-label">Patrimônio alugando + investindo</div><div style="font-size:18px;font-weight:800;font-family:var(--font-mono);color:var(--up)" id="im-pat-alugar">—</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+            <div><div class="calc-result-label">1ª parcela</div><div style="font-size:15px;font-weight:700;font-family:var(--font-mono);color:var(--text2)" id="im-parc-ini">—</div></div>
+            <div><div class="calc-result-label">Última parcela</div><div style="font-size:15px;font-weight:700;font-family:var(--font-mono);color:var(--text2)" id="im-parc-fim">—</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+            <div><div class="calc-result-label">Total de juros pagos</div><div style="font-size:15px;font-weight:700;font-family:var(--font-mono);color:var(--dn)" id="im-juros-total">—</div></div>
+            <div><div class="calc-result-label">Total desembolsado (compra)</div><div style="font-size:15px;font-weight:700;font-family:var(--font-mono);color:var(--text2)" id="im-total-comprar">—</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="calc-box">
+        <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Evolução do patrimônio: comprar x alugar+investir</div>
+        <div style="position:relative;height:300px"><canvas id="imovelChart"></canvas></div>
+        <div style="margin-top:1.25rem;padding:1rem;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.8">
+          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">Como a comparação é feita (jogo justo):</div>
+          <div>• <strong style="color:var(--text)">Comprando</strong>: você dá a entrada, paga a parcela (SAC ou Price) + IPTU/manutenção. Patrimônio = imóvel valorizado − saldo devedor.</div>
+          <div>• <strong style="color:var(--text)">Alugando + investindo</strong>: você investe a entrada, paga o aluguel e investe todo mês a diferença (o que o comprador gastaria a mais). Patrimônio = total investido.</div>
+          <div>• Os dois gastam o mesmo por mês — a diferença vai toda para o investimento, para a comparação ser honesta.</div>
+          <div>• Levam a decisão: <strong style="color:var(--text)">valorização do imóvel</strong> x <strong style="color:var(--text)">rendimento dos investimentos</strong>. Imóvel comprado é pouco líquido — considere isso.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SALÁRIO CLT x PJ -->
+  <div id="tool-salario" style="display:none">
+    <div class="tool-grid">
+      <div class="calc-box">
+        <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path stroke-width="5" stroke-opacity=".22" d="M3 7h18v12H3z M3 11h18 M8 7V5h8v2"/><path stroke-width="1.5" d="M3 7h18v12H3z M3 11h18 M8 7V5h8v2"/></svg>Salário Líquido: CLT x PJ</div>
+        <label class="calc-label">Salário CLT bruto (R$/mês)</label>
+        <input class="calc-input" type="number" id="sal-clt" value="6000" step="100" oninput="calcSalario()">
+        <label class="calc-label">Nº de dependentes (IR)</label>
+        <input class="calc-input" type="number" id="sal-dep" value="0" step="1" oninput="calcSalario()">
+        <div style="margin-top:1.25rem;font-size:14px;font-weight:700;color:var(--gold)">Cenário PJ</div>
+        <label class="calc-label">Faturamento PJ (R$/mês)</label>
+        <input class="calc-input" type="number" id="pj-fat" value="7000" step="100" oninput="calcSalario()">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><label class="calc-label">Imposto PJ / Simples (%)</label><input class="calc-input" type="number" id="pj-aliq" value="6" step="0.5" oninput="calcSalario()"></div>
+          <div><label class="calc-label">Contador (R$/mês)</label><input class="calc-input" type="number" id="pj-cont" value="200" step="10" oninput="calcSalario()"></div>
+        </div>
+        <label class="calc-label">Pró-labore (R$/mês) — base do INSS/IR do sócio</label>
+        <input class="calc-input" type="number" id="pj-prol" value="1518" step="100" oninput="calcSalario()">
+        <div class="calc-result">
+          <div class="calc-result-label" style="margin-bottom:.5rem">Comparação lado a lado</div>
+          <div id="sal-tabela"></div>
+        </div>
+      </div>
+      <div class="calc-box">
+        <div style="font-size:14px;font-weight:700;margin-bottom:1rem;color:var(--text2)">Quanto sobra líquido por mês</div>
+        <div style="position:relative;height:240px"><canvas id="salarioChart"></canvas></div>
+        <div style="margin-top:1.25rem;padding:1rem;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.8">
+          <div style="font-weight:700;color:var(--gold);margin-bottom:6px">O que entra na conta:</div>
+          <div>• <strong style="color:var(--text)">CLT</strong>: desconta INSS e IRRF na fonte. Além do líquido, você tem FGTS (8%), 13º e férias + 1/3 — somados como "remuneração total".</div>
+          <div>• <strong style="color:var(--text)">PJ</strong>: paga o imposto do Simples sobre o faturamento, contador, e INSS (11%) + IRRF sobre o pró-labore que retira.</div>
+          <div>• PJ costuma render mais no bolso, mas você abre mão de FGTS, 13º, férias, seguro-desemprego e estabilidade — pense nisso.</div>
+          <div>• Ferramenta educativa e simplificada — a tributação real depende do seu anexo do Simples e da sua situação. Confirme com um contador.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <div id="footer-placeholder"></div>
@@ -671,7 +767,7 @@ const CHART_OPTS = {
 };
 
 function show(id,el){
-  ['juros','carteira','aposentadoria','dy-calc','dcf','bazin','graham','darf','rebalance','rendafixa','reserva','comecotas','conversor','inflacao'].forEach(t=>{
+  ['juros','carteira','aposentadoria','dy-calc','dcf','bazin','graham','darf','rebalance','rendafixa','reserva','comecotas','conversor','imovel','salario','inflacao'].forEach(t=>{
     const el2=document.getElementById('tool-'+t);
     if(el2){ el2.style.display='none'; el2.classList.remove('fade-in-2'); }
   });
@@ -692,6 +788,8 @@ function show(id,el){
   if(id==='reserva')calcReserva();
   if(id==='comecotas')calcComeCotas();
   if(id==='conversor')initConversor();
+  if(id==='imovel')calcImovel();
+  if(id==='salario')calcSalario();
   if(id==='inflacao')calcInflacao();
 }
 
@@ -1417,6 +1515,145 @@ function calcConversor(){
 function inverterConversor(){
   const de=document.getElementById('conv-de'), para=document.getElementById('conv-para');
   const t=de.value; de.value=para.value; para.value=t; calcConversor();
+}
+
+// ===================== FINANCIAR x ALUGAR x INVESTIR =====================
+let imovelChart=null;
+function calcImovel(){
+  const valor=+document.getElementById('im-valor').value||0;
+  const entrada=Math.min(+document.getElementById('im-entrada').value||0,valor);
+  const sistema=document.getElementById('im-sistema').value;
+  const jurosAA=(+document.getElementById('im-juros').value||0)/100;
+  const anos=+document.getElementById('im-anos').value||0;
+  const aluguel0=+document.getElementById('im-aluguel').value||0;
+  const valorizAA=(+document.getElementById('im-valoriz').value||0)/100;
+  const reajusteAA=(+document.getElementById('im-reajuste').value||0)/100;
+  const rendAA=(+document.getElementById('im-rend').value||0)/100;
+  const custoDonoAA=(+document.getElementById('im-custodono').value||0)/100;
+  const custoAqPct=(+document.getElementById('im-custoaq').value||0)/100;
+  const N=Math.round(anos*12);
+  if(N<=0||valor<=0) return;
+  const principal=Math.max(0,valor-entrada);
+  const i=Math.pow(1+jurosAA,1/12)-1;
+  const rInv=Math.pow(1+rendAA,1/12)-1;
+  const vMes=Math.pow(1+valorizAA,1/12)-1;
+  const parcelaPrice = i>0? principal*i/(1-Math.pow(1+i,-N)) : principal/N;
+  const amortSAC = principal/N;
+  let saldo=principal;
+  let saldoInvest=entrada+valor*custoAqPct; // locador investe o mesmo caixa inicial do comprador
+  let jurosTotal=0, somaParcelas=0, parcIni=0, parcFim=0;
+  const labels=[], serieComprar=[], serieAlugar=[];
+  for(let m=1;m<=N;m++){
+    const imovelAtual=valor*Math.pow(1+vMes,m);
+    let juros=saldo*i, amort, parcela;
+    if(sistema==='SAC'){ amort=amortSAC; parcela=amort+juros; }
+    else { parcela=parcelaPrice; amort=parcela-juros; }
+    saldo=Math.max(0,saldo-amort);
+    jurosTotal+=juros; somaParcelas+=parcela;
+    if(m===1) parcIni=parcela; if(m===N) parcFim=parcela;
+    const custoDonoMes=imovelAtual*custoDonoAA/12;
+    const aluguelAtual=aluguel0*Math.pow(1+reajusteAA,Math.floor((m-1)/12));
+    const diff=(parcela+custoDonoMes)-aluguelAtual; // locador investe o que o comprador gasta a mais
+    saldoInvest=saldoInvest*(1+rInv)+diff;
+    if(m%12===0||m===N){ labels.push((m/12).toFixed(m%12===0?0:1)+'a'); serieComprar.push(Math.round(imovelAtual-saldo)); serieAlugar.push(Math.round(saldoInvest)); }
+  }
+  const imovelFinal=valor*Math.pow(1+vMes,N);
+  const patComprar=imovelFinal-saldo;
+  const patAlugar=saldoInvest;
+  document.getElementById('im-pat-comprar').textContent=fmt(patComprar);
+  document.getElementById('im-pat-alugar').textContent=fmt(patAlugar);
+  document.getElementById('im-parc-ini').textContent=fmt(parcIni);
+  document.getElementById('im-parc-fim').textContent=fmt(parcFim);
+  document.getElementById('im-juros-total').textContent=fmt(jurosTotal);
+  document.getElementById('im-total-comprar').textContent=fmt(entrada+valor*custoAqPct+somaParcelas);
+  const vEl=document.getElementById('im-veredito');
+  const dif=Math.abs(patComprar-patAlugar);
+  if(patComprar>=patAlugar){ vEl.textContent='Comprar — '+fmt(dif)+' a mais'; vEl.style.color='var(--gold)'; }
+  else { vEl.textContent='Alugar + investir — '+fmt(dif)+' a mais'; vEl.style.color='var(--up)'; }
+  if(imovelChart) imovelChart.destroy();
+  imovelChart=new Chart(document.getElementById('imovelChart'),{type:'line',
+    data:{labels,datasets:[
+      {label:'Comprando (imóvel − dívida)',data:serieComprar,borderColor:'#F5A623',borderWidth:2,pointRadius:0,fill:false,tension:0.25},
+      {label:'Alugando + investindo',data:serieAlugar,borderColor:'#1FC96E',borderWidth:2,pointRadius:0,fill:false,tension:0.25}
+    ]},
+    options:{...CHART_OPTS,scales:{...CHART_OPTS.scales,y:{...CHART_OPTS.scales.y,ticks:{...CHART_OPTS.scales.y.ticks,callback:v=>'R$'+Math.round(v/1000)+'k'}}}}
+  });
+}
+
+// ===================== SALÁRIO CLT x PJ =====================
+let salarioChart=null;
+function inssProgressivo(sal){
+  if(sal<=0) return 0;
+  if(sal>8475.55) return 988.08;
+  if(sal<=1621.00) return sal*0.075;
+  if(sal<=2902.84) return sal*0.09-24.32;
+  if(sal<=4354.27) return sal*0.12-111.41;
+  return sal*0.14-198.50;
+}
+function irrfMensal(base, rendimentoRef){
+  let ir;
+  if(base<=2428.80) ir=0;
+  else if(base<=2826.65) ir=base*0.075-182.16;
+  else if(base<=3751.05) ir=base*0.15-394.16;
+  else if(base<=4664.68) ir=base*0.225-675.49;
+  else ir=base*0.275-908.73;
+  ir=Math.max(0,ir);
+  // Isenção/redução vigente em 2026
+  if(rendimentoRef<=5000) ir=0;
+  else if(rendimentoRef<=7350){ const red=Math.max(0,978.62-0.133145*rendimentoRef); ir=Math.max(0,ir-red); }
+  return Math.max(0,ir);
+}
+function calcSalario(){
+  const bruto=+document.getElementById('sal-clt').value||0;
+  const dep=+document.getElementById('sal-dep').value||0;
+  const fat=+document.getElementById('pj-fat').value||0;
+  const aliq=(+document.getElementById('pj-aliq').value||0)/100;
+  const cont=+document.getElementById('pj-cont').value||0;
+  const pl=+document.getElementById('pj-prol').value||0;
+  // CLT
+  const inss=inssProgressivo(bruto);
+  const baseIR=Math.max(0,bruto-inss-dep*189.59);
+  const ir=irrfMensal(baseIR,bruto);
+  const liquidoCLT=bruto-inss-ir;
+  const fgts=bruto*0.08;
+  const beneficios=fgts+liquidoCLT/12+(bruto/3)/12; // FGTS + 13º + 1/3 de férias diluídos
+  const remTotalCLT=liquidoCLT+beneficios;
+  // PJ
+  const impSimples=fat*aliq;
+  const inssPl=Math.min(pl,8475.55)*0.11;
+  const baseIRpl=Math.max(0,pl-inssPl);
+  const irPl=irrfMensal(baseIRpl,pl);
+  const liquidoPJ=fat-impSimples-cont-inssPl-irPl;
+  const linha=(lbl,val,cor)=>`<div style="display:flex;justify-content:space-between;padding:.3rem 0"><span style="color:var(--text3);font-size:12px">${lbl}</span><span style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:${cor||'var(--text2)'}">${val}</span></div>`;
+  document.getElementById('sal-tabela').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div>
+        <div style="font-weight:800;color:var(--gold);font-size:13px;margin-bottom:.3rem">CLT</div>
+        ${linha('Bruto',fmt(bruto))}
+        ${linha('− INSS',fmt(inss),'var(--dn)')}
+        ${linha('− IRRF',fmt(ir),'var(--dn)')}
+        ${linha('= Líquido',fmt(liquidoCLT),'var(--up)')}
+        ${linha('+ FGTS/13º/férias',fmt(beneficios),'var(--text2)')}
+        <div style="border-top:1px solid var(--border);margin-top:.3rem;padding-top:.3rem">${linha('= Total equiv.',fmt(remTotalCLT),'var(--gold)')}</div>
+      </div>
+      <div>
+        <div style="font-weight:800;color:var(--gold);font-size:13px;margin-bottom:.3rem">PJ</div>
+        ${linha('Faturamento',fmt(fat))}
+        ${linha('− Simples',fmt(impSimples),'var(--dn)')}
+        ${linha('− Contador',fmt(cont),'var(--dn)')}
+        ${linha('− INSS pró-labore',fmt(inssPl),'var(--dn)')}
+        ${linha('− IRRF pró-labore',fmt(irPl),'var(--dn)')}
+        <div style="border-top:1px solid var(--border);margin-top:.3rem;padding-top:.3rem">${linha('= Líquido',fmt(liquidoPJ),'var(--up)')}</div>
+      </div>
+    </div>`;
+  if(salarioChart) salarioChart.destroy();
+  salarioChart=new Chart(document.getElementById('salarioChart'),{type:'bar',
+    data:{labels:['CLT líquido','CLT total*','PJ líquido'],
+      datasets:[{data:[+liquidoCLT.toFixed(2),+remTotalCLT.toFixed(2),+liquidoPJ.toFixed(2)],
+        backgroundColor:['rgba(245,166,35,.55)','rgba(245,166,35,.85)','rgba(31,201,110,.7)'],borderRadius:6}]},
+    options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>fmt(ctx.parsed.y)}}},
+      scales:{...CHART_OPTS.scales,y:{...CHART_OPTS.scales.y,ticks:{...CHART_OPTS.scales.y.ticks,callback:v=>'R$'+Math.round(v/1000)+'k'}}}}
+  });
 }
 
 async function init(){ await loadData(); calcJuros(); populateInflacaoSelect(); }
