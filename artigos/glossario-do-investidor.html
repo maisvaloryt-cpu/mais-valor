@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/png" href="../favicon.png">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Glossário do investidor: 40 termos que você precisa conhecer — Mais Valor</title>
-<meta name="description" content="De aporte a volatilidade: os 40 termos essenciais do mercado explicados em uma frase cada, organizados por tema, com links para os guias completos.">
+<title>Glossário do investidor: 61 termos explicados | Mais Valor</title>
+<meta name="description" content="De aporte a circuit breaker: 61 termos do mercado financeiro explicados um por um, em linguagem clara, organizados por tema e com link para o guia completo de cada assunto.">
 <link rel="canonical" href="https://canalmaisvalor.com.br/artigos/glossario-do-investidor.html">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Mais Valor">
-<meta property="og:title" content="Glossário do investidor: 40 termos que você precisa conhecer">
-<meta property="og:description" content="De aporte a volatilidade: os 40 termos essenciais do mercado explicados em uma frase cada, organizados por tema, com links para os guias completos.">
+<meta property="og:title" content="Glossário do investidor: 61 termos explicados">
+<meta property="og:description" content="De aporte a circuit breaker: 61 termos do mercado financeiro explicados um por um, em linguagem clara, organizados por tema.">
 <meta property="og:url" content="https://canalmaisvalor.com.br/artigos/glossario-do-investidor.html">
 <meta property="og:image" content="https://canalmaisvalor.com.br/logo.png">
 <meta name="twitter:card" content="summary">
@@ -18,13 +18,29 @@
 <link rel="stylesheet" href="../style.css">
 <link rel="stylesheet" href="../mobile.css">
 <link rel="stylesheet" href="artigos.css">
+<style>
+  .gloss{margin:1.2rem 0 2rem}
+  .gloss dl{margin:0}
+  .gloss-item{display:grid;grid-template-columns:185px 1fr;gap:16px;padding:12px 0;border-bottom:1px solid var(--border);align-items:baseline}
+  .gloss-item:last-child{border-bottom:none}
+  .gloss-item dt{font-size:14px;font-weight:700;color:var(--gold);line-height:1.45;margin:0}
+  .gloss-item dd{margin:0;font-size:13.5px;color:var(--text2);line-height:1.75}
+  html:not([data-theme="light"]) .gloss-item dd{color:#B3B1AB}
+  .gloss-item dd a{color:var(--gold);border-bottom:1px dotted var(--border2)}
+  .gloss-item dd a:hover{border-bottom-style:solid}
+  .gloss-count{font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.4px;margin:0 0 2px}
+  @media(max-width:640px){
+    .gloss-item{grid-template-columns:1fr;gap:4px;padding:11px 0}
+    .gloss-item dt{font-size:14.5px}
+  }
+</style>
 </head>
 <body>
 <div id="nav-placeholder"></div>
 
 <div class="page-hero fade-in">
   <h1>GLOSSÁRIO DO <em>INVESTIDOR</em></h1>
-  <p>Os 40 termos que aparecem em toda conversa de investimento — explicados sem enrolação.</p>
+  <p>Os 61 termos que aparecem em toda conversa de investimento, explicados um por um, sem enrolação.</p>
 </div>
 
 <div class="container">
@@ -34,35 +50,298 @@
 <article class="art fade-in-1">
 
   <div class="art-meta">
-    <span class="art-tag nivel-1">Todos os níveis</span>
-    <span class="art-tag tempo">8 min de leitura</span>
+    <span class="art-tag nivel-1">Iniciante</span>
+    <span class="art-tag tempo">9 min de leitura</span>
   </div>
 
-
-  <p>Todo mundo que começa passa pelo mesmo aperto: cada texto sobre investimento assume que você já sabe o vocabulário. Este glossário resolve — <strong>40 termos essenciais, uma explicação direta cada</strong>, organizados por tema. Salve nos favoritos e volte sempre que travar numa palavra.</p>
+  <p>Todo mundo que começa passa pelo mesmo aperto: cada texto sobre investimento assume que você já conhece o vocabulário. Este glossário resolve isso. São <strong>61 termos essenciais, cada um em sua própria linha, com uma explicação direta e só daquele termo</strong>. Estão organizados por tema, e os que têm guia completo no site levam direto para ele. Salve nos favoritos e volte sempre que travar numa palavra.</p>
 
   <figure class="art-fig">
-    <svg viewBox="0 0 640 120" role="img" aria-label="Temas do glossário"><rect x="20" y="44" width="110" height="40" rx="10" fill="rgba(245,166,35,0.05)" stroke="rgba(245,166,35,0.28)"/><text x="75" y="68" fill="#F5A623" font-size="11.5" font-weight="700" text-anchor="middle">O básico</text><rect x="142" y="44" width="110" height="40" rx="10" fill="rgba(245,166,35,0.05)" stroke="rgba(245,166,35,0.28)"/><text x="197" y="68" fill="#F5A623" font-size="11.5" font-weight="700" text-anchor="middle">Renda fixa</text><rect x="264" y="44" width="110" height="40" rx="10" fill="rgba(245,166,35,0.05)" stroke="rgba(245,166,35,0.28)"/><text x="319" y="68" fill="#F5A623" font-size="11.5" font-weight="700" text-anchor="middle">Ações</text><rect x="386" y="44" width="110" height="40" rx="10" fill="rgba(245,166,35,0.05)" stroke="rgba(245,166,35,0.28)"/><text x="441" y="68" fill="#F5A623" font-size="11.5" font-weight="700" text-anchor="middle">FIIs</text><rect x="508" y="44" width="110" height="40" rx="10" fill="rgba(245,166,35,0.05)" stroke="rgba(245,166,35,0.28)"/><text x="563" y="68" fill="#F5A623" font-size="11.5" font-weight="700" text-anchor="middle">Operacional</text></svg>
-    <figcaption>40 termos essenciais organizados em cinco grandes temas.</figcaption>
+    <svg viewBox="0 0 640 130" role="img" aria-label="Os cinco temas do glossário e quantos termos cada um tem"><rect x="14" y="34" width="116" height="58" rx="10" fill="rgba(245,166,35,0.05)" stroke="rgba(245,166,35,0.28)"/><text x="72" y="58" fill="#F5A623" font-size="11.5" font-weight="700" text-anchor="middle">O básico</text><text x="72" y="77" fill="#7C7A75" font-size="10.5" font-weight="500" text-anchor="middle">9 termos</text><rect x="140" y="34" width="116" height="58" rx="10" fill="rgba(245,166,35,0.05)" stroke="rgba(245,166,35,0.28)"/><text x="198" y="58" fill="#F5A623" font-size="11.5" font-weight="700" text-anchor="middle">Renda fixa</text><text x="198" y="77" fill="#7C7A75" font-size="10.5" font-weight="500" text-anchor="middle">11 termos</text><rect x="266" y="34" width="116" height="58" rx="10" fill="rgba(245,166,35,0.05)" stroke="rgba(245,166,35,0.28)"/><text x="324" y="58" fill="#F5A623" font-size="11.5" font-weight="700" text-anchor="middle">Ações</text><text x="324" y="77" fill="#7C7A75" font-size="10.5" font-weight="500" text-anchor="middle">21 termos</text><rect x="392" y="34" width="116" height="58" rx="10" fill="rgba(245,166,35,0.05)" stroke="rgba(245,166,35,0.28)"/><text x="450" y="58" fill="#F5A623" font-size="11.5" font-weight="700" text-anchor="middle">FIIs</text><text x="450" y="77" fill="#7C7A75" font-size="10.5" font-weight="500" text-anchor="middle">7 termos</text><rect x="518" y="34" width="108" height="58" rx="10" fill="rgba(245,166,35,0.05)" stroke="rgba(245,166,35,0.28)"/><text x="572" y="58" fill="#F5A623" font-size="11.5" font-weight="700" text-anchor="middle">Operacional</text><text x="572" y="77" fill="#7C7A75" font-size="10.5" font-weight="500" text-anchor="middle">13 termos</text></svg>
+    <figcaption>Os 61 termos distribuídos nos cinco temas que você mais encontra pela frente.</figcaption>
   </figure>
 
-  <h2>O básico</h2>
-  <p><strong>Aporte</strong> — cada depósito que você faz nos investimentos. · <strong>Liquidez</strong> — a facilidade de transformar um ativo em dinheiro sem perder valor. · <strong>Volatilidade</strong> — o tamanho das oscilações de preço; alta volatilidade = montanha-russa. · <strong>Rentabilidade nominal × real</strong> — o número bruto × o que sobra após a <a href="inflacao-e-ipca.html">inflação</a>. · <strong>Carteira/portfólio</strong> — o conjunto dos seus investimentos. · <strong>Perfil de investidor</strong> — conservador, moderado ou arrojado; sua tolerância a risco. · <strong>Benchmark</strong> — o índice de referência para comparar desempenho (CDI, Ibovespa).</p>
+  <h2>O <em>básico</em></h2>
+  <p class="gloss-count">9 TERMOS</p>
+  <div class="gloss">
+  <dl>
+    <div class="gloss-item">
+      <dt>Aporte</dt>
+      <dd>Cada depósito que você faz nos seus investimentos. Aportar todo mês é o hábito que mais pesa no resultado final, mais até do que acertar o momento de comprar.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Liquidez</dt>
+      <dd>A facilidade de transformar um investimento em dinheiro na conta sem perder valor. Alta liquidez significa sacar hoje ou amanhã. Veja o guia sobre <a href="liquidez-nos-investimentos.html">liquidez nos investimentos</a>.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Volatilidade</dt>
+      <dd>O tamanho das oscilações de preço de um ativo. Volatilidade alta é montanha-russa. Ela não mede se o investimento é bom ou ruim, mede só o quanto ele balança pelo caminho.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Rentabilidade nominal</dt>
+      <dd>O número que aparece no extrato, sem nenhum desconto. Se rendeu 10 por cento no ano, essa é a rentabilidade nominal.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Rentabilidade real</dt>
+      <dd>O que sobra da rentabilidade nominal depois de descontar a <a href="inflacao-e-ipca.html">inflação</a>. É a única que importa de verdade, porque é ela que diz se o seu dinheiro passou a comprar mais coisas ou menos.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Carteira</dt>
+      <dd>O conjunto de todos os seus investimentos, também chamado de portfólio. Aprenda a <a href="montar-primeira-carteira.html">montar a primeira</a>.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Perfil de investidor</dt>
+      <dd>A classificação da sua tolerância a risco, geralmente em conservador, moderado ou arrojado. A corretora descobre isso num questionário obrigatório antes de você começar.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Benchmark</dt>
+      <dd>O índice usado como régua de comparação. Se o seu investimento em renda fixa rendeu menos que o CDI, ele perdeu do próprio benchmark.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Diversificação</dt>
+      <dd>Espalhar o dinheiro entre investimentos diferentes para que um problema isolado não derrube a carteira inteira. Detalhes no guia de <a href="diversificacao.html">diversificação</a>.</dd>
+    </div>
+  </dl>
+  </div>
 
-  <h2>Renda fixa</h2>
-  <p><strong>CDI</strong> — a taxa interbancária que serve de régua para quase toda a renda fixa; anda colada na <a href="selic-e-copom.html">Selic</a>. · <strong>Pós-fixado</strong> — rende conforme um índice (ex: 105% do CDI). · <strong>Prefixado</strong> — taxa travada na compra. · <strong>Híbrido</strong> — inflação + taxa fixa (IPCA+6%). · <strong>Marcação a mercado</strong> — a oscilação diária do preço dos títulos antes do vencimento. · <strong>FGC</strong> — o fundo que garante até R$ 250 mil por CPF por banco em <a href="cdb-lci-lca.html">CDBs e afins</a>. · <strong>Tabela regressiva</strong> — IR que cai com o tempo: 22,5% → 15% após 2 anos. · <strong>Come-cotas</strong> — a antecipação semestral de IR dos <a href="fundos-e-come-cotas.html">fundos</a>.</p>
+  <h2>Renda <em>fixa</em></h2>
+  <p class="gloss-count">11 TERMOS</p>
+  <div class="gloss">
+  <dl>
+    <div class="gloss-item">
+      <dt>Selic</dt>
+      <dd>A taxa básica de juros da economia brasileira, definida a cada 45 dias pelo Copom. Ela é o ponto de partida de quase todo rendimento do país. Veja <a href="selic-e-copom.html">Selic e Copom</a>.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>CDI</dt>
+      <dd>A taxa dos empréstimos que os bancos fazem entre si, que anda praticamente colada na Selic. É a régua da renda fixa, por isso os produtos se anunciam como 100 por cento do CDI ou 110 por cento do CDI.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Pós-fixado</dt>
+      <dd>Título cujo rendimento acompanha um índice ao longo do tempo, como 105 por cento do CDI. Você conhece a regra na hora da compra, mas só descobre o valor exato no fim.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Prefixado</dt>
+      <dd>Título com taxa travada no momento da compra, por exemplo 11 por cento ao ano. Você já sabe quanto vai receber no vencimento, independentemente do que acontecer com os juros.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Híbrido</dt>
+      <dd>Título que combina inflação mais uma taxa fixa, como IPCA mais 6 por cento. Garante ganho acima da inflação, seja ela qual for. É o formato do <a href="tesouro-direto.html">Tesouro IPCA+</a>.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Emissor</dt>
+      <dd>Quem pegou o seu dinheiro emprestado e tem a obrigação de devolver: o governo, um banco ou uma empresa. Em renda fixa, a qualidade do emissor é o risco principal.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Vencimento</dt>
+      <dd>A data em que o título acaba e o dinheiro volta com os juros combinados. Escolher vencimento compatível com o seu objetivo evita ter que sair no meio do caminho.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Marcação a mercado</dt>
+      <dd>A atualização diária do preço de um título antes do vencimento. É por isso que um prefixado pode aparecer no negativo mesmo rendendo direitinho: quem segura até o fim recebe o combinado.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>FGC</dt>
+      <dd>O Fundo Garantidor de Créditos, que devolve até um limite por CPF e por instituição caso o banco emissor quebre. Cobre <a href="cdb-lci-lca.html">CDB, LCI, LCA</a>, poupança e conta corrente, mas não cobre debênture nem fundo.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Tabela regressiva</dt>
+      <dd>A regra de imposto de renda que cai conforme o tempo de aplicação, começando em 22,5 por cento e chegando a 15 por cento depois de dois anos. Vale para a maior parte da renda fixa.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Come-cotas</dt>
+      <dd>A antecipação semestral de imposto que a Receita cobra em vários fundos, reduzindo o número de cotas que você tem. Entenda em <a href="fundos-e-come-cotas.html">fundos e come-cotas</a>.</dd>
+    </div>
+  </dl>
+  </div>
 
-  <h2>Ações</h2>
-  <p><strong>Ticker</strong> — o código do ativo (PETR4). · <strong>ON/PN/Unit</strong> — as <a href="acoes-on-pn-units.html">classes de ação</a> (finais 3, 4 e 11). · <strong>Dividendo</strong> — parte do lucro distribuída, isenta de IR. · <strong>JCP</strong> — <a href="jcp-juros-sobre-capital-proprio.html">juros sobre capital próprio</a>, com 15% na fonte. · <strong>Data-com/data-ex</strong> — o limite para ter direito ao provento anunciado. · <strong>P/L, P/VP, ROE, DY</strong> — os <a href="indicadores-fundamentalistas.html">indicadores fundamentalistas</a> básicos. · <strong>Valuation</strong> — a arte de <a href="valuation-como-estimar.html">estimar o valor justo</a> de um negócio. · <strong>Blue chip / small cap</strong> — as gigantes × as <a href="small-caps.html">pequenas</a> da bolsa. · <strong>IPO</strong> — a <a href="ipos-vale-a-pena.html">estreia</a> de uma empresa na bolsa. · <strong>Tag along</strong> — proteção do minoritário na venda do controle. · <strong>Proventos</strong> — o guarda-chuva: dividendos + JCP + bonificações.</p>
+  <h2>Ações e <em>bolsa</em></h2>
+  <p class="gloss-count">21 TERMOS</p>
+  <div class="gloss">
+  <dl>
+    <div class="gloss-item">
+      <dt>Ticker</dt>
+      <dd>O código de negociação do ativo na bolsa, como PETR4 ou ITUB3. São quatro letras que identificam a empresa mais um número que indica o tipo de ação.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Ação ON</dt>
+      <dd>Ação ordinária, terminada em 3, que dá direito a voto nas assembleias da empresa. Veja as diferenças em <a href="acoes-on-pn-units.html">ON, PN e Units</a>.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Ação PN</dt>
+      <dd>Ação preferencial, terminada em 4, que normalmente não dá direito a voto mas tem preferência no recebimento de proventos.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Unit</dt>
+      <dd>Um pacote que junta ações ordinárias e preferenciais num único papel, terminado em 11. Você compra o conjunto de uma vez só.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Lote-padrão</dt>
+      <dd>O mercado principal, onde as ações são negociadas de 100 em 100. É onde acontece o maior volume e por isso os melhores preços.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Fracionário</dt>
+      <dd>O mercado onde dá para comprar de 1 a 99 ações, identificado pela letra F no fim do código. Serve para quem está começando com pouco dinheiro.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Dividendo</dt>
+      <dd>A parte do lucro que a empresa distribui aos acionistas em dinheiro. No Brasil, hoje é isento de imposto de renda na mão da pessoa física. Veja o <a href="guia-de-dividendos.html">guia de dividendos</a>.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>JCP</dt>
+      <dd>Juros sobre capital próprio, uma forma alternativa de a empresa distribuir lucro, com 15 por cento de imposto retido na fonte. Entenda o <a href="jcp-juros-sobre-capital-proprio.html">JCP</a>.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Proventos</dt>
+      <dd>O nome guarda-chuva de tudo que a empresa distribui aos acionistas: dividendos, JCP, bonificações e direitos de subscrição.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Data-com</dt>
+      <dd>O último dia em que você precisa ter a ação na carteira para receber o provento anunciado. Quem compra até esse dia, recebe.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Data-ex</dt>
+      <dd>O primeiro dia em que a ação passa a ser negociada sem o direito ao provento. É normal a cotação abrir mais baixa nesse dia, porque o dinheiro do provento saiu da empresa.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Dividend Yield</dt>
+      <dd>O quanto a empresa pagou de proventos no ano dividido pelo preço da ação, em porcentagem. Um DY de 8 por cento significa 8 reais de provento para cada 100 reais investidos.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>P/L</dt>
+      <dd>Preço dividido pelo lucro por ação. Em teoria, quantos anos de lucro atual seriam necessários para pagar o preço da ação. Detalhes nos <a href="indicadores-fundamentalistas.html">indicadores fundamentalistas</a>.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>P/VP</dt>
+      <dd>Preço dividido pelo valor patrimonial por ação. Abaixo de 1 significa que o mercado paga menos do que o patrimônio contábil da empresa, o que pode ser oportunidade ou sinal de problema.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>ROE</dt>
+      <dd>Retorno sobre o patrimônio líquido. Mostra quanto de lucro a empresa gera para cada real que os sócios colocaram nela. Quanto maior e mais constante ao longo dos anos, melhor.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Valuation</dt>
+      <dd>O exercício de estimar quanto um negócio realmente vale, independentemente do preço do dia. Veja <a href="valuation-como-estimar.html">como se estima o valor justo</a>.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Blue chip</dt>
+      <dd>Ação de empresa gigante, muito negociada e conhecida por todo mundo. Costuma oscilar menos e ter liquidez alta todos os dias.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Small cap</dt>
+      <dd>Ação de empresa de porte pequeno na bolsa. Tem potencial de crescimento maior e também risco e oscilação bem maiores. Veja o guia de <a href="small-caps.html">small caps</a>.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>IPO</dt>
+      <dd>A estreia de uma empresa na bolsa, quando ela vende ações ao público pela primeira vez. Entenda se <a href="ipos-vale-a-pena.html">vale a pena entrar</a>.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Tag along</dt>
+      <dd>A proteção que garante ao acionista minoritário vender a ação junto quando o controlador vende o controle da empresa, recebendo um percentual do preço pago ao controlador.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Free float</dt>
+      <dd>A fatia das ações que circula livremente no mercado, fora das mãos dos controladores. Quanto maior o free float, mais líquida tende a ser a negociação.</dd>
+    </div>
+  </dl>
+  </div>
 
-  <h2>FIIs e imobiliário</h2>
-  <p><strong>Cota</strong> — sua fração de um <a href="fundos-imobiliarios.html">fundo imobiliário</a>. · <strong>Tijolo/papel</strong> — FIIs de imóveis físicos × de títulos (CRIs). · <strong>Vacância</strong> — a fatia dos imóveis sem inquilino. · <strong>Cap rate</strong> — aluguel anual ÷ valor do imóvel. · <strong>CRI/CRA</strong> — <a href="debentures-cri-cra.html">recebíveis</a> imobiliários e do agro, isentos de IR.</p>
+  <h2>Fundos <em>imobiliários</em></h2>
+  <p class="gloss-count">7 TERMOS</p>
+  <div class="gloss">
+  <dl>
+    <div class="gloss-item">
+      <dt>Cota</dt>
+      <dd>Sua fração de um fundo. Comprar uma cota de <a href="fundos-imobiliarios.html">FII</a> é comprar um pedacinho de uma carteira de imóveis ou de títulos imobiliários.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>FII de tijolo</dt>
+      <dd>Fundo que possui imóveis físicos de verdade, como shoppings, galpões logísticos, lajes corporativas ou hospitais, e vive do aluguel deles.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>FII de papel</dt>
+      <dd>Fundo que não tem imóvel nenhum e sim títulos de dívida do setor imobiliário, principalmente CRIs. Vive dos juros desses títulos.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Vacância</dt>
+      <dd>A parcela dos imóveis do fundo que está sem inquilino. Vacância alta significa menos aluguel entrando e, normalmente, menos rendimento distribuído. Veja <a href="como-analisar-fiis.html">como analisar FIIs</a>.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Cap rate</dt>
+      <dd>O aluguel anual dividido pelo valor do imóvel, em porcentagem. É a medida de quanto aquele imóvel rende por ano em relação ao que custa.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>CRI</dt>
+      <dd>Certificado de Recebíveis Imobiliários, um título de dívida lastreado em pagamentos do setor imobiliário. É isento de imposto para pessoa física, mas não tem cobertura do FGC. Veja <a href="debentures-cri-cra.html">CRI e CRA</a>.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>CRA</dt>
+      <dd>Certificado de Recebíveis do Agronegócio, o primo do CRI voltado ao agro. Mesma lógica: isenção de imposto para pessoa física e nenhuma garantia do FGC.</dd>
+    </div>
+  </dl>
+  </div>
 
-  <h2>Operacional e estratégia</h2>
-  <p><strong>Home broker</strong> — a plataforma de negociação da corretora na <a href="como-funciona-a-b3.html">B3</a>. · <strong>Ordem a mercado/limitada</strong> — executa já × só no seu preço. · <strong>Fracionário</strong> — o mercado de 1 a 99 ações (final F). · <strong>Custódia</strong> — o registro dos ativos no seu CPF. · <strong>D+2</strong> — o prazo de liquidação das operações. · <strong>Buy &amp; hold</strong> — a estratégia de <a href="day-trade-vs-buy-and-hold.html">comprar e segurar</a>. · <strong>Preço médio (DCA)</strong> — <a href="preco-medio-e-aportes.html">aportes regulares</a> que diluem o preço de entrada. · <strong>Rebalanceamento</strong> — <a href="rebalanceamento.html">devolver a carteira</a> aos percentuais-alvo. · <strong>Stop loss</strong> — ordem automática de venda num preço-limite. · <strong>Alavancagem</strong> — operar com dinheiro emprestado; multiplica ganhos E perdas (perigo). · <strong>Bull/bear market</strong> — as fases de alta e baixa dos <a href="ciclos-de-mercado.html">ciclos</a>.</p>
+  <h2>Operacional e <em>estratégia</em></h2>
+  <p class="gloss-count">13 TERMOS</p>
+  <div class="gloss">
+  <dl>
+    <div class="gloss-item">
+      <dt>Home broker</dt>
+      <dd>A plataforma da corretora onde você envia as ordens de compra e venda. É a sua porta de entrada na <a href="como-funciona-a-b3.html">B3</a>.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Ordem a mercado</dt>
+      <dd>Ordem que executa imediatamente pelo melhor preço disponível naquele instante. Rápida, mas você não controla o preço exato da execução.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Ordem limitada</dt>
+      <dd>Ordem que só executa no preço que você definiu ou em um melhor. Você controla o preço, mas corre o risco de a ordem não ser executada.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Custódia</dt>
+      <dd>O registro dos seus ativos no seu CPF, guardado na B3 e não na corretora. Se a corretora quebrar, os ativos continuam sendo seus.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>D+2</dt>
+      <dd>O prazo de liquidação das operações com ações no Brasil. Você vende hoje e o dinheiro fica disponível para saque dois dias úteis depois.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Buy and hold</dt>
+      <dd>A estratégia de comprar bons ativos e segurar por muitos anos, ignorando o ruído do curto prazo. Compare com o oposto em <a href="day-trade-vs-buy-and-hold.html">day trade e buy and hold</a>.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Preço médio</dt>
+      <dd>A média ponderada do que você pagou por um ativo somando todas as compras. Aportar aos poucos suaviza esse preço. Veja <a href="preco-medio-e-aportes.html">preço médio e aportes</a>.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Rebalanceamento</dt>
+      <dd>Ajustar periodicamente a carteira de volta aos percentuais que você definiu, vendendo o que subiu demais e reforçando o que ficou para trás. Entenda o <a href="rebalanceamento.html">rebalanceamento</a>.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Stop loss</dt>
+      <dd>Ordem automática programada para vender caso o preço caia até um determinado nível, limitando a perda daquela operação.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Alavancagem</dt>
+      <dd>Operar com dinheiro emprestado ou com instrumentos que multiplicam a exposição. Multiplica o ganho e multiplica a perda na mesma proporção, por isso é o caminho mais curto para zerar a conta.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Bull market</dt>
+      <dd>Fase prolongada de alta do mercado, com otimismo generalizado. O touro ataca de baixo para cima, daí o nome.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Bear market</dt>
+      <dd>Fase prolongada de queda, normalmente contada a partir de 20 por cento de recuo. O urso ataca de cima para baixo. Veja os <a href="ciclos-de-mercado.html">ciclos de mercado</a>.</dd>
+    </div>
+    <div class="gloss-item">
+      <dt>Circuit breaker</dt>
+      <dd>A parada automática de todo o pregão quando o índice cai além de um limite no mesmo dia. Serve para esfriar o pânico e dar tempo de todo mundo respirar.</dd>
+    </div>
+  </dl>
+  </div>
 
   <div class="art-box">
-    <p><strong>Como usar este glossário:</strong> não decore — navegue. Cada termo em dourado leva ao guia completo do assunto. A fluência vem do uso: explore as páginas de <a href="../acoes.html">Ações</a> e <a href="../fiis.html">FIIs</a> com o glossário aberto do lado e, em poucas semanas, o "economês" vira segunda língua.</p>
+    <p><strong>Como usar este glossário:</strong> não tente decorar. Deixe esta página aberta enquanto navega pelas páginas de <a href="../acoes.html">Ações</a> e <a href="../fiis.html">FIIs</a> e volte aqui toda vez que travar numa palavra. Cada termo em dourado leva ao guia completo daquele assunto. Em poucas semanas de uso, o vocabulário do mercado deixa de ser barreira.</p>
   </div>
 
   <div class="art-cta">
@@ -70,8 +349,7 @@
     <a class="sec" href="como-comecar-a-investir.html">Ler: Começar do zero</a>
   </div>
 
-
-  <div class="art-aviso"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M12 9v4M12 17h.01" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M12 9v4M12 17h.01" stroke="#F5A623" stroke-width="1.5"/><path d="M10.24 3.96 2.46 17.14a2 2 0 0 0 1.75 2.98h15.58a2 2 0 0 0 1.75-2.98L13.76 3.96a2 2 0 0 0-3.52 0z" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M10.24 3.96 2.46 17.14a2 2 0 0 0 1.75 2.98h15.58a2 2 0 0 0 1.75-2.98L13.76 3.96a2 2 0 0 0-3.52 0z" stroke="#F5A623" stroke-width="1.5"/></svg> Este artigo tem caráter educativo e não é recomendação de investimento. Regras e taxas podem mudar — confirme as condições vigentes antes de investir. Rentabilidade passada não garante resultados futuros.</div>
+  <div class="art-aviso"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M12 9v4M12 17h.01" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M12 9v4M12 17h.01" stroke="#F5A623" stroke-width="1.5"/><path d="M10.24 3.96 2.46 17.14a2 2 0 0 0 1.75 2.98h15.58a2 2 0 0 0 1.75-2.98L13.76 3.96a2 2 0 0 0-3.52 0z" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M10.24 3.96 2.46 17.14a2 2 0 0 0 1.75 2.98h15.58a2 2 0 0 0 1.75-2.98L13.76 3.96a2 2 0 0 0-3.52 0z" stroke="#F5A623" stroke-width="1.5"/></svg> Este artigo tem caráter educativo e não é recomendação de investimento. Regras e taxas podem mudar, então confirme as condições vigentes antes de investir. Rentabilidade passada não garante resultados futuros.</div>
 
   <div class="art-nav">
     <a href="index.html">← Todos os artigos</a>

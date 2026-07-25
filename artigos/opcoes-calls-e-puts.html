@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="../favicon.png">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Opções: o que são calls e puts | Mais Valor</title>
+<meta name="description" content="Como funcionam de verdade as opções na B3: call e put, strike, prêmio, vencimento, valor extrínseco, gregas, payoff e por que a maioria das opções vira pó.">
+<link rel="canonical" href="https://canalmaisvalor.com.br/artigos/opcoes-calls-e-puts.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Mais Valor">
+<meta property="og:title" content="Opções: o que são calls e puts">
+<meta property="og:description" content="Como funcionam de verdade as opções na B3: call e put, strike, prêmio, vencimento, valor extrínseco, gregas, payoff e por que a maioria das opções vira pó.">
+<meta property="og:url" content="https://canalmaisvalor.com.br/artigos/opcoes-calls-e-puts.html">
+<meta property="og:image" content="https://canalmaisvalor.com.br/logo.png">
+<meta name="twitter:card" content="summary">
+<script>window.NAV_BASE_PATH="../";</script>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../mobile.css">
+<link rel="stylesheet" href="artigos.css">
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<div class="page-hero fade-in">
+  <h1>OPÇÕES: O QUE SÃO <em>CALLS</em> E <em>PUTS</em></h1>
+  <p>O instrumento mais perigoso da bolsa, explicado sem romantismo e sem atalho.</p>
+</div>
+
+<div class="container">
+<!-- IMAGEM: descomentar quando a foto estiver na pasta
+<div class="art-hero-img-wrap">
+  <img src="../imagens/Artigos/otimizadas/opcoes-calls-e-puts-01.webp" alt="OPÇÕES: O QUE SÃO CALLS E PUTS" class="art-hero-img" loading="lazy" width="1000" height="450">
+</div>
+-->
+<article class="art fade-in-1">
+
+  <div class="art-meta">
+    <span class="art-tag nivel-3">Avançado</span>
+    <span class="art-tag tempo">11 min de leitura</span>
+  </div>
+
+  <p>Antes de qualquer explicação técnica, um aviso que este artigo inteiro vai repetir: <strong>opções são o instrumento em que o investidor pessoa física brasileiro mais perde dinheiro, e perde rápido</strong>. Não existe "aprender opções em uma semana e viver de renda". Existe um mecanismo financeiro sofisticado, com prazo de validade embutido, que transfere dinheiro de quem não entende para quem entende. Este texto explica o mecanismo de verdade, inclusive as partes que os cursos de internet costumam pular.</p>
+
+  <h2>A analogia do <em>sinal do imóvel</em></h2>
+  <p>Você visita um apartamento que custa R$ 500 mil. Gostou, mas quer 60 dias para decidir e para levantar o dinheiro. Você propõe ao dono: "eu te pago R$ 10 mil agora, não reembolsáveis, e em troca você me garante o direito de comprar esse apartamento por R$ 500 mil a qualquer momento nos próximos 60 dias. Se eu não quiser, você fica com os R$ 10 mil e vende para quem quiser".</p>
+  <p>Esse contrato é uma opção de compra. Repare em cada peça, porque todas reaparecem na bolsa:</p>
+  <ul>
+    <li>Os <strong>R$ 10 mil</strong> são o <strong>prêmio</strong>: o preço do contrato, pago hoje, perdido para sempre se você desistir.</li>
+    <li>Os <strong>R$ 500 mil</strong> são o <strong>strike</strong> (preço de exercício): o valor pelo qual você tem o direito de comprar.</li>
+    <li>Os <strong>60 dias</strong> são o <strong>vencimento</strong>: depois disso o contrato deixa de existir.</li>
+    <li>Você comprou um <strong>direito, não uma obrigação</strong>. O vendedor, ao contrário, assumiu uma <strong>obrigação, não um direito</strong>. Ele tem que vender se você mandar.</li>
+  </ul>
+  <p>Se em 30 dias descobrem que vai passar um metrô na esquina e o apartamento passa a valer R$ 600 mil, você exerce: compra por 500, vale 600, ganhou 100 mil gastando 10 mil. Se descobrem que vai passar um presídio e o imóvel cai para R$ 400 mil, você simplesmente não exerce: perdeu os R$ 10 mil e acabou. <strong>Essa assimetria, perda limitada ao prêmio e ganho grande se a tese der certo, é o que seduz, e é exatamente por isso que o prêmio nunca é barato de verdade.</strong></p>
+
+  <h2>Call e put, dos <em>dois lados</em> do balcão</h2>
+  <p>Toda opção tem duas pontas. Para cada real que um lado ganha, o outro perde um real. É um jogo de soma zero antes dos custos, e de soma negativa depois das corretagens e do imposto. Guarde isso: não existe estratégia em que os dois lados ganham.</p>
+  <p><strong>Call</strong> é opção de compra. Quem <strong>compra a call</strong> (titular) paga o prêmio e adquire o direito de comprar a ação pelo strike até o vencimento. Aposta que a ação sobe. Perda máxima: o prêmio pago. Quem <strong>vende a call</strong> (lançador) recebe o prêmio e assume a obrigação de entregar a ação pelo strike se for exercido. Ganho máximo: o prêmio recebido, e nada mais.</p>
+  <p><strong>Put</strong> é opção de venda. Quem <strong>compra a put</strong> paga o prêmio e adquire o direito de vender a ação pelo strike. É a apólice de seguro do investidor: se a ação desabar, ele vende pelo preço combinado. Aposta na queda ou protege uma carteira. Quem <strong>vende a put</strong> recebe o prêmio e assume a obrigação de comprar a ação pelo strike, mesmo que ela tenha virado pó.</p>
+  <div class="art-box">
+    <p><strong>Regra que resolve metade da confusão:</strong> quem compra opção paga e tem direito. Quem vende opção recebe e tem obrigação. O comprador tem prejuízo limitado e passa a maior parte do tempo perdendo pequeno. O vendedor tem lucro limitado e passa a maior parte do tempo ganhando pequeno, até o dia em que perde muito de uma vez.</p>
+  </div>
+
+  <h2>Dentro, no e fora <em>do dinheiro</em></h2>
+  <p>Uma opção está <strong>dentro do dinheiro</strong> quando exercê-la agora daria resultado positivo. Uma call de strike R$ 30 com a ação a R$ 34 está dentro do dinheiro em R$ 4. A mesma call com a ação a R$ 26 está <strong>fora do dinheiro</strong>: ninguém compra por 30 o que se compra por 26 no mercado. Com a ação exatamente a R$ 30, está <strong>no dinheiro</strong>.</p>
+  <p>Para puts a lógica inverte: put de strike R$ 30 está dentro do dinheiro quando a ação está abaixo de R$ 30. As opções muito fora do dinheiro são as mais baratas e as mais divulgadas nas redes sociais, justamente porque custam centavos e ocasionalmente multiplicam por dez. O que não se conta é que, na esmagadora maioria das vezes, elas simplesmente expiram valendo zero.</p>
+
+  <h2>Como se lê o <em>código</em> de uma opção na B3</h2>
+  <p>O código tem três partes: as quatro letras do ativo, uma letra que indica o mês e o tipo, e um número ligado ao strike. Tome <code>PETRK32</code>. <code>PETR</code> é a Petrobras. <code>K</code> é a letra do vencimento. E <code>32</code> é a referência de strike da série.</p>
+  <p>As letras de <strong>A a L</strong> indicam calls de janeiro a dezembro. As letras de <strong>M a X</strong> indicam puts de janeiro a dezembro. Então <code>K</code> é call de novembro e <code>W</code> seria put de novembro. Decorar isso não é obrigatório, mas confundir uma call com uma put na hora de enviar a ordem já custou muito dinheiro a muita gente.</p>
+  <p>O vencimento das opções sobre ações na B3 é a <strong>terceira sexta-feira do mês</strong>, e se for feriado passa para o dia útil seguinte. Existem também séries semanais em alguns papéis, com vencimentos nas demais sextas-feiras. Na semana do vencimento o comportamento dos preços muda bastante, porque o tempo restante está acabando. Se você quiser entender o funcionamento da bolsa e da liquidação por trás disso, vale ler <a href="como-funciona-a-b3.html">como funciona a B3</a>.</p>
+
+  <h2>Valor intrínseco e valor <em>extrínseco</em></h2>
+  <p>O prêmio de uma opção é sempre a soma de duas coisas. O <strong>valor intrínseco</strong> é o quanto ela vale se fosse exercida agora, ou seja, o quanto ela está dentro do dinheiro. O <strong>valor extrínseco</strong> é todo o resto: é o preço da esperança, o quanto o mercado cobra pela possibilidade de a ação se mover a favor do titular antes do vencimento.</p>
+  <p>Exemplo concreto. Ação a R$ 34, call de strike R$ 30 custando R$ 5,20. O valor intrínseco é R$ 4,00 (34 menos 30). O valor extrínseco é R$ 1,20. Esse R$ 1,20 é um bloco de gelo. <strong>No vencimento, o valor extrínseco de toda opção é zero, sem exceção.</strong> Ou a opção tem valor intrínseco e é exercida, ou não tem e vira pó.</p>
+  <p>Repare no que isso significa para quem compra: você paga por um ativo que, mantido tudo constante, perde valor todo santo dia. A ação pode ficar parada e você perde. A ação pode subir devagar demais e você ainda perde. <strong>Comprar opção seca exige acertar direção, magnitude e prazo ao mesmo tempo.</strong> Errar qualquer um dos três já basta para zerar.</p>
+
+  <figure class="art-fig">
+    <svg viewBox="0 0 640 250" role="img" aria-label="Gráficos de payoff no vencimento para compra de call, venda de call, compra de put e venda de put">
+      <text x="20" y="16" fill="#F5A623" font-size="11" font-weight="800">PAYOFF NO VENCIMENTO (resultado em reais x preço da ação)</text>
+      <g>
+        <rect x="14" y="30" width="146" height="96" rx="8" fill="rgba(245,166,35,0.05)" stroke="rgba(245,166,35,0.28)"/>
+        <line x1="26" y1="90" x2="150" y2="90" stroke="#7C7A75" stroke-width="1"/>
+        <line x1="88" y1="40" x2="88" y2="118" stroke="#7C7A75" stroke-width="0.6" stroke-dasharray="3 3"/>
+        <path d="M26 104 L88 104 L146 46" stroke="#1FC96E" stroke-width="2" fill="none"/>
+        <text x="87" y="136" fill="#A8A6A0" font-size="9.5" font-weight="600" text-anchor="middle">COMPRA DE CALL</text>
+        <text x="87" y="146" fill="#7C7A75" font-size="8.5" text-anchor="middle">perde o prêmio, ganho aberto</text>
+      </g>
+      <g>
+        <rect x="172" y="30" width="146" height="96" rx="8" fill="rgba(245,166,35,0.05)" stroke="rgba(245,166,35,0.28)"/>
+        <line x1="184" y1="90" x2="308" y2="90" stroke="#7C7A75" stroke-width="1"/>
+        <line x1="246" y1="40" x2="246" y2="118" stroke="#7C7A75" stroke-width="0.6" stroke-dasharray="3 3"/>
+        <path d="M184 76 L246 76 L304 118" stroke="#E8503A" stroke-width="2" fill="none"/>
+        <text x="245" y="136" fill="#A8A6A0" font-size="9.5" font-weight="600" text-anchor="middle">VENDA DE CALL</text>
+        <text x="245" y="146" fill="#7C7A75" font-size="8.5" text-anchor="middle">ganha o prêmio, perda aberta</text>
+      </g>
+      <g>
+        <rect x="330" y="30" width="146" height="96" rx="8" fill="rgba(245,166,35,0.05)" stroke="rgba(245,166,35,0.28)"/>
+        <line x1="342" y1="90" x2="466" y2="90" stroke="#7C7A75" stroke-width="1"/>
+        <line x1="404" y1="40" x2="404" y2="118" stroke="#7C7A75" stroke-width="0.6" stroke-dasharray="3 3"/>
+        <path d="M346 46 L404 104 L464 104" stroke="#1FC96E" stroke-width="2" fill="none"/>
+        <text x="403" y="136" fill="#A8A6A0" font-size="9.5" font-weight="600" text-anchor="middle">COMPRA DE PUT</text>
+        <text x="403" y="146" fill="#7C7A75" font-size="8.5" text-anchor="middle">seguro contra a queda</text>
+      </g>
+      <g>
+        <rect x="488" y="30" width="138" height="96" rx="8" fill="rgba(245,166,35,0.05)" stroke="rgba(245,166,35,0.28)"/>
+        <line x1="498" y1="90" x2="618" y2="90" stroke="#7C7A75" stroke-width="1"/>
+        <line x1="558" y1="40" x2="558" y2="118" stroke="#7C7A75" stroke-width="0.6" stroke-dasharray="3 3"/>
+        <path d="M500 118 L558 76 L616 76" stroke="#E8503A" stroke-width="2" fill="none"/>
+        <text x="557" y="136" fill="#A8A6A0" font-size="9.5" font-weight="600" text-anchor="middle">VENDA DE PUT</text>
+        <text x="557" y="146" fill="#7C7A75" font-size="8.5" text-anchor="middle">obrigado a comprar na baixa</text>
+      </g>
+      <line x1="20" y1="168" x2="620" y2="168" stroke="rgba(245,166,35,0.2)" stroke-width="1"/>
+      <text x="20" y="188" fill="#A8A6A0" font-size="10" font-weight="600">Linha tracejada vertical: o strike. Linha horizontal: resultado zero.</text>
+      <text x="20" y="206" fill="#7C7A75" font-size="10">Em verde, as posições de risco limitado (você compra e no pior caso perde o prêmio).</text>
+      <text x="20" y="222" fill="#7C7A75" font-size="10">Em vermelho, as posições vendidas: ganho travado no prêmio e prejuízo que pode</text>
+      <text x="20" y="238" fill="#7C7A75" font-size="10">superar em muitas vezes tudo o que foi recebido.</text>
+    </svg>
+    <figcaption>Os quatro cenários básicos. Note a assimetria: quem vende opção descoberta troca um ganho pequeno e certo por um prejuízo grande e improvável.</figcaption>
+  </figure>
+
+  <h2>As gregas, sem <em>matemática pesada</em></h2>
+  <p>As gregas são apenas nomes para perguntas simples sobre como o prêmio se comporta. Você não precisa calcular nenhuma delas para entender o que importa.</p>
+  <p><strong>Delta</strong> responde: se a ação subir R$ 1, quanto sobe o prêmio? Uma call com delta 0,60 sobe cerca de R$ 0,60 quando a ação sobe R$ 1. Opções bem dentro do dinheiro têm delta perto de 1 e andam quase como a ação. Opções muito fora do dinheiro têm delta perto de 0,05 e mal reagem. O delta também funciona como uma estimativa grosseira da chance de a opção terminar dentro do dinheiro: delta 0,20 sugere algo em torno de 20% de chance. Pense nisso na próxima vez que alguém oferecer uma opção "que pode multiplicar por dez".</p>
+  <p><strong>Theta</strong> responde: quanto o prêmio derrete por dia só pela passagem do tempo? É o gelo derretendo. Theta é inimigo declarado de quem compra e amigo de quem vende. E ele acelera: nas últimas duas semanas antes do vencimento, o valor extrínseco despenca muito mais rápido do que no primeiro mês.</p>
+  <p><strong>Vega</strong> responde: quanto o prêmio muda quando o mercado fica mais nervoso? Volatilidade alta encarece todas as opções, porque a chance de um movimento grande aumenta. É por isso que <strong>comprar opção em dia de pânico costuma ser um péssimo negócio</strong>: você acerta a direção, a poeira baixa, a volatilidade recua e o prêmio cai mesmo com você certo. Muita gente já viveu isso sem entender o que aconteceu.</p>
+
+  <h2>Por que a maioria das opções <em>vira pó</em></h2>
+  <p>"Virar pó" é o jargão para a opção expirar fora do dinheiro, valendo zero. Isso acontece com a maior parte das séries negociadas, sobretudo as fora do dinheiro, que são as mais populares entre iniciantes justamente por serem baratas.</p>
+  <p>Não é conspiração nem manipulação: é a matemática do instrumento. Para uma call fora do dinheiro dar lucro, a ação precisa subir o suficiente para cobrir a distância até o strike <strong>e ainda</strong> o prêmio pago, dentro de um prazo curto. Uma alta de 4% em três semanas, que seria excelente para quem tem a ação, pode significar prejuízo total para quem comprou a call.</p>
+  <p>A leitura errada disso é: "então eu vendo opções e fico com o prêmio". Cuidado. É verdade que o vendedor ganha na maioria dos meses. Também é verdade que o tamanho do ganho é pequeno e travado, enquanto o tamanho da perda eventual não é travado. Um vendedor descoberto pode acumular doze meses de prêmios e devolver tudo, mais o capital, em um único pregão de choque. <strong>Ganhar com frequência não é a mesma coisa que ganhar dinheiro.</strong></p>
+
+  <h2>O risco ilimitado do <em>lançador descoberto</em></h2>
+  <p>Vender uma call sem ter as ações é a operação mais perigosa deste artigo. Se você lança 1.000 calls de strike R$ 30 e recebe R$ 1.200 de prêmio, seu ganho máximo é R$ 1.200. Se sair uma notícia e a ação abrir a R$ 55, você é obrigado a entregar 1.000 ações que valem R$ 55 recebendo R$ 30 por cada uma. São R$ 25.000 de prejuízo bruto contra R$ 1.200 recebidos. E não existe teto: a ação pode ir a R$ 80.</p>
+  <p>Some a isso a <strong>chamada de margem</strong>. Posições vendidas exigem garantias depositadas na corretora, e essas garantias aumentam quando o mercado vira contra você. Você pode ser forçado a encerrar a posição no pior momento possível, no pior preço possível, sem escolha. A versão que reduz esse risco a um patamar administrável é a <a href="venda-coberta.html">venda coberta</a>, em que você já possui as ações que pode ser obrigado a entregar. Continua tendo custo, só que o custo é abrir mão da alta, não a ruína.</p>
+  <p>Vender put descoberta tem o mesmo problema espelhado: você se compromete a comprar a ação por R$ 30 e ela pode estar a R$ 8 no dia do exercício. O prejuízo não é infinito em teoria, porque a ação não vai abaixo de zero, mas na prática pode ser maior do que todo o seu patrimônio, já que você vendeu mais contratos do que teria dinheiro para honrar.</p>
+
+  <h2>Tributação de opções <em>no Brasil</em></h2>
+  <p>Opções seguem a lógica geral da renda variável, com uma diferença importante em relação a ações.</p>
+  <ul>
+    <li><strong>Alíquota de 15%</strong> sobre o lucro líquido em operações normais, e <strong>20%</strong> em day trade (abrir e fechar a mesma série no mesmo dia).</li>
+    <li><strong>Não existe a isenção de R$ 20 mil</strong> que vale para venda de ações no mercado à vista. Em opções, lucro é lucro, e é tributado desde o primeiro real.</li>
+    <li>O <strong>recolhimento é seu</strong>, via DARF, até o último dia útil do mês seguinte ao da apuração, com código 6015. Atraso gera multa e juros.</li>
+    <li>Há <strong>retenção na fonte</strong> de 0,005% em operações comuns e 1% em day trade, o famoso dedo-duro, que serve para a Receita cruzar informações.</li>
+    <li><strong>Prejuízos podem ser compensados</strong> com lucros futuros da mesma modalidade, sem prazo de validade, desde que você mantenha o controle mês a mês. Quem opera opções e não mantém planilha própria acaba pagando imposto a mais.</li>
+    <li>Quando a opção é exercida, o resultado se incorpora à operação com a ação, o que muda o preço de aquisição ou de venda do papel. Isso exige atenção no cálculo do <a href="preco-medio-e-aportes.html">preço médio</a>.</li>
+  </ul>
+  <p>Detalhes específicos de declaração estão em <a href="irpf-investimentos.html">IRPF para investimentos</a>. Regras tributárias mudam, então confirme sempre as vigentes no ano da sua operação.</p>
+
+  <h2>Quem realmente <em>deveria</em> operar isso</h2>
+  <p>Opções têm usos legítimos e antigos. Produtores rurais travam preço de safra. Empresas travam câmbio. Gestores compram puts como seguro de carteira em momentos de risco elevado, aceitando pagar por isso como se paga um seguro de carro. Investidores de longo prazo lançam calls cobertas sobre posições que já possuem.</p>
+  <p>O que quase nunca funciona é o uso mais comum entre pessoas físicas: comprar opções baratas fora do dinheiro tentando multiplicar capital rápido. Isso não é investimento nem sequer especulação estruturada. É uma aposta com prazo curto, custo de corretagem, spread largo e o tempo jogando contra. A discussão sobre por que o giro rápido destrói patrimônio está em <a href="day-trade-vs-buy-and-hold.html">day trade contra buy and hold</a>, e vale integralmente aqui, em versão ainda mais severa.</p>
+  <div class="art-box">
+    <p><strong>Se ainda assim você quiser estudar opções, três regras mínimas:</strong> primeiro, nunca venda descoberto, em nenhuma circunstância, por mais atraente que pareça o prêmio. Segundo, use apenas dinheiro que você pode perder integralmente sem afetar sua vida ou sua carteira principal, e trate esse valor como já perdido no momento da entrada. Terceiro, entenda que ficar bom nisso leva anos e a maioria das pessoas que tenta desiste com prejuízo. Nada disso é pessimismo, é a estatística do instrumento.</p>
+  </div>
+
+  <h2>O <em>resumo</em> honesto</h2>
+  <p>Opção é um contrato com data de validade: direito para quem compra, obrigação para quem vende. O prêmio embute valor intrínseco, que é real, e valor extrínseco, que evapora até zerar no vencimento. Quem compra tem perda limitada e acerta pouco. Quem vende tem ganho limitado e acerta muito, até o dia do choque. O jogo é de soma zero antes dos custos e negativo depois deles.</p>
+  <p>Não existe forma de operar opções sem risco relevante, e qualquer pessoa que apresente o assunto como fonte previsível de renda mensal está omitindo a parte que importa. A porta de entrada menos perigosa, para quem já tem ações e entende o que está abrindo mão, é a venda coberta, e mesmo ela tem armadilhas.</p>
+
+  <div class="art-cta">
+    <a href="venda-coberta.html">Ler: venda coberta na prática</a>
+    <a class="sec" href="como-funciona-a-b3.html">Entender como funciona a B3</a>
+  </div>
+
+  <div class="art-aviso"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M12 9v4M12 17h.01" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M12 9v4M12 17h.01" stroke="#F5A623" stroke-width="1.5"/><path d="M10.24 3.96 2.46 17.14a2 2 0 0 0 1.75 2.98h15.58a2 2 0 0 0 1.75-2.98L13.76 3.96a2 2 0 0 0-3.52 0z" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M10.24 3.96 2.46 17.14a2 2 0 0 0 1.75 2.98h15.58a2 2 0 0 0 1.75-2.98L13.76 3.96a2 2 0 0 0-3.52 0z" stroke="#F5A623" stroke-width="1.5"/></svg> Este artigo tem caráter educativo e não é recomendação de investimento. Regras e taxas podem mudar, então confirme as condições vigentes antes de investir. Rentabilidade passada não garante resultados futuros.</div>
+
+  <div class="art-nav">
+    <a href="index.html">← Todos os artigos</a>
+    <a href="venda-coberta.html">Leia também: Venda coberta →</a>
+  </div>
+
+</article>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="motion.js" defer></script>
+<script src="../nav.js"></script>
+</body>
+</html>

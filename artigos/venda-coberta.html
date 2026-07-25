@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="../favicon.png">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Venda coberta de opções: como funciona | Mais Valor</title>
+<meta name="description" content="Lançar calls cobertas sobre ações que você já tem: exemplo numérico completo, os três cenários no vencimento, efeito no preço médio, imposto e os riscos reais.">
+<link rel="canonical" href="https://canalmaisvalor.com.br/artigos/venda-coberta.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Mais Valor">
+<meta property="og:title" content="Venda coberta de opções: como funciona">
+<meta property="og:description" content="Lançar calls cobertas sobre ações que você já tem: exemplo numérico completo, os três cenários no vencimento, efeito no preço médio, imposto e os riscos reais.">
+<meta property="og:url" content="https://canalmaisvalor.com.br/artigos/venda-coberta.html">
+<meta property="og:image" content="https://canalmaisvalor.com.br/logo.png">
+<meta name="twitter:card" content="summary">
+<script>window.NAV_BASE_PATH="../";</script>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../mobile.css">
+<link rel="stylesheet" href="artigos.css">
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<div class="page-hero fade-in">
+  <h1>VENDA <em>COBERTA</em> DE OPÇÕES</h1>
+  <p>Gerar renda com as ações que você já tem, e o preço real que se paga por isso.</p>
+</div>
+
+<div class="container">
+<!-- IMAGEM: descomentar quando a foto estiver na pasta
+<div class="art-hero-img-wrap">
+  <img src="../imagens/Artigos/otimizadas/venda-coberta-01.webp" alt="VENDA COBERTA DE OPÇÕES" class="art-hero-img" loading="lazy" width="1000" height="450">
+</div>
+-->
+<article class="art fade-in-1">
+
+  <div class="art-meta">
+    <span class="art-tag nivel-3">Avançado</span>
+    <span class="art-tag tempo">10 min de leitura</span>
+  </div>
+
+  <p>A venda coberta é apresentada por aí como o jeito seguro de ganhar dinheiro com opções. A primeira parte é verdadeira: é de longe a estratégia menos perigosa da família. A segunda parte é enganosa, porque ninguém paga prêmio por nada. <strong>Todo real que você recebe hoje é a compra de um direito seu que você está entregando: o de participar de uma alta forte.</strong> Este artigo mostra a conta inteira, com números em reais, e explica exatamente quando a estratégia machuca.</p>
+
+  <h2>A analogia do <em>aluguel com opção de compra</em></h2>
+  <p>Imagine que você tem um imóvel alugado. Aparece um inquilino e propõe: além do aluguel normal, eu te pago mais R$ 3 mil por mês, e em troca, se eu quiser, posso comprar o imóvel por R$ 500 mil ao fim de qualquer mês.</p>
+  <p>Você aceita, porque acha R$ 500 mil um preço bom. Nos meses em que o imóvel vale menos que isso, você embolsa os R$ 3 mil e mantém o imóvel. Perfeito. Mas se aparecer um metrô na esquina e o imóvel disparar para R$ 700 mil, o inquilino compra por 500. Você fica com os R$ 3 mil e perde R$ 200 mil de valorização.</p>
+  <p><strong>Isso é uma venda coberta.</strong> O imóvel é o seu lote de ações. Os R$ 3 mil são o prêmio. Os R$ 500 mil são o strike. E o metrô é o motivo pelo qual essa estratégia não é dinheiro grátis.</p>
+
+  <h2>O que é <em>lançar</em> uma call coberta</h2>
+  <p>Você possui as ações. Vende opções de compra sobre elas e recebe o prêmio imediatamente, no dia seguinte, em dinheiro na conta. Em troca, assume a obrigação de vender essas ações pelo strike caso o titular exerça no vencimento.</p>
+  <p>A palavra <strong>coberta</strong> muda tudo. Como as ações já estão na sua custódia e ficam bloqueadas como garantia, você nunca será obrigado a comprar papel a preço de mercado para entregar. Não há chamada de margem em dinheiro, não há risco de prejuízo ilimitado. O pior que acontece é você vender ações que já tinha por um preço que você mesmo escolheu. Compare isso com o lançador descoberto descrito em <a href="opcoes-calls-e-puts.html">calls e puts</a>, que pode perder muito mais do que o patrimônio investido.</p>
+  <p>Requisitos práticos na B3: opções sobre ações são negociadas em lotes de 100. Então você precisa de no mínimo 100 ações para lançar 1 contrato, 1.000 ações para lançar 10 contratos, e assim por diante. Ações fracionárias não servem de cobertura.</p>
+
+  <h2>Exemplo numérico <em>completo</em></h2>
+  <p>Vamos usar uma empresa fictícia, a Companhia Aurora Energia, ticker AURE3, que não existe e serve só para a conta ficar limpa.</p>
+  <ul>
+    <li>Você tem <strong>1.000 ações</strong> de AURE3, compradas ao longo do tempo a um preço médio de <strong>R$ 26,00</strong>. Custo total: R$ 26.000.</li>
+    <li>Hoje AURE3 está cotada a <strong>R$ 30,00</strong>. Sua posição vale R$ 30.000.</li>
+    <li>Falta um mês para o vencimento. A call de strike <strong>R$ 33,00</strong> está sendo negociada a <strong>R$ 0,70</strong>.</li>
+  </ul>
+  <p>Você lança 10 contratos (1.000 ações). Recebe 1.000 vezes R$ 0,70, ou seja, <strong>R$ 700 brutos</strong>. Descontando cerca de R$ 20 entre corretagem e taxas da B3, sobram aproximadamente <strong>R$ 680 líquidos</strong> creditados na conta, seus para sempre, aconteça o que acontecer.</p>
+  <p>R$ 680 sobre uma posição de R$ 30.000 é <strong>2,27% em um mês</strong>. É esse número que aparece nos anúncios. Segure o entusiasmo até o fim do artigo, porque ele é verdadeiro apenas em dois dos três cenários possíveis, e mesmo assim não se repete todo mês.</p>
+
+  <h2>Os três cenários no <em>vencimento</em></h2>
+
+  <table class="art-table">
+    <thead>
+      <tr><th>Cenário no vencimento</th><th class="r">AURE3</th><th class="r">Resultado da posição</th><th class="r">Com o prêmio</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>A ação cai</strong><br>Opção vira pó, você mantém as ações</td>
+        <td class="r">R$ 27,00</td>
+        <td class="r">R$ 3.000 a menos<br>(perda não realizada)</td>
+        <td class="r">R$ 2.320 a menos<br>o prêmio amorteceu</td>
+      </tr>
+      <tr>
+        <td><strong>A ação anda de lado</strong><br>Opção vira pó, você mantém as ações</td>
+        <td class="r">R$ 30,50</td>
+        <td class="r">R$ 500 a mais<br>(ganho não realizado)</td>
+        <td class="r">R$ 1.180 a mais<br>melhor caso da estratégia</td>
+      </tr>
+      <tr>
+        <td><strong>A ação sobe acima do strike</strong><br>Você é exercido e entrega as ações</td>
+        <td class="r">R$ 38,00</td>
+        <td class="r">Venda travada em<br>R$ 33.000</td>
+        <td class="r">R$ 7.680 de ganho,<br>mas R$ 5.000 ficaram na mesa</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>Vale abrir cada linha, porque a tabela esconde nuances.</p>
+  <p><strong>Cenário 1, a ação cai para R$ 27.</strong> A call de R$ 33 expira sem valor. Você fica com as ações e com os R$ 680. Sua posição, que valia R$ 30.000, agora vale R$ 27.000. Você perdeu R$ 3.000 no papel e recuperou R$ 680 com o prêmio, então o estrago líquido é de R$ 2.320. <strong>O prêmio amorteceu 23% da queda, não a impediu.</strong> Se AURE3 tivesse caído para R$ 20, os R$ 680 seriam irrelevantes diante de R$ 10.000 de perda. Venda coberta não é proteção, é um pequeno colchão.</p>
+  <p><strong>Cenário 2, a ação vai a R$ 30,50.</strong> A opção vira pó de novo. Você continua com as 1.000 ações, ganhou R$ 500 de valorização e R$ 680 de prêmio. Esse é o cenário perfeito: a ação subiu, mas não o suficiente para ser exercido. É por isso que a venda coberta funciona melhor em mercados laterais e por isso quem a usa torce, meio sem querer, para que suas ações não subam demais. Pare um segundo nessa frase, porque ela é estranha para um investidor de longo prazo.</p>
+  <p><strong>Cenário 3, a ação vai a R$ 38.</strong> O titular exerce e você entrega as 1.000 ações a R$ 33. Sua venda total foi R$ 33.000 mais R$ 680 de prêmio, contra um custo de R$ 26.000. Ganho de R$ 7.680, que é ótimo em termos absolutos. Só que sem ter lançado a call, sua posição valeria R$ 38.000. <strong>Você abriu mão de R$ 5.000 para receber R$ 680.</strong> E o pior nem é o dinheiro: você perdeu a ação. Se AURE3 era uma boa empresa que você pretendia carregar por dez anos, agora precisa recomprá-la a R$ 38 ou ficar de fora.</p>
+
+  <figure class="art-fig">
+    <svg viewBox="0 0 640 220" role="img" aria-label="Comparação do resultado da venda coberta e da ação sozinha conforme o preço no vencimento">
+      <text x="20" y="16" fill="#F5A623" font-size="11" font-weight="800">RESULTADO NO VENCIMENTO: AÇÃO SOZINHA CONTRA AÇÃO COM CALL LANÇADA</text>
+      <line x1="60" y1="150" x2="610" y2="150" stroke="#7C7A75" stroke-width="1"/>
+      <line x1="60" y1="40" x2="60" y2="150" stroke="#7C7A75" stroke-width="1"/>
+      <line x1="420" y1="38" x2="420" y2="158" stroke="rgba(245,166,35,0.45)" stroke-width="1" stroke-dasharray="4 4"/>
+      <text x="420" y="174" fill="#F5A623" font-size="9.5" font-weight="700" text-anchor="middle">strike R$ 33</text>
+      <path d="M70 146 L610 44" stroke="#7C7A75" stroke-width="1.8" fill="none" stroke-dasharray="5 4"/>
+      <path d="M70 132 L420 66 L610 66" stroke="#1FC96E" stroke-width="2.4" fill="none"/>
+      <circle class="mv-dot" cx="180" cy="111" r="3.2" fill="#E8503A"/>
+      <text x="180" y="103" fill="#A8A6A0" font-size="9" text-anchor="middle">R$ 27</text>
+      <circle class="mv-dot" cx="288" cy="91" r="3.2" fill="#F5A623"/>
+      <text x="288" y="83" fill="#A8A6A0" font-size="9" text-anchor="middle">R$ 30,50</text>
+      <circle class="mv-dot" cx="530" cy="66" r="3.2" fill="#1FC96E"/>
+      <text x="533" y="58" fill="#A8A6A0" font-size="9" text-anchor="middle">R$ 38</text>
+      <text x="30" y="46" fill="#7C7A75" font-size="9" text-anchor="middle">+</text>
+      <text x="30" y="152" fill="#7C7A75" font-size="9" text-anchor="middle">0</text>
+      <text x="76" y="196" fill="#A8A6A0" font-size="10" font-weight="600">Linha tracejada cinza: só a ação. Linha verde cheia: ação mais o prêmio recebido.</text>
+      <text x="76" y="212" fill="#7C7A75" font-size="10">Abaixo do strike a linha verde fica acima. Acima do strike ela trava e o ganho para.</text>
+    </svg>
+    <figcaption>O prêmio levanta o resultado nos preços baixos e o congela nos preços altos. Esse é o trade-off inteiro, em um desenho.</figcaption>
+  </figure>
+
+  <h2>O trade-off <em>central</em></h2>
+  <p>Toda venda coberta é a mesma troca: <strong>você vende um ganho grande e improvável para comprar um ganho pequeno e provável</strong>. Recebe hoje, com certeza, uma quantia modesta. Entrega, em troca, a cauda de alta, aquele movimento raro de 20% ou 40% que costuma responder por boa parte do retorno de longo prazo de uma carteira de ações.</p>
+  <p>É por isso que a estratégia é matematicamente honesta e psicologicamente traiçoeira. Ela produz uma sequência longa de pequenas vitórias, o que dá enorme sensação de competência, e ocasionalmente uma amputação de retorno que não aparece no extrato como prejuízo, porque não é prejuízo: é lucro que não veio. <strong>Custo de oportunidade não dói na hora, mas destrói composição ao longo dos anos.</strong> Quem entende o efeito dos <a href="juros-compostos.html">juros compostos</a> sabe que perder as maiores altas é caro.</p>
+  <div class="art-box">
+    <p><strong>O teste de sinceridade antes de lançar:</strong> pergunte se você venderia essa ação, hoje, pelo preço do strike. Se a resposta é sim, o lançamento faz sentido, porque o pior cenário é uma venda que você já queria fazer. Se a resposta é não, você está apostando que a ação não sobe, o que é uma aposta direcional sobre um papel que você teoricamente admira. Isso não combina.</p>
+  </div>
+
+  <h2>Como escolher o <em>strike</em></h2>
+  <p>A escolha do strike define a estratégia inteira. Não existe strike certo, existe strike coerente com a sua intenção.</p>
+  <ul>
+    <li><strong>Strike bem acima do preço atual</strong>, por exemplo R$ 36 com a ação a R$ 30. Prêmio magro, talvez R$ 0,15, que dá 0,5% ao mês. Chance de exercício baixa. Serve para quem quer manter as ações e só está catando alguns trocados. É a versão conservadora e também a mais decepcionante em termos de renda, porque os custos comem boa parte.</li>
+    <li><strong>Strike moderadamente acima</strong>, algo em torno de 8% a 12% de distância, que foi o caso do exemplo. Equilíbrio entre prêmio decente e chance razoável de manter o papel. É onde a maioria opera.</li>
+    <li><strong>Strike perto do preço atual ou dentro do dinheiro</strong>. Prêmio gordo, exercício muito provável. Isso não é geração de renda, é uma venda programada da ação com um bônus. Faz sentido quando você já decidiu sair da posição e quer receber um pouco mais por isso.</li>
+  </ul>
+  <p>Sobre o prazo: séries mais curtas rendem menos por operação, porém o valor extrínseco derrete mais rápido no fim, o que favorece o vendedor. Séries longas pagam mais em valor absoluto, mas travam sua ação por meses e rendem menos por unidade de tempo. Na prática, vencimentos de 30 a 45 dias costumam ser o ponto usado por quem opera com método.</p>
+
+  <h2>Efeito no <em>preço médio</em> e no imposto</h2>
+  <p>Duas confusões muito comuns merecem correção.</p>
+  <p><strong>O prêmio não reduz o seu preço médio.</strong> Muita gente diz que recebeu R$ 0,68 por ação e portanto seu preço médio caiu de R$ 26,00 para R$ 25,32. Isso é contabilidade mental, não contabilidade real. O prêmio é um resultado apurado à parte, tributado como operação de opções. Seu preço médio para fins fiscais continua sendo R$ 26,00 até que você compre mais ações. Tratar prêmio como redução de custo faz o investidor achar que está mais protegido do que está, e a diferença aparece justamente na hora ruim. Vale revisar como o custo é apurado em <a href="preco-medio-e-aportes.html">preço médio e aportes</a>.</p>
+  <p><strong>Ser exercido é uma venda, com todas as consequências.</strong> No cenário 3, você vendeu 1.000 ações a R$ 33 com custo de R$ 26. Lucro tributável de R$ 7.000 na operação com ações. Aqui entra um ponto importante: como foi venda de ações no mercado à vista com valor total de R$ 33.000 no mês, acima do limite de R$ 20 mil, a isenção mensal não se aplica e você paga 15% sobre o lucro, algo em torno de R$ 1.050 de DARF. O prêmio de R$ 700 é apurado separadamente, na modalidade opções, onde <strong>não existe isenção alguma</strong>, e paga 15% sobre o resultado.</p>
+  <p>Ou seja: além de perder a valorização, o exercício antecipa um imposto que você adiaria indefinidamente se apenas segurasse o papel. Para quem investe pensando em décadas, esse é um custo silencioso relevante. Os detalhes de apuração e declaração estão em <a href="irpf-investimentos.html">IRPF para investimentos</a>.</p>
+
+  <h2>Por que isso <em>não</em> é dinheiro grátis</h2>
+  <p>Existem dois momentos em que a venda coberta machuca de verdade, e eles são espelhados.</p>
+  <p><strong>Quando a ação dispara e você fica de fora.</strong> A empresa divulga um resultado excepcional, ou surge uma proposta de aquisição, e o papel sobe 35% em duas semanas. Você entrega tudo no strike. Agora tem dinheiro em caixa, uma ação que você gostava negociando muito mais caro, e uma decisão desconfortável: recomprar no topo ou aceitar que a tese acabou. Muita gente, nesse ponto, recompra por teimosia e piora o preço médio. É o erro mais caro da estratégia.</p>
+  <p><strong>Quando a ação despenca e o prêmio não cobre nada.</strong> Vem uma crise, o papel cai 30%, e os R$ 680 que pareciam tão bons agora representam menos de um décimo do prejuízo. Pior: se você tentar "consertar" lançando calls de strike cada vez mais baixo para receber prêmio maior, acaba travando a venda das suas ações abaixo do preço que pagou. É assim que uma estratégia conservadora vira uma máquina de realizar prejuízo.</p>
+  <p>E há o desgaste que ninguém menciona: <strong>venda coberta exige atenção mensal</strong>. Escolher série, acompanhar o vencimento, decidir se recompra a opção para não ser exercido, recolher DARF, controlar planilha. Comparado a receber <a href="guia-de-dividendos.html">dividendos</a> de forma totalmente passiva, é muito trabalho para um retorno adicional que, líquido de tudo, costuma ser bem menor do que a propaganda sugere.</p>
+
+  <h2>Custos e <em>liquidez</em>, o filtro que elimina quase todo mundo</h2>
+  <p>Este é o ponto que separa a teoria da realidade brasileira, e ele é decisivo.</p>
+  <p>No mercado americano quase toda ação relevante tem opções líquidas em dezenas de strikes. <strong>No Brasil, não.</strong> A liquidez de opções na B3 se concentra em um punhado de nomes, essencialmente as blue chips mais negociadas, com Petrobras e Vale respondendo por uma fatia enorme do volume, seguidas de alguns bancos, mineração e varejo de primeira linha. Fora dessa lista curta, a situação piora muito rápido.</p>
+  <p>O que "pouca liquidez" significa na prática:</p>
+  <ul>
+    <li><strong>Spread largo.</strong> A opção tem compra a R$ 0,40 e venda a R$ 0,70. Você vende a mercado e recebe o pior preço. Esse spread pode consumir sozinho um terço do seu retorno esperado.</li>
+    <li><strong>Você fica preso.</strong> Se quiser recomprar a opção antes do vencimento para liberar suas ações, pode não haver ninguém do outro lado por um preço razoável.</li>
+    <li><strong>Poucos strikes e poucas séries.</strong> Você acaba aceitando um strike que não é o que faria sentido para a sua intenção, só porque é o único com negócios.</li>
+    <li><strong>Corretagem e taxas.</strong> Em operações pequenas, os custos fixos destroem a matemática. Lançar 1 contrato para receber R$ 40 e pagar R$ 15 de custos não é estratégia, é passatempo caro.</li>
+  </ul>
+  <p>A conclusão desconfortável é que a venda coberta só faz sentido operacional para quem tem <strong>posições grandes, de pelo menos algumas centenas de ações, em um número pequeno de empresas muito líquidas</strong>. Se a sua carteira é diversificada em empresas de médio porte, provavelmente nenhuma delas tem opções negociáveis. E se você comprou essas blue chips justamente para carregar décadas recebendo proventos, entregar a valorização delas em troca de prêmio pode contrariar a sua própria estratégia. Quem busca fluxo de caixa recorrente costuma ter caminhos mais simples e mais previsíveis, discutidos em <a href="renda-passiva-mensal.html">renda passiva mensal</a>.</p>
+
+  <h2>Quando a venda coberta <em>realmente</em> faz sentido</h2>
+  <p>Existe um caso de uso claro, e ele é mais estreito do que se vende por aí. Você tem um lote grande de uma ação muito líquida, já decidiu que venderia esse papel se ele chegasse a determinado preço, e não se importaria de sair nesse nível. Nessa situação específica, lançar uma call no strike que você já escolheu como preço de saída é uma decisão coerente: você é pago para esperar por uma venda que já queria fazer.</p>
+  <p>Fora disso, o mais comum é o investidor se convencer de que está gerando renda quando na verdade está trocando o motor de longo prazo da carteira por gorjetas mensais. <strong>A pergunta correta nunca é "quanto eu recebo de prêmio", é "quanto de alta eu estou vendendo, e a que preço".</strong></p>
+  <p>Se você chegou até aqui achando a estratégia menos empolgante do que imaginava, esse era o objetivo. Venda coberta é a operação mais defensável do universo de opções e ainda assim tem custo, trabalho, imposto antecipado e um teto de ganho. Qualquer apresentação que a descreva como renda mensal garantida está mostrando dois dos três cenários e escondendo o terceiro.</p>
+
+  <div class="art-cta">
+    <a href="opcoes-calls-e-puts.html">Ler: opções, calls e puts</a>
+    <a class="sec" href="guia-de-dividendos.html">Guia de dividendos</a>
+  </div>
+
+  <div class="art-aviso"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M12 9v4M12 17h.01" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M12 9v4M12 17h.01" stroke="#F5A623" stroke-width="1.5"/><path d="M10.24 3.96 2.46 17.14a2 2 0 0 0 1.75 2.98h15.58a2 2 0 0 0 1.75-2.98L13.76 3.96a2 2 0 0 0-3.52 0z" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M10.24 3.96 2.46 17.14a2 2 0 0 0 1.75 2.98h15.58a2 2 0 0 0 1.75-2.98L13.76 3.96a2 2 0 0 0-3.52 0z" stroke="#F5A623" stroke-width="1.5"/></svg> Este artigo tem caráter educativo e não é recomendação de investimento. Regras e taxas podem mudar, então confirme as condições vigentes antes de investir. Rentabilidade passada não garante resultados futuros.</div>
+
+  <div class="art-nav">
+    <a href="index.html">← Todos os artigos</a>
+    <a href="renda-passiva-mensal.html">Leia também: Renda passiva mensal →</a>
+  </div>
+
+</article>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="motion.js" defer></script>
+<script src="../nav.js"></script>
+</body>
+</html>

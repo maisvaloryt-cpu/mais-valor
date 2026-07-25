@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="../favicon.png">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>ROIC e WACC: a empresa cria ou destrói valor | Mais Valor</title>
+<meta name="description" content="Por que o ROE engana em empresa alavancada, como calcular ROIC e capital investido, o que é WACC e por que o spread entre os dois é o teste real de criação de valor.">
+<link rel="canonical" href="https://canalmaisvalor.com.br/artigos/roic-e-wacc.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Mais Valor">
+<meta property="og:title" content="ROIC e WACC: a empresa cria ou destrói valor">
+<meta property="og:description" content="Por que o ROE engana em empresa alavancada, como calcular ROIC e capital investido, o que é WACC e por que o spread entre os dois é o teste real de criação de valor.">
+<meta property="og:url" content="https://canalmaisvalor.com.br/artigos/roic-e-wacc.html">
+<meta property="og:image" content="https://canalmaisvalor.com.br/logo.png">
+<meta name="twitter:card" content="summary">
+<script>window.NAV_BASE_PATH="../";</script>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../mobile.css">
+<link rel="stylesheet" href="artigos.css">
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<div class="page-hero fade-in">
+  <h1>ROIC E <em>WACC</em></h1>
+  <p>O teste que separa a empresa que cria valor da que só movimenta dinheiro alheio.</p>
+</div>
+
+<div class="container">
+<!-- IMAGEM: descomentar quando a foto estiver na pasta
+<div class="art-hero-img-wrap">
+  <img src="../imagens/Artigos/otimizadas/roic-e-wacc-01.webp" alt="ROIC E WACC" class="art-hero-img" loading="lazy" width="1000" height="450">
+</div>
+-->
+<article class="art fade-in-1">
+
+  <div class="art-meta">
+    <span class="art-tag nivel-3">Avançado</span>
+    <span class="art-tag tempo">11 min de leitura</span>
+  </div>
+
+  <p>Existe uma pergunta que resume quase tudo em análise de empresas, e ela cabe em nove palavras: <strong>essa empresa ganha mais do que custa o dinheiro dela?</strong> Se ganha, cada real reinvestido vira mais de um real de valor. Se não ganha, cada real reinvestido evapora um pouco, mesmo que o lucro esteja subindo e o gráfico esteja bonito. O ROIC responde a primeira metade da pergunta, o WACC responde a segunda, e a diferença entre os dois é o veredicto. Este artigo mostra como calcular os dois com os dados que existem no Brasil.</p>
+
+  <figure class="art-fig">
+    <svg viewBox="0 0 640 210" role="img" aria-label="Comparação de ROIC contra WACC em três empresas com ROE semelhante">
+      <text x="20" y="20" fill="#A8A6A0" font-size="10.5" font-weight="600">Três empresas, ROE quase idêntico. O spread conta outra história.</text>
+      <line x1="150" y1="36" x2="150" y2="176" stroke="#7C7A75" stroke-width="1"/>
+      <text x="20" y="58" fill="#F5A623" font-size="10.5" font-weight="700">Malharia Aurora</text>
+      <rect x="150" y="46" width="288" height="14" rx="3" fill="rgba(245,166,35,0.45)" class="mv-bar-h"/>
+      <text x="446" y="57" fill="#A8A6A0" font-size="9.5" font-weight="600">ROIC 18,0%</text>
+      <rect x="150" y="64" width="224" height="10" rx="3" fill="rgba(168,166,160,0.30)" class="mv-bar-h"/>
+      <text x="382" y="73" fill="#7C7A75" font-size="9" font-weight="500">WACC 14,0%</text>
+      <text x="530" y="63" fill="#1FC96E" font-size="11" font-weight="800">+4,0 p.p.</text>
+      <text x="20" y="108" fill="#F5A623" font-size="10.5" font-weight="700">Cimentos Ipê</text>
+      <rect x="150" y="96" width="192" height="14" rx="3" fill="rgba(245,166,35,0.45)" class="mv-bar-h"/>
+      <text x="350" y="107" fill="#A8A6A0" font-size="9.5" font-weight="600">ROIC 12,0%</text>
+      <rect x="150" y="114" width="179" height="10" rx="3" fill="rgba(168,166,160,0.30)" class="mv-bar-h"/>
+      <text x="337" y="123" fill="#7C7A75" font-size="9" font-weight="500">WACC 11,2%</text>
+      <text x="530" y="113" fill="#1FC96E" font-size="11" font-weight="800">+0,8 p.p.</text>
+      <text x="20" y="158" fill="#F5A623" font-size="10.5" font-weight="700">Varejo Guaraci</text>
+      <rect x="150" y="146" width="185" height="14" rx="3" fill="rgba(245,166,35,0.45)" class="mv-bar-h"/>
+      <text x="343" y="157" fill="#A8A6A0" font-size="9.5" font-weight="600">ROIC 11,6%</text>
+      <rect x="150" y="164" width="194" height="10" rx="3" fill="rgba(232,80,58,0.40)" class="mv-bar-h"/>
+      <text x="352" y="173" fill="#7C7A75" font-size="9" font-weight="500">WACC 12,1%</text>
+      <text x="530" y="163" fill="#E8503A" font-size="11" font-weight="800">−0,5 p.p.</text>
+      <text x="20" y="200" fill="#7C7A75" font-size="9.5" font-weight="500">Barra dourada: retorno sobre o capital investido. Barra cinza: custo desse capital.</text>
+    </svg>
+    <figcaption>Quando a barra cinza ultrapassa a dourada, a empresa está queimando o dinheiro dos sócios com um sorriso no rosto.</figcaption>
+  </figure>
+
+  <h2>Por que o <em>ROE</em> engana</h2>
+  <p>Imagine dois vizinhos que compraram apartamentos idênticos de R$ 500 mil e alugam cada um por R$ 3 mil por mês. O primeiro pagou tudo à vista. O segundo deu R$ 100 mil de entrada e financiou o resto. Sobre o dinheiro que cada um colocou do próprio bolso, o segundo aparenta um retorno muito maior. Só que ele não é melhor investidor de imóveis: ele apenas usou o banco. E se o aluguel cair, ou se a taxa subir, é ele quem quebra primeiro.</p>
+  <p>O ROE (retorno sobre o patrimônio líquido) é exatamente essa conta: lucro líquido dividido pelo patrimônio dos sócios. <strong>Ele mistura duas coisas que precisam ser separadas: a qualidade da operação e a dose de dívida usada.</strong> Uma empresa medíocre com muita dívida pode exibir um ROE de 18% e parecer irmã de uma empresa excelente sem dívida nenhuma que exibe os mesmos 18%.</p>
+  <p>A decomposição clássica (DuPont) deixa isso explícito: ROE = margem líquida × giro do ativo × alavancagem. O terceiro termo, ativo total dividido pelo patrimônio, é puro multiplicador. Quando uma empresa dobra a dívida, esse termo dobra e o ROE sobe sem que uma única unidade a mais tenha sido vendida. Por isso, no artigo sobre <a href="indicadores-fundamentalistas.html">indicadores fundamentalistas</a>, o ROE aparece sempre acompanhado da dívida líquida sobre EBITDA. Um sem o outro é meia verdade.</p>
+
+  <h2>O que é <em>capital investido</em></h2>
+  <p>Antes do ROIC, precisamos definir o denominador. Capital investido é <strong>todo o dinheiro que foi colocado dentro do negócio para ele funcionar, venha de sócio ou de credor</strong>. É a soma do dinheiro no caixa da empresa que está efetivamente trabalhando.</p>
+  <div class="art-box">
+    <p><strong>Dois caminhos que dão no mesmo lugar:</strong></p>
+    <p><strong>Pelo passivo:</strong> Patrimônio líquido + dívida onerosa total − caixa e aplicações financeiras. Ou seja, patrimônio líquido mais dívida líquida.</p>
+    <p><strong>Pelo ativo:</strong> Capital de giro operacional (estoques + contas a receber − fornecedores e outras contas operacionais) + imobilizado + intangível.</p>
+    <p>Tira-se o caixa porque dinheiro parado em CDB não é operação, é reserva. Se você deixar o caixa dentro do denominador, uma empresa com caixa gordo vai parecer pior operadora do que realmente é.</p>
+  </div>
+  <p>Uma decisão que vale discutir: incluir ou não o ágio de aquisições (goodwill). <strong>Se você quer saber se a operação é boa, exclua. Se você quer saber se o gestor aloca capital bem, inclua.</strong> A segunda pergunta costuma ser a mais relevante para o investidor de longo prazo, porque uma empresa que compra concorrentes caros demais está destruindo o seu dinheiro mesmo que as lojas dela sejam ótimas.</p>
+
+  <h2>Como calcular o <em>ROIC</em></h2>
+  <p>ROIC é o retorno sobre o capital investido, e a fórmula é curta:</p>
+  <p><strong>ROIC = NOPAT ÷ Capital investido</strong>, onde NOPAT = EBIT × (1 − 34%).</p>
+  <p>O NOPAT é o lucro operacional depois do imposto e <strong>antes dos juros</strong>. Essa é a sacada. Como o denominador inclui o capital do credor, o numerador precisa incluir o retorno que vai para o credor. Se você usasse lucro líquido (que já está depois dos juros) sobre capital investido, estaria comparando um bolo cortado com a receita inteira.</p>
+  <p>Na prática brasileira, três atalhos ajudam:</p>
+  <ul>
+    <li><strong>EBIT</strong> você acha na DRE do release trimestral, às vezes com o nome de "resultado operacional" ou "EBIT ajustado". Prefira o número sem os ajustes de gentileza da administração, ou pelo menos entenda o que foi ajustado.</li>
+    <li><strong>Alíquota efetiva</strong> nem sempre é 34%. Empresas com benefícios fiscais (Sudene, Lei do Bem) ou com <a href="jcp-juros-sobre-capital-proprio.html">JCP</a> pagam menos. Pegue a alíquota efetiva real dividindo o imposto do ano pelo lucro antes do imposto.</li>
+    <li><strong>Use o capital médio do período</strong> (média entre o saldo do início e do fim do ano) quando a empresa fez uma grande aquisição no meio do exercício. Senão, o ROIC do ano da compra fica artificialmente alto.</li>
+  </ul>
+
+  <h2>O que é o <em>custo de capital</em></h2>
+  <p>A analogia: dinheiro tem preço de tabela, e o preço muda conforme quem empresta e quanto ele pode perder. O banco que empresta para a empresa tem garantia, tem prioridade no recebimento e cobra menos. O sócio entra por último na fila, pode perder tudo, e por isso exige mais. <strong>O WACC é a média desses dois preços, pesada pela participação de cada um no capital.</strong></p>
+  <p><strong>WACC = (E ÷ (D+E)) × Ke + (D ÷ (D+E)) × Kd × (1 − 34%)</strong></p>
+  <ul>
+    <li><strong>E</strong> é o valor do patrimônio (idealmente o valor de mercado, não o contábil) e <strong>D</strong> é a dívida líquida.</li>
+    <li><strong>Kd é o custo da dívida.</strong> Achar esse número é fácil: divida a despesa financeira do ano pela dívida bruta média, ou leia a taxa média informada na nota explicativa de empréstimos e financiamentos. É a parte menos subjetiva de tudo.</li>
+    <li><strong>O (1 − 34%) na ponta</strong> existe porque juros são despesa dedutível. Se a empresa paga 14% ao banco, o custo real para ela é 9,24%, já que o restante ela economizaria em imposto. Esse benefício fiscal é a razão econômica legítima para uma empresa ter alguma dívida.</li>
+    <li><strong>Ke é o custo do equity</strong>, o retorno que o acionista exige. É o número mais discutível do modelo inteiro. A convenção é taxa livre de risco (a NTN-B longa serve bem no Brasil) mais beta vezes o prêmio de risco de mercado.</li>
+  </ul>
+  <div class="art-box">
+    <p><strong>Uma estimativa de bolso para o Ke no Brasil:</strong> pegue o juro real da NTN-B longa, some a inflação implícita para chegar ao nominal, e some um prêmio de risco de renda variável de 5 a 7 pontos percentuais. Com NTN-B a 7% real e inflação implícita de 5%, o nominal fica em 12%. Somando 6 de prêmio, o Ke de uma empresa de risco médio sai em torno de <strong>18% ao ano</strong>.</p>
+    <p>Sim, é alto. É a realidade de um país onde o governo paga muito para tomar dinheiro emprestado. Isso significa que a barra para criar valor no Brasil é mais alta do que nos Estados Unidos, e explica por que tanta empresa boa aqui negocia com múltiplo baixo.</p>
+  </div>
+
+  <h2>O <em>spread</em>: o teste real</h2>
+  <p>Agora junte as peças. <strong>Spread = ROIC − WACC.</strong> Positivo, a empresa cria valor. Negativo, destrói. Zero, ela é uma máquina de dar trabalho que devolve exatamente o que consumiu.</p>
+  <p>Veja três empresas fictícias com ROE praticamente idêntico e histórias completamente diferentes. Todas apresentam lucro líquido em torno de R$ 175 milhões e patrimônio líquido em torno de R$ 1 bilhão.</p>
+
+  <table class="art-table">
+    <thead>
+      <tr><th>Indicador</th><th class="r">Malharia Aurora</th><th class="r">Cimentos Ipê</th><th class="r">Varejo Guaraci</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Lucro líquido</td><td class="r">R$ 180 mi</td><td class="r">R$ 180 mi</td><td class="r">R$ 170 mi</td></tr>
+      <tr><td>Patrimônio líquido</td><td class="r">R$ 1.000 mi</td><td class="r">R$ 1.000 mi</td><td class="r">R$ 950 mi</td></tr>
+      <tr><td><strong>ROE</strong></td><td class="r"><strong>18,0%</strong></td><td class="r"><strong>18,0%</strong></td><td class="r"><strong>17,9%</strong></td></tr>
+      <tr><td>Dívida líquida</td><td class="r">R$ 0</td><td class="r">R$ 1.500 mi</td><td class="r">R$ 2.600 mi</td></tr>
+      <tr><td>Custo da dívida (Kd)</td><td class="r">nenhum</td><td class="r">12,0%</td><td class="r">14,0%</td></tr>
+      <tr><td>Despesa de juros</td><td class="r">R$ 0</td><td class="r">R$ 180 mi</td><td class="r">R$ 364 mi</td></tr>
+      <tr><td>EBIT</td><td class="r">R$ 273 mi</td><td class="r">R$ 453 mi</td><td class="r">R$ 622 mi</td></tr>
+      <tr><td>NOPAT (EBIT × 0,66)</td><td class="r">R$ 180 mi</td><td class="r">R$ 299 mi</td><td class="r">R$ 410 mi</td></tr>
+      <tr><td>Capital investido</td><td class="r">R$ 1.000 mi</td><td class="r">R$ 2.500 mi</td><td class="r">R$ 3.550 mi</td></tr>
+      <tr><td><strong>ROIC</strong></td><td class="r"><strong>18,0%</strong></td><td class="r"><strong>12,0%</strong></td><td class="r"><strong>11,6%</strong></td></tr>
+      <tr><td>WACC estimado</td><td class="r">14,0%</td><td class="r">11,2%</td><td class="r">12,1%</td></tr>
+      <tr><td><strong>Spread</strong></td><td class="r"><strong>+4,0 p.p.</strong></td><td class="r"><strong>+0,8 p.p.</strong></td><td class="r"><strong>−0,5 p.p.</strong></td></tr>
+    </tbody>
+  </table>
+
+  <p>Se você olhasse apenas o ROE, as três seriam gêmeas. Olhando o ROIC, a Malharia Aurora produz 18% sobre cada real posto no negócio, enquanto o Varejo Guaraci produz 11,6% e ainda paga 12,1% pelo dinheiro. <strong>O ROE de 17,9% do Guaraci é um empréstimo disfarçado de competência.</strong></p>
+  <p>Repare também que a Aurora tem o WACC mais alto das três, porque não usa dívida e capital de sócio é caro. Mesmo assim ela vence com folga. Isso derruba um mito comum: dívida barata não é vantagem competitiva, é apenas um desconto no custo do dinheiro que qualquer concorrente também consegue tomar.</p>
+
+  <h2>Crescer destruindo valor é <em>pior</em> que não crescer</h2>
+  <p>Essa é a parte contraintuitiva e talvez a mais valiosa. Existe uma crença de que crescimento é sempre bom. Não é. <strong>Crescimento multiplica o spread, seja ele positivo ou negativo.</strong></p>
+  <p>Pense numa franquia de lanchonete. Cada loja nova custa R$ 500 mil e gera R$ 40 mil de lucro operacional depois de imposto, um retorno de 8%. Se o custo de capital do dono é 12%, cada loja nova <strong>destrói</strong> cerca de R$ 20 mil de valor por ano. Abrir cem lojas não corrige o problema, ele multiplica o problema por cem. O faturamento explode, sai na imprensa, e o patrimônio do dono encolhe.</p>
+  <p>A matemática por trás disso é direta. Uma empresa que reinveste 60% do lucro a um ROIC de 8% com WACC de 12% vale <em>menos</em> do que a mesma empresa distribuindo 100% do lucro em <a href="guia-de-dividendos.html">dividendos</a> e não crescendo nada. É por isso que empresa madura com spread negativo deveria devolver dinheiro ao acionista em vez de tentar se reinventar. Poucas fazem, porque distribuir caixa reduz o império do executivo.</p>
+  <div class="art-box">
+    <p><strong>A regra em uma frase:</strong> crescimento só cria valor quando o ROIC marginal supera o WACC. Fora disso, crescimento é apenas uma forma mais rápida de perder dinheiro.</p>
+    <p>Repare que o termo é <strong>ROIC marginal</strong>, o retorno sobre o capital novo, não sobre o capital já investido. Uma empresa pode ter ROIC histórico de 20% e estar reinvestindo o caixa atual a 6% em um projeto ruim. A média demora anos para revelar isso.</p>
+  </div>
+
+  <h2>O que <em>sustenta</em> um ROIC alto</h2>
+  <p>Capitalismo funciona por imitação. Se um negócio rende 25% ao ano, alguém vai copiar, entrar no mercado, brigar por preço e derrubar o retorno para perto do custo de capital. <strong>ROIC alto por muitos anos é a evidência mais confiável de que existe uma barreira impedindo essa imitação.</strong> As barreiras que funcionam de verdade são poucas:</p>
+  <ul>
+    <li><strong>Custo de troca.</strong> O sistema de gestão que roda o hospital inteiro, o banco onde estão todos os débitos automáticos. Trocar dá trabalho, então o cliente aceita reajuste.</li>
+    <li><strong>Efeito de rede.</strong> Cada usuário novo aumenta o valor para os que já estão. Bolsas de valores, marketplaces e sistemas de pagamento vivem disso.</li>
+    <li><strong>Vantagem de custo estrutural.</strong> A mina com o melhor minério, a fábrica no lugar certo, a escala que dilui o frete. Não é ser mais eficiente, é ter algo que o outro não consegue replicar com dinheiro.</li>
+    <li><strong>Ativo intangível protegido.</strong> Patente, licença regulatória, marca com décadas de preferência. Faz o cliente pagar mais pelo mesmo produto físico.</li>
+    <li><strong>Escala em mercado pequeno.</strong> A empresa que domina um nicho onde não cabe um segundo concorrente lucrativo.</li>
+  </ul>
+  <p>Um teste prático: puxe o ROIC dos últimos oito ou dez anos. Se ele oscila mas fica sempre acima do custo de capital, inclusive nos anos ruins, você provavelmente encontrou uma barreira real. Se ele é alto só nos anos de commodity em alta, o que você encontrou foi um ciclo, e ciclos se explicam melhor pelo artigo sobre <a href="ciclos-de-mercado.html">ciclos de mercado</a> do que por qualquer tese de qualidade.</p>
+
+  <h2>Como estimar isso <em>no Brasil</em>, na prática</h2>
+  <p>Todos os dados necessários são públicos. O roteiro:</p>
+  <ol>
+    <li><strong>EBIT e imposto:</strong> DRE do release trimestral ou das demonstrações padronizadas na CVM. Some quatro trimestres para ter o número dos últimos doze meses.</li>
+    <li><strong>Dívida bruta, caixa e patrimônio líquido:</strong> balanço patrimonial. Dívida onerosa aparece como empréstimos e financiamentos, debêntures e arrendamentos.</li>
+    <li><strong>Custo da dívida:</strong> nota explicativa de empréstimos, que traz a taxa média contratada (CDI mais spread, IPCA mais spread, prefixado). Alternativa: despesa financeira do ano dividida pela dívida bruta média.</li>
+    <li><strong>Custo do equity:</strong> taxa da NTN-B longa mais inflação implícita mais 5 a 7 pontos de prêmio. Ajuste para cima em setores voláteis e para baixo em concessões reguladas.</li>
+    <li><strong>Arrendamentos (IFRS 16):</strong> atenção especial no varejo. Aluguéis de loja viraram dívida no balanço. Se você ignorar essa linha, o capital investido de uma rede de varejo fica subestimado e o ROIC aparece inflado.</li>
+    <li><strong>Repita para três a cinco anos</strong> e olhe a trajetória, não o ponto. Um ROIC único é uma fotografia de um dia atípico.</li>
+  </ol>
+  <p>Duas armadilhas frequentes. A primeira: <strong>empresas com ativos muito antigos e depreciados exibem ROIC artificialmente alto</strong>, porque o denominador está registrado a preço de 1998. A segunda: <strong>holdings e conglomerados diluem tudo</strong>, e o ROIC consolidado esconde uma divisão excelente carregando três medíocres. Nesses casos, o número que importa está na abertura por segmento.</p>
+
+  <h2>Como isso se conecta ao <em>preço</em></h2>
+  <p>ROIC e WACC não dizem se a ação está barata. Dizem se o negócio merece ser dono. São coisas diferentes, e confundir as duas é o erro clássico de quem descobre empresas de qualidade e paga qualquer preço por elas.</p>
+  <p>A ligação prática é esta: <strong>o spread justifica o múltiplo.</strong> Uma empresa com ROIC de 25% e WACC de 13% pode negociar a P/L 20 sem estar cara, porque cada real reinvestido cria valor. Uma empresa com spread zero não merece prêmio nenhum sobre o valor patrimonial, por melhor que seja a marca. E é exatamente o spread que aparece disfarçado dentro das premissas de crescimento quando você monta um <a href="dcf-na-pratica.html">fluxo de caixa descontado</a>: modelo que projeta crescimento alto sem exigir capital novo está, implicitamente, assumindo um ROIC infinito.</p>
+  <p>Se você quiser um único filtro para começar a separar empresas antes de qualquer <a href="valuation-como-estimar.html">valuation</a>, use este: <strong>ROIC acima do custo de capital em pelo menos oito dos últimos dez anos.</strong> Quase nenhuma empresa passa. As que passam merecem seu tempo.</p>
+
+  <div class="art-cta">
+    <a href="dcf-na-pratica.html">Ler: DCF na prática, passo a passo</a>
+    <a class="sec" href="../comparador.html">Comparar empresas lado a lado</a>
+  </div>
+
+  <div class="art-aviso"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M12 9v4M12 17h.01" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M12 9v4M12 17h.01" stroke="#F5A623" stroke-width="1.5"/><path d="M10.24 3.96 2.46 17.14a2 2 0 0 0 1.75 2.98h15.58a2 2 0 0 0 1.75-2.98L13.76 3.96a2 2 0 0 0-3.52 0z" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M10.24 3.96 2.46 17.14a2 2 0 0 0 1.75 2.98h15.58a2 2 0 0 0 1.75-2.98L13.76 3.96a2 2 0 0 0-3.52 0z" stroke="#F5A623" stroke-width="1.5"/></svg> Este artigo tem caráter educativo e não é recomendação de investimento. Malharia Aurora, Cimentos Ipê e Varejo Guaraci são empresas fictícias criadas apenas para o exemplo. Regras e taxas podem mudar, confirme as condições vigentes antes de investir. Rentabilidade passada não garante resultados futuros.</div>
+
+  <div class="art-nav">
+    <a href="index.html">← Todos os artigos</a>
+    <a href="indicadores-fundamentalistas.html">Leia também: Indicadores fundamentalistas →</a>
+  </div>
+
+</article>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="motion.js" defer></script>
+<script src="../nav.js"></script>
+</body>
+</html>

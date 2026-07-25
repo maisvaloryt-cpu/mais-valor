@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="../favicon.png">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>DCF na prática: fluxo de caixa descontado passo a passo | Mais Valor</title>
+<meta name="description" content="Como montar um fluxo de caixa descontado do zero: FCL a partir da DRE, projeção de 5 anos, taxa de desconto, perpetuidade e sensibilidade, com exemplo numérico completo em reais.">
+<link rel="canonical" href="https://canalmaisvalor.com.br/artigos/dcf-na-pratica.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Mais Valor">
+<meta property="og:title" content="DCF na prática: fluxo de caixa descontado passo a passo">
+<meta property="og:description" content="Como montar um fluxo de caixa descontado do zero: FCL a partir da DRE, projeção de 5 anos, taxa de desconto, perpetuidade e sensibilidade, com exemplo numérico completo em reais.">
+<meta property="og:url" content="https://canalmaisvalor.com.br/artigos/dcf-na-pratica.html">
+<meta property="og:image" content="https://canalmaisvalor.com.br/logo.png">
+<meta name="twitter:card" content="summary">
+<script>window.NAV_BASE_PATH="../";</script>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../mobile.css">
+<link rel="stylesheet" href="artigos.css">
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<div class="page-hero fade-in">
+  <h1>DCF NA <em>PRÁTICA</em></h1>
+  <p>Como montar um fluxo de caixa descontado do zero, com um exemplo numérico completo em reais.</p>
+</div>
+
+<div class="container">
+<!-- IMAGEM: descomentar quando a foto estiver na pasta
+<div class="art-hero-img-wrap">
+  <img src="../imagens/Artigos/otimizadas/dcf-na-pratica-01.webp" alt="DCF NA PRÁTICA" class="art-hero-img" loading="lazy" width="1000" height="450">
+</div>
+-->
+<article class="art fade-in-1">
+
+  <div class="art-meta">
+    <span class="art-tag nivel-3">Avançado</span>
+    <span class="art-tag tempo">11 min de leitura</span>
+  </div>
+
+  <p>Todo mundo já ouviu que uma empresa vale o caixa que ela vai gerar no futuro, trazido a valor presente. Bonito na teoria. O problema começa quando você abre uma planilha em branco e não sabe qual número colocar na primeira célula. <strong>Este artigo monta um DCF inteiro, do balanço até o preço por ação</strong>, com uma empresa fictícia brasileira, e mostra no final por que o mesmo modelo pode "provar" R$ 9,50 ou R$ 16,00 dependendo de quem está digitando. Se você ainda não viu a visão geral dos métodos, comece pelo artigo <a href="valuation-como-estimar.html">o que é valuation</a> e volte aqui.</p>
+
+  <figure class="art-fig">
+    <svg viewBox="0 0 640 200" role="img" aria-label="Composição do valor da empresa: fluxos projetados de 5 anos e perpetuidade">
+      <text x="20" y="20" fill="#A8A6A0" font-size="10.5" font-weight="600">Valor presente de cada parcela (R$ milhões)</text>
+      <rect x="20" y="34" width="66" height="18" rx="4" fill="rgba(245,166,35,0.28)" class="mv-bar-h"/>
+      <text x="94" y="47" fill="#A8A6A0" font-size="10" font-weight="600">Ano 1: 482</text>
+      <rect x="20" y="58" width="63" height="18" rx="4" fill="rgba(245,166,35,0.28)" class="mv-bar-h"/>
+      <text x="94" y="71" fill="#A8A6A0" font-size="10" font-weight="600">Ano 2: 461</text>
+      <rect x="20" y="82" width="60" height="18" rx="4" fill="rgba(245,166,35,0.28)" class="mv-bar-h"/>
+      <text x="94" y="95" fill="#A8A6A0" font-size="10" font-weight="600">Ano 3: 436</text>
+      <rect x="20" y="106" width="56" height="18" rx="4" fill="rgba(245,166,35,0.28)" class="mv-bar-h"/>
+      <text x="94" y="119" fill="#A8A6A0" font-size="10" font-weight="600">Ano 4: 409</text>
+      <rect x="20" y="130" width="52" height="18" rx="4" fill="rgba(245,166,35,0.28)" class="mv-bar-h"/>
+      <text x="94" y="143" fill="#A8A6A0" font-size="10" font-weight="600">Ano 5: 380</text>
+      <rect x="20" y="158" width="500" height="22" rx="4" fill="rgba(245,166,35,0.55)" class="mv-bar-h"/>
+      <text x="30" y="173" fill="#14120F" font-size="11" font-weight="800">Perpetuidade: 4.933</text>
+      <text x="532" y="174" fill="#F5A623" font-size="11" font-weight="800">69,5%</text>
+      <text x="20" y="196" fill="#7C7A75" font-size="9.5" font-weight="500">Total do valor da firma: R$ 7.100 milhões. Quase 7 de cada 10 reais vêm do que acontece depois do ano 5.</text>
+    </svg>
+    <figcaption>A parte que você projeta com carinho é a menor. A perpetuidade domina o resultado, e é justamente a mais frágil.</figcaption>
+  </figure>
+
+  <h2>Passo 1: chegar no <em>fluxo de caixa livre</em></h2>
+  <p>Pense numa padaria. O lucro contábil dela é uma opinião do contador sobre o ano. O caixa livre é outra coisa: é o dinheiro que sobra na gaveta depois de pagar farinha, funcionários, imposto, trocar o forno que queimou e bancar o estoque maior porque as vendas cresceram. <strong>É esse dinheiro da gaveta que o dono pode tirar sem quebrar o negócio, e é ele que o DCF desconta.</strong></p>
+  <p>A ponte entre a DRE e o caixa livre da firma (FCFF, o caixa que pertence a todos os financiadores, sócios e credores) tem quatro ajustes:</p>
+  <ol>
+    <li><strong>Comece no EBIT</strong>, o lucro operacional, antes de juros e de imposto de renda. Ele mede o negócio, não a estrutura de dívida.</li>
+    <li><strong>Tire o imposto sobre o EBIT.</strong> No Brasil, IRPJ mais CSLL somam 34% no lucro real. O resultado se chama NOPAT: EBIT × (1 − 0,34).</li>
+    <li><strong>Some de volta depreciação e amortização.</strong> São despesas que passaram pela DRE mas não saíram do caixa. Estão na DFC ou na nota explicativa.</li>
+    <li><strong>Tire o CAPEX e a variação do capital de giro.</strong> CAPEX é a máquina nova, o galpão, o sistema. Capital de giro é o dinheiro que fica preso em estoque e em contas a receber quando a empresa cresce. Crescer consome caixa, e muita gente esquece disso.</li>
+  </ol>
+  <div class="art-box">
+    <p><strong>A fórmula em uma linha:</strong> FCL = EBIT × (1 − 34%) + Depreciação e amortização − CAPEX − Variação do capital de giro.</p>
+    <p>Se o número der negativo em uma empresa que cresce rápido, não é necessariamente um problema. Significa que ela está investindo mais do que gera. A pergunta que importa é se esse investimento volta em forma de lucro depois, e isso você responde olhando o <a href="roic-e-wacc.html">ROIC contra o custo de capital</a>.</p>
+  </div>
+
+  <h2>A empresa do exemplo: <em>Brasil Alimentos</em></h2>
+  <p>Vamos trabalhar com a Brasil Alimentos S.A., uma fabricante fictícia de alimentos embalados listada na B3, ticker imaginário BRAL3. Os números do último exercício:</p>
+  <ul>
+    <li>Receita líquida: R$ 6.200 milhões</li>
+    <li>EBIT: R$ 806 milhões (margem operacional de 13,0%)</li>
+    <li>NOPAT: 806 × 0,66 = R$ 532 milhões</li>
+    <li>Depreciação e amortização: R$ 260 milhões</li>
+    <li>CAPEX: R$ 245 milhões</li>
+    <li>Aumento do capital de giro: R$ 47 milhões</li>
+    <li><strong>Fluxo de caixa livre do ano base: 532 + 260 − 245 − 47 = R$ 500 milhões</strong></li>
+    <li>Dívida líquida (dívida bruta menos caixa): R$ 1.100 milhões</li>
+    <li>Ações em circulação: 500 milhões</li>
+  </ul>
+  <p>Repare que o FCL de R$ 500 milhões não caiu do céu: ele é a soma de cinco linhas que você encontra no release trimestral e nas demonstrações do formulário de referência. Nenhuma delas é secreta. O trabalho é de garimpo, não de mágica.</p>
+
+  <h2>Passo 2: projetar <em>cinco anos</em></h2>
+  <p>Aqui entra a parte que separa o modelo honesto do modelo de vendedor. Você precisa de duas premissas por ano: quanto o negócio cresce e qual margem ele consegue sustentar. A regra prática é que <strong>o crescimento deve convergir para algo próximo do nominal da economia ao longo do horizonte</strong>. Nenhuma empresa cresce 15% ao ano para sempre. Se crescesse, ela viraria maior que o PIB brasileiro em algumas décadas, o que é aritmeticamente impossível.</p>
+  <p>Para a Brasil Alimentos, assumimos um crescimento que desacelera de 8% para 4% ao longo dos cinco anos, e margem operacional estável em 13%. É uma empresa de alimentos, categoria madura, sem grande alavancagem operacional à vista. A desaceleração não é pessimismo, é o reconhecimento de que concorrente entra, o mercado satura e a base de comparação fica grande.</p>
+
+  <table class="art-table">
+    <thead>
+      <tr><th>Ano</th><th class="r">Crescimento</th><th class="r">FCL projetado</th><th class="r">Fator de desconto (12%)</th><th class="r">Valor presente</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Ano 1</td><td class="r">8,0%</td><td class="r">R$ 540,0 mi</td><td class="r">1,120</td><td class="r">R$ 482,1 mi</td></tr>
+      <tr><td>Ano 2</td><td class="r">7,0%</td><td class="r">R$ 577,8 mi</td><td class="r">1,254</td><td class="r">R$ 460,6 mi</td></tr>
+      <tr><td>Ano 3</td><td class="r">6,0%</td><td class="r">R$ 612,5 mi</td><td class="r">1,405</td><td class="r">R$ 436,0 mi</td></tr>
+      <tr><td>Ano 4</td><td class="r">5,0%</td><td class="r">R$ 643,1 mi</td><td class="r">1,574</td><td class="r">R$ 408,7 mi</td></tr>
+      <tr><td>Ano 5</td><td class="r">4,0%</td><td class="r">R$ 668,8 mi</td><td class="r">1,762</td><td class="r">R$ 379,5 mi</td></tr>
+      <tr><td><strong>Soma dos 5 anos</strong></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"><strong>R$ 2.166,9 mi</strong></td></tr>
+    </tbody>
+  </table>
+  <p>O fator de desconto é simplesmente (1 + taxa) elevado ao número do ano. No ano 3, 1,12³ = 1,405, então R$ 612,5 milhões daqui a três anos equivalem a R$ 436,0 milhões hoje. Quanto mais longe o dinheiro, mais ele encolhe. No ano 5 já perdeu 43% do valor de face.</p>
+
+  <h2>Passo 3: a <em>taxa de desconto</em></h2>
+  <p>A analogia mais honesta: a taxa de desconto é o aluguel do dinheiro mais o preço do susto. Se você pode comprar um <a href="tesouro-direto.html">título público</a> e receber uma taxa livre de risco sem trabalho nenhum, qualquer empresa precisa oferecer mais que isso, e o "mais" é proporcional à incerteza do negócio.</p>
+  <p>Como o fluxo que projetamos pertence a sócios e credores juntos, a taxa correta é o <strong>WACC</strong>, o custo médio ponderado de capital: a média do que os acionistas exigem e do que os bancos e debenturistas cobram, cada um com seu peso na estrutura de capital. Para a Brasil Alimentos usamos 12% ao ano em termos nominais.</p>
+  <div class="art-box">
+    <p><strong>Coerência é obrigatória.</strong> Se o WACC está em termos nominais (com inflação embutida), o fluxo projetado também precisa estar. Misturar fluxo real com taxa nominal é o erro mais comum de quem está começando, e ele destrói o modelo silenciosamente, sem dar nenhum aviso na planilha.</p>
+    <p>O detalhamento de como se chega a esse número, custo da dívida, custo do equity, peso de cada um, está no artigo <a href="roic-e-wacc.html">ROIC e WACC</a>.</p>
+  </div>
+
+  <h2>Passo 4: a <em>perpetuidade</em>, o elefante da sala</h2>
+  <p>A empresa não fecha as portas no ano 6. Alguém precisa colocar um valor em tudo que vem depois. A convenção é a fórmula de Gordon aplicada ao último fluxo projetado:</p>
+  <p><strong>Valor terminal = FCL do ano 5 × (1 + g) ÷ (WACC − g)</strong>, onde g é o crescimento perpétuo.</p>
+  <p>Com g de 4% ao ano: 668,8 × 1,04 ÷ (0,12 − 0,04) = 695,6 ÷ 0,08 = <strong>R$ 8.694,5 milhões</strong>. Mas esse é um valor lá no ano 5, então ainda precisa ser trazido para hoje: 8.694,5 ÷ 1,762 = <strong>R$ 4.933,4 milhões</strong>.</p>
+  <p>Agora olhe o que aconteceu. Os cinco anos que você projetou linha por linha, com carinho, valem R$ 2.167 milhões. A perpetuidade, que saiu de uma fórmula com dois números, vale R$ 4.933 milhões. <strong>São 69,5% do valor total da empresa concentrados na premissa mais preguiçosa do modelo.</strong> Isso não é um defeito do seu DCF, é o comportamento normal de qualquer DCF. Empresas de crescimento chegam a ter 85% do valor na perpetuidade.</p>
+  <p>O denominador (WACC − g) é uma bomba-relógio. Com WACC 12% e g 4%, ele vale 0,08. Se você subir g para 6%, ele vira 0,06, e o valor terminal salta 33% de uma vez. Se g chegar perto do WACC, o denominador tende a zero e o valor tende ao infinito, o que é a forma matemática de dizer que a premissa perdeu o contato com a realidade. Por isso <strong>g nunca deve superar o crescimento nominal de longo prazo da economia</strong>, algo entre 4% e 6% no Brasil considerando meta de inflação mais crescimento real.</p>
+
+  <h2>Passo 5: somar, ajustar a dívida e <em>dividir pelas ações</em></h2>
+  <ol>
+    <li>Valor da firma (enterprise value) = 2.166,9 + 4.933,4 = <strong>R$ 7.100,4 milhões</strong></li>
+    <li>Menos a dívida líquida de R$ 1.100 milhões, porque o credor recebe antes do sócio</li>
+    <li>Valor do patrimônio dos acionistas (equity value) = <strong>R$ 6.000,4 milhões</strong></li>
+    <li>Dividido por 500 milhões de ações = <strong>R$ 12,00 por ação</strong></li>
+  </ol>
+  <p>Esse é o valor intrínseco estimado da BRAL3 sob as premissas adotadas. Se a ação estiver sendo negociada a R$ 8,00, o modelo aponta desconto. Se estiver a R$ 15,00, aponta prêmio. Guarde a expressão "sob as premissas adotadas", porque ela é metade do trabalho.</p>
+
+  <h2>Passo 6: <em>sensibilidade</em>, ou a hora da verdade</h2>
+  <p>Um valuation que entrega um número único é propaganda. Um valuation que entrega uma faixa é análise. A matriz abaixo recalcula o preço por ação variando a taxa de desconto em um ponto percentual para cada lado e o crescimento perpétuo também em um ponto.</p>
+
+  <table class="art-table">
+    <thead>
+      <tr><th>Preço por ação</th><th class="r">g = 3%</th><th class="r">g = 4%</th><th class="r">g = 5%</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>WACC 11%</strong></td><td class="r">R$ 12,47</td><td class="r">R$ 14,04</td><td class="r">R$ 16,14</td></tr>
+      <tr><td><strong>WACC 12%</strong></td><td class="r">R$ 10,82</td><td class="r"><strong>R$ 12,00</strong></td><td class="r">R$ 13,52</td></tr>
+      <tr><td><strong>WACC 13%</strong></td><td class="r">R$ 9,50</td><td class="r">R$ 10,41</td><td class="r">R$ 11,55</td></tr>
+    </tbody>
+  </table>
+
+  <figure class="art-fig">
+    <svg viewBox="0 0 640 170" role="img" aria-label="Faixa de preço por ação conforme premissas de taxa de desconto e crescimento perpétuo">
+      <line x1="60" y1="140" x2="620" y2="140" stroke="#7C7A75" stroke-width="1"/>
+      <text x="60" y="158" fill="#7C7A75" font-size="9.5" font-weight="500">R$ 9</text>
+      <text x="300" y="158" fill="#7C7A75" font-size="9.5" font-weight="500">R$ 12,50</text>
+      <text x="575" y="158" fill="#7C7A75" font-size="9.5" font-weight="500">R$ 17</text>
+      <text x="20" y="22" fill="#A8A6A0" font-size="10.5" font-weight="600">Amplitude do resultado com variações de apenas 1 ponto nas premissas</text>
+      <rect x="60" y="42" width="560" height="26" rx="6" fill="rgba(245,166,35,0.05)" stroke="rgba(245,166,35,0.28)"/>
+      <rect x="93" y="42" width="465" height="26" rx="6" fill="rgba(245,166,35,0.22)"/>
+      <text x="326" y="59" fill="#F5A623" font-size="11" font-weight="800" text-anchor="middle">R$ 9,50 até R$ 16,14</text>
+      <circle cx="326" cy="55" r="4.5" fill="#F5A623" class="mv-dot"/>
+      <text x="60" y="92" fill="#E8503A" font-size="10.5" font-weight="700">O pior cenário vale 41% menos que o melhor.</text>
+      <text x="60" y="110" fill="#A8A6A0" font-size="10" font-weight="500">Cenário central de R$ 12,00 marcado no meio da faixa.</text>
+      <text x="60" y="128" fill="#1FC96E" font-size="10" font-weight="600">Compra com margem de segurança de 30%: até R$ 8,40.</text>
+    </svg>
+    <figcaption>O DCF não produz um preço, produz um intervalo. Quem esconde o intervalo está vendendo alguma coisa.</figcaption>
+  </figure>
+
+  <p>Leia a matriz com atenção. Mexendo um único ponto percentual em cada premissa, o valor justo vai de R$ 9,50 a R$ 16,14. <strong>É uma variação de 70% entre o extremo pessimista e o otimista, e nenhuma das nove células é absurda.</strong> Qualquer uma delas defende uma tese com cara de rigor. É exatamente por isso que analista de banco e investidor de bar conseguem, com o mesmo modelo, justificar recomendações opostas sobre a mesma ação.</p>
+
+  <h2>Seja honesto: o DCF é <em>fácil de manipular</em></h2>
+  <p>Vale dizer isso sem rodeios, porque poucos dizem. <strong>O DCF é o método mais rigoroso na aparência e o mais dócil na prática.</strong> Ele tem tantos parâmetros que quem quer chegar num número específico consegue, e ainda por cima com aspecto de ciência. Os truques mais comuns:</p>
+  <ul>
+    <li><strong>Esticar o horizonte.</strong> Projetar dez anos em vez de cinco empurra a perpetuidade para longe e permite crescimento alto por mais tempo sem parecer agressivo.</li>
+    <li><strong>Subir g em meio ponto.</strong> Ninguém questiona 4,5% em vez de 4,0%, e o valor terminal sobe 7% de graça.</li>
+    <li><strong>Baixar o WACC.</strong> Trocar o prêmio de risco de mercado de 6% para 5% derruba a taxa e infla tudo, com uma justificativa acadêmica pronta para cada escolha.</li>
+    <li><strong>Ignorar o capital de giro.</strong> Projetar crescimento de 8% sem aumentar estoque e recebíveis cria caixa que não existe.</li>
+    <li><strong>Usar margem de pico como margem normal.</strong> Se o ano base foi excepcional, toda a projeção nasce inflada.</li>
+  </ul>
+  <p>O antídoto não é abandonar o DCF, é inverter a pergunta. Em vez de perguntar "quanto vale?", pergunte <strong>"o que precisa ser verdade para o preço de hoje fazer sentido?"</strong>. Se a ação está a R$ 15,00 e o seu modelo só chega lá com WACC de 11% e crescimento perpétuo de 5%, você agora sabe exatamente qual aposta o mercado está fazendo, e pode julgar se ela é plausível. Isso é chamado de DCF reverso e vale muito mais que o modelo normal.</p>
+
+  <h2>Margem de <em>segurança</em></h2>
+  <p>Como toda estimativa está errada em algum grau, a última etapa é embutir espaço para o erro. A ideia de Graham é simples: se você calcula que a ponte aguenta 10 toneladas, atravesse com um caminhão de 7. <strong>Compre apenas quando o preço estiver bem abaixo do valor estimado</strong>, tipicamente 30% ou mais.</p>
+  <p>No caso da Brasil Alimentos, com valor central de R$ 12,00, a compra com 30% de margem só acontece a R$ 8,40 ou menos. Repare que R$ 8,40 está abaixo até do pior cenário da matriz (R$ 9,50). É esse o ponto: <strong>a margem de segurança não é desconto sobre o seu cenário favorito, é proteção contra o cenário que você não modelou.</strong> A crise setorial, o processo tributário, o concorrente com capital novo, o gestor que decide fazer uma aquisição ruim.</p>
+  <p>A lógica se conecta direto com os métodos mais diretos de <a href="graham-e-bazin.html">Graham e Bazin</a>, que chegam a um preço-teto por caminhos bem mais curtos, e com a leitura de múltiplos que você encontra em <a href="indicadores-fundamentalistas.html">indicadores fundamentalistas</a>. O melhor uso do tempo é rodar o DCF, comparar com o múltiplo dos pares e com o preço-teto, e desconfiar quando os três discordarem muito.</p>
+
+  <h2>Checklist para não se enganar</h2>
+  <ol>
+    <li>O FCL do ano base é representativo ou foi um ano fora da curva? Olhe a média de três a cinco anos.</li>
+    <li>O crescimento projetado desacelera até algo defensável? Se termina acima de 6%, tem algo errado.</li>
+    <li>O capital de giro cresce junto com a receita na sua projeção?</li>
+    <li>Quanto por cento do valor está na perpetuidade? Acima de 80% pede cautela redobrada.</li>
+    <li>Você rodou a matriz de sensibilidade antes de olhar a cotação, ou depois?</li>
+    <li>O preço de compra que você definiu tem 30% de folga sobre o cenário central?</li>
+  </ol>
+  <p>O último item da lista é o mais importante e o mais ignorado. <strong>O valor do DCF não está no número final, está na disciplina de precisar explicitar cada premissa.</strong> Quando você é obrigado a escrever "acredito que essa empresa cresce 8% no ano que vem e mantém margem de 13%", fica muito mais difícil comprar por impulso.</p>
+
+  <div class="art-cta">
+    <a href="roic-e-wacc.html">Ler: ROIC e WACC na prática</a>
+    <a class="sec" href="../analise.html">Gerar análise de uma empresa</a>
+  </div>
+
+  <div class="art-aviso"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M12 9v4M12 17h.01" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M12 9v4M12 17h.01" stroke="#F5A623" stroke-width="1.5"/><path d="M10.24 3.96 2.46 17.14a2 2 0 0 0 1.75 2.98h15.58a2 2 0 0 0 1.75-2.98L13.76 3.96a2 2 0 0 0-3.52 0z" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M10.24 3.96 2.46 17.14a2 2 0 0 0 1.75 2.98h15.58a2 2 0 0 0 1.75-2.98L13.76 3.96a2 2 0 0 0-3.52 0z" stroke="#F5A623" stroke-width="1.5"/></svg> Este artigo tem caráter educativo e não é recomendação de investimento. A Brasil Alimentos S.A. é uma empresa fictícia criada apenas para o exemplo. Regras e taxas podem mudar, confirme as condições vigentes antes de investir. Rentabilidade passada não garante resultados futuros.</div>
+
+  <div class="art-nav">
+    <a href="index.html">← Todos os artigos</a>
+    <a href="valuation-como-estimar.html">Leia também: O que é valuation →</a>
+  </div>
+
+</article>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="motion.js" defer></script>
+<script src="../nav.js"></script>
+</body>
+</html>
