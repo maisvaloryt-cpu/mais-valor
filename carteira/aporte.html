@@ -274,8 +274,12 @@ function apRenderTabela(){
   const maxAp=Math.max(linhas.length?linhas[0].ap:0,...reservas.map(r=>r.v),1);
   const totalDist=linhas.reduce((s,x)=>s+x.ap,0)+reservas.reduce((s,r)=>s+r.v,0)+sobra;
   const animBars=!apTabelaShown; apTabelaShown=true; // anima as barras só na 1ª vez que a tabela aparece
+  // Guarda os dados exatos exibidos em cada linha, pra o popup de confirmação usar
+  // os mesmos números que a pessoa está vendo na tela (sem recalcular de novo).
+  window._apLinhaByTicker={};
+  linhas.forEach(({a,ap,qtd})=>{window._apLinhaByTicker[a.ticker]={a,ap,qtd,frac:FRAC.has(a.classe)};});
   el.innerHTML=`<div class="tbl-wrap"><table class="tbl">
-    <thead><tr><th>Ativo</th><th>Classe</th><th class="r">Nota</th><th class="r">% alvo</th><th class="r">Preço atual</th><th class="r">Qtd</th><th class="r">Aporte sugerido</th><th class="r">% do aporte</th></tr></thead>
+    <thead><tr><th>Ativo</th><th>Classe</th><th class="r">Nota</th><th class="r">% alvo</th><th class="r">Preço atual</th><th class="r">Qtd</th><th class="r">Aporte sugerido</th><th class="r">% do aporte</th><th></th></tr></thead>
     <tbody>
       ${linhas.map(({a,ap,alvo,qtd},bi)=>{const frac=FRAC.has(a.classe);return `<tr>
         <td><strong title="${a.ticker}">${typeof rotuloAtivo==='function'?rotuloAtivo(a):a.ticker}</strong></td>
@@ -288,20 +292,96 @@ function apRenderTabela(){
           <span style="flex:1;max-width:110px;height:6px;border-radius:3px;background:rgba(128,128,128,0.15);overflow:hidden"><span class="${animBars?'ap-bar-anim':''}" style="display:block;height:100%;width:${(ap/maxAp*100).toFixed(0)}%;background:#1D9E75;${animBars?`animation-delay:${bi*30}ms;`:''}"></span></span>
           <strong style="color:#1D9E75">${fmtR(ap)}</strong></div></td>
         <td class="r">${(ap/aporteAtual*100).toFixed(1)}%</td>
+        <td class="r"><button class="btn btn-sm" title="Confirmar que comprei ${a.ticker}" onclick="apAbrirConfirmacao('${a.ticker}')" style="padding:3px 8px"><i class="ti ti-plus" aria-hidden="true"></i></button></td>
       </tr>`;}).join('')}
       ${reservas.map(({cl,v})=>`<tr style="background:rgba(255,204,0,0.05)">
         <td colspan="6"><span style="display:inline-flex;align-items:center;gap:6px"><i class="ti ti-plus" aria-hidden="true" style="color:#FFCC00"></i><span>Adicione <strong>${CLASS_LABEL[cl]||cl}</strong> na sua carteira para alcançar a meta</span></span></td>
         <td class="r"><strong style="color:#FFCC00">${fmtR(v)}</strong></td>
         <td class="r">${(v/aporteAtual*100).toFixed(1)}%</td>
+        <td></td>
       </tr>`).join('')}
       ${sobra>0.005?`<tr style="opacity:.7">
         <td colspan="6"><span style="display:inline-flex;align-items:center;gap:6px"><i class="ti ti-coin" aria-hidden="true"></i><span>Troco que não fechou uma cota (classes já no alvo)</span></span></td>
         <td class="r"><strong>${fmtR(sobra)}</strong></td>
         <td class="r">${(sobra/aporteAtual*100).toFixed(1)}%</td>
+        <td></td>
       </tr>`:''}
     </tbody>
-    <tfoot><tr><td colspan="6" style="text-align:right;font-weight:600">Total</td><td class="r"><strong>${fmtR(totalDist)}</strong></td><td class="r">100%</td></tr></tfoot>
+    <tfoot><tr><td colspan="6" style="text-align:right;font-weight:600">Total</td><td class="r"><strong>${fmtR(totalDist)}</strong></td><td class="r">100%</td><td></td></tr></tfoot>
   </table></div>`;
+}
+
+/* ---- Popup: confirmar que a sugestão foi seguida (vira lançamento marcado "Sugestão") ---- */
+function apAbrirConfirmacao(ticker){
+  const info=window._apLinhaByTicker&&window._apLinhaByTicker[ticker];
+  if(!info){toast('Não encontrei essa sugestão — a tabela pode ter mudado. Tente de novo.');return;}
+  const {a,ap,qtd,frac}=info;
+  const hoje=new Date().toISOString().slice(0,10);
+  document.getElementById('modal-confirma-aporte')?.remove();
+  const el=document.createElement('div');
+  el.id='modal-confirma-aporte';
+  el.className='modal-bg';
+  el.style.zIndex='1100';
+  el.onclick=function(e){ if(e.target===el)_apFecharConfirmacao(); };
+  el.innerHTML=`
+<div class="modal" style="width:min(380px,94vw)">
+  <h2 style="display:flex;align-items:center;gap:8px">
+    ${typeof logoAtivo==='function'?logoAtivo(a,28):''}
+    <span>Confirmar compra</span>
+  </h2>
+  <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:14px;line-height:1.5">
+    Confira quantidade e preço de <strong>${a.ticker}</strong> antes de confirmar. Isso cria um lançamento de compra
+    marcado como <strong>Sugestão</strong> — quando você importar o extrato da B3, o sistema ajusta sozinho pra bater com o valor real.
+  </div>
+  <div class="modal-grid">
+    ${frac?`
+    <div class="form-group"><label>Valor investido (R$)</label><input id="ca-valor" type="number" step="0.01" min="0" value="${(ap||0).toFixed(2)}"></div>
+    `:`
+    <div class="form-group"><label>Quantidade (cotas)</label><input id="ca-qtd" type="number" step="1" min="0" value="${qtd||0}"></div>
+    <div class="form-group"><label>Preço por cota (R$)</label><input id="ca-preco" type="number" step="0.01" min="0" value="${(a.cotacao||0).toFixed(2)}"></div>
+    `}
+    <div class="form-group"><label>Data da compra</label><input id="ca-data" type="date" value="${hoje}"></div>
+  </div>
+  <div class="modal-actions" style="margin-top:1rem">
+    <button class="btn" onclick="_apFecharConfirmacao()">Cancelar</button>
+    <button class="btn btn-primary" onclick="_apSalvarConfirmacao('${ticker}')"><i class="ti ti-check"></i> Confirmar compra</button>
+  </div>
+</div>`;
+  document.body.appendChild(el);
+  el.style.display='flex';
+  setTimeout(()=>{const f=document.getElementById('ca-qtd')||document.getElementById('ca-valor');if(f)f.focus();},100);
+}
+function _apFecharConfirmacao(){ document.getElementById('modal-confirma-aporte')?.remove(); }
+function _apSalvarConfirmacao(ticker){
+  const info=window._apLinhaByTicker&&window._apLinhaByTicker[ticker];
+  if(!info)return;
+  const {a,frac}=info;
+  const data=document.getElementById('ca-data')?.value||new Date().toISOString().slice(0,10);
+  let qtd,pm,valorConfirmado;
+  if(frac){
+    valorConfirmado=parseFloat(document.getElementById('ca-valor')?.value)||0;
+    qtd=1; pm=valorConfirmado;
+  }else{
+    qtd=parseFloat(document.getElementById('ca-qtd')?.value)||0;
+    pm=parseFloat(document.getElementById('ca-preco')?.value)||0;
+    valorConfirmado=qtd*pm;
+  }
+  if(qtd<=0||pm<=0){toast('Preencha quantidade e preço maiores que zero.');return;}
+  const obj={
+    ticker:a.ticker, classe:a.classe, tipo:'Compra',
+    qtd, pm, cotacao:pm, dy:0,
+    data, nota:a.nota||0, ideal:0, moeda:'BRL', comprar:'Não',
+    nome:a.nome||'', rfSubtipo:a.rfSubtipo||'',
+    origemSugestao:true
+  };
+  ativos.push(obj);
+  saveAtivos();
+  // Abate do valor que ainda falta aportar, pra não sugerir de novo o que você já confirmou.
+  aporteAtual=Math.max(0,aporteAtual-valorConfirmado);
+  const inp=document.getElementById('ap-input'); if(inp)inp.value=aporteAtual>0?aporteAtual.toFixed(2):'';
+  _apFecharConfirmacao();
+  toast('Aporte confirmado! Lançamento adicionado (marcado como Sugestão até você importar o extrato da B3).');
+  apBuildColorMap(); apRenderCharts(); apRenderTabela(); apRenderResumo(); apRenderRebal(); apRenderHistorico();
 }
 
 /* ---- Rebalanceamento por classe: o que comprar/reduzir para chegar na meta ---- */

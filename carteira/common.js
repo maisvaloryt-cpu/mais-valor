@@ -63,6 +63,19 @@ function parseNumBR(v){
 // Classes tratadas como Renda Fixa (valor corrigido por taxa, não por cotação de mercado)
 const RF_CLASSES=new Set(['RF','TD']);
 
+/* ---- Casamento aproximado de datas/valores (usado para achar, no extrato da B3,
+   o lançamento "de sugestão" que corresponde a uma compra já confirmada manualmente) ---- */
+function _diasEntreDatas(d1,d2){
+  if(!d1||!d2)return 9999;
+  const t1=new Date(d1+'T00:00:00'), t2=new Date(d2+'T00:00:00');
+  if(isNaN(t1)||isNaN(t2))return 9999;
+  return Math.abs(t1-t2)/86400000;
+}
+function _valoresProximos(v1,v2,tolPct){
+  if(v1<=0||v2<=0)return v1===v2;
+  return Math.abs(v1-v2)/Math.max(v1,v2)<=tolPct;
+}
+
 // Migra dados antigos para a nova taxonomia (idempotente): Tesouro que estava em "Renda Fixa" vira "Tesouro Direto".
 function migrarClasses(){
   if(!Array.isArray(ativos))return;
@@ -1469,6 +1482,26 @@ function processB3Rows(rows){
         nome:nome||'',rfSubtipo:rfSubtipo||''
       };
       if(tx.evento)obj.evento=tx.evento; // Desdobro/Bonificação (informativo)
+
+      // [Sugestão de aporte] Se existe um lançamento provisório criado pelo "+" da tela
+      // "Onde aportar" (marcado com origemSugestao), e ele bate com esta linha do extrato
+      // (mesmo ticker/tipo, mesma quantidade, data a até 4 dias de diferença e valor total
+      // a até 10% de diferença — a ferramenta pode ter usado um preço um pouco desatualizado),
+      // SUBSTITUI os dados aproximados pelos dados reais da B3 em vez de criar um lançamento novo.
+      const matchSug=ativos.find(x=>x.origemSugestao&&x.ticker===obj.ticker&&x.tipo===obj.tipo&&
+        Math.abs(parseFloat(x.qtd)-parseFloat(obj.qtd))<0.0001&&
+        _diasEntreDatas(x.data,obj.data)<=4&&
+        _valoresProximos(parseFloat(x.qtd)*parseFloat(x.pm),parseFloat(obj.qtd)*parseFloat(obj.pm),0.10));
+      if(matchSug){
+        matchSug.pm=obj.pm; matchSug.cotacao=obj.pm; matchSug.data=obj.data;
+        if(obj.nome)matchSug.nome=obj.nome;
+        if(obj.rfSubtipo)matchSug.rfSubtipo=obj.rfSubtipo;
+        delete matchSug.origemSugestao;
+        matchSug.confirmadoPelaB3=true;
+        importados++;
+        continue;
+      }
+
       // RF: se já existe esse título nessa data, atualiza valor/nome em vez de duplicar
       //     (corrige CDBs antigos que entraram zerados ou sem o nome do banco).
       if(isRF){

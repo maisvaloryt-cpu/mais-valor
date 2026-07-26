@@ -128,7 +128,7 @@ function renderLancamentos(){
   document.getElementById('tbody-lanc').innerHTML=filtered.length?filtered.map(a=>`
     <tr>
       <td>${a.data?a.data.split('-').reverse().join('/'):'-'}</td>
-      <td><strong title="${a.ticker}">${typeof rotuloAtivo==='function'?rotuloAtivo(a):a.ticker}</strong></td>
+      <td><strong title="${a.ticker}">${typeof rotuloAtivo==='function'?rotuloAtivo(a):a.ticker}</strong>${a.origemSugestao?` <span class="badge" style="background:rgba(224,184,74,.15);color:#e0b84a;border:1px solid rgba(224,184,74,.4)" title="Criado ao confirmar a sugestão de aporte. Quando você importar o extrato da B3, este lançamento é atualizado automaticamente com os valores reais.">Sugestão</span>`:''}</td>
       <td><span class="badge ${CLASS_BADGE[a.classe]||''}">${CLASS_LABEL[a.classe]||a.classe}</span></td>
       <td>${a.tipo||'Compra'}</td>
       <td class="r">${a.qtd.toLocaleString('pt-BR')}</td>
