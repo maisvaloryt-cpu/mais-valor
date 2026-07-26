@@ -218,41 +218,45 @@ def _dedup_data_igual(lista):
 
 
 def _limpar_estimativas_superadas(lista):
-    """[2026-07-26] O Fundamentus mostra, ANTES de um pagamento ser confirmado,
-    uma previsao do valor que vai sendo revisada dia a dia (cada revisao chega
-    com um 'pag' levemente diferente da anterior, entao o _dedup_data_igual acima
-    -- que so funde MESMA data -- nao pega essas). Quando o pagamento e enfim
-    confirmado, ele vem com 'tipo' preenchido (DIVIDENDO/JCP/RENDIMENTO/etc) e
-    normalmente 'com' tambem; as previsoes antigas (tipo='' e com='') NUNCA sao
-    apagadas sozinhas, e ficam acumulando pra sempre (isso inflava o calendario
-    de proventos, o DY e o div12m.json -- ex: MXRF11 mostrando 7 pagamentos em
-    Vez de 1 so em Junho/2026).
+    """[2026-07-26, revisado] O Fundamentus mostra, ANTES de um pagamento ser
+    confirmado, uma previsao do valor que vai sendo revisada dia a dia (cada
+    revisao chega com um 'pag' levemente diferente da anterior -- e pode ser
+    MESES antes do pagamento real para tickers que pagam com pouca frequencia,
+    tipo BBSE3 -- entao o _dedup_data_igual acima, que so funde MESMA data ou
+    o agrupamento por MES, nao pega essas). Quando o pagamento e enfim
+    confirmado, ele vem com 'tipo' preenchido (DIVIDENDO/JCP/RENDIMENTO/etc);
+    as previsoes antigas (tipo='' e com='') NUNCA sao apagadas sozinhas, e
+    ficam acumulando pra sempre (isso inflava o calendario de proventos, o DY
+    e o div12m.json -- ex: MXRF11 mostrando 7 pagamentos em vez de 1 so em
+    Junho/2026, BBSE3 mostrando 10 registros em vez de 4 reais).
 
-    Regra: agrupa por mes de pagamento. Se existir ao menos 1 registro com
-    'tipo' preenchido (confirmado) naquele mes, descarta os SEM tipo daquele
-    mesmo mes (sao a previsao superada). NUNCA descarta um registro com tipo
-    -- isso preserva pagamentos reais multiplos no mesmo mes (ex: Dividendo +
-    JCP juntos, ou 2 parcelas de JCP). Se nenhum registro do mes tem tipo
-    (pagamento futuro/anunciado, ainda sem confirmacao), mantem so o mais
-    recente como melhor estimativa disponivel."""
-    por_mes = {}
-    ordem = []
-    for d in lista:
-        pag = d.get("pag") or d.get("com") or ""
-        ym = pag[:7] if len(pag) >= 7 else pag
-        if ym not in por_mes:
-            por_mes[ym] = []
-            ordem.append(ym)
-        por_mes[ym].append(d)
-    out = []
-    for ym in ordem:
-        grupo = por_mes[ym]
-        tipados = [d for d in grupo if str(d.get("tipo") or "").strip()]
-        sem_tipo = [d for d in grupo if not str(d.get("tipo") or "").strip()]
-        if tipados:
-            out.extend(tipados)
-        elif sem_tipo:
-            out.append(max(sem_tipo, key=lambda d: (d.get("pag") or "")))
+    Regra (ticker inteiro, nao so o mes): um registro sem 'tipo' e a previsao
+    de um pagamento que ainda sera confirmado. Se ja existe QUALQUER registro
+    com tipo confirmado, com data de pagamento POSTERIOR a essa previsao, ela
+    foi superada -> descarta. NUNCA descarta um registro COM tipo -- isso
+    preserva pagamentos reais multiplos (ex: Dividendo + JCP juntos, ou 2
+    parcelas de JCP). A previsao mais recente que ainda NAO foi superada por
+    nenhum confirmado (ou seja, o proximo pagamento anunciado, ainda sem
+    confirmacao) e sempre preservada -- ela alimenta a tela de "Proximos
+    Pagamentos" do site (gerar_dividendos.py / dividendos.html), que precisa
+    dela; so nao pode duplicar quando o pagamento real chegar, e e isso que
+    esta regra garante.
+
+    Trava de seguranca: se o ticker NUNCA tem 'tipo' preenchido em nenhum
+    registro da sua historia toda (a fonte simplesmente nao traz esse campo
+    pra alguns tickers, ex: TAEE11 -- 107 pagamentos reais, nenhum com tipo),
+    nao mexe em nada. Sem 'tipo' nao ha como distinguir com seguranca
+    estimativa de pagamento real, e o risco de apagar pagamentos reais e
+    grande demais."""
+    tipados = [d for d in lista if str(d.get("tipo") or "").strip()]
+    if not tipados:
+        return lista
+    sem_tipo = [d for d in lista if not str(d.get("tipo") or "").strip()]
+    ultima_confirmada = max((d.get("pag") or "") for d in tipados)
+    sobras = [d for d in sem_tipo if (d.get("pag") or "") > ultima_confirmada]
+    out = list(tipados)
+    if sobras:
+        out.append(max(sobras, key=lambda d: (d.get("pag") or "")))
     out.sort(key=lambda d: (d.get("pag") or d.get("com") or ""))
     return out
 

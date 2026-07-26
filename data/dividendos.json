@@ -1,7 +1,7 @@
 {
-  "updated_at": "26/07/2026 03:14",
-  "total": 478,
-  "total_registros": 57329,
+  "updated_at": "26/07/2026 03:29",
+  "total": 445,
+  "total_registros": 49401,
   "total_ativos": 1094,
   "dividendos": [
     {
@@ -662,15 +662,6 @@
       "dy": "48.56%"
     },
     {
-      "t": "ABCB4",
-      "n": "Banco ABC Brasil SA Conv Pfd",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-29",
-      "val": 1.168,
-      "dy": "59.01%"
-    },
-    {
       "t": "BCIA11",
       "n": "Bradesco Carteira Imobiliatia Ative- Fundo de Fundos de Investimento Imobiliario- FII Cotas",
       "tipo": "Rendimento",
@@ -707,24 +698,6 @@
       "dy": "4.51%"
     },
     {
-      "t": "QUAL3",
-      "n": "Qualicorp Consultoria e Corretora de Seguros S.A.",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-29",
-      "val": 0.009,
-      "dy": "7.77%"
-    },
-    {
-      "t": "RBFY11",
-      "n": "Rio Bravo For You Fundo De Investimento ImobiliaRio De Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "",
-      "pag": "2026-06-29",
-      "val": 0.07,
-      "dy": "1.17%"
-    },
-    {
       "t": "ADSH11",
       "n": "Ad Shopping Fundo de Investimento Imobiliario Responsabilidade Limitada",
       "tipo": "Rendimento",
@@ -743,15 +716,6 @@
       "dy": "7.81%"
     },
     {
-      "t": "AFLT3",
-      "n": "Afluente Transmissao De Energia Eletrica SA",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.1535,
-      "dy": "23.73%"
-    },
-    {
       "t": "ALUP11",
       "n": "Alupar Investimento SA Unit Cons of 1 Sh + 2 Pfd Shs",
       "tipo": "Rendimento",
@@ -761,15 +725,6 @@
       "dy": "7.68%"
     },
     {
-      "t": "B3SA3",
-      "n": "B3 SA - Brasil, Bolsa, Balcao",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.2212,
-      "dy": "17.19%"
-    },
-    {
       "t": "BBGO11",
       "n": "BB Fundo de Investimento de Credito Fiagro Imobiliario",
       "tipo": "Rendimento",
@@ -777,15 +732,6 @@
       "pag": "2026-06-30",
       "val": 0.85,
       "dy": "15.51%"
-    },
-    {
-      "t": "BLAU3",
-      "n": "Blau Farmaceutica SA",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.0758,
-      "dy": "10.32%"
     },
     {
       "t": "BMGB4",
@@ -840,15 +786,6 @@
       "pag": "2026-06-30",
       "val": 0.145,
       "dy": "18.93%"
-    },
-    {
-      "t": "CEEB3",
-      "n": "Companhia de Electricidade do Estado da Bahia - COELBA",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.4965,
-      "dy": "12.73%"
     },
     {
       "t": "CLSC3",
@@ -1013,24 +950,6 @@
       "dy": "7.05%"
     },
     {
-      "t": "CSUD3",
-      "n": "CSU Digital SA",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.1717,
-      "dy": "14.42%"
-    },
-    {
-      "t": "CURY3",
-      "n": "Cury Construtora e Incorporadora SA",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.5194,
-      "dy": "21.24%"
-    },
-    {
       "t": "DCRA11",
       "n": "Devant Fundo de Investimento nas Cadeias Produtivas Agroindustriais Fiagro Imobiliario",
       "tipo": "Rendimento",
@@ -1058,33 +977,6 @@
       "dy": "18.13%"
     },
     {
-      "t": "EKTR4",
-      "n": "Elektro Redes S.A. Pfd Shs",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.1384,
-      "dy": "4.17%"
-    },
-    {
-      "t": "EMBJ3",
-      "n": "Embraer S.A.",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.281,
-      "dy": "4.09%"
-    },
-    {
-      "t": "FMOF11",
-      "n": "Fundo De Investimento Imobiliario Memorial Office",
-      "tipo": "Rendimento",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 1.55,
-      "dy": "53.05%"
-    },
-    {
       "t": "GCRA11",
       "n": "Galapagos Recebiveis do Agronegocio - Fiagro-Imobiliario",
       "tipo": "Rendimento",
@@ -1110,15 +1002,6 @@
       "pag": "2026-06-30",
       "val": 0.42,
       "dy": "12.03%"
-    },
-    {
-      "t": "HYPE3",
-      "n": "Hypera S.A.",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.263,
-      "dy": "15.60%"
     },
     {
       "t": "IAAG11",
@@ -1166,24 +1049,6 @@
       "dy": "6.41%"
     },
     {
-      "t": "ITSA3",
-      "n": "Itausa SA",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.138,
-      "dy": "12.13%"
-    },
-    {
-      "t": "ITSA4",
-      "n": "Itausa SA Non-Cum Perp Pfd Registered Shs",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.138,
-      "dy": "12.31%"
-    },
-    {
       "t": "JGPX11",
       "n": "Fundo de Investimento nas Cadeias Produtivas Agroindustriais JGP Credito Fiagro Imobiliario",
       "tipo": "Rendimento",
@@ -1211,24 +1076,6 @@
       "dy": "61.84%"
     },
     {
-      "t": "KLBN3",
-      "n": "Klabin SA",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.1806,
-      "dy": "61.39%"
-    },
-    {
-      "t": "KLBN4",
-      "n": "Klabin SA Non-Cum Perp Pfd Registered Shs",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.1806,
-      "dy": "61.91%"
-    },
-    {
       "t": "KNCA11",
       "n": "Kinea Credito Agro Fiagro Imobiliario",
       "tipo": "Rendimento",
@@ -1254,15 +1101,6 @@
       "pag": "2026-06-30",
       "val": 0.3642,
       "dy": "16.92%"
-    },
-    {
-      "t": "LREN3",
-      "n": "Lojas Renner S.A.",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.2293,
-      "dy": "20.74%"
     },
     {
       "t": "LSAG11",
@@ -1391,15 +1229,6 @@
       "dy": "21.77%"
     },
     {
-      "t": "PINE4",
-      "n": "Banco PINE S.A. Pfd",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.2229,
-      "dy": "20.44%"
-    },
-    {
       "t": "PLCA11",
       "n": "Patria Credito Agro Fundo de Investimento nas Cadeias Produtivas do Agronegocio Fiagro Responsabilidade Limitada",
       "tipo": "Rendimento",
@@ -1407,42 +1236,6 @@
       "pag": "2026-06-30",
       "val": 1.05,
       "dy": "17.15%"
-    },
-    {
-      "t": "PLRI11",
-      "n": "Polo FII - FII Recebiveis Imobiliarios I Cotas",
-      "tipo": "Rendimento",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.2515,
-      "dy": "41.92%"
-    },
-    {
-      "t": "PNVL3",
-      "n": "Dimed S.A. Distribuidora de Medicamentos",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.1206,
-      "dy": "12.57%"
-    },
-    {
-      "t": "PSSA3",
-      "n": "Porto Seguro S.A.",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.5128,
-      "dy": "11.23%"
-    },
-    {
-      "t": "RADL3",
-      "n": "Raia Drogasil S.A.",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.086,
-      "dy": "5.74%"
     },
     {
       "t": "RANI3",
@@ -1454,15 +1247,6 @@
       "dy": "3.39%"
     },
     {
-      "t": "RENT3",
-      "n": "Localiza Rent A Car SA",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.5351,
-      "dy": "17.41%"
-    },
-    {
       "t": "RIAA3",
       "n": "RIACHUELO",
       "tipo": "JRS CAP PROPRIO",
@@ -1470,24 +1254,6 @@
       "pag": "2026-06-30",
       "val": 0.0996,
       "dy": "15.58%"
-    },
-    {
-      "t": "ROMI3",
-      "n": "Romi SA",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.06,
-      "dy": "12.33%"
-    },
-    {
-      "t": "RSPD11",
-      "n": "RB Capital Desenvolvimento Residencial III Fundo de Investimento Imobiliario - FII",
-      "tipo": "Rendimento",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 53.6873,
-      "dy": "92.04%"
     },
     {
       "t": "RURA11",
@@ -1535,15 +1301,6 @@
       "dy": "24.90%"
     },
     {
-      "t": "SAUD3",
-      "n": "Bradsaude SA",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.2435,
-      "dy": "19.98%"
-    },
-    {
       "t": "SCPF11",
       "n": "SCP Fundo de Investimento Imobiliario Cotas",
       "tipo": "Rendimento",
@@ -1551,15 +1308,6 @@
       "pag": "2026-06-30",
       "val": 0.018,
       "dy": "6.97%"
-    },
-    {
-      "t": "SHUL4",
-      "n": "Schulz S.A.Non-Cum Perp Pfd Registered Shs",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.0773,
-      "dy": "20.58%"
     },
     {
       "t": "SNAG11",
@@ -1587,33 +1335,6 @@
       "pag": "2026-06-30",
       "val": 0.559,
       "dy": "16.65%"
-    },
-    {
-      "t": "TAEE3",
-      "n": "Transmissora Alianca De Energia Eletrica S.A.",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.1863,
-      "dy": "16.75%"
-    },
-    {
-      "t": "TAEE4",
-      "n": "Transmissora Alianca De Energia Eletrica S.A. Pfd",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.1863,
-      "dy": "16.36%"
-    },
-    {
-      "t": "TFCO4",
-      "n": "Track & Field Co SA Pfd Registered Shs",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.0852,
-      "dy": "7.35%"
     },
     {
       "t": "TIMS3",
@@ -1688,15 +1409,6 @@
       "dy": "142.78%"
     },
     {
-      "t": "VIVT3",
-      "n": "Telefonica Brasil S.A.",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.072,
-      "dy": "2.43%"
-    },
-    {
       "t": "VLID3",
       "n": "Valid Solucoes SA",
       "tipo": "JRS CAP PROPRIO",
@@ -1722,15 +1434,6 @@
       "pag": "2026-06-30",
       "val": 1.07,
       "dy": "15.47%"
-    },
-    {
-      "t": "WEGE3",
-      "n": "WEG SA",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.1044,
-      "dy": "2.72%"
     },
     {
       "t": "WHRL3",
