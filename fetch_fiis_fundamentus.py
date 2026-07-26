@@ -72,19 +72,28 @@ def fetch_fiis():
             if not ticker[-2:].isdigit():
                 continue
 
+            # Colunas reais do fundamentus.com.br/fii_resultado.php (confirmado em 26/07/2026):
+            # 0 Papel | 1 Segmento | 2 Cotação | 3 FFO Yield | 4 Dividend Yield | 5 P/VP |
+            # 6 Valor de Mercado | 7 Liquidez | 8 Qtd de imóveis | 9 Preço do m2 |
+            # 10 Aluguel por m2 | 11 Cap Rate | 12 Vacância Média | 13 Endereço
+            # [BUG CORRIGIDO 26/07/2026] Faltava a coluna "Segmento" (índice 1) no mapeamento,
+            # o que deslocava TODAS as colunas seguintes uma casa pra esquerda (ex: "pvp" guardava
+            # o Dividend Yield real, "vacancia" guardava o Cap Rate real, etc.) e nunca capturava
+            # o segmento nem a vacância verdadeira.
             dados[ticker] = {
                 "ticker": ticker,
-                "preco": parse_num(row[1]) if len(row) > 1 else None,
-                "ffo_yield": parse_num(row[2]) if len(row) > 2 else None,
-                "dy": parse_num(row[3]) if len(row) > 3 else None,
-                "pvp": parse_num(row[4]) if len(row) > 4 else None,
-                "valor_mercado": parse_num(row[5]) if len(row) > 5 else None,
-                "liq": parse_num(row[6]) if len(row) > 6 else None,
-                "qtd_imoveis": parse_num(row[7]) if len(row) > 7 else None,
-                "preco_m2": parse_num(row[8]) if len(row) > 8 else None,
-                "aluguel_m2": parse_num(row[9]) if len(row) > 9 else None,
-                "cap_rate": parse_num(row[10]) if len(row) > 10 else None,
-                "vacancia": parse_num(row[11]) if len(row) > 11 else None,
+                "segmento": row[1].strip() if len(row) > 1 and row[1] else None,
+                "preco": parse_num(row[2]) if len(row) > 2 else None,
+                "ffo_yield": parse_num(row[3]) if len(row) > 3 else None,
+                "dy": parse_num(row[4]) if len(row) > 4 else None,
+                "pvp": parse_num(row[5]) if len(row) > 5 else None,
+                "valor_mercado": parse_num(row[6]) if len(row) > 6 else None,
+                "liq": parse_num(row[7]) if len(row) > 7 else None,
+                "qtd_imoveis": parse_num(row[8]) if len(row) > 8 else None,
+                "preco_m2": parse_num(row[9]) if len(row) > 9 else None,
+                "aluguel_m2": parse_num(row[10]) if len(row) > 10 else None,
+                "cap_rate": parse_num(row[11]) if len(row) > 11 else None,
+                "vacancia": parse_num(row[12]) if len(row) > 12 else None,
             }
 
         print(f"  {len(dados)} FIIs extraídos")
