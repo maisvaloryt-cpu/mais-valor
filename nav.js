@@ -111,7 +111,7 @@ const FERRAMENTA_ICONS = {
 };
 
 // ── Ícone de carteira (aba "Carteira"), mesmo estilo dourado dos ícones acima ──
-const WALLET_ICON = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M17 8V5a1 1 0 0 0-1-1H6a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V6M20 12v4h-4a2 2 0 0 1 0-4h4" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M17 8V5a1 1 0 0 0-1-1H6a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V6M20 12v4h-4a2 2 0 0 1 0-4h4" stroke="#F5A623" stroke-width="1.5"/></svg>`;
+const WALLET_ICON = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M17 8V5a1 1 0 0 0-1-1H6a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V6M20 12v4h-4a2 2 0 0 1 0-4h4" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M17 8V5a1 1 0 0 0-1-1H6a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V6M20 12v4h-4a2 2 0 0 1 0-4h4" stroke="#F5A623" stroke-width="1.5"/></svg>`;
 
 // ── Theme toggle ─────────────────────────────────────────────────
 function getTheme() { return localStorage.getItem('mv_theme') || 'dark'; }
