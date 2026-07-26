@@ -603,9 +603,14 @@ html, body {
      (Home, Ativos, Ferramentas, Watchlist, Carteira) e a barra de busca.
      O logo continua visível; o avatar de login é movido pelo nav.js pra
      dentro da linha "Sua carteira" (ver regra #carteira-switcher #nav-auth-area
-     logo abaixo), em vez de ficar sozinho nesta linha. ────────────────── */
+     logo abaixo), em vez de ficar sozinho nesta linha. Com isso a .nav-bottom-row
+     fica completamente vazia (nada dentro dela), então escondemos ela inteira
+     também, senão sobra um espaço em branco entre a logo e "Sua carteira". ── */
   body.is-consolidador .nav-links,
   body.is-consolidador .nav-bottom-row .nav-search-wrap {
+    display: none !important;
+  }
+  body.is-consolidador .nav-bottom-row {
     display: none !important;
   }
 
