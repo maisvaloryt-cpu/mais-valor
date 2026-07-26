@@ -195,7 +195,7 @@ def _key(d):
     return f"{d.get('com','')}|{d.get('pag','')}|{d.get('value','')}"
 
 
-def _dedup(lista):
+def _dedup_data_igual(lista):
     """[dedup na origem] O mesmo pagamento chega de fontes diferentes com pequenas
     variacoes de arredondamento (0.0845 vs 0.084538) ou com 'com' vazio numa fonte.
     Agrupa por data de pagamento e funde valores que diferem menos de 0,5%
@@ -215,6 +215,53 @@ def _dedup(lista):
                 continue
         out.append(d)
     return out
+
+
+def _limpar_estimativas_superadas(lista):
+    """[2026-07-26] O Fundamentus mostra, ANTES de um pagamento ser confirmado,
+    uma previsao do valor que vai sendo revisada dia a dia (cada revisao chega
+    com um 'pag' levemente diferente da anterior, entao o _dedup_data_igual acima
+    -- que so funde MESMA data -- nao pega essas). Quando o pagamento e enfim
+    confirmado, ele vem com 'tipo' preenchido (DIVIDENDO/JCP/RENDIMENTO/etc) e
+    normalmente 'com' tambem; as previsoes antigas (tipo='' e com='') NUNCA sao
+    apagadas sozinhas, e ficam acumulando pra sempre (isso inflava o calendario
+    de proventos, o DY e o div12m.json -- ex: MXRF11 mostrando 7 pagamentos em
+    Vez de 1 so em Junho/2026).
+
+    Regra: agrupa por mes de pagamento. Se existir ao menos 1 registro com
+    'tipo' preenchido (confirmado) naquele mes, descarta os SEM tipo daquele
+    mesmo mes (sao a previsao superada). NUNCA descarta um registro com tipo
+    -- isso preserva pagamentos reais multiplos no mesmo mes (ex: Dividendo +
+    JCP juntos, ou 2 parcelas de JCP). Se nenhum registro do mes tem tipo
+    (pagamento futuro/anunciado, ainda sem confirmacao), mantem so o mais
+    recente como melhor estimativa disponivel."""
+    por_mes = {}
+    ordem = []
+    for d in lista:
+        pag = d.get("pag") or d.get("com") or ""
+        ym = pag[:7] if len(pag) >= 7 else pag
+        if ym not in por_mes:
+            por_mes[ym] = []
+            ordem.append(ym)
+        por_mes[ym].append(d)
+    out = []
+    for ym in ordem:
+        grupo = por_mes[ym]
+        tipados = [d for d in grupo if str(d.get("tipo") or "").strip()]
+        sem_tipo = [d for d in grupo if not str(d.get("tipo") or "").strip()]
+        if tipados:
+            out.extend(tipados)
+        elif sem_tipo:
+            out.append(max(sem_tipo, key=lambda d: (d.get("pag") or "")))
+    out.sort(key=lambda d: (d.get("pag") or d.get("com") or ""))
+    return out
+
+
+def _dedup(lista):
+    """Limpeza completa: primeiro funde duplicatas de mesma data (fontes
+    diferentes), depois remove previsoes ja superadas por um pagamento
+    confirmado no mesmo mes. Ver _limpar_estimativas_superadas."""
+    return _limpar_estimativas_superadas(_dedup_data_igual(lista))
 
 
 def merge_dividendos(path, ticker, novos):
