@@ -535,36 +535,6 @@ function renderNav() {
     <a href="${NAV_BASE}status.html" class="${statusActive?'active':''}" onclick="toggleMobileMenu()" style="color:var(--up)">● Status</a>
   </div>
 
-  <nav>
-    <div class="nav-top-row">
-      <a class="nav-logo" href="${NAV_BASE}index.html">
-        ${LOGO_SVG('main')}
-      </a>
-      <div id="nav-auth-area"></div>
-      <button id="nav-hamburger" onclick="toggleMobileMenu()" aria-label="Menu"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6l16 0 M4 12l16 0 M4 18l16 0"/></svg></button>
-    </div>
-    <div class="nav-bottom-row">
-      <div class="nav-links">
-        <a href="${NAV_BASE}index.html" class="${homeActive?'active':''}">Home</a>
-        <a href="${NAV_BASE}carteira/index.html" class="${carteiraActive?'active':''}">${WALLET_ICON} Carteira</a>
-        <span id="mv-ativos-btn" style="${dropBtnStyle(ativosActive)}">Ativos ▾</span>
-        <span id="mv-ferramentas-btn" style="${dropBtnStyle(ferramentasActive)}">Ferramentas ▾</span>
-        <a href="${NAV_BASE}artigos/index.html" class="${artigosActive?'active':''}"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M14 3v4a1 1 0 0 0 1 1h4" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M14 3v4a1 1 0 0 0 1 1h4" stroke="#F5A623" stroke-width="1.5"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" stroke="#F5A623" stroke-width="1.5"/><path d="M9 9h1M9 13h6M9 17h6" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M9 9h1M9 13h6M9 17h6" stroke="#F5A623" stroke-width="1.5"/></svg> Artigos</a>
-        <a href="${NAV_BASE}watchlist.html" class="${watchActive?'active':''}">★ Watchlist</a>
-        <a href="${NAV_BASE}status.html" class="${statusActive?'active':''}" style="color:var(--up);font-size:11px">● Status</a>
-      </div>
-      <div class="nav-search-wrap">
-        <span class="nav-search-icon">⌕</span>
-        <input class="nav-search" type="text" placeholder="Buscar ativo... " id="nav-search-input"
-          oninput="navSearchLive(this.value)" onkeydown="if(event.key==='Enter')navSearchGo(this.value)"
-          onfocus="document.querySelector('.nav-search-shortcut').style.display='none'"
-          onblur="document.querySelector('.nav-search-shortcut').style.display=''">
-        <span class="nav-search-shortcut">/</span>
-        <div id="nav-search-results"></div>
-      </div>
-    </div>
-  </nav>
-
   ${document.documentElement.dataset.indices === 'true' ? `
   <div class="ticker-bar">
     <div class="ticker-track" id="ticker-track">
@@ -603,7 +573,37 @@ function renderNav() {
       <div class="idx-val" id="idx-eth">—</div>
       <div class="idx-chg" id="idx-eth-chg">—</div>
     </div>
-  </div>` : ''}`;
+  </div>` : ''}
+
+  <nav>
+    <div class="nav-top-row">
+      <a class="nav-logo" href="${NAV_BASE}index.html">
+        ${LOGO_SVG('main')}
+      </a>
+      <div id="nav-auth-area"></div>
+      <button id="nav-hamburger" onclick="toggleMobileMenu()" aria-label="Menu"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6l16 0 M4 12l16 0 M4 18l16 0"/></svg></button>
+    </div>
+    <div class="nav-bottom-row">
+      <div class="nav-links">
+        <a href="${NAV_BASE}index.html" class="${homeActive?'active':''}">Home</a>
+        <a href="${NAV_BASE}carteira/index.html" class="${carteiraActive?'active':''}">${WALLET_ICON} Carteira</a>
+        <span id="mv-ativos-btn" style="${dropBtnStyle(ativosActive)}">Ativos ▾</span>
+        <span id="mv-ferramentas-btn" style="${dropBtnStyle(ferramentasActive)}">Ferramentas ▾</span>
+        <a href="${NAV_BASE}artigos/index.html" class="${artigosActive?'active':''}"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M14 3v4a1 1 0 0 0 1 1h4" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M14 3v4a1 1 0 0 0 1 1h4" stroke="#F5A623" stroke-width="1.5"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" stroke="#F5A623" stroke-width="1.5"/><path d="M9 9h1M9 13h6M9 17h6" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M9 9h1M9 13h6M9 17h6" stroke="#F5A623" stroke-width="1.5"/></svg> Artigos</a>
+        <a href="${NAV_BASE}watchlist.html" class="${watchActive?'active':''}">★ Watchlist</a>
+        <a href="${NAV_BASE}status.html" class="${statusActive?'active':''}" style="color:var(--up);font-size:11px">● Status</a>
+      </div>
+      <div class="nav-search-wrap">
+        <span class="nav-search-icon">⌕</span>
+        <input class="nav-search" type="text" placeholder="Buscar ativo... " id="nav-search-input"
+          oninput="navSearchLive(this.value)" onkeydown="if(event.key==='Enter')navSearchGo(this.value)"
+          onfocus="document.querySelector('.nav-search-shortcut').style.display='none'"
+          onblur="document.querySelector('.nav-search-shortcut').style.display=''">
+        <span class="nav-search-shortcut">/</span>
+        <div id="nav-search-results"></div>
+      </div>
+    </div>
+  </nav>`;
 
   applyTheme(getTheme());
 
