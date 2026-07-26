@@ -8,7 +8,6 @@
 <link rel="icon" type="image/png" href="../favicon.png">
 <link rel="stylesheet" href="../style.css">
 <link rel="stylesheet" href="../mobile.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
 <script>window.NAV_BASE_PATH = "../"; window.NAV_SLIM = true;</script>
 </head>
 <body>
@@ -17,7 +16,7 @@
 
 <div class="app">
   <div class="header">
-    <h1><i class="ti ti-chart-pie" aria-hidden="true" style="color:var(--blue)"></i>Carteira</h1>
+    <h1><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-6.8a2 2 0 0 1 -2 -2v-7a.9 .9 0 0 0 -1 -.8 M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a1 1 0 0 1 -1 -1v-4.5"/><path stroke-width="1.5" d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-6.8a2 2 0 0 1 -2 -2v-7a.9 .9 0 0 0 -1 -.8 M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a1 1 0 0 1 -1 -1v-4.5"/></svg> Carteira</h1>
     <div class="header-actions" id="header-actions"></div>
   </div>
 
@@ -27,7 +26,7 @@
     <p class="tab-hint">Defina seus objetivos de patrimônio e a alocação ideal por classe, e acompanhe o progresso até alcançá-los.</p>
     <div class="metrics" id="metas-resumo"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
-      <div class="section-title" style="margin:0"><i class="ti ti-target" aria-hidden="true"></i>Meus objetivos</div>
+      <div class="section-title" style="margin:0"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M7 12a5 5 0 1 0 10 0a5 5 0 1 0 -10 0 M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path stroke-width="1.5" d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M7 12a5 5 0 1 0 10 0a5 5 0 1 0 -10 0 M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/></svg>Meus objetivos</div>
       <button class="btn btn-sm btn-primary" onclick="objToggleForm()">+ Novo objetivo</button>
     </div>
     <div id="obj-form" style="display:none"></div>
@@ -177,9 +176,9 @@ function renderResumoObjetivos(){
   });
   const media=somaPct/arr.length;
   el.innerHTML=`
-    <div class="mcard"><div class="mcard-label"><i class="ti ti-flag" aria-hidden="true"></i> Objetivos</div><div class="mcard-value">${arr.length}</div><div class="mcard-sub">${concl} concluído(s)</div></div>
-    <div class="mcard"><div class="mcard-label"><i class="ti ti-progress" aria-hidden="true"></i> Progresso médio</div><div class="mcard-value">${fmt(media)}%</div><div class="progress-bar" style="margin-top:8px"><div class="progress-fill" style="width:${media}%;background:#2E86C1"></div></div></div>
-    <div class="mcard"><div class="mcard-label"><i class="ti ti-target-arrow" aria-hidden="true"></i> Mais perto de concluir</div><div class="mcard-value" style="font-size:15px">${maisPerto?objTitulo(maisPerto.o):'Tudo concluído! 🎉'}</div><div class="mcard-sub">${maisPerto?fmt(maisPerto.pct)+'% atingido':'Parabéns!'}</div></div>
+    <div class="mcard"><div class="mcard-label"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M5 5a5 5 0 0 1 7 0a5 5 0 0 0 7 0v9a5 5 0 0 1 -7 0a5 5 0 0 0 -7 0v-9 M5 21v-7"/><path stroke-width="1.5" d="M5 5a5 5 0 0 1 7 0a5 5 0 0 0 7 0v9a5 5 0 0 1 -7 0a5 5 0 0 0 -7 0v-9 M5 21v-7"/></svg> Objetivos</div><div class="mcard-value">${arr.length}</div><div class="mcard-sub">${concl} concluído(s)</div></div>
+    <div class="mcard"><div class="mcard-label"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M10 20.777a8.942 8.942 0 0 1 -2.48 -.969 M14 3.223a9.003 9.003 0 0 1 0 17.554 M4.579 17.093a8.961 8.961 0 0 1 -1.227 -2.592 M3.124 10.5c.16 -.95 .468 -1.85 .9 -2.675l.169 -.305 M6.907 4.579a8.954 8.954 0 0 1 3.093 -1.356"/><path stroke-width="1.5" d="M10 20.777a8.942 8.942 0 0 1 -2.48 -.969 M14 3.223a9.003 9.003 0 0 1 0 17.554 M4.579 17.093a8.961 8.961 0 0 1 -1.227 -2.592 M3.124 10.5c.16 -.95 .468 -1.85 .9 -2.675l.169 -.305 M6.907 4.579a8.954 8.954 0 0 1 3.093 -1.356"/></svg> Progresso médio</div><div class="mcard-value">${fmt(media)}%</div><div class="progress-bar" style="margin-top:8px"><div class="progress-fill" style="width:${media}%;background:#2E86C1"></div></div></div>
+    <div class="mcard"><div class="mcard-label"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M12 7a5 5 0 1 0 5 5 M13 3.055a9 9 0 1 0 7.941 7.945 M15 6v3h3l3 -3h-3v-3l-3 3 M15 9l-3 3"/><path stroke-width="1.5" d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M12 7a5 5 0 1 0 5 5 M13 3.055a9 9 0 1 0 7.941 7.945 M15 6v3h3l3 -3h-3v-3l-3 3 M15 9l-3 3"/></svg> Mais perto de concluir</div><div class="mcard-value" style="font-size:15px">${maisPerto?objTitulo(maisPerto.o):'Tudo concluído! 🎉'}</div><div class="mcard-sub">${maisPerto?fmt(maisPerto.pct)+'% atingido':'Parabéns!'}</div></div>
   `;
 }
 

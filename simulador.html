@@ -893,7 +893,7 @@ input[type="text"].mini:focus { border-color: var(--sim-accent); }
 
       <!-- 6b. Impostos (opcional, não bloqueia a cascata) -->
       <div class="param-group etapa" id="etapaImpostos" style="display:none">
-        <div class="param-group-label" title="Estimativa simplificada de imposto de renda. Na reserva-CDI (tratada como fundo DI) aplica o come-cotas: 15% sobre o rendimento do semestre, em maio e novembro. Também aplica 15% sobre o ganho em vendas do rebalanceamento ativo (20% para FIIs). Não considera a isenção de R$ 20 mil/mês na venda de ações, a tabela regressiva nas vendas nem custos de corretagem." style="cursor:help">Impostos (estimativa)</div>
+        <div class="param-group-label" title="Estimativa simplificada de imposto de renda. Na reserva-CDI (tratada como fundo DI de longo prazo) aplica o come-cotas: 15% sobre o rendimento do semestre, em maio e novembro, a alíquota mínima da tabela regressiva (22,5% a 15%, conforme o prazo). Na vida real, um resgate feito antes de 2 anos pode ter um ajuste adicional nessa tabela na hora de sacar; a simulação sempre usa os 15% fixos, por simplicidade. Também aplica 15% sobre o ganho em vendas do rebalanceamento ativo (20% para FIIs). Não considera a isenção de R$ 20 mil/mês na venda de ações nem custos de corretagem." style="cursor:help">Impostos (estimativa)</div>
         <div class="divmode-row" style="margin-bottom:0">
           <div class="divmode-btn divmode-ir active" id="irNaoBtn" onclick="selectIR(false,this)" title="Simula o retorno bruto, sem descontar impostos.">
             <div class="divmode-btn-title">Sem IR</div>

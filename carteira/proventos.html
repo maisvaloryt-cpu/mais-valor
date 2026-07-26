@@ -8,7 +8,6 @@
 <link rel="icon" type="image/png" href="../favicon.png">
 <link rel="stylesheet" href="../style.css">
 <link rel="stylesheet" href="../mobile.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
 <script>window.NAV_BASE_PATH = "../"; window.NAV_SLIM = true;</script>
 </head>
 <body>
@@ -17,7 +16,7 @@
 
 <div class="app">
   <div class="header">
-    <h1><i class="ti ti-chart-pie" aria-hidden="true" style="color:var(--blue)"></i>Carteira</h1>
+    <h1><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-6.8a2 2 0 0 1 -2 -2v-7a.9 .9 0 0 0 -1 -.8 M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a1 1 0 0 1 -1 -1v-4.5"/><path stroke-width="1.5" d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-6.8a2 2 0 0 1 -2 -2v-7a.9 .9 0 0 0 -1 -.8 M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a1 1 0 0 1 -1 -1v-4.5"/></svg> Carteira</h1>
     <div class="header-actions" id="header-actions"></div>
   </div>
 
@@ -37,12 +36,12 @@
       </div>
     </div>
     <div class="card" style="margin-bottom:1.25rem">
-      <div class="card-title"><i class="ti ti-calendar-month" aria-hidden="true" style="color:#1D9E75"></i>Calendário de Proventos</div>
+      <div class="card-title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#1D9E75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12 M16 3v4 M8 3v4 M4 11h16 M8 14v4 M12 14v4 M16 14v4"/><path stroke-width="1.5" d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12 M16 3v4 M8 3v4 M4 11h16 M8 14v4 M12 14v4 M16 14v4"/></svg>Calendário de Proventos</div>
       <div id="prov-calendario" style="overflow-x:auto"></div>
     </div>
 
     <div class="card" style="margin-bottom:1.25rem">
-      <div class="card-title"><i class="ti ti-snowman" aria-hidden="true" style="color:#2E86C1"></i>Bola de Neve — Renda Passiva Projetada</div>
+      <div class="card-title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#2E86C1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M12 3a4 4 0 0 1 2.906 6.75a6 6 0 1 1 -5.81 0a4 4 0 0 1 2.904 -6.75 M17.5 11.5l2.5 -1.5 M6.5 11.5l-2.5 -1.5 M12 13h.01 M12 16h.01"/><path stroke-width="1.5" d="M12 3a4 4 0 0 1 2.906 6.75a6 6 0 1 1 -5.81 0a4 4 0 0 1 2.904 -6.75 M17.5 11.5l2.5 -1.5 M6.5 11.5l-2.5 -1.5 M12 13h.01 M12 16h.01"/></svg>Bola de Neve — Renda Passiva Projetada</div>
       <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:12px">
         <div><div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:3px">Aporte por mês (R$)</div>
           <input id="bn-aporte" type="number" min="0" step="50" value="0" class="cell-edit" style="width:120px;text-align:right" oninput="renderBolaNeve()"></div>
@@ -222,7 +221,7 @@ function abrirDetalheProvento(y,mIdx){
   el.innerHTML=`
 <div class="modal" style="width:min(440px,94vw)">
   <h2 style="display:flex;align-items:center;gap:8px">
-    <i class="ti ti-calendar-month" aria-hidden="true" style="color:#1D9E75"></i>
+    <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#1D9E75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12 M16 3v4 M8 3v4 M4 11h16 M8 14v4 M12 14v4 M16 14v4"/><path stroke-width="1.5" d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12 M16 3v4 M8 3v4 M4 11h16 M8 14v4 M12 14v4 M16 14v4"/></svg>
     <span>${nomes[mIdx]}/${y}</span>
   </h2>
   <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:10px">

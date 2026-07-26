@@ -63,6 +63,19 @@ function parseNumBR(v){
 // Classes tratadas como Renda Fixa (valor corrigido por taxa, não por cotação de mercado)
 const RF_CLASSES=new Set(['RF','TD']);
 
+/* [2.7] "Hoje" no fuso do Brasil, não em UTC. new Date().toISOString() sempre
+   devolve UTC — depois das 21h no horário de Brasília, isso já é o dia seguinte
+   (afeta cutoffs de 12 meses, datas padrão de formulário etc). */
+function hojeLocal(){
+  return new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'});
+}
+/* Soma/subtrai meses a uma data 'YYYY-MM-DD' fazendo aritmética de calendário
+   (via Date.UTC, sem depender do fuso do navegador), devolve 'YYYY-MM-DD'. */
+function somarMesesData(dataStr,meses){
+  const[y,m,d]=dataStr.split('-').map(Number);
+  return new Date(Date.UTC(y,m-1+meses,d)).toISOString().slice(0,10);
+}
+
 /* ---- Casamento aproximado de datas/valores (usado para achar, no extrato da B3,
    o lançamento "de sugestão" que corresponde a uma compra já confirmada manualmente) ---- */
 function _diasEntreDatas(d1,d2){
@@ -249,7 +262,7 @@ function calcEvolucaoPatrimonio(nMeses=24){
     // Data de referência do mês = último dia do mês (limitado a hoje), para corrigir RF e escolher cotação.
     const [yy,mm]=ym.split('-').map(Number);
     const fimMes=new Date(Date.UTC(yy,mm,0)).toISOString().slice(0,10);
-    const hojeStr=new Date().toISOString().slice(0,10);
+    const hojeStr=hojeLocal();
     const ateData=fimMes>hojeStr?hojeStr:fimMes;
     let vt=0,custo=0,usouFallback=false; // [5.9] marca meses avaliados sem preço histórico
     posicoes.forEach(a=>{
@@ -347,14 +360,53 @@ function getQtdTickerAtDate(ticker,dateStr){
   return qtd;
 }
 
+/* [2.8] Timeline pré-computada da qtd líquida de um ticker (uma passada O(n log n),
+   com o MESMO desempate Compra-antes-de-Venda do getQtdTickerAtDate) em vez de
+   refazer o filtro+sort do zero a cada provento — evita o O(n²) quando um ticker
+   tem muitos proventos ao longo de muitos lançamentos. */
+function getQtdTimelineTicker(ticker){
+  const txs=ativos.filter(a=>a.ticker===ticker&&a.data)
+    .slice()
+    .sort((a,b)=>{
+      if(a.data!==b.data)return a.data<b.data?-1:1;
+      const oa=a.tipo==='Venda'?1:0, ob=b.tipo==='Venda'?1:0;
+      return oa-ob;
+    });
+  let qtd=0;
+  const timeline=[];
+  txs.forEach(a=>{
+    const tipo=a.tipo||'Compra';
+    if(tipo==='Venda')qtd=Math.max(0,qtd-a.qtd);
+    else if(tipo==='Compra')qtd+=a.qtd;
+    if(timeline.length&&timeline[timeline.length-1].data===a.data){
+      timeline[timeline.length-1].qtd=qtd; // mesmo dia: fica só o valor final do dia
+    }else{
+      timeline.push({data:a.data,qtd});
+    }
+  });
+  return timeline;
+}
+/* Busca binária na timeline: qtd líquida na data (última transação com data <= dateStr) */
+function qtdNaTimeline(timeline,dateStr){
+  let lo=0,hi=timeline.length-1,res=0;
+  while(lo<=hi){
+    const mid=(lo+hi)>>1;
+    if(timeline[mid].data<=dateStr){res=timeline[mid].qtd;lo=mid+1;}
+    else hi=mid-1;
+  }
+  return res;
+}
+
 function calcProventosAtivo(ticker,dataCompra,_qtd){
   const from=dataCompra||'1900-01-01';
   const cache=DIVIDENDOS_CACHE[ticker]||[];
   if(cache.length>0){
+    // [2.8] timeline pré-computada em vez de getQtdTickerAtDate a cada provento
+    const timeline=getQtdTimelineTicker(ticker);
     // [BUG-P1 FIX] Arredondamento intermediário para evitar acúmulo de erro de ponto flutuante
     return cache
       .filter(d=>d.date>=from)
-      .reduce((s,d)=>s+Math.round(d.value*getQtdTickerAtDate(ticker,d.com||d.date)*100)/100,0);
+      .reduce((s,d)=>s+Math.round(d.value*qtdNaTimeline(timeline,d.com||d.date)*100)/100,0);
   }
   // Fallback: proventos importados via Excel (só usados se site não tiver dados)
   return ativos
@@ -365,14 +417,14 @@ function calcProventosAtivo(ticker,dataCompra,_qtd){
 /* [5.1] Proventos dos últimos 12 meses de UM ticker (qtd na data-com quando houver).
    Base do DY 12m e do Yield on Cost por ativo. */
 function calcProventos12mTicker(ticker){
-  const cutoff=new Date();
-  cutoff.setFullYear(cutoff.getFullYear()-1);
-  const cutoffStr=cutoff.toISOString().slice(0,10);
+  const cutoffStr=somarMesesData(hojeLocal(),-12);
   const cache=DIVIDENDOS_CACHE[ticker]||[];
   if(cache.length>0){
+    // [2.8] timeline pré-computada em vez de getQtdTickerAtDate a cada provento
+    const timeline=getQtdTimelineTicker(ticker);
     return cache
       .filter(d=>d.date>=cutoffStr)
-      .reduce((s,d)=>s+Math.round(d.value*getQtdTickerAtDate(ticker,d.com||d.date)*100)/100,0);
+      .reduce((s,d)=>s+Math.round(d.value*qtdNaTimeline(timeline,d.com||d.date)*100)/100,0);
   }
   // Fallback: proventos importados
   return ativos
@@ -399,10 +451,11 @@ function getDividendosPorMes(){
     const cache=DIVIDENDOS_CACHE[ticker]||[];
     if(cache.length>0){
       // Usa dados do site
+      const timeline=getQtdTimelineTicker(ticker); // [2.8] uma passada por ticker, não uma por provento
       cache.forEach(d=>{
         const ym=d.date.slice(0,7);
         if(!map[ym])return;
-        const qtd=getQtdTickerAtDate(ticker,d.com||d.date);
+        const qtd=qtdNaTimeline(timeline,d.com||d.date);
         if(qtd<=0)return;
         // [BUG-P1 FIX] Arredondamento intermediário
         const val=Math.round(d.value*qtd*100)/100;
@@ -434,9 +487,10 @@ function getDividendosTotalPorMes(){
   tickers.forEach(ticker=>{
     const cache=DIVIDENDOS_CACHE[ticker]||[];
     if(cache.length>0){
+      const timeline=getQtdTimelineTicker(ticker); // [2.8] uma passada por ticker, não uma por provento
       cache.forEach(d=>{
         const ym=d.date.slice(0,7);
-        const qtd=getQtdTickerAtDate(ticker,d.com||d.date);
+        const qtd=qtdNaTimeline(timeline,d.com||d.date);
         if(qtd<=0)return;
         const val=Math.round(d.value*qtd*100)/100;
         map[ym]=(map[ym]||0)+val;
@@ -488,8 +542,9 @@ function calcProventosAno(ticker,ano){
   const from=String(ano)+'-01-01';const to=String(ano)+'-12-31';
   const cache=DIVIDENDOS_CACHE[ticker]||[];
   if(cache.length>0){
+    const timeline=getQtdTimelineTicker(ticker); // [2.8] uma passada por ticker, não uma por provento
     return cache.filter(d=>d.date>=from&&d.date<=to)
-      .reduce((s,d)=>s+Math.round(d.value*getQtdTickerAtDate(ticker,d.com||d.date)*100)/100,0);
+      .reduce((s,d)=>s+Math.round(d.value*qtdNaTimeline(timeline,d.com||d.date)*100)/100,0);
   }
   return ativos.filter(a=>a.ticker===ticker&&a.tipo==='Provento'&&a.data&&a.data>=from&&a.data<=to)
     .reduce((s,a)=>s+Math.round(a.qtd*a.pm*100)/100,0);
@@ -541,7 +596,7 @@ function calcImpostoGanhos(ano){
     if(doAno)ganhoBrutoAno+=d.ganho;
     if(d.ganho<0){prej[d.grupo]+=-d.ganho;return;} // prejuízo acumula p/ compensar
     if(d.grupo==='acoes'&&d.vendas<=20000)return;  // mês isento (ações)
-    if(d.grupo==='cripto'&&d.vendas<35000)return;  // mês isento (cripto)
+    if(d.grupo==='cripto'&&d.vendas<=35000)return;  // [2.5] mês isento (cripto) — até R$ 35 mil, igual ações usa <=20000
     const usado=Math.min(d.ganho,prej[d.grupo]);   // compensa prejuízo anterior
     prej[d.grupo]-=usado;
     const trib=d.ganho-usado;
@@ -582,8 +637,8 @@ function openRowMenu(ev, idx){
   m.id='row-menu';
   m.className='row-menu';
   m.innerHTML=`
-    <button type="button" onclick="closeRowMenu();editAtivoIdx(${idx})"><i class="ti ti-pencil" aria-hidden="true"></i> Editar transação</button>
-    <button type="button" class="danger" onclick="closeRowMenu();removeAtivoIdx(${idx})"><i class="ti ti-trash" aria-hidden="true"></i> Remover transação</button>`;
+    <button type="button" onclick="closeRowMenu();editAtivoIdx(${idx})"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4 M13.5 6.5l4 4"/><path stroke-width="1.5" d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4 M13.5 6.5l4 4"/></svg> Editar transação</button>
+    <button type="button" class="danger" onclick="closeRowMenu();removeAtivoIdx(${idx})"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M4 7l16 0 M10 11l0 6 M14 11l0 6 M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12 M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/><path stroke-width="1.5" d="M4 7l16 0 M10 11l0 6 M14 11l0 6 M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12 M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/></svg> Remover transação</button>`;
   document.body.appendChild(m);
   const r=btn.getBoundingClientRect();
   // alinha o menu pela direita do botão, logo abaixo dele
@@ -607,8 +662,8 @@ function openRowMenuTicker(ev, ticker){
   m.id='row-menu';
   m.className='row-menu';
   m.innerHTML=`
-    <button type="button" onclick="closeRowMenu();location.href='lancamentos.html?ticker='+encodeURIComponent('${t}')"><i class="ti ti-pencil" aria-hidden="true"></i> Editar transações</button>
-    <button type="button" class="danger" onclick="closeRowMenu();removeAtivo('${t}')"><i class="ti ti-trash" aria-hidden="true"></i> Remover ativo</button>`;
+    <button type="button" onclick="closeRowMenu();location.href='lancamentos.html?ticker='+encodeURIComponent('${t}')"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4 M13.5 6.5l4 4"/><path stroke-width="1.5" d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4 M13.5 6.5l4 4"/></svg> Editar transações</button>
+    <button type="button" class="danger" onclick="closeRowMenu();removeAtivo('${t}')"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M4 7l16 0 M10 11l0 6 M14 11l0 6 M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12 M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/><path stroke-width="1.5" d="M4 7l16 0 M10 11l0 6 M14 11l0 6 M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12 M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/></svg> Remover ativo</button>`;
   document.body.appendChild(m);
   const r=btn.getBoundingClientRect();
   m.style.top=(window.scrollY+r.bottom+4)+'px';
@@ -623,7 +678,7 @@ function injectEditModal(){
   w.innerHTML=`
 <div class="modal-bg" id="modal-edit" style="display:none" onclick="if(event.target===this)closeEditModal()">
   <div class="modal" style="width:min(440px,96vw)">
-    <h2><i class="ti ti-pencil" aria-hidden="true" style="margin-right:6px"></i>Editar Lançamento</h2>
+    <h2><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right:6px;vertical-align:-3px"><path stroke-width="5" stroke-opacity=".22" d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4 M13.5 6.5l4 4"/><path stroke-width="1.5" d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4 M13.5 6.5l4 4"/></svg>Editar Lançamento</h2>
     <input type="hidden" id="e-idx">
     <div class="modal-grid">
       <div class="form-group"><label>Ativo</label><input id="e-ticker" type="text" readonly></div>
@@ -635,7 +690,7 @@ function injectEditModal(){
     </div>
     <div class="modal-actions">
       <button class="btn" onclick="closeEditModal()">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarEdicaoAtivo()"><i class="ti ti-check" aria-hidden="true"></i> Salvar</button>
+      <button class="btn btn-primary" onclick="salvarEdicaoAtivo()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M5 12l5 5l10 -10"/><path stroke-width="1.5" d="M5 12l5 5l10 -10"/></svg> Salvar</button>
     </div>
   </div>
 </div>`;
@@ -772,7 +827,7 @@ function _mvEnsureGateEls(){
   const loading=document.createElement('div');
   loading.id='mv-gate-loading';
   loading.style.cssText='display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--color-text-secondary);font-size:14px;gap:8px';
-  loading.innerHTML='<i class="ti ti-loader-2" aria-hidden="true"></i> Carregando...';
+  loading.innerHTML='<svg class="mv-spin" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M12 3a9 9 0 1 0 9 9"/><path stroke-width="1.5" d="M12 3a9 9 0 1 0 9 9"/></svg> Carregando...';
   const login=document.createElement('div');
   login.id='mv-gate-login';
   login.style.cssText='display:none;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:14px;text-align:center;color:var(--color-text-secondary);font-size:14px';
@@ -793,7 +848,7 @@ function _mvEnsureGateEls(){
         <div class="gw-passo"><div class="gw-num">4</div><div class="gw-txt"><b>Explore as abas</b> — Proventos, Rentabilidade, Metas e IRPF mostram cada detalhe da sua jornada.</div></div>
       </div>
       <button class="btn btn-primary gw-btn" onclick="loginGoogle()">
-        <i class="ti ti-brand-google" aria-hidden="true"></i> Entrar com Google
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M20.945 11a9 9 0 1 1 -3.284 -5.997l-2.655 2.392a5.5 5.5 0 1 0 2.119 6.605h-4.125v-3h7.945"/><path stroke-width="1.5" d="M20.945 11a9 9 0 1 1 -3.284 -5.997l-2.655 2.392a5.5 5.5 0 1 0 2.119 6.605h-4.125v-3h7.945"/></svg> Entrar com Google
       </button>
       <div class="gw-priv">Seus dados são privados e visíveis apenas para você. Ferramenta gratuita criada pelo canal Mais Valor.</div>
     </div>`;
@@ -947,7 +1002,7 @@ function diasUteisRF(de,ate){
    Retorna null quando a série não cobre o período → fatorRF cai no fallback antigo. */
 function _fatorRFHistorico(idx,taxa,de,ate){
   if(!BCB_HIST||!_bcbHistKeys||!de)return null;
-  const fim=ate||new Date().toISOString().slice(0,10);
+  const fim=ate||hojeLocal();
   if(fim<=de)return 1;
   const ck=idx+'|'+taxa+'|'+de+'|'+fim;
   if(ck in _fatorRFCache)return _fatorRFCache[ck];
@@ -1273,7 +1328,7 @@ function processImportRows(rows){
       pm:parseFloat(pm)||0,
       cotacao:parseFloat(cotacao)||parseFloat(pm)||0,
       dy:parseFloat(dy)||0,
-      data:dataStr||new Date().toISOString().slice(0,10),
+      data:dataStr||hojeLocal(),
       nota:parseInt(nota)||0,
       ideal:parseFloat(ideal)||0,
       moeda:moeda?String(moeda).trim():'BRL',
@@ -1477,7 +1532,7 @@ function processB3Rows(rows){
         pm:pmFinal,
         cotacao:pmFinal,
         dy:0,
-        data:tx.data||new Date().toISOString().slice(0,10),
+        data:tx.data||hojeLocal(),
         nota:0,ideal:0,moeda:'BRL',comprar:'Não',
         nome:nome||'',rfSubtipo:rfSubtipo||''
       };
@@ -1670,16 +1725,34 @@ function adicionarCarteiraModal(){
 
 /* ---- navegação ---- */
 const NAV_TABS=[
-  {id:'resumo',label:'Resumo',icon:'ti-layout-dashboard',href:'resumo.html'},
-  {id:'aporte',label:'Aporte',icon:'ti-cash',href:'aporte.html'},
-  {id:'proventos',label:'Proventos',icon:'ti-coin',href:'proventos.html'},
-  {id:'patrimonio',label:'Patrimônio',icon:'ti-trending-up',href:'patrimonio.html'},
-  {id:'rentabilidade',label:'Rentabilidade',icon:'ti-percent',href:'rentabilidade.html'},
-  {id:'metas',label:'Metas',icon:'ti-target',href:'metas.html'},
-  {id:'analise',label:'Análise',icon:'ti-microscope',href:'analise.html'},
-  {id:'lancamentos',label:'Lançamentos',icon:'ti-list',href:'lancamentos.html'},
-  {id:'irpf',label:'IRPF',icon:'ti-file-text',href:'irpf.html'},
+  {id:'resumo',label:'Resumo',icon:'layout-dashboard',href:'resumo.html'},
+  {id:'aporte',label:'Aporte',icon:'cash',href:'aporte.html'},
+  {id:'proventos',label:'Proventos',icon:'coin',href:'proventos.html'},
+  {id:'patrimonio',label:'Patrimônio',icon:'trending-up',href:'patrimonio.html'},
+  {id:'rentabilidade',label:'Rentabilidade',icon:'percentage',href:'rentabilidade.html'},
+  {id:'metas',label:'Metas',icon:'target',href:'metas.html'},
+  {id:'analise',label:'Análise',icon:'microscope',href:'analise.html'},
+  {id:'lancamentos',label:'Lançamentos',icon:'list',href:'lancamentos.html'},
+  {id:'irpf',label:'IRPF',icon:'file-text',href:'irpf.html'},
 ];
+/* [7.5] Ícones das abas em SVG inline (paths do Tabler Icons) em vez da webfont —
+   não depende de fonte externa carregando a tempo (ver botoes-icon-only-tabler),
+   e stroke="currentColor" acompanha a cor da aba (cinza normal, dourado ativa). */
+const NAV_TAB_ICON_D={
+  'layout-dashboard':'M5 4h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1 M5 16h4a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1v-2a1 1 0 0 1 1 -1 M15 12h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1 M15 4h4a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1v-2a1 1 0 0 1 1 -1',
+  'cash':'M7 15h-3a1 1 0 0 1 -1 -1v-8a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v3 M7 10a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v8a1 1 0 0 1 -1 1h-12a1 1 0 0 1 -1 -1l0 -8 M12 14a2 2 0 1 0 4 0a2 2 0 0 0 -4 0',
+  'coin':'M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M14.8 9a2 2 0 0 0 -1.8 -1h-2a2 2 0 1 0 0 4h2a2 2 0 1 1 0 4h-2a2 2 0 0 1 -1.8 -1 M12 7v10',
+  'trending-up':'M3 17l6 -6l4 4l8 -8 M14 7l7 0l0 7',
+  'percentage':'M16 17a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M6 7a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M6 18l12 -12',
+  'target':'M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M7 12a5 5 0 1 0 10 0a5 5 0 1 0 -10 0 M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0',
+  'microscope':'M5 21h14 M6 18h2 M7 18v3 M9 11l3 3l6 -6l-3 -3l-6 6 M10.5 12.5l-1.5 1.5 M17 3l3 3 M12 21a6 6 0 0 0 3.715 -10.712',
+  'list':'M9 6l11 0 M9 12l11 0 M9 18l11 0 M5 6l0 .01 M5 12l0 .01 M5 18l0 .01',
+  'file-text':'M14 3v4a1 1 0 0 0 1 1h4 M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2 M9 9l1 0 M9 13l6 0 M9 17l6 0',
+};
+function navTabIconSvg(name){
+  const d=NAV_TAB_ICON_D[name]||'';
+  return `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0"><path d="${d}"/></svg>`;
+}
 
 function renderHeaderAndNav(active){
   const headerActions=document.getElementById('header-actions');
@@ -1694,11 +1767,11 @@ function renderHeaderAndNav(active){
   const tabsEl=document.getElementById('tabs');
   if(tabsEl){
     tabsEl.innerHTML=`<div class="tabs-scroll">`
-      +NAV_TABS.map(t=>`<a class="tab ${t.id===active?'active':''}" href="${t.href}"><i class="ti ${t.icon}" aria-hidden="true"></i> ${t.label}</a>`).join('')
+      +NAV_TABS.map(t=>`<a class="tab ${t.id===active?'active':''}" href="${t.href}">${navTabIconSvg(t.icon)} ${t.label}</a>`).join('')
       +`</div>`
       +`<div class="tabs-actions">
           <input type="file" id="csv-input" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleCSVImport(this)">
-          <button class="btn btn-sm" onclick="openImport()"><i class="ti ti-file-spreadsheet" aria-hidden="true"></i> Importar Excel</button>
+          <button class="btn btn-sm" onclick="openImport()"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M14 3v4a1 1 0 0 0 1 1h4 M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2 M8 11h8v7h-8l0 -7 M8 15h8 M11 11v7"/><path stroke-width="1.5" d="M14 3v4a1 1 0 0 0 1 1h4 M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2 M8 11h8v7h-8l0 -7 M8 15h8 M11 11v7"/></svg> Importar Excel</button>
           <button class="btn btn-sm btn-primary" onclick="openModal()" style="position:relative">+ Transação<span id="rf-badge" title="Há Renda Fixa sem dados" style="display:none;position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#e23b3b;color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center;box-shadow:0 0 0 2px var(--bg2,#16161a)">!</span></button>
         </div>`;
     atualizarBadgeRF();
@@ -1879,7 +1952,7 @@ function openModalRFComplement(pendingList, onDone){
     el.innerHTML=`
 <div class="modal" style="width:min(480px,96vw)">
   <h2 style="display:flex;align-items:center;gap:8px">
-    <i class="ti ti-building-bank" style="color:var(--gold)"></i>
+    <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M3 21l18 0 M3 10l18 0 M5 6l7 -3l7 3 M4 10l0 11 M20 10l0 11 M8 14l0 3 M12 14l0 3 M16 14l0 3"/><path stroke-width="1.5" d="M3 21l18 0 M3 10l18 0 M5 6l7 -3l7 3 M4 10l0 11 M20 10l0 11 M8 14l0 3 M12 14l0 3 M16 14l0 3"/></svg>
     Completar dados — ${titulo}
     <span style="margin-left:auto;font-size:11px;color:var(--color-text-secondary);font-weight:400">${idx+1} de ${pendingList.length}</span>
   </h2>
@@ -1915,7 +1988,7 @@ function openModalRFComplement(pendingList, onDone){
   </div>
   <div class="modal-actions" style="margin-top:1rem">
     <button class="btn" onclick="_rfcSkip()">Pular</button>
-    <button class="btn btn-primary" onclick="_rfcSave()"><i class="ti ti-check"></i> Salvar e continuar</button>
+    <button class="btn btn-primary" onclick="_rfcSave()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M5 12l5 5l10 -10"/><path stroke-width="1.5" d="M5 12l5 5l10 -10"/></svg> Salvar e continuar</button>
   </div>
 </div>`;
     document.body.appendChild(el);
@@ -1963,7 +2036,7 @@ function injectModals(){
   wrap.innerHTML=`
 <div class="modal-bg" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
   <div class="modal">
-    <h2><i class="ti ti-plus" aria-hidden="true" style="margin-right:6px"></i>Adicionar Lançamento</h2>
+    <h2><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right:6px;vertical-align:-3px"><path stroke-width="5" stroke-opacity=".22" d="M12 5l0 14 M5 12l14 0"/><path stroke-width="1.5" d="M12 5l0 14 M5 12l14 0"/></svg>Adicionar Lançamento</h2>
 
     <div id="modal-rf-pend" style="display:none;align-items:center;gap:10px;background:rgba(226,59,59,0.12);border:1px solid rgba(226,59,59,0.4);color:#ff6b6b;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px;line-height:1.4">
       <span id="modal-rf-pend-txt" style="flex:1"></span>
@@ -1971,8 +2044,8 @@ function injectModals(){
     </div>
 
     <div class="seg-toggle">
-      <button type="button" id="seg-Compra" class="seg-btn active" onclick="setTipoTx('Compra')"><i class="ti ti-shopping-cart" aria-hidden="true"></i> Compra</button>
-      <button type="button" id="seg-Venda" class="seg-btn" onclick="setTipoTx('Venda')"><i class="ti ti-cash" aria-hidden="true"></i> Venda</button>
+      <button type="button" id="seg-Compra" class="seg-btn active" onclick="setTipoTx('Compra')"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M4 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M15 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M17 17h-11v-14h-2 M6 5l14 1l-1 7h-13"/><path stroke-width="1.5" d="M4 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M15 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M17 17h-11v-14h-2 M6 5l14 1l-1 7h-13"/></svg> Compra</button>
+      <button type="button" id="seg-Venda" class="seg-btn" onclick="setTipoTx('Venda')"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M7 15h-3a1 1 0 0 1 -1 -1v-8a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v3 M7 10a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v8a1 1 0 0 1 -1 1h-12a1 1 0 0 1 -1 -1l0 -8 M12 14a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/><path stroke-width="1.5" d="M7 15h-3a1 1 0 0 1 -1 -1v-8a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v3 M7 10a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v8a1 1 0 0 1 -1 1h-12a1 1 0 0 1 -1 -1l0 -8 M12 14a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/></svg> Venda</button>
     </div>
     <input type="hidden" id="f-tipo" value="Compra">
 
@@ -2030,13 +2103,13 @@ function injectModals(){
     </div>
     <div class="modal-actions">
       <button class="btn" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-primary" onclick="addAtivo()"><i class="ti ti-check" aria-hidden="true"></i> Adicionar Lançamento</button>
+      <button class="btn btn-primary" onclick="addAtivo()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M5 12l5 5l10 -10"/><path stroke-width="1.5" d="M5 12l5 5l10 -10"/></svg> Adicionar Lançamento</button>
     </div>
   </div>
 </div>
 <div class="modal-bg" id="modal-meta" style="display:none" onclick="if(event.target===this)closeModalMeta()">
   <div class="modal">
-    <h2><i class="ti ti-target" aria-hidden="true" style="margin-right:6px"></i>Nova Meta de Alocação</h2>
+    <h2><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right:6px;vertical-align:-3px"><path stroke-width="5" stroke-opacity=".22" d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M7 12a5 5 0 1 0 10 0a5 5 0 1 0 -10 0 M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path stroke-width="1.5" d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M7 12a5 5 0 1 0 10 0a5 5 0 1 0 -10 0 M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/></svg>Nova Meta de Alocação</h2>
     <div class="modal-grid">
       <div class="form-group"><label>Classe</label>
         <select id="m-classe">
@@ -2052,20 +2125,20 @@ function injectModals(){
     </div>
     <div class="modal-actions">
       <button class="btn" onclick="closeModalMeta()">Cancelar</button>
-      <button class="btn btn-primary" onclick="addMeta()"><i class="ti ti-check" aria-hidden="true"></i> Salvar</button>
+      <button class="btn btn-primary" onclick="addMeta()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M5 12l5 5l10 -10"/><path stroke-width="1.5" d="M5 12l5 5l10 -10"/></svg> Salvar</button>
     </div>
   </div>
 </div>
 <div class="modal-bg" id="modal-carteiras" style="display:none" onclick="if(event.target===this)closeModalCarteiras()">
   <div class="modal">
-    <h2><i class="ti ti-folders" aria-hidden="true" style="margin-right:6px"></i>Gerenciar Carteiras</h2>
+    <h2><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right:6px;vertical-align:-3px"><path stroke-width="5" stroke-opacity=".22" d="M9 3h3l2 2h5a2 2 0 0 1 2 2v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2 M17 16v2a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2h2"/><path stroke-width="1.5" d="M9 3h3l2 2h5a2 2 0 0 1 2 2v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2 M17 16v2a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2h2"/></svg>Gerenciar Carteiras</h2>
     <div id="lista-carteiras"></div>
     <div class="modal-grid" style="margin-top:10px">
       <div class="form-group" style="grid-column:1/-1"><label>Nova Carteira</label><input id="nc-nome" type="text" placeholder="Ex: Carteira da Esposa, Aposentadoria..."></div>
     </div>
     <div class="modal-actions">
       <button class="btn" onclick="closeModalCarteiras()">Fechar</button>
-      <button class="btn btn-primary" onclick="adicionarCarteiraModal()"><i class="ti ti-plus" aria-hidden="true"></i> Adicionar Carteira</button>
+      <button class="btn btn-primary" onclick="adicionarCarteiraModal()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M12 5l0 14 M5 12l14 0"/><path stroke-width="1.5" d="M12 5l0 14 M5 12l14 0"/></svg> Adicionar Carteira</button>
     </div>
   </div>
 </div>`;
@@ -2075,7 +2148,7 @@ function injectModals(){
 function openModal(){
   injectModals();
   document.getElementById('modal').style.display='flex';
-  const hoje=new Date().toISOString().slice(0,10);
+  const hoje=hojeLocal();
   document.getElementById('f-data').value=hoje;
   document.getElementById('rf-data').value=hoje;
   setTipoTx('Compra');
@@ -2158,7 +2231,7 @@ function montarListaVendaRF(){
         <strong>R$ ${fmt(a.vt)}</strong>
       </label>`;
     }).join('')+
-    '<button type="button" class="btn btn-primary btn-sm" style="margin-top:4px" onclick="confirmarSelecaoRF()"><i class="ti ti-check" aria-hidden="true"></i> Confirmar seleção</button>';
+    '<button type="button" class="btn btn-primary btn-sm" style="margin-top:4px" onclick="confirmarSelecaoRF()"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M5 12l5 5l10 -10"/><path stroke-width="1.5" d="M5 12l5 5l10 -10"/></svg> Confirmar seleção</button>';
 }
 
 /* Depois de escolher o título, abre o formulário de valor + IR já preenchido */
@@ -2166,7 +2239,7 @@ function confirmarSelecaoRF(){
   if(_rfVendaSel===null||!_rfVendaLista[_rfVendaSel]){alert('Selecione um título para vender.');return}
   const pos=_rfVendaLista[_rfVendaSel];
   document.getElementById('rf-venda-titulo').value=pos.ticker;
-  document.getElementById('rf-venda-data').value=new Date().toISOString().slice(0,10);
+  document.getElementById('rf-venda-data').value=hojeLocal();
   document.getElementById('rf-venda-valor').value=pos.vt.toFixed(2);
   document.getElementById('rf-venda-form').style.display='';
   atualizarResumoVendaRF();
@@ -2207,7 +2280,7 @@ function finalizarVendaRF(){
   if(_rfVendaSel===null||!_rfVendaLista[_rfVendaSel]){alert('Selecione um título e clique em "Confirmar seleção".');return}
   const pos=_rfVendaLista[_rfVendaSel];
   const valor=parseFloat(document.getElementById('rf-venda-valor').value)||0;
-  const dataVenda=document.getElementById('rf-venda-data').value||new Date().toISOString().slice(0,10);
+  const dataVenda=document.getElementById('rf-venda-data').value||hojeLocal();
   if(valor<=0){alert('Informe o valor a resgatar.');return}
   if(valor>pos.vt+0.01){alert(`Valor maior que o saldo do título (R$ ${fmt(pos.vt)}).`);return}
   const precoUnit=pos.cotacao;

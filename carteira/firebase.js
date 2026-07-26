@@ -74,7 +74,7 @@ function renderAuthUI(user){
       <span style="font-size:12px;color:var(--color-text-secondary);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
         title="${user.displayName||''}">${(user.displayName||'').split(' ')[0]}</span>
       <button class="btn" style="padding:4px 10px;font-size:12px" onclick="logoutUser()">
-        <i class="ti ti-logout" aria-hidden="true"></i> Sair
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2 M9 12h12l-3 -3 M18 15l3 -3"/><path stroke-width="1.5" d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2 M9 12h12l-3 -3 M18 15l3 -3"/></svg> Sair
       </button>`;
   } else {
     el.innerHTML = `

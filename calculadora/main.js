@@ -2508,7 +2508,10 @@
             : document.getElementById('chkIpcaCalc')?.checked;
         const usaIpca = !!ipcaAtivo;
 
-        const cabecalho = [sufixo, 'Patrimônio Total (R$)', 'Total em Juros (R$)', 'Total Aportado (R$)', 'Renda Anual (R$)', 'Renda Mensal (R$)'];
+        // [1.7] No período mensal, "Renda Anual" é renda mensal × 12 (linear, sem juros
+        // compostos entre os meses) — o rótulo deixa isso explícito pra não parecer outra conta.
+        const rotuloRendaAnual = tipoPeriodo === 'anual' ? 'Renda Anual (R$)' : 'Renda Anual (R$, renda mensal × 12)';
+        const cabecalho = [sufixo, 'Patrimônio Total (R$)', 'Total em Juros (R$)', 'Total Aportado (R$)', rotuloRendaAnual, 'Renda Mensal (R$)'];
         if (usaIpca) cabecalho.push('Aporte Mensal Vigente (R$)');
 
         const rows = [cabecalho];
@@ -2599,12 +2602,20 @@
 
         const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
         const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
+        // [1.6] window.open devolve null se o navegador bloquear o pop-up — avisar em vez de falhar em silêncio
+        const janela = window.open(url, '_blank');
+        if (!janela) {
+            mostrarToastMV('Desbloqueie os pop-ups do navegador para exportar o PDF.');
+        }
         setTimeout(() => URL.revokeObjectURL(url), 15000);
     }
 
     // ── [S8-17] COMPARTILHAR SIMULAÇÃO POR URL ──────────────────────────────
     // Gera um link com os parâmetros principais; quem abrir vê a mesma simulação.
+    // [1.4] Agora também leva IPCA no aporte, aporte inteligente, retirada
+    // recorrente, retiradas pontuais e liberdade financeira. As metas com nome
+    // livre (metaList) não entram no link (ver aviso abaixo) — texto arbitrário
+    // não é seguro de serializar numa URL curta.
     function compartilharSimulacao(btn) {
         const p = new URLSearchParams();
         p.set('i', String(parseCurrencyValue(document.getElementById('inputInicial').value) || 0));
@@ -2614,12 +2625,54 @@
         p.set('n', document.getElementById('inputAnos').value || '1');
         p.set('tp', tipoPeriodo === 'anual' ? 'a' : 'm');
         p.set('md', modoAtual === 'completo' ? 'c' : 's');
+
+        const isSim = modoAtual === 'completo';
+        const ipcaChk = isSim ? document.getElementById('chkInflacaoAporte') : document.getElementById('chkIpcaCalc');
+        const ipcaVal = isSim ? document.getElementById('inputInflacao') : document.getElementById('inputIpcaCalcValor');
+        if (ipcaChk?.checked) {
+            p.set('ia', '1');
+            if (ipcaVal?.value) p.set('iv', ipcaVal.value);
+        }
+
+        let metasNaoInclusas = false;
+        if (isSim) {
+            if (document.getElementById('chkVidaReal')?.checked) p.set('vr', '1');
+            if (document.getElementById('chkAtivarAvancado')?.checked) {
+                p.set('av', '1');
+                if (document.getElementById('chkAporteInteligente')?.checked) {
+                    const anoAI = document.getElementById('inputAnoInicioInteligente')?.value;
+                    if (anoAI) { p.set('ai', '1'); p.set('aa', anoAI); }
+                    if (document.getElementById('chkUltimoAporte')?.checked) p.set('ua', '1');
+                }
+                if (document.getElementById('chkRetirada')?.checked) {
+                    const anoR = document.getElementById('inputAnoInicioRetirada')?.value;
+                    const valR = document.getElementById('inputValorRetirada')?.value;
+                    if (anoR) { p.set('rt', '1'); p.set('ra', anoR); if (valR) p.set('rv', valR); }
+                }
+                if (document.getElementById('chkLiberdade')?.checked) {
+                    const custo = document.getElementById('inputCustoVida')?.value;
+                    if (custo) { p.set('lb', '1'); p.set('lc', custo); }
+                }
+                if (document.getElementById('chkMeta')?.checked && typeof metaList !== 'undefined' && metaList.length > 0) {
+                    metasNaoInclusas = true;
+                }
+            }
+            const rus = (typeof retiradaUnicaList !== 'undefined' ? retiradaUnicaList : [])
+                .filter(r => r.ano > 0 && parseCurrencyValue(r.valorRaw || '') > 0);
+            if (rus.length > 0) {
+                p.set('ru', rus.map(r => `${r.ano}:${parseCurrencyValue(r.valorRaw)}`).join(','));
+            }
+        }
+
         const url = location.origin + location.pathname + '?' + p.toString();
         const feedbackOk = () => {
             if (!btn) return;
             if (!btn.dataset.orig) btn.dataset.orig = btn.innerHTML;
             btn.innerHTML = '✓ Link copiado!';
             setTimeout(() => { btn.innerHTML = btn.dataset.orig; }, 2200);
+            if (metasNaoInclusas) {
+                mostrarToastMV('O link leva toda a simulação, menos as metas com nome (são texto livre).');
+            }
         };
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(url).then(feedbackOk)
@@ -2648,6 +2701,81 @@
             const n = parseInt(q.get('n'));
             if (isFinite(n) && n >= 1 && n <= 1200) document.getElementById('inputAnos').value = String(n);
         }
+
+        // [1.4] Parâmetros avançados: IPCA no aporte, aporte inteligente, retirada
+        // recorrente, retiradas pontuais e liberdade financeira. Dispara 'change'
+        // nos checkboxes pra reaproveitar os mesmos listeners que abrem as caixas.
+        const isSimQ = modoAtual === 'completo';
+        if (q.get('ia') === '1') {
+            const chk = isSimQ ? document.getElementById('chkInflacaoAporte') : document.getElementById('chkIpcaCalc');
+            const val = isSimQ ? document.getElementById('inputInflacao') : document.getElementById('inputIpcaCalcValor');
+            if (val && q.has('iv')) {
+                const iv = parseFloat(String(q.get('iv')).replace(',', '.'));
+                if (isFinite(iv) && iv >= 0 && iv <= 100) val.value = String(iv);
+            }
+            if (chk) { chk.checked = true; chk.dispatchEvent(new Event('change')); }
+        }
+        if (isSimQ) {
+            if (q.get('vr') === '1') {
+                const chk = document.getElementById('chkVidaReal');
+                if (chk) { chk.checked = true; chk.dispatchEvent(new Event('change')); }
+            }
+            if (q.get('av') === '1') {
+                const chkAv = document.getElementById('chkAtivarAvancado');
+                if (chkAv) { chkAv.checked = true; chkAv.dispatchEvent(new Event('change')); }
+
+                if (q.get('ai') === '1' && q.has('aa')) {
+                    const anoAI = parseInt(q.get('aa'));
+                    if (isFinite(anoAI) && anoAI > 0) {
+                        const inpAI = document.getElementById('inputAnoInicioInteligente');
+                        if (inpAI) inpAI.value = String(anoAI);
+                        const chkAI = document.getElementById('chkAporteInteligente');
+                        if (chkAI) { chkAI.checked = true; chkAI.dispatchEvent(new Event('change')); }
+                        if (q.get('ua') === '1') {
+                            const chkUA = document.getElementById('chkUltimoAporte');
+                            if (chkUA) chkUA.checked = true;
+                        }
+                    }
+                }
+                if (q.get('rt') === '1' && q.has('ra')) {
+                    const anoR = parseInt(q.get('ra'));
+                    if (isFinite(anoR) && anoR > 0) {
+                        const inpR = document.getElementById('inputAnoInicioRetirada');
+                        if (inpR) inpR.value = String(anoR);
+                        if (q.has('rv')) {
+                            const inpRV = document.getElementById('inputValorRetirada');
+                            if (inpRV) inpRV.value = fmtBR(q.get('rv'));
+                        }
+                        const chkR = document.getElementById('chkRetirada');
+                        if (chkR) { chkR.checked = true; chkR.dispatchEvent(new Event('change')); }
+                    }
+                }
+                if (q.get('lb') === '1' && q.has('lc')) {
+                    const custo = parseFloat(String(q.get('lc')).replace(',', '.'));
+                    if (isFinite(custo) && custo > 0) {
+                        const inpL = document.getElementById('inputCustoVida');
+                        if (inpL) inpL.value = fmtBR(q.get('lc'));
+                        const chkL = document.getElementById('chkLiberdade');
+                        if (chkL) { chkL.checked = true; chkL.dispatchEvent(new Event('change')); }
+                    }
+                }
+            }
+            if (q.has('ru')) {
+                const pares = String(q.get('ru')).split(',').map(s => s.split(':'));
+                let algumaAdicionada = false;
+                pares.forEach(([anoStr, valStr], idx) => {
+                    const ano = parseInt(anoStr);
+                    const valorNum = parseFloat(valStr);
+                    if (isFinite(ano) && ano > 0 && isFinite(valorNum) && valorNum > 0) {
+                        const valorFmt = fmtBR(valorNum);
+                        retiradaUnicaList.push({ id: Date.now() + idx, ano, valor: valorFmt, valorRaw: valorFmt });
+                        algumaAdicionada = true;
+                    }
+                });
+                if (algumaAdicionada) renderizarRetiradaUnica();
+            }
+        }
+
         executarPipelineCore();
     }
 
@@ -3241,7 +3369,8 @@
         const valEl = document.getElementById('reversoValor');
         const detEl = document.getElementById('reversoDetalhe');
 
-        if (patrimonioAlvo <= 0 || taxaInput <= 0 || tempoInput <= 0) {
+        // [1.3] taxa 0% é um caso válido (juros zero), não deve esconder o resultado
+        if (patrimonioAlvo <= 0 || taxaInput < 0 || tempoInput <= 0) {
             resEl?.classList.add('hidden');
             return;
         }
@@ -3292,6 +3421,12 @@
             }
             totalAportadoCalc = vInicial + somaIpca(Math.ceil(aportNecessario));
             sufixoIpca = ` · 1º aporte (cresce ${(taxaInfl*100).toFixed(1).replace('.',',')}%/ano com o IPCA)`;
+        } else if (taxaMensal === 0) {
+            // [1.3] Taxa 0%: sem juros, é divisão simples entre os (n-1) aportes
+            // (mês 1 sem aporte, igual à convenção do site). aporte = (meta - inicial) / (n-1).
+            if (totalMeses - 1 <= 0) { resEl?.classList.add('hidden'); return; }
+            aportNecessario = (patrimonioAlvo - vInicial) / (totalMeses - 1);
+            totalAportadoCalc = vInicial + Math.ceil(Math.max(0, aportNecessario)) * (totalMeses - 1);
         } else {
             // Sem IPCA: fórmula fechada com (n-1) aportes, do mês 2 ao mês n:
             // PMT = (FV - PV*(1+r)^n) / [((1+r)^(n-1) - 1)/r]
@@ -3542,6 +3677,22 @@
         toast.style.opacity = '1';
         toast.style.transform = 'translateY(0)';
         setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(8px)'; }, 3500);
+    }
+
+    // [1.6] Toast genérico no padrão dourado do site (usado em avisos como pop-up bloqueado)
+    function mostrarToastMV(msg) {
+        let toast = document.getElementById('toastMV');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'toastMV';
+            toast.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9998;background:#16161a;border:1px solid rgba(245,166,35,0.5);border-radius:12px;padding:10px 16px;font-size:12px;font-weight:700;color:#F5A623;box-shadow:0 4px 24px rgba(0,0,0,0.4);transition:opacity 0.4s,transform 0.4s;pointer-events:none;max-width:280px;';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = msg;
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+        clearTimeout(toast._hideTimer);
+        toast._hideTimer = setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(8px)'; }, 4000);
     }
 
     //  FUNÇÕES MALUCAS — toggle helpers

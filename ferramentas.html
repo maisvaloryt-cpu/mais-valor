@@ -293,8 +293,21 @@
     <div class="tool-grid">
       <div class="calc-box">
         <div style="font-size:16px;font-weight:700;margin-bottom:1.25rem;color:var(--gold)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path stroke-width="5" stroke-opacity=".22" d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10z M12 11.5a.5 .5 0 1 0 0 1 .5 .5 0 0 0 0-1z"/><path stroke-width="1.5" d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10z M12 11.5a.5 .5 0 1 0 0 1 .5 .5 0 0 0 0-1z"/></svg>Preço Teto (Método Bazin)</div>
-        <label class="calc-label">Dividendo médio mensal por cota/ação (R$)</label>
-        <input class="calc-input" type="number" id="bz-div-men" value="0.10" step="0.01" oninput="calcBazin()">
+        <div class="tabs" style="margin-bottom:1rem">
+          <button type="button" class="tab active" id="bz-tab-mensal" onclick="setBazinModo('mensal')">Média mensal</button>
+          <button type="button" class="tab" id="bz-tab-12m" onclick="setBazinModo('12m')">Proventos 12 meses</button>
+        </div>
+        <div id="bz-modo-mensal">
+          <label class="calc-label">Dividendo médio mensal por cota/ação (R$)</label>
+          <input class="calc-input" type="number" id="bz-div-men" value="0.10" step="0.01" oninput="calcBazin()">
+        </div>
+        <div id="bz-modo-12m" style="display:none">
+          <label class="calc-label">Proventos pagos nos últimos 12 meses, por cota/ação (R$)</label>
+          <input class="calc-input" type="number" id="bz-div-12m" value="1.20" step="0.01" oninput="calcBazin()">
+          <p style="font-size:11px;color:var(--text3);margin:4px 0 0">
+            Pra pagador irregular (2 a 4 pagamentos por ano), some tudo que caiu na conta nos últimos 12 meses. Isso evita multiplicar um mês típico por 12 e errar o dividendo anual.
+          </p>
+        </div>
         <label class="calc-label">Yield mínimo exigido (% a.a.)</label>
         <input class="calc-input" type="number" id="bz-yield" value="6" step="0.5" oninput="calcBazin()">
         <label class="calc-label">Preço atual de mercado (R$)</label>
@@ -373,6 +386,7 @@
           <option value="etf-swing">ETF de ações — Swing Trade (sem isenção)</option>
           <option value="acoes-day">Ações / ETFs — Day Trade</option>
           <option value="fii">Fundos Imobiliários (FIIs) — venda de cotas</option>
+          <option value="cripto">Criptomoedas (venda)</option>
         </select>
         <label class="calc-label">Total vendido no mês (R$)</label>
         <input class="calc-input" type="number" id="darf-venda" value="15000" step="0.01" oninput="calcDARF()">
@@ -403,6 +417,7 @@
           <div>• <strong style="color:var(--text)">ETF de ações</strong>: 15% sobre o lucro, mas <strong style="color:var(--text)">sem</strong> a isenção de R$ 20.000 (só ação individual tem)</div>
           <div>• <strong style="color:var(--text)">Day trade</strong>: 20% sobre o lucro, sem isenção · o prejuízo de day trade só compensa lucro de day trade</div>
           <div>• <strong style="color:var(--text)">FIIs</strong>: 20% sobre o ganho na venda de cotas, sem isenção (rendimentos mensais distribuídos costumam ser isentos, mas o ganho de capital na venda não)</div>
+          <div>• <strong style="color:var(--text)">Criptomoedas</strong>: 15% sobre o lucro, isento se as vendas do mês (todas as cripto somadas) ficarem até R$ 35.000</div>
           <div>• DARF abaixo de R$ 10 não precisa ser pago — some ao mês seguinte</div>
           <div>• Vencimento: último dia útil do mês seguinte · código DARF usual 6015</div>
           <div>• Ferramenta educativa — não substitui orientação de um contador</div>
@@ -834,10 +849,14 @@ function calcAp(){
   const pat=renda*12/taxa;
   document.getElementById('ap-pat').textContent=fmt(pat);
   document.getElementById('ap-anos').textContent=anos+' anos';
-  const ap=pat*r/(Math.pow(1+r,anos*12)-1);
+  // [4.1] Mesma convenção da calculadora de Juros Compostos: mês 1 sem aporte
+  // (o 1º aporte só entra no mês 2) → (n-1) aportes em n meses.
+  const n=anos*12;
+  const fatorAnuidade=n>1?(Math.pow(1+r,n-1)-1)/r:0;
+  const ap=fatorAnuidade>0?pat/fatorAnuidade:0;
   document.getElementById('ap-aporte').textContent=fmt(ap);
   const labels=[],data=[];
-  for(let y=0;y<=anos;y++){const ny=y*12;labels.push((idade+y)+'a');data.push(Math.round(ap*(Math.pow(1+r,ny)-1)/r));}
+  for(let y=0;y<=anos;y++){const ny=y*12;labels.push((idade+y)+'a');data.push(Math.round(ny<=1?0:ap*(Math.pow(1+r,ny-1)-1)/r));}
   if(apChart) apChart.destroy();
   apChart=new Chart(document.getElementById('apChart'),{type:'line',
     data:{labels,datasets:[{data,borderColor:'#1FC96E',borderWidth:2,pointRadius:0,fill:true,backgroundColor:'rgba(31,201,110,0.07)',tension:0.4}]},
@@ -1045,12 +1064,22 @@ function calcDCF(){
 }
 
 // ===================== BAZIN (PREÇO TETO) =====================
+let bazinModo='mensal';
+function setBazinModo(modo){
+  bazinModo=modo;
+  document.getElementById('bz-tab-mensal').classList.toggle('active',modo==='mensal');
+  document.getElementById('bz-tab-12m').classList.toggle('active',modo==='12m');
+  document.getElementById('bz-modo-mensal').style.display=modo==='mensal'?'':'none';
+  document.getElementById('bz-modo-12m').style.display=modo==='12m'?'':'none';
+  calcBazin();
+}
 function calcBazin(){
   const divMen=+document.getElementById('bz-div-men').value||0;
+  const div12m=+document.getElementById('bz-div-12m').value||0;
   const yieldMin=(+document.getElementById('bz-yield').value||0)/100;
   const preco=+document.getElementById('bz-preco').value||0;
 
-  const divAnu=divMen*12;
+  const divAnu=bazinModo==='12m'?div12m:divMen*12;
   const teto=yieldMin>0?divAnu/yieldMin:0;
 
   document.getElementById('bz-teto').textContent=teto>0?fmt(teto):'—';
@@ -1145,6 +1174,11 @@ function calcDARF(){
     isento=(venda<=20000 && resultadoBruto>0);
   } else if(tipo==='etf-swing'){
     aliquota=0.15; // ETF de ações NÃO tem a isenção de R$ 20 mil
+  } else if(tipo==='cripto'){
+    // [4.2] Cripto: 15%, isento se a SOMA DAS VENDAS de cripto no mês ficar até R$ 35 mil
+    // (mesma regra usada no consolidador da carteira, calcImpostoGanhos)
+    aliquota=0.15;
+    isento=(venda<=35000 && resultadoBruto>0);
   } else if(tipo==='acoes-day'){
     aliquota=0.20;
   } else {
@@ -1162,7 +1196,7 @@ function calcDARF(){
     novoPrejuizo=prejuizoAcum+prejuizoMes;
     ir=0;
   } else if(isento){
-    isencaoEl.textContent='Sim — vendas até R$ 20.000';
+    isencaoEl.textContent=tipo==='cripto' ? 'Sim, vendas até R$ 35.000' : 'Sim, vendas até R$ 20.000';
     isencaoEl.style.color='var(--up)';
     novoPrejuizo=prejuizoAcum;
     ir=0;

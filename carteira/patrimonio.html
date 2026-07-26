@@ -8,7 +8,6 @@
 <link rel="icon" type="image/png" href="../favicon.png">
 <link rel="stylesheet" href="../style.css">
 <link rel="stylesheet" href="../mobile.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
 <script>window.NAV_BASE_PATH = "../"; window.NAV_SLIM = true;</script>
 </head>
 <body>
@@ -17,7 +16,7 @@
 
 <div class="app">
   <div class="header">
-    <h1><i class="ti ti-chart-pie" aria-hidden="true" style="color:var(--blue)"></i>Carteira</h1>
+    <h1><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-6.8a2 2 0 0 1 -2 -2v-7a.9 .9 0 0 0 -1 -.8 M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a1 1 0 0 1 -1 -1v-4.5"/><path stroke-width="1.5" d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-6.8a2 2 0 0 1 -2 -2v-7a.9 .9 0 0 0 -1 -.8 M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a1 1 0 0 1 -1 -1v-4.5"/></svg> Carteira</h1>
     <div class="header-actions" id="header-actions"></div>
   </div>
 
@@ -35,7 +34,7 @@
       <div style="position:relative;height:220px"><canvas id="chartPatri" role="img" aria-label="Evolução real do patrimônio"></canvas></div>
     </div>
     <div class="card" style="margin-bottom:1.25rem">
-      <div class="card-title"><i class="ti ti-chart-line" aria-hidden="true" style="color:#2E86C1"></i>Sua carteira vs Mercado
+      <div class="card-title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#2E86C1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M4 19l16 0 M4 15l4 -6l4 2l4 -5l4 4"/><path stroke-width="1.5" d="M4 19l16 0 M4 15l4 -6l4 2l4 -5l4 4"/></svg>Sua carteira vs Mercado
         <select id="sel-bench" onchange="renderBenchmark(+this.value)" style="font-size:11px;padding:3px 6px;border:0.5px solid var(--color-border-secondary);border-radius:6px;background:var(--color-background-primary);color:var(--color-text-secondary)">
           <option value="12">12 meses</option><option value="24" selected>24 meses</option><option value="60">5 anos</option><option value="120">10 anos</option>
         </select>
@@ -44,7 +43,7 @@
       <div style="font-size:10px;color:var(--color-text-secondary);margin-top:8px">Simula seus mesmos aportes aplicados no IBOV, no CDI e corrigidos pelo IPCA (inflação). Linha amarela = sua carteira de verdade.</div>
     </div>
     <div class="card" style="margin-bottom:1.25rem">
-      <div class="card-title"><i class="ti ti-telescope" aria-hidden="true" style="color:#1D9E75"></i>Projeção do patrimônio</div>
+      <div class="card-title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#1D9E75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M6 21l6 -5l6 5 M12 13v8 M3.294 13.678l.166 .281c.52 .88 1.624 1.265 2.605 .91l14.242 -5.165a1.023 1.023 0 0 0 .565 -1.456l-2.62 -4.705a1.087 1.087 0 0 0 -1.447 -.42l-.056 .032l-12.694 7.618c-1.02 .613 -1.357 1.897 -.76 2.905l-.001 0 M14 5l3 5.5"/><path stroke-width="1.5" d="M6 21l6 -5l6 5 M12 13v8 M3.294 13.678l.166 .281c.52 .88 1.624 1.265 2.605 .91l14.242 -5.165a1.023 1.023 0 0 0 .565 -1.456l-2.62 -4.705a1.087 1.087 0 0 0 -1.447 -.42l-.056 .032l-12.694 7.618c-1.02 .613 -1.357 1.897 -.76 2.905l-.001 0 M14 5l3 5.5"/></svg>Projeção do patrimônio</div>
       <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:12px">
         <div><div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:3px">Aporte por mês (R$)</div>
           <input id="proj-aporte" type="number" min="0" step="50" class="cell-edit" style="width:120px;text-align:right" oninput="renderProjecao()"></div>
@@ -196,9 +195,9 @@ function renderRecordes(){
   const atual=evol[evol.length-1].vt;
   const abaixo=pico-atual;
   el.innerHTML=`
-    <div class="mcard"><div class="mcard-label"><i class="ti ti-trophy" aria-hidden="true"></i> Recorde de patrimônio</div><div class="mcard-value">${fmtR(pico)}</div><div class="mcard-sub">Em ${picoYM}</div></div>
-    <div class="mcard"><div class="mcard-label"><i class="ti ti-trending-down" aria-hidden="true"></i> Maior queda do pico</div><div class="mcard-value negative">-${fmt(ddMax)}%</div><div class="mcard-sub">A pior baixa registrada</div></div>
-    <div class="mcard"><div class="mcard-label"><i class="ti ti-arrow-up-right" aria-hidden="true"></i> Distância do recorde</div><div class="mcard-value ${abaixo<=0?'positive':''}">${abaixo<=0?'No topo! 🎉':fmtR(abaixo)}</div><div class="mcard-sub">${abaixo<=0?'Você está no maior valor':'Falta para bater o recorde'}</div></div>
+    <div class="mcard"><div class="mcard-label"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M8 21l8 0 M12 17l0 4 M7 4l10 0 M17 4v8a5 5 0 0 1 -10 0v-8 M3 9a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M17 9a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path stroke-width="1.5" d="M8 21l8 0 M12 17l0 4 M7 4l10 0 M17 4v8a5 5 0 0 1 -10 0v-8 M3 9a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M17 9a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/></svg> Recorde de patrimônio</div><div class="mcard-value">${fmtR(pico)}</div><div class="mcard-sub">Em ${picoYM}</div></div>
+    <div class="mcard"><div class="mcard-label"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M3 7l6 6l4 -4l8 8 M21 10l0 7l-7 0"/><path stroke-width="1.5" d="M3 7l6 6l4 -4l8 8 M21 10l0 7l-7 0"/></svg> Maior queda do pico</div><div class="mcard-value negative">-${fmt(ddMax)}%</div><div class="mcard-sub">A pior baixa registrada</div></div>
+    <div class="mcard"><div class="mcard-label"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M17 7l-10 10 M8 7l9 0l0 9"/><path stroke-width="1.5" d="M17 7l-10 10 M8 7l9 0l0 9"/></svg> Distância do recorde</div><div class="mcard-value ${abaixo<=0?'positive':''}">${abaixo<=0?'No topo! 🎉':fmtR(abaixo)}</div><div class="mcard-sub">${abaixo<=0?'Você está no maior valor':'Falta para bater o recorde'}</div></div>
   `;
 }
 

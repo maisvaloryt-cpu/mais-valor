@@ -44,6 +44,19 @@
             --popup-border: #6366f1;
         }
 
+        /* [7.8] Respeita quem pediu pro sistema operacional reduzir
+           animações: desliga (quase) todas as animações/transições
+           da calculadora inteira (inclusive as que o JS aplica direto
+           no style do elemento, como o "tilt" dos cards). */
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+          }
+        }
+
         /* ═══════════════════════════════════════════════════
            TEMA CLARO
            ═══════════════════════════════════════════════════ */

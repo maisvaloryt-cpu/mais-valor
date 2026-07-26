@@ -8,7 +8,6 @@
 <link rel="icon" type="image/png" href="../favicon.png">
 <link rel="stylesheet" href="../style.css">
 <link rel="stylesheet" href="../mobile.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
 <style>
   /* Motion design da carteira — sutil e rápido */
   @keyframes apFadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
@@ -29,7 +28,7 @@
 
 <div class="app">
   <div class="header">
-    <h1><i class="ti ti-chart-pie" aria-hidden="true" style="color:var(--blue)"></i>Carteira</h1>
+    <h1><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-6.8a2 2 0 0 1 -2 -2v-7a.9 .9 0 0 0 -1 -.8 M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a1 1 0 0 1 -1 -1v-4.5"/><path stroke-width="1.5" d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-6.8a2 2 0 0 1 -2 -2v-7a.9 .9 0 0 0 -1 -.8 M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a1 1 0 0 1 -1 -1v-4.5"/></svg> Carteira</h1>
     <div class="header-actions" id="header-actions"></div>
   </div>
 
@@ -47,7 +46,7 @@
           <div id="ap-resumo" style="font-size:12px;color:var(--color-text-secondary);margin-top:10px"></div>
         </div>
         <div style="min-width:260px;max-width:380px">
-          <div class="card-title" style="margin-bottom:8px"><i class="ti ti-history" aria-hidden="true" style="color:#2E86C1"></i>Seu histórico de aportes</div>
+          <div class="card-title" style="margin-bottom:8px"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#2E86C1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M12 8l0 4l2 2 M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5"/><path stroke-width="1.5" d="M12 8l0 4l2 2 M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5"/></svg>Seu histórico de aportes</div>
           <div id="ap-historico"></div>
         </div>
       </div>
@@ -55,7 +54,7 @@
 
     <div class="charts-row">
       <div class="card">
-        <div class="card-title"><i class="ti ti-target" aria-hidden="true" style="color:var(--blue)"></i>Carteira ideal (sua meta)</div>
+        <div class="card-title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M7 12a5 5 0 1 0 10 0a5 5 0 1 0 -10 0 M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path stroke-width="1.5" d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M7 12a5 5 0 1 0 10 0a5 5 0 1 0 -10 0 M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/></svg>Carteira ideal (sua meta)</div>
         <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:12px">
           <div style="position:relative;flex:1;min-width:130px;height:210px"><canvas id="ap-pizza-ideal" role="img" aria-label="Carteira ideal por classe"></canvas></div>
           <div id="ap-legenda-ideal" style="flex-shrink:0;display:flex;flex-direction:column;gap:6px"></div>
@@ -74,10 +73,10 @@
       </div>
     </div>
 
-    <div class="section-title"><i class="ti ti-arrow-big-down-lines" aria-hidden="true"></i>Onde aportar</div>
+    <div class="section-title"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M15 12h3.586a1 1 0 0 1 .707 1.707l-6.586 6.586a1 1 0 0 1 -1.414 0l-6.586 -6.586a1 1 0 0 1 .707 -1.707h3.586v-3h6v3 M15 3h-6 M15 6h-6"/><path stroke-width="1.5" d="M15 12h3.586a1 1 0 0 1 .707 1.707l-6.586 6.586a1 1 0 0 1 -1.414 0l-6.586 -6.586a1 1 0 0 1 .707 -1.707h3.586v-3h6v3 M15 3h-6 M15 6h-6"/></svg>Onde aportar</div>
     <div id="ap-tabela"></div>
 
-    <div class="section-title" style="margin-top:1.5rem"><i class="ti ti-adjustments" aria-hidden="true"></i>Rebalanceamento por classe</div>
+    <div class="section-title" style="margin-top:1.5rem"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M4 10a2 2 0 1 0 4 0a2 2 0 0 0 -4 0 M6 4v4 M6 12v8 M10 16a2 2 0 1 0 4 0a2 2 0 0 0 -4 0 M12 4v10 M12 18v2 M16 7a2 2 0 1 0 4 0a2 2 0 0 0 -4 0 M18 4v1 M18 9v11"/><path stroke-width="1.5" d="M4 10a2 2 0 1 0 4 0a2 2 0 0 0 -4 0 M6 4v4 M6 12v8 M10 16a2 2 0 1 0 4 0a2 2 0 0 0 -4 0 M12 4v10 M12 18v2 M16 7a2 2 0 1 0 4 0a2 2 0 0 0 -4 0 M18 4v1 M18 9v11"/></svg>Rebalanceamento por classe</div>
     <div id="ap-rebal"></div>
   </div>
 </div>
@@ -295,13 +294,13 @@ function apRenderTabela(){
         <td class="r"><button class="btn btn-sm" title="Confirmar que comprei ${a.ticker}" onclick="apAbrirConfirmacao('${a.ticker}')" style="padding:2px 0;width:26px;height:26px;justify-content:center;font-size:16px;font-weight:700;line-height:1">+</button></td>
       </tr>`;}).join('')}
       ${reservas.map(({cl,v})=>`<tr style="background:rgba(255,204,0,0.05)">
-        <td colspan="6"><span style="display:inline-flex;align-items:center;gap:6px"><i class="ti ti-plus" aria-hidden="true" style="color:#FFCC00"></i><span>Adicione <strong>${CLASS_LABEL[cl]||cl}</strong> na sua carteira para alcançar a meta</span></span></td>
+        <td colspan="6"><span style="display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#FFCC00" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M12 5l0 14 M5 12l14 0"/><path stroke-width="1.5" d="M12 5l0 14 M5 12l14 0"/></svg><span>Adicione <strong>${CLASS_LABEL[cl]||cl}</strong> na sua carteira para alcançar a meta</span></span></td>
         <td class="r"><strong style="color:#FFCC00">${fmtR(v)}</strong></td>
         <td class="r">${(v/aporteAtual*100).toFixed(1)}%</td>
         <td></td>
       </tr>`).join('')}
       ${sobra>0.005?`<tr style="opacity:.7">
-        <td colspan="6"><span style="display:inline-flex;align-items:center;gap:6px"><i class="ti ti-coin" aria-hidden="true"></i><span>Troco que não fechou uma cota (classes já no alvo)</span></span></td>
+        <td colspan="6"><span style="display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M14.8 9a2 2 0 0 0 -1.8 -1h-2a2 2 0 1 0 0 4h2a2 2 0 1 1 0 4h-2a2 2 0 0 1 -1.8 -1 M12 7v10"/><path stroke-width="1.5" d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M14.8 9a2 2 0 0 0 -1.8 -1h-2a2 2 0 1 0 0 4h2a2 2 0 1 1 0 4h-2a2 2 0 0 1 -1.8 -1 M12 7v10"/></svg><span>Troco que não fechou uma cota (classes já no alvo)</span></span></td>
         <td class="r"><strong>${fmtR(sobra)}</strong></td>
         <td class="r">${(sobra/aporteAtual*100).toFixed(1)}%</td>
         <td></td>
@@ -316,7 +315,7 @@ function apAbrirConfirmacao(ticker){
   const info=window._apLinhaByTicker&&window._apLinhaByTicker[ticker];
   if(!info){toast('Não encontrei essa sugestão — a tabela pode ter mudado. Tente de novo.');return;}
   const {a,ap,qtd,frac}=info;
-  const hoje=new Date().toISOString().slice(0,10);
+  const hoje=hojeLocal();
   document.getElementById('modal-confirma-aporte')?.remove();
   const el=document.createElement('div');
   el.id='modal-confirma-aporte';
@@ -344,7 +343,7 @@ function apAbrirConfirmacao(ticker){
   </div>
   <div class="modal-actions" style="margin-top:1rem">
     <button class="btn" onclick="_apFecharConfirmacao()">Cancelar</button>
-    <button class="btn btn-primary" onclick="_apSalvarConfirmacao('${ticker}')"><i class="ti ti-check"></i> Confirmar compra</button>
+    <button class="btn btn-primary" onclick="_apSalvarConfirmacao('${ticker}')"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M5 12l5 5l10 -10"/><path stroke-width="1.5" d="M5 12l5 5l10 -10"/></svg> Confirmar compra</button>
   </div>
 </div>`;
   document.body.appendChild(el);
@@ -356,7 +355,7 @@ function _apSalvarConfirmacao(ticker){
   const info=window._apLinhaByTicker&&window._apLinhaByTicker[ticker];
   if(!info)return;
   const {a,frac}=info;
-  const data=document.getElementById('ca-data')?.value||new Date().toISOString().slice(0,10);
+  const data=document.getElementById('ca-data')?.value||hojeLocal();
   let qtd,pm,valorConfirmado;
   if(frac){
     valorConfirmado=parseFloat(document.getElementById('ca-valor')?.value)||0;

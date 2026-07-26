@@ -113,10 +113,49 @@ console.log('\n■ carteira/common.js — consolidador');
     "function ehFeriadoUTC",
     "function diasUteisRF",
     "function _fatorRFHistorico",
+    "function hojeLocal",
+    "function somarMesesData",
+    "function getQtdTickerAtDate",
+    "function getQtdTimelineTicker",
+    "function qtdNaTimeline",
   ].map(d => extrair(src, d));
-  const ctx = { console, Math, Date, _feriadosCache: {}, BCB_HIST: null, _bcbHistKeys: null, _fatorRFCache: {} };
+  const ctx = { console, Math, Date, _feriadosCache: {}, BCB_HIST: null, _bcbHistKeys: null, _fatorRFCache: {}, ativos: [] };
   vm.createContext(ctx);
   vm.runInContext('var _feriadosCache={};\n' + partes.join('\n'), ctx);
+
+  // [2.7] hojeLocal: mesma técnica de fuso horário (America/Sao_Paulo) usada pela
+  // função real, testada com um horário fixo logo após a virada do dia em UTC —
+  // é justamente o cenário em que toISOString() (UTC puro) erra o dia no Brasil.
+  {
+    const fixo = new Date('2026-01-01T02:30:00Z'); // 23:30 de 31/12 em São Paulo (UTC-3)
+    const dataSP = fixo.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+    ok(dataSP === '2025-12-31',
+       'hojeLocal: técnica de fuso (America/Sao_Paulo) acerta o dia mesmo logo após 00h UTC');
+    ok(/^\d{4}-\d{2}-\d{2}$/.test(ctx.hojeLocal()), 'hojeLocal: devolve string no formato YYYY-MM-DD');
+  }
+
+  // [2.7] somarMesesData: usado pelo corte de "últimos 12 meses" dos proventos
+  ok(ctx.somarMesesData('2026-07-26', -12) === '2025-07-26', "somarMesesData('2026-07-26',-12) = 2025-07-26");
+  ok(ctx.somarMesesData('2026-01-05', -1) === '2025-12-05', "somarMesesData('2026-01-05',-1) = 2025-12-05 (vira o ano)");
+  ok(ctx.somarMesesData('2025-11-20', 3) === '2026-02-20', "somarMesesData('2025-11-20',3) = 2026-02-20 (vira o ano)");
+
+  // [2.8] getQtdTimelineTicker + qtdNaTimeline (busca binária) tem que dar EXATAMENTE
+  // o mesmo resultado que getQtdTickerAtDate (varredura completa) pra qualquer data —
+  // é a garantia de que a otimização O(n²)→O(n log n) não mudou nenhum número.
+  {
+    ctx.ativos = [
+      { ticker: 'XXXX', data: '2024-01-10', tipo: 'Compra', qtd: 100 },
+      { ticker: 'XXXX', data: '2024-02-15', tipo: 'Compra', qtd: 50 },
+      { ticker: 'XXXX', data: '2024-02-15', tipo: 'Venda', qtd: 30 },
+      { ticker: 'XXXX', data: '2024-03-01', tipo: 'Venda', qtd: 20 },
+      { ticker: 'XXXX', data: '2024-04-01', tipo: 'Compra', qtd: 40 },
+    ];
+    const timeline = ctx.getQtdTimelineTicker('XXXX');
+    const datasTeste = ['2024-01-05', '2024-01-10', '2024-02-01', '2024-02-15', '2024-02-20', '2024-03-01', '2024-12-31'];
+    const todasIguais = datasTeste.every(d => ctx.getQtdTickerAtDate('XXXX', d) === ctx.qtdNaTimeline(timeline, d));
+    ok(todasIguais, 'getQtdTimelineTicker/qtdNaTimeline == getQtdTickerAtDate em todas as datas de teste',
+       datasTeste.map(d => `${d}:${ctx.getQtdTickerAtDate('XXXX', d)}/${ctx.qtdNaTimeline(timeline, d)}`).join(' '));
+  }
 
   // parseNumBR
   ok(ctx.parseNumBR('R$ 1.700,00') === 1700, "parseNumBR('R$ 1.700,00') = 1700");
@@ -186,6 +225,24 @@ console.log('\n■ convenção "mês 1 sem aporte" — invariantes');
   const pmt = (alvo - PV * Math.pow(1 + r, n)) / ((Math.pow(1 + r, n - 1) - 1) / r);
   ok(aprox(pipeline(PV, pmt, tx, n), alvo, 0.01),
      'modo reverso: PMT sugerido atinge a meta com erro < R$ 0,01');
+
+  // [1.3] Modo reverso com taxa 0% (juros zero é caso válido, não pode ficar escondido):
+  // aporte = (meta - inicial) / (n-1), sem juros nenhum.
+  const pipelineZero = (PV, PMT, meses) => { let s = PV; for (let m = 1; m <= meses; m++) s += (m === 1 ? 0 : PMT); return s; };
+  const alvo0 = 500000, PV0 = 50000, n0 = 120;
+  const pmt0 = (alvo0 - PV0) / (n0 - 1);
+  ok(aprox(pipelineZero(PV0, pmt0, n0), alvo0, 0.01),
+     'modo reverso com taxa 0%: aporte = (meta-inicial)/(n-1) atinge a meta exata');
+
+  // [4.1] ferramentas.html calcAp (Aposentadoria): mesma convenção "mês 1 sem aporte"
+  // (n-1 aportes) usada na Calculadora — o aporte sugerido tem que bater com a meta
+  // quando simulado pelo MESMO motor da Calculadora (função pipeline acima).
+  const patAlvo = 2000000, txApAnual = 0.10, nAp = 30 * 12;
+  const rAp = Math.pow(1 + txApAnual, 1 / 12) - 1;
+  const fatorAp = nAp > 1 ? (Math.pow(1 + rAp, nAp - 1) - 1) / rAp : 0;
+  const apCalc = fatorAp > 0 ? patAlvo / fatorAp : 0;
+  ok(aprox(pipeline(0, apCalc, txApAnual, nAp), patAlvo, 0.01),
+     'ferramentas.html calcAp: aporte necessário segue a mesma convenção da Calculadora (mês 1 sem aporte)');
 }
 
 console.log(`\n${'='.repeat(60)}\n${total - falhas}/${total} testes passaram${falhas ? ' \u2014 ' + falhas + ' FALHA(S)' : ' \u2713'}\n`);

@@ -388,7 +388,10 @@ function toggleMobileMenu() {
   const btn  = document.getElementById('nav-hamburger');
   if (!menu) return;
   const open = menu.classList.toggle('open');
-  if (btn) btn.innerHTML = open ? '✕' : '☰';
+  // [7.5] Ícones SVG em vez de caractere/emoji — mesmo padrão dourado-neutro do resto do nav
+  const ICONE_FECHAR = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6l-12 12 M6 6l12 12"/></svg>';
+  const ICONE_MENU = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6l16 0 M4 12l16 0 M4 18l16 0"/></svg>';
+  if (btn) btn.innerHTML = open ? ICONE_FECHAR : ICONE_MENU;
   document.body.style.overflow = open ? 'hidden' : '';
 }
 
@@ -535,7 +538,7 @@ function renderNav() {
         ${LOGO_SVG('main')}
       </a>
       <div id="nav-auth-area"></div>
-      <button id="nav-hamburger" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
+      <button id="nav-hamburger" onclick="toggleMobileMenu()" aria-label="Menu"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6l16 0 M4 12l16 0 M4 18l16 0"/></svg></button>
     </div>
     <div class="nav-bottom-row">
       <div class="nav-links">
@@ -712,6 +715,12 @@ function navUpdateTotal() {
   }, 3000);
 }
 
+// [5.6] Escapa texto antes de inserir em innerHTML — defesa extra mesmo o nome
+// vindo dos próprios JSONs do site (risco baixo, mas escapar não custa nada).
+function _mvEscHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
 function navSearchLive(q) {
   const box = document.getElementById('nav-search-results');
   if (!box || q.length < 2) { if (box) box.style.display = 'none'; return; }
@@ -737,7 +746,7 @@ function navSearchLive(q) {
             <span style="font-weight:700;font-size:13px">${d.t}</span>
             ${score}
           </div>
-          <div style="font-size:11px;color:var(--text3)">${d.n.slice(0,30)}</div>
+          <div style="font-size:11px;color:var(--text3)">${_mvEscHtml(d.n.slice(0,30))}</div>
         </div>
       </div>
       <div style="text-align:right">
@@ -756,8 +765,9 @@ function navSearchGo(q) {
     ...(typeof FIIS  !== 'undefined' ? FIIS  : []),
   ];
   const found = all.find(d => d.t.toLowerCase() === q.toLowerCase());
-  if (found) location.href = `${NAV_BASE}ativo.html?t=${found.t}${found.t.match(/\d{2}$/) ? '&tipo=fii' : ''}`;
-  else location.href = `${NAV_BASE}acoes.html?q=${q}`;
+  // [5.6] encodeURIComponent: sem isso, uma busca com "&" ou "#" quebrava a URL
+  if (found) location.href = `${NAV_BASE}ativo.html?t=${encodeURIComponent(found.t)}${found.t.match(/\d{2}$/) ? '&tipo=fii' : ''}`;
+  else location.href = `${NAV_BASE}acoes.html?q=${encodeURIComponent(q)}`;
 }
 
 // ── Autenticação global (Firebase) ───────────────────────────────

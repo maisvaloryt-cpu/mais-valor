@@ -3,7 +3,7 @@
    com fallback para cache quando estiver offline.
    Chamadas externas (Firebase, Google, fontes) passam direto, sem cache. */
 
-const CACHE = 'mv-pwa-v2';
+const CACHE = 'mv-pwa-v3'; // [5.3] versão nova: limpa os JSONs de histórico/dividendos já cacheados na v2
 const SHELL = [
   '/index.html',
   '/style.css',
@@ -50,15 +50,31 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
   // Só intercepta o próprio site. Firebase/Google/fontes seguem normalmente.
-  if (new URL(req.url).origin !== self.location.origin) return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+
+  // [5.3] Pastas de dados por-ticker (data/historico/*, data/dividendos/*,
+  // data/cripto_historico/*, data/fundamentalistas/*, data/diario/*,
+  // data/intraday/*) somam centenas de JSONs e só crescem — não entram no
+  // cache do PWA, senão ele incha sem limite. Os JSONs "soltos" em /data/
+  // (cotacoes.json, tickers.json etc) continuam cacheados normalmente.
+  const isDadosPorTicker = /^\/data\/[^/]+\//.test(url.pathname);
 
   event.respondWith(
     fetch(req)
       .then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE).then((cache) => cache.put(req, copy)).catch(() => {});
+        if (!isDadosPorTicker) {
+          const copy = res.clone();
+          caches.open(CACHE).then((cache) => cache.put(req, copy)).catch(() => {});
+        }
         return res;
       })
-      .catch(() => caches.match(req).then((cached) => cached || caches.match('/index.html')))
+      .catch(() => caches.match(req).then((cached) => {
+        if (cached) return cached;
+        // [5.3] Só cai pro index.html em NAVEGAÇÃO (usuário abrindo uma página
+        // offline); um JS/CSS/JSON que falhou não deve virar HTML disfarçado.
+        if (req.mode === 'navigate') return caches.match('/index.html');
+        return Response.error();
+      }))
   );
 });

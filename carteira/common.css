@@ -557,3 +557,11 @@ select option { background: var(--bg2, #0E0E11); color: var(--text, #ECEAE4); }
 .gate-welcome .gw-priv { font-size: 11px; color: var(--text3, #7C7A75); line-height: 1.6; max-width: 500px; }
 html:not([data-theme="light"]) .gate-welcome .gw-desc,
 html:not([data-theme="light"]) .gate-welcome .gw-txt { color: #A8A6A0; }
+
+/* [7.5/7.8] Spinner do ícone "Carregando..." (era webfont, virou SVG); respeita
+   quem pediu pro sistema reduzir movimento. */
+@keyframes mv-spin { to { transform: rotate(360deg); } }
+.mv-spin { animation: mv-spin 0.8s linear infinite; transform-origin: 50% 50%; }
+@media (prefers-reduced-motion: reduce) {
+  .mv-spin { animation: none; }
+}

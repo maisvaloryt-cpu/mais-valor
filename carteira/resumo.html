@@ -8,7 +8,6 @@
 <link rel="icon" type="image/png" href="../favicon.png">
 <link rel="stylesheet" href="../style.css">
 <link rel="stylesheet" href="../mobile.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
 <script>window.NAV_BASE_PATH = "../"; window.NAV_SLIM = true;</script>
 <style>
 /* ── Boas-vindas carteira vazia ── */
@@ -35,7 +34,7 @@ html:not([data-theme="light"]) #welcome-carteira .w-txt{color:#A8A6A0}
 
 <div class="app">
   <div class="header">
-    <h1><i class="ti ti-chart-pie" aria-hidden="true" style="color:var(--blue)"></i>Carteira</h1>
+    <h1><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-6.8a2 2 0 0 1 -2 -2v-7a.9 .9 0 0 0 -1 -.8 M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a1 1 0 0 1 -1 -1v-4.5"/><path stroke-width="1.5" d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-6.8a2 2 0 0 1 -2 -2v-7a.9 .9 0 0 0 -1 -.8 M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a1 1 0 0 1 -1 -1v-4.5"/></svg> Carteira</h1>
     <div class="header-actions" id="header-actions"></div>
   </div>
 
@@ -87,7 +86,7 @@ html:not([data-theme="light"]) #welcome-carteira .w-txt{color:#A8A6A0}
         </div>
       </div>
     </div>
-    <div class="section-title"><i class="ti ti-stack" aria-hidden="true"></i>Meus Ativos <span id="total-count" style="font-size:12px;color:var(--color-text-secondary);font-weight:400"></span></div>
+    <div class="section-title"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M12 6l-8 4l8 4l8 -4l-8 -4 M4 14l8 4l8 -4"/><path stroke-width="1.5" d="M12 6l-8 4l8 4l8 -4l-8 -4 M4 14l8 4l8 -4"/></svg>Meus Ativos <span id="total-count" style="font-size:12px;color:var(--color-text-secondary);font-weight:400"></span></div>
     <div id="grupos-ativos"></div>
     </div><!-- /dash-resumo -->
   </div>
@@ -109,27 +108,27 @@ function renderMetricsResumo(){
   const c=calcAtivos(); // Bug #6 fix: contagem real de posições, não de lançamentos
   document.getElementById('metrics-resumo').innerHTML=`
     <div class="mcard">
-      <div class="mcard-label"><i class="ti ti-wallet" aria-hidden="true"></i> Patrimônio total</div>
+      <div class="mcard-label"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12 M20 12v4h-4a2 2 0 0 1 0 -4h4"/><path stroke-width="1.5" d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12 M20 12v4h-4a2 2 0 0 1 0 -4h4"/></svg> Patrimônio total</div>
       <div class="mcard-value">${fmtR(t.total)}</div>
       <div class="mcard-sub">Valor investido: <strong>${fmtR(t.custo)}</strong></div>
     </div>
     <div class="mcard">
-      <div class="mcard-label"><i class="ti ti-trending-up" aria-hidden="true"></i> Lucro total</div>
+      <div class="mcard-label"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M3 17l6 -6l4 4l8 -8 M14 7l7 0l0 7"/><path stroke-width="1.5" d="M3 17l6 -6l4 4l8 -8 M14 7l7 0l0 7"/></svg> Lucro total</div>
       <div class="mcard-value ${t.lucroTotal>=0?'positive':'negative'}">${t.lucroTotal>=0?'+':''}${fmtR(t.lucroTotal)}</div>
       <div class="mcard-sub">Capital: <span class="${t.res>=0?'positive':'negative'}">${t.res>=0?'+':''}${fmtR(t.res)}</span> + Prov: <span class="positive">${fmtR(t.proventosTotal)}</span></div>
     </div>
     <div class="mcard">
-      <div class="mcard-label"><i class="ti ti-coin" aria-hidden="true"></i> Proventos (12M)</div>
+      <div class="mcard-label"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M14.8 9a2 2 0 0 0 -1.8 -1h-2a2 2 0 1 0 0 4h2a2 2 0 1 1 0 4h-2a2 2 0 0 1 -1.8 -1 M12 7v10"/><path stroke-width="1.5" d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M14.8 9a2 2 0 0 0 -1.8 -1h-2a2 2 0 1 0 0 4h2a2 2 0 1 1 0 4h-2a2 2 0 0 1 -1.8 -1 M12 7v10"/></svg> Proventos (12M)</div>
       <div class="mcard-value positive">${fmtR(t.provAno)}</div>
       <div class="mcard-sub">DY médio: <strong class="positive">${fmt(t.dyMed)}%</strong></div>
     </div>
     <div class="mcard">
-      <div class="mcard-label"><i class="ti ti-chart-bar" aria-hidden="true"></i> Variação (capital)</div>
+      <div class="mcard-label"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M3 13a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -6 M15 9a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -10 M9 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -14 M4 20h14"/><path stroke-width="1.5" d="M3 13a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -6 M15 9a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -10 M9 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -14 M4 20h14"/></svg> Variação (capital)</div>
       <div class="mcard-value ${t.resPct>=0?'positive':'negative'}">${fmtP(t.resPct)}</div>
       <div class="mcard-sub">${fmtR(Math.abs(t.res))} ${t.res>=0?'acima':'abaixo'} do custo</div>
     </div>
     <div class="mcard">
-      <div class="mcard-label"><i class="ti ti-percent" aria-hidden="true"></i> Rentabilidade total</div>
+      <div class="mcard-label"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M16 17a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M6 7a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M6 18l12 -12"/><path stroke-width="1.5" d="M16 17a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M6 7a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M6 18l12 -12"/></svg> Rentabilidade total</div>
       <div class="mcard-value ${t.rentTotal>=0?'positive':'negative'}">${fmtP(t.rentTotal)}</div>
       <div class="mcard-sub">${c.length} ativos em ${new Set(c.map(a=>a.classe)).size} classes</div>
     </div>
@@ -283,7 +282,7 @@ function renderGrupos(){
           <div class="grupo-stat"><div class="gs-label">Rentabilidade</div><div class="gs-value ${gRent>=0?'positive':'negative'}">${fmtP(gRent)}</div></div>
           <div class="grupo-stat"><div class="gs-label">% carteira / ideal</div><div class="gs-value" style="color:${corCls}">${pctCart.toFixed(1)}% / ${idealCls}%</div></div>
         </div>
-        <i class="ti ti-chevron-down chevron open" aria-hidden="true"></i>
+        <svg class="chevron open" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6l6 -6"/></svg>
       </div>
       <div id="g-${cls}">
         <div class="tbl-wrap">
@@ -395,7 +394,7 @@ function renderResumoExtra(){
   const cdi=calcSaldoCDI();
   // Card termômetro
   const cardTerm=`<div class="card">
-    <div class="card-title"><i class="ti ti-temperature" aria-hidden="true" style="color:${term.cor}"></i>Termômetro da carteira</div>
+    <div class="card-title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="${term.cor}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M10 13.5a4 4 0 1 0 4 0v-8.5a2 2 0 0 0 -4 0v8.5 M10 9l4 0"/><path stroke-width="1.5" d="M10 13.5a4 4 0 1 0 4 0v-8.5a2 2 0 0 0 -4 0v8.5 M10 9l4 0"/></svg>Termômetro da carteira</div>
     <div style="display:flex;align-items:center;gap:14px">
       <div style="font-size:30px;font-weight:800;color:${term.cor};line-height:1">${term.nota}<span style="font-size:14px;color:var(--color-text-secondary);font-weight:600">/100</span></div>
       <div style="flex:1">
@@ -408,7 +407,7 @@ function renderResumoExtra(){
   </div>`;
   // Card destaques do mês
   const cardDest=dest?`<div class="card">
-    <div class="card-title"><i class="ti ti-flame" aria-hidden="true" style="color:#FF8C00"></i>Destaques do mês</div>
+    <div class="card-title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#FF8C00" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M12 10.941c2.333 -3.308 .167 -7.823 -1 -8.941c0 3.395 -2.235 5.299 -3.667 6.706c-1.43 1.408 -2.333 3.294 -2.333 5.588c0 3.704 3.134 6.706 7 6.706c3.866 0 7 -3.002 7 -6.706c0 -1.712 -1.232 -4.403 -2.333 -5.588c-2.084 3.353 -3.257 3.353 -4.667 2.235"/><path stroke-width="1.5" d="M12 10.941c2.333 -3.308 .167 -7.823 -1 -8.941c0 3.395 -2.235 5.299 -3.667 6.706c-1.43 1.408 -2.333 3.294 -2.333 5.588c0 3.704 3.134 6.706 7 6.706c3.866 0 7 -3.002 7 -6.706c0 -1.712 -1.232 -4.403 -2.333 -5.588c-2.084 3.353 -3.257 3.353 -4.667 2.235"/></svg>Destaques do mês</div>
     <div style="display:flex;flex-direction:column;gap:12px">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <span style="font-size:12px;color:var(--color-text-secondary)">▲ Maior alta</span>
@@ -431,7 +430,7 @@ function renderResumoExtra(){
     const diff=seuTotal-cdi.saldoCDI;
     const ganhou=diff>=0;
     cardCDI=`<div class="card">
-      <div class="card-title"><i class="ti ti-scale" aria-hidden="true" style="color:#534AB7"></i>Sua carteira vs Renda Fixa (CDI)</div>
+      <div class="card-title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#534AB7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M7 20l10 0 M6 6l6 -1l6 1 M12 3l0 17 M9 12l-3 -6l-3 6a3 3 0 0 0 6 0 M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/><path stroke-width="1.5" d="M7 20l10 0 M6 6l6 -1l6 1 M12 3l0 17 M9 12l-3 -6l-3 6a3 3 0 0 0 6 0 M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/></svg>Sua carteira vs Renda Fixa (CDI)</div>
       <div style="display:flex;flex-direction:column;gap:10px">
         <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--color-text-secondary)">Você tem hoje <span style="font-size:10px">(carteira + proventos)</span></span><strong>${fmtR(seuTotal)}</strong></div>
         <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--color-text-secondary)">Se fosse só CDI</span><strong>${fmtR(cdi.saldoCDI)}</strong></div>
@@ -483,9 +482,9 @@ function renderCardRebalanceamento(){
     }).join('');
   const corpo=desvios.length
     ?linhas+`<div style="font-size:10px;color:var(--color-text-secondary);margin-top:4px">Banda de tolerância: ±${BANDA}pp. Prefira rebalancear com APORTES (aba Aporte) para não gerar imposto.</div>`
-    :`<div style="font-size:13px;color:#1D9E75;font-weight:600"><i class="ti ti-check" aria-hidden="true"></i> Carteira dentro das metas (±${BANDA}pp)</div>`;
+    :`<div style="font-size:13px;color:#1D9E75;font-weight:600"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#1D9E75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M5 12l5 5l10 -10"/><path stroke-width="1.5" d="M5 12l5 5l10 -10"/></svg> Carteira dentro das metas (±${BANDA}pp)</div>`;
   return `<div class="card">
-    <div class="card-title"><i class="ti ti-scale" aria-hidden="true" style="color:${desvios.length?'#BA7517':'#1D9E75'}"></i>Rebalanceamento</div>
+    <div class="card-title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="${desvios.length?'#BA7517':'#1D9E75'}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M7 20l10 0 M6 6l6 -1l6 1 M12 3l0 17 M9 12l-3 -6l-3 6a3 3 0 0 0 6 0 M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/><path stroke-width="1.5" d="M7 20l10 0 M6 6l6 -1l6 1 M12 3l0 17 M9 12l-3 -6l-3 6a3 3 0 0 0 6 0 M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/></svg>Rebalanceamento</div>
     ${corpo}
   </div>`;
 }

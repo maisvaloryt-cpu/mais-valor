@@ -8,7 +8,6 @@
 <link rel="icon" type="image/png" href="../favicon.png">
 <link rel="stylesheet" href="../style.css">
 <link rel="stylesheet" href="../mobile.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
 <script>window.NAV_BASE_PATH = "../"; window.NAV_SLIM = true;</script>
 </head>
 <body>
@@ -17,7 +16,7 @@
 
 <div class="app">
   <div class="header">
-    <h1><i class="ti ti-chart-pie" aria-hidden="true" style="color:var(--blue)"></i>Carteira</h1>
+    <h1><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-6.8a2 2 0 0 1 -2 -2v-7a.9 .9 0 0 0 -1 -.8 M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a1 1 0 0 1 -1 -1v-4.5"/><path stroke-width="1.5" d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-6.8a2 2 0 0 1 -2 -2v-7a.9 .9 0 0 0 -1 -.8 M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a1 1 0 0 1 -1 -1v-4.5"/></svg> Carteira</h1>
     <div class="header-actions" id="header-actions"></div>
   </div>
 
@@ -26,18 +25,18 @@
   <div id="tab-irpf">
     <p class="tab-hint">Os números da sua carteira organizados para a declaração do Imposto de Renda: bens e direitos, rendimentos isentos e imposto estimado sobre vendas.</p>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;flex-wrap:wrap">
-      <div class="section-title" style="margin:0"><i class="ti ti-file-text" aria-hidden="true"></i>Informações para IRPF</div>
+      <div class="section-title" style="margin:0"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M14 3v4a1 1 0 0 0 1 1h4 M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2 M9 9l1 0 M9 13l6 0 M9 17l6 0"/><path stroke-width="1.5" d="M14 3v4a1 1 0 0 0 1 1h4 M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2 M9 9l1 0 M9 13l6 0 M9 17l6 0"/></svg>Informações para IRPF</div>
       <span class="tag-irpf" id="tag-ano-irpf">Ano-Calendário</span>
-      <button class="btn btn-sm" style="margin-left:auto" onclick="exportarRelatorioIRPF()"><i class="ti ti-download" aria-hidden="true"></i> Exportar Relatório ↗</button>
+      <button class="btn btn-sm" style="margin-left:auto" onclick="exportarRelatorioIRPF()"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2 M7 11l5 5l5 -5 M12 4l0 12"/><path stroke-width="1.5" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2 M7 11l5 5l5 -5 M12 4l0 12"/></svg> Exportar Relatório ↗</button>
     </div>
     <div class="metrics" id="metrics-irpf"></div>
     <div class="charts-row">
       <div class="card">
-        <div class="card-title"><i class="ti ti-receipt-tax" aria-hidden="true" style="color:#BA7517"></i>Imposto estimado (ganho de capital)</div>
+        <div class="card-title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#BA7517" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M9 14l6 -6 M9 8.5a.5 .5 0 1 0 1 0a.5 .5 0 1 0 -1 0 M14 13.5a.5 .5 0 1 0 1 0a.5 .5 0 1 0 -1 0 M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2"/><path stroke-width="1.5" d="M9 14l6 -6 M9 8.5a.5 .5 0 1 0 1 0a.5 .5 0 1 0 -1 0 M14 13.5a.5 .5 0 1 0 1 0a.5 .5 0 1 0 -1 0 M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2"/></svg>Imposto estimado (ganho de capital)</div>
         <div id="irpf-imposto"></div>
       </div>
       <div class="card">
-        <div class="card-title"><i class="ti ti-alert-triangle" aria-hidden="true" style="color:#E24B4A"></i>Vendas de Ações por Mês (isenção R$20 mil)</div>
+        <div class="card-title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#E24B4A" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke-width="5" stroke-opacity=".22" d="M12 9v4 M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0 M12 16h.01"/><path stroke-width="1.5" d="M12 9v4 M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0 M12 16h.01"/></svg>Vendas de Ações por Mês (isenção R$20 mil)</div>
         <div id="irpf-alerta20k"></div>
       </div>
     </div>
