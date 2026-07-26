@@ -134,7 +134,7 @@ body { padding: 0 0 2rem; }
    abas a começarem na esquerda, alinhadas com o seletor. */
 .app .tabs { margin-left: 0; margin-right: auto; }
 /* As abas rolam na horizontal aqui dentro; os botões (Importar/Transação) ficam fixos à direita. */
-.tabs-scroll { display: flex; overflow-x: auto; overflow-y: hidden; flex: 1 1 auto; min-width: 0; }
+.tabs-scroll { display: flex; overflow-x: auto; flex: 1 1 auto; min-width: 0; }
 .tabs-actions { display: flex; align-items: center; gap: 7px; flex-shrink: 0; margin-left: auto; padding-bottom: 4px; }
 .tab {
   padding: 9px 16px;
@@ -518,6 +518,7 @@ select option { background: var(--bg2, #0E0E11); color: var(--text, #ECEAE4); }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #6B6A72 !important; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #8A8884 !important; }
+.tabs-scroll::-webkit-scrollbar-thumb { background: var(--bg, #080809) !important; }
 
 /* ── Responsive ── */
 @media (max-width: 760px) {
