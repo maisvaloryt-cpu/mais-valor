@@ -1775,6 +1775,10 @@ function renderHeaderAndNav(active){
           <button class="btn btn-sm btn-primary" onclick="openModal()" style="position:relative">+ Transação<span id="rf-badge" title="Há Renda Fixa sem dados" style="display:none;position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#e23b3b;color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center;box-shadow:0 0 0 2px var(--bg2,#16161a)">!</span></button>
         </div>`;
     atualizarBadgeRF();
+    // Mantém a aba ativa visível: centraliza ela na rolagem horizontal (quando possível),
+    // já que a barra é remontada do zero a cada troca de aba e voltaria pro início.
+    const abaAtiva=tabsEl.querySelector('.tab.active');
+    if(abaAtiva)abaAtiva.scrollIntoView({inline:'center',block:'nearest'});
   }
   mvInitSpaTabs();
 }
