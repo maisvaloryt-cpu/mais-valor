@@ -866,7 +866,7 @@ footer em { color: var(--gold); font-style: normal; }
   .sidebar      { display: none; }
   .mini-cards   { grid-template-columns: repeat(2, 1fr); }
   .chart-stats  { grid-template-columns: repeat(2, 1fr); }
-  .indices-bar  { grid-template-columns: repeat(3, 1fr); } /* 6 cards em 2 linhas no celular */
+  .indices-bar  { display: none; } /* 6 cotações estáticas ocultas no celular, fica só a faixa que rola */
   .tool-grid { grid-template-columns: 1fr; }
   .nav-search { width: 140px; }
 }
