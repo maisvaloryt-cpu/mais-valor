@@ -517,7 +517,6 @@ html, body {
   .nav-logo img {
     width: 61px !important;
     height: 61px !important;
-    border-radius: 13px !important;
     flex-shrink: 0 !important;
   }
   .nav-logo span {
