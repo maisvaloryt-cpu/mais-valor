@@ -697,13 +697,19 @@ function renderNav() {
 
   // Mobile: move o login (#nav-auth-area) para a linha da busca,
   // posicionado antes das abas (.nav-links) para ficar na linha 2.
+  // Na Carteira (Consolidador) esse ícone vai pra linha "Sua carteira" (mvSyncAuthIcon).
   if (window.matchMedia('(max-width:768px)').matches) {
     const authArea = document.getElementById('nav-auth-area');
-    const bottomRow = document.querySelector('.nav-bottom-row');
-    const navLinks = bottomRow ? bottomRow.querySelector('.nav-links') : null;
-    if (authArea && bottomRow) {
-      if (navLinks) bottomRow.insertBefore(authArea, navLinks);
-      else bottomRow.appendChild(authArea);
+    if (!window._mvNavAuthAreaEl) window._mvNavAuthAreaEl = authArea;
+    if (inConsolidador) {
+      mvSyncAuthIcon();
+    } else {
+      const bottomRow = document.querySelector('.nav-bottom-row');
+      const navLinks = bottomRow ? bottomRow.querySelector('.nav-links') : null;
+      if (authArea && bottomRow) {
+        if (navLinks) bottomRow.insertBefore(authArea, navLinks);
+        else bottomRow.appendChild(authArea);
+      }
     }
   }
 }
@@ -875,7 +881,35 @@ function renderNavAuth(user) {
       if (drop && !e.target.closest('#nav-auth-area')) drop.classList.remove('open');
     }, { once: false, capture: false });
   }
+  mvSyncAuthIcon();
 }
+
+/* No celular, dentro da Carteira (Consolidador), o ícone de login (avatar roxo/foto)
+   fica sozinho numa linha embaixo da logo, porque as abas do site e a busca somem ali.
+   Esta função move esse mesmo elemento (#nav-auth-area) pra dentro da linha "Sua
+   carteira", depois do botão de engrenagem. Guarda a referência em window._mvNavAuthAreaEl
+   porque toda vez que a carteira troca, o #carteira-switcher é redesenhado do zero
+   (innerHTML) e perderia o ícone — por isso common.js chama esta função de novo
+   depois de cada renderCarteiraSwitcher(). */
+function mvSyncAuthIcon() {
+  if (!window._mvNavAuthAreaEl) {
+    window._mvNavAuthAreaEl = document.getElementById('nav-auth-area');
+  }
+  const authArea = window._mvNavAuthAreaEl;
+  if (!authArea) return;
+  const isMobile = window.matchMedia('(max-width:768px)').matches;
+  const isConsolidador = document.body.classList.contains('is-consolidador');
+  const switcher = document.getElementById('carteira-switcher');
+  if (isMobile && isConsolidador && switcher) {
+    if (authArea.parentElement !== switcher) switcher.appendChild(authArea);
+  } else if (authArea.parentElement === switcher) {
+    // Voltou pro desktop ou saiu da Carteira: devolve o ícone pro lugar de sempre.
+    const topRow = document.querySelector('.nav-top-row');
+    const hamburger = document.getElementById('nav-hamburger');
+    if (topRow) topRow.insertBefore(authArea, hamburger || null);
+  }
+}
+window.mvSyncAuthIcon = mvSyncAuthIcon;
 
 function _setupNavAuth() {
   if (typeof firebase === 'undefined' || typeof firebase.auth !== 'function') return;

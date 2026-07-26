@@ -1688,6 +1688,10 @@ function renderCarteiraSwitcher(){
       <button class="btn btn-sm" onclick="openModalCarteiras()" title="Configurar carteiras">⚙</button>
     </span>
   `;
+  // No celular, o ícone de login (nav.js) mora dentro desta linha, depois da
+  // engrenagem. Como o innerHTML acima é redesenhado do zero, precisa recolocar
+  // o ícone toda vez (ver mvSyncAuthIcon em nav.js).
+  if (typeof mvSyncAuthIcon === 'function') mvSyncAuthIcon();
 }
 
 /* Renderiza a lista de carteiras dentro do modal de gerenciamento */

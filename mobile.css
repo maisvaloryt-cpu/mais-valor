@@ -515,13 +515,13 @@ html, body {
   }
   .nav-logo svg,
   .nav-logo img {
-    width: 61px !important;
-    height: 61px !important;
+    width: 76px !important;
+    height: 76px !important;
     flex-shrink: 0 !important;
   }
   .nav-logo span {
-    font-size: 49px !important;
-    line-height: 61px !important;
+    font-size: 61px !important;
+    line-height: 76px !important;
     letter-spacing: 0.3px !important;
     white-space: nowrap !important;
   }
@@ -601,9 +601,19 @@ html, body {
 
   /* ── Na Carteira (Consolidador), no celular: esconder as abas do site
      (Home, Ativos, Ferramentas, Watchlist, Carteira) e a barra de busca.
-     O logo e o avatar de login continuam visíveis. ──────────────────── */
+     O logo continua visível; o avatar de login é movido pelo nav.js pra
+     dentro da linha "Sua carteira" (ver regra #carteira-switcher #nav-auth-area
+     logo abaixo), em vez de ficar sozinho nesta linha. ────────────────── */
   body.is-consolidador .nav-links,
   body.is-consolidador .nav-bottom-row .nav-search-wrap {
     display: none !important;
+  }
+
+  /* Ícone de login dentro da linha "Sua carteira" (movido via JS por
+     mvSyncAuthIcon, em nav.js): sem isso ficaria com position:absolute
+     (regra padrão de #nav-auth-area) e pularia pro canto da tela. */
+  #carteira-switcher #nav-auth-area {
+    position: static !important;
+    flex-shrink: 0 !important;
   }
 }
