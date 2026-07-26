@@ -47,6 +47,31 @@ def get_tickers():
     return list(dict.fromkeys(tickers))
 
 
+def _carregar_tickers_fii():
+    """[2026-07-26] A classificacao real de FII vem do PROPRIO
+    fiis_fundamentus.json (a mesma fonte que o resto do site usa pra saber
+    se um ticker e FII ou acao) -- NUNCA do sufixo "11" do ticker.
+
+    Antes, fetch_statusinvest/fetch_fundamentus_prov decidiam "e FII?" so
+    olhando se o ticker termina em "11". Isso quebra as Units (TAEE11,
+    KLBN11, SANB11, ENGI11, ALUP11, SAPR11, BPAC11, BRBI11, IGTI11, BRGE11
+    etc.) -- elas SAO ACOES (1 ON + N PN empacotadas), so tem o sufixo "11"
+    por serem "units", e o Fundamentus nao tem essas cadastradas na pagina
+    de FII (fii_proventos.php retorna vazio pra elas) -- ai a cascata caia
+    pro Yahoo, que nunca preenche o campo 'tipo', e o pagamento nunca era
+    confirmado (ver aplicar_reconstrucao_units() mais abaixo, que e o
+    contorno pros dados JA salvos; esta funcao aqui corrige a fonte, pra
+    nao acontecer de novo nas proximas buscas)."""
+    try:
+        with open("data/fiis_fundamentus.json") as f:
+            return set(json.load(f).get("fiis", {}).keys())
+    except Exception:
+        return set()
+
+
+TICKERS_FII = _carregar_tickers_fii()
+
+
 def _norm_date(s):
     """Aceita 'YYYY-MM-DD' ou 'DD/MM/YYYY' (com hora opcional) → 'YYYY-MM-DD' ou ''."""
     if not s:
@@ -96,7 +121,7 @@ def fetch_brapi(ticker):
 
 # ── Fonte 2: StatusInvest (ed = data-com, pd = pagamento) ─────────────────────
 def fetch_statusinvest(ticker):
-    base = "fii" if ticker.endswith("11") else "acao"
+    base = "fii" if ticker in TICKERS_FII else "acao"
     url = f"https://statusinvest.com.br/{base}/companytickerprovents?ticker={ticker}&chartProventsType=2"
     try:
         r = requests.get(url, headers=HEADERS, timeout=15)
@@ -144,7 +169,7 @@ def fetch_yahoo(ticker):
 
 def fetch_fundamentus_prov(ticker):
     """Fundamentus — proventos: data-com, valor, tipo, data de pagamento (inclui anunciados/futuros). Grátis."""
-    base = "fii_proventos" if ticker.endswith("11") else "proventos"
+    base = "fii_proventos" if ticker in TICKERS_FII else "proventos"
     url = f"https://www.fundamentus.com.br/{base}.php?papel={ticker}&tipo=2"
     try:
         r = requests.get(url, headers=HEADERS, timeout=15)
@@ -172,8 +197,14 @@ def fetch_fundamentus_prov(ticker):
 
 
 def get_dividendos(ticker):
-    """Cascata: tenta as fontes na ordem; a primeira com dados vence."""
-    for nome, fn in (("Fundamentus", fetch_fundamentus_prov), ("Yahoo", fetch_yahoo)):
+    """[2026-07-26] Cascata completa: Fundamentus -> Brapi -> StatusInvest ->
+    Yahoo (antes so tentava Fundamentus e Yahoo -- Brapi/StatusInvest ja
+    existiam prontas no arquivo mas nunca eram chamadas). Isso ajuda tickers
+    como AGCX11, onde o Fundamentus simplesmente nao tem a pagina de
+    proventos cadastrada ("Nenhum provento encontrado") e a busca caia
+    direto pro Yahoo (que nunca traz o campo 'tipo')."""
+    for nome, fn in (("Fundamentus", fetch_fundamentus_prov), ("Brapi", fetch_brapi),
+                     ("StatusInvest", fetch_statusinvest), ("Yahoo", fetch_yahoo)):
         try:
             divs = fn(ticker)
         except Exception:
@@ -378,20 +409,31 @@ def reconstruir_unit(on_ticker, on_ratio, pn_ticker, pn_ratio):
 
 
 def aplicar_reconstrucao_units():
-    """Recalcula data/dividendos/{UNIT}.json pras Units conhecidas (ver
-    COMPOSICAO_UNITS) a partir do historico confirmado das acoes ON+PN,
-    em vez de depender da fonte do Fundamentus pra elas (que nunca confirma
-    'tipo' porque trata ticker terminado em "11" como FII)."""
+    """[2026-07-26] BACKUP, nao a fonte principal. Desde que TICKERS_FII
+    corrigiu a classificacao (ver acima), a busca direta dessas Units ja
+    deve trazer pagamento confirmado de verdade direto do Fundamentus. Essa
+    funcao SO reconstroi (e so sobrescreve o arquivo) se, apos a busca
+    normal deste ciclo, o ticker da Unit AINDA nao tiver nenhum registro
+    confirmado (tipo preenchido) -- ou seja, so entra em acao se a busca
+    direta falhar por algum motivo (Fundamentus fora do ar, mudou o layout
+    da pagina, etc.). Quando a busca direta volta a funcionar, essa funcao
+    para de mexer no arquivo sozinha -- confia no dado real, que e mais
+    completo e preciso que a reconstrucao ON+PN."""
     now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-3))).strftime("%d/%m/%Y %H:%M")
     for unit, (on_t, on_r, pn_t, pn_r) in COMPOSICAO_UNITS.items():
+        atual = _carregar_divs_ticker(unit)
+        ja_confirmado = any(str(d.get("tipo") or "").strip() for d in atual)
+        if ja_confirmado:
+            print(f"{unit}: busca direta ja confirmou pagamento real -- reconstrucao NAO usada")
+            continue
         reconstruido = reconstruir_unit(on_t, on_r, pn_t, pn_r)
         if not reconstruido:
             continue
         path = f"data/dividendos/{unit}.json"
         with open(path, "w") as f:
             json.dump({"ticker": unit, "dividendos": reconstruido, "updated_at": now,
-                       "fonte": f"calculado ({on_r}x{on_t} + {pn_r}x{pn_t})"}, f, ensure_ascii=False)
-        print(f"{unit}: reconstruido a partir de {on_t}+{pn_t} ({len(reconstruido)} pagamentos)")
+                       "fonte": f"calculado ({on_r}x{on_t} + {pn_r}x{pn_t}) -- backup, busca direta falhou"}, f, ensure_ascii=False)
+        print(f"{unit}: SEM confirmacao direta -- usando backup reconstruido de {on_t}+{pn_t} ({len(reconstruido)} pagamentos)")
 
 
 def gerar_div12m():

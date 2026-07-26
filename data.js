@@ -300,6 +300,20 @@ function isDuplicado(ticker) {
   return false;
 }
 
+// FIIs com volume de negociacao praticamente zero (fundos em fase de
+// desenvolvimento/muito ilíquidos ou encerrados) — escondidos das listas,
+// buscas e rankings públicos porque a maioria mostrava DY absurdo (o dado
+// de dividendo deles nunca é confirmado pela fonte). Os dados continuam
+// salvos em disco (nada foi apagado), só não aparecem na navegação normal.
+// [2026-07-26] Revisão futura: reavaliar se algum ganhar volume real.
+const FIIS_OCULTOS = new Set([
+  "HDEL11","PNDL11","RDLI11","BRIM11","XPHT11","RBLG11","RBRI11","YUFI11",
+  "ISCJ11","CFII11","PNRC11","FMOF11","HYPI11","BBFI11","HGPO11","RBTS11",
+  "MMPD11","BRIP11","ERCR11","CYLD11","RSPD11","BICE11","KEVE11","LPLP11",
+  "VGII11","GCOI11","ICNE11","RBIR11","LRDI11","VVRI11","ROOF11","HRES11",
+  "RECD11","REIT11","AEFI11","BBVJ11","HGJH11","RDES11",
+]);
+
 // ─── FUNÇÃO PRINCIPAL ─────────────────────────────────────────────────────────
 async function loadData() {
   try {
@@ -454,7 +468,7 @@ async function loadData() {
           stale:    cot.stale    || false,
           _source:  cot._source,
         };
-      }).filter(Boolean);
+      }).filter(f => f && !FIIS_OCULTOS.has(f.t));
     } else {
       FIIS = (json.fiis||[]).map(d => {
         const cot = mergeCot(d.ticker, 'fiis') || d;
@@ -472,7 +486,7 @@ async function loadData() {
           stale:    cot.stale||false,
           _source:  cot._source,
         };
-      }).filter(f => f.p > 0);
+      }).filter(f => f.p > 0 && !FIIS_OCULTOS.has(f.t));
     }
 
     // ── Timestamp ─────────────────────────────────────────────────────────────
