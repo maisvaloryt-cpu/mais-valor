@@ -1,8 +1,8 @@
 {
-  "updated_at": "26/07/2026 04:07",
-  "total": 446,
-  "total_registros": 49273,
-  "total_ativos": 1094,
+  "updated_at": "26/07/2026 07:09",
+  "total": 455,
+  "total_registros": 49544,
+  "total_ativos": 1102,
   "dividendos": [
     {
       "t": "AFHF11",
@@ -629,9 +629,18 @@
       "t": "SAPR11",
       "n": "Companhia de Saneamento do Parana - Sanepar Units Cons of 1 Sh + 4 Pfd Shs",
       "tipo": "JRS CAP PROPRIO",
+      "com": "2025-12-30",
+      "pag": "2026-06-26",
+      "val": 0.5524,
+      "dy": "18.22%"
+    },
+    {
+      "t": "SAPR11",
+      "n": "Companhia de Saneamento do Parana - Sanepar Units Cons of 1 Sh + 4 Pfd Shs",
+      "tipo": "JRS CAP PROPRIO",
       "com": "2025-06-30",
       "pag": "2026-06-26",
-      "val": 1.4084,
+      "val": 1.4082,
       "dy": "46.44%"
     },
     {
@@ -1263,33 +1272,6 @@
       "pag": "2026-06-30",
       "val": 0.12,
       "dy": "17.20%"
-    },
-    {
-      "t": "SANB11",
-      "n": "Banco Santander (Brasil) S.A. Units Cons of 1 Sh + 1 Pfd Sh",
-      "tipo": "Rendimento",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.5347,
-      "dy": "24.36%"
-    },
-    {
-      "t": "SANB3",
-      "n": "Banco Santander (Brasil) S.A.",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.2546,
-      "dy": "23.72%"
-    },
-    {
-      "t": "SANB4",
-      "n": "Banco Santander (Brasil) SA Pfd",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.2801,
-      "dy": "24.90%"
     },
     {
       "t": "SCPF11",
@@ -3389,15 +3371,6 @@
       "dy": "11.52%"
     },
     {
-      "t": "IGTI11",
-      "n": "Iguatemi SA Units Cons of 1 Sh + 2 Pfd Shs",
-      "tipo": "Rendimento",
-      "com": "",
-      "pag": "2026-07-16",
-      "val": 0.1687,
-      "dy": "8.33%"
-    },
-    {
       "t": "APTO11",
       "n": "Navi Residencial Fundo de Investimento Imobiliario",
       "tipo": "Rendimento",
@@ -3497,6 +3470,15 @@
       "dy": "13.11%"
     },
     {
+      "t": "IGTI11",
+      "n": "Iguatemi SA Units Cons of 1 Sh + 2 Pfd Shs",
+      "tipo": "DIVIDENDO",
+      "com": "2026-07-15",
+      "pag": "2026-07-29",
+      "val": 0.1687,
+      "dy": "8.33%"
+    },
+    {
       "t": "IGTI3",
       "n": "Iguatemi SA",
       "tipo": "DIVIDENDO",
@@ -3504,6 +3486,33 @@
       "pag": "2026-07-29",
       "val": 0.0241,
       "dy": "8.93%"
+    },
+    {
+      "t": "CEBR3",
+      "n": "Companhia Energetica de Brasilia - CEB",
+      "tipo": "DIVIDENDO",
+      "com": "2026-07-20",
+      "pag": "2026-07-30",
+      "val": 1.0,
+      "dy": "48.10%"
+    },
+    {
+      "t": "CEBR5",
+      "n": "Companhia Energetica de Brasilia - CEB Pfd A",
+      "tipo": "DIVIDENDO",
+      "com": "2026-07-20",
+      "pag": "2026-07-30",
+      "val": 1.0,
+      "dy": "48.98%"
+    },
+    {
+      "t": "CEBR6",
+      "n": "Companhia Energetica de Brasilia - CEB Pfd B",
+      "tipo": "DIVIDENDO",
+      "com": "2026-07-20",
+      "pag": "2026-07-30",
+      "val": 1.1,
+      "dy": "46.92%"
     },
     {
       "t": "BBDC3",
@@ -3533,6 +3542,15 @@
       "dy": "7.13%"
     },
     {
+      "t": "MDIA3",
+      "n": "M. Dias Branco SA Industria e Comercio de Alimentos",
+      "tipo": "DIVIDENDO",
+      "com": "2026-07-23",
+      "pag": "2026-07-31",
+      "val": 0.03,
+      "dy": "2.11%"
+    },
+    {
       "t": "ODER3",
       "n": "ODER3",
       "tipo": "JRS CAP PROPRIO",
@@ -3558,6 +3576,15 @@
       "pag": "2026-07-31",
       "val": 0.0652,
       "dy": "3.98%"
+    },
+    {
+      "t": "WIZC3",
+      "n": "WIZ Co Participacoes e Corretagem de Seguros SA",
+      "tipo": "DIVIDENDO",
+      "com": "2025-12-26",
+      "pag": "2026-07-31",
+      "val": 0.3161,
+      "dy": "45.92%"
     },
     {
       "t": "BBDC3",
@@ -3612,6 +3639,60 @@
       "pag": "2026-08-03",
       "val": 0.0182,
       "dy": "0.52%"
+    },
+    {
+      "t": "ALOS3",
+      "n": "Allos S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-07-23",
+      "pag": "2026-08-04",
+      "val": 0.2919,
+      "dy": "13.37%"
+    },
+    {
+      "t": "SBFG3",
+      "n": "Grupo SBF S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-04-24",
+      "pag": "2026-08-05",
+      "val": 0.5429,
+      "dy": "69.60%"
+    },
+    {
+      "t": "JALL3",
+      "n": "Jalles Machado SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-07-23",
+      "pag": "2026-08-06",
+      "val": 0.008,
+      "dy": "4.82%"
+    },
+    {
+      "t": "SANB11",
+      "n": "Banco Santander (Brasil) S.A. Units Cons of 1 Sh + 1 Pfd Sh",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-07-21",
+      "pag": "2026-08-06",
+      "val": 0.5347,
+      "dy": "24.36%"
+    },
+    {
+      "t": "SANB3",
+      "n": "Banco Santander (Brasil) S.A.",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-07-21",
+      "pag": "2026-08-06",
+      "val": 0.2546,
+      "dy": "23.72%"
+    },
+    {
+      "t": "SANB4",
+      "n": "Banco Santander (Brasil) SA Pfd",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-07-21",
+      "pag": "2026-08-06",
+      "val": 0.2801,
+      "dy": "24.90%"
     },
     {
       "t": "ABCB4",
