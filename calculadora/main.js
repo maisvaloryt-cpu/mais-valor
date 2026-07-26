@@ -163,7 +163,10 @@
         _libTooltipEl.style.cssText = isAporte
             ? 'position:fixed;z-index:9999;background:#1a1a24;border:1px solid rgba(255,204,0,0.5);border-radius:8px;padding:6px 11px;font-size:11px;font-weight:bold;color:#FFCC00;pointer-events:none;transition:opacity 0.15s;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,0.5);'
             : 'position:fixed;z-index:9999;background:#1a1a24;border:1px solid rgba(239,68,68,0.5);border-radius:8px;padding:6px 11px;font-size:11px;font-weight:bold;color:#ef4444;pointer-events:none;transition:opacity 0.15s;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,0.5);';
-        _libTooltipEl.textContent = text;
+        // [26/07] innerHTML em vez de textContent: o label da Liberdade agora traz um
+        // ícone SVG embutido (texto continua vindo só de valores gerados internamente,
+        // nunca de entrada do usuário).
+        _libTooltipEl.innerHTML = text;
         _libTooltipEl.style.opacity = '1';
         _libTooltipEl.style.left = (event.x + 14) + 'px';
         _libTooltipEl.style.top = (event.y - 8) + 'px';
@@ -362,10 +365,20 @@
                 }
                 if (x !== null) {
                     ctx.save();
-                    ctx.font = '17px serif';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'bottom';
-                    ctx.fillText('🚩', x, y - 4);
+                    // [26/07] Bandeira em SVG (Path2D) no lugar do emoji, mesmo traço
+                    // duplo (halo + nítido) dos ícones do site.
+                    const flagPath = new Path2D('M5 5a5 5 0 0 1 7 0a5 5 0 0 0 7 0v9a5 5 0 0 1 -7 0a5 5 0 0 0 -7 0v-9 M5 21v-7');
+                    ctx.translate(x - 8, y - 21);
+                    ctx.scale(0.7, 0.7);
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.strokeStyle = '#FFCC00';
+                    ctx.globalAlpha = 0.22;
+                    ctx.lineWidth = 5;
+                    ctx.stroke(flagPath);
+                    ctx.globalAlpha = 1;
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke(flagPath);
                     ctx.restore();
                 }
             }
@@ -1283,7 +1296,7 @@
             if (liberdadePoint) {
                 const custoRaw = document.getElementById('inputCustoVida')?.value;
                 const custo = parseCurrencyValue(custoRaw);
-                libStatusEl.innerHTML = `<span style="color:#32CD32;">🚩 Liberdade atingida em <strong>${liberdadePoint.humanLabel}</strong></span><br><span style="color:#6b7280;">Renda passiva ≥ ${formatCurrency(custo)}/mês</span>`;
+                libStatusEl.innerHTML = `<span style="color:#32CD32;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#FFCC00" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:3px"><path stroke-width="5" stroke-opacity=".22" d="M5 5a5 5 0 0 1 7 0a5 5 0 0 0 7 0v9a5 5 0 0 1 -7 0a5 5 0 0 0 -7 0v-9 M5 21v-7"/><path stroke-width="1.5" d="M5 5a5 5 0 0 1 7 0a5 5 0 0 0 7 0v9a5 5 0 0 1 -7 0a5 5 0 0 0 -7 0v-9 M5 21v-7"/></svg>Liberdade atingida em <strong>${liberdadePoint.humanLabel}</strong></span><br><span style="color:#6b7280;">Renda passiva ≥ ${formatCurrency(custo)}/mês</span>`;
                 libStatusEl.classList.remove('hidden');
             } else if (document.getElementById('chkLiberdade')?.checked && parseCurrencyValue(document.getElementById('inputCustoVida')?.value) > 0) {
                 libStatusEl.innerHTML = '<span style="color:#9ca3af;">⚠️ Liberdade não atingida no período</span>';
@@ -1598,7 +1611,8 @@
                     annotation: (() => {
                         const annots = {};
                         if (liberdadePoint) {
-                            const libLabel = `🚩 Liberdade — ${liberdadePoint.humanLabel || (tipoPeriodo === 'anual' ? 'Ano' : 'Mês') + ' ' + liberdadePoint.label}`;
+                            const flagIconSvg = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#FFCC00" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:2px"><path stroke-width="5" stroke-opacity=".22" d="M5 5a5 5 0 0 1 7 0a5 5 0 0 0 7 0v9a5 5 0 0 1 -7 0a5 5 0 0 0 -7 0v-9 M5 21v-7"/><path stroke-width="1.5" d="M5 5a5 5 0 0 1 7 0a5 5 0 0 0 7 0v9a5 5 0 0 1 -7 0a5 5 0 0 0 -7 0v-9 M5 21v-7"/></svg>';
+                            const libLabel = `${flagIconSvg}Liberdade — ${liberdadePoint.humanLabel || (tipoPeriodo === 'anual' ? 'Ano' : 'Mês') + ' ' + liberdadePoint.label}`;
                             const libFracX = liberdadePoint.fracIdx !== undefined ? liberdadePoint.fracIdx : liberdadePoint.idx;
                             annots.liberdadeFlag = {
                                 type: 'line',

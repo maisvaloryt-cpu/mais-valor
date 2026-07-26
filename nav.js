@@ -119,7 +119,10 @@ function applyTheme(t) {
   document.documentElement.setAttribute('data-theme', t);
   localStorage.setItem('mv_theme', t);
   const btn = document.getElementById('theme-btn');
-  if (btn) btn.textContent = t === 'dark' ? '☀️' : '🌙';
+  // [26/07] SVG no lugar do emoji de sol/lua, cor herdada do botão (currentColor)
+  if (btn) btn.innerHTML = t === 'dark'
+    ? '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M14.828 14.828a4 4 0 1 0 -5.656 -5.656a4 4 0 0 0 5.656 5.656 M6.343 17.657l-1.414 1.414 M6.343 6.343l-1.414 -1.414 M17.657 6.343l1.414 -1.414 M17.657 17.657l1.414 1.414 M4 12h-2 M12 4v-2 M20 12h2 M12 20v2"/></svg>'
+    : '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454l0 .008"/></svg>';
 }
 function toggleTheme() { applyTheme(getTheme() === 'dark' ? 'light' : 'dark'); }
 
@@ -314,7 +317,7 @@ async function loadIndicesNav() {
     // Renda fixa (BCB)
     items.push(`<div class="ticker-item"><span class="ticker-name">IPCA 12m</span><span class="ticker-val tk-ipca">—</span></div>`);
     if (isCopomDay()) {
-      items.push(`<div class="ticker-item" style="border-color:rgba(245,166,35,0.4)"><span class="ticker-name" style="color:var(--gold)">🔔 SELIC</span><span class="ticker-val tk-selic">—</span></div>`);
+      items.push(`<div class="ticker-item" style="border-color:rgba(245,166,35,0.4)"><span class="ticker-name" style="color:var(--gold)"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:2px"><path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6 M9 17v1a3 3 0 0 0 6 0v-1"/></svg>SELIC</span><span class="ticker-val tk-selic">—</span></div>`);
     }
     setTimeout(() => {
       if (typeof ACOES !== 'undefined' && ACOES.length) {
@@ -438,7 +441,7 @@ function renderNavSlim() {
       <a class="nav-slim-logo" href="${NAV_BASE}index.html">${LOGO_SVG('slim')}</a>
       <div class="nav-slim-links">${links}</div>
     </div>
-    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Alternar tema" style="flex-shrink:0;background:transparent;border:none;cursor:pointer;font-size:16px;padding:4px 8px;margin-left:1rem;color:var(--text2)">☀️</button>
+    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Alternar tema" style="flex-shrink:0;background:transparent;border:none;cursor:pointer;font-size:16px;padding:4px 8px;margin-left:1rem;color:var(--text2)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M14.828 14.828a4 4 0 1 0 -5.656 -5.656a4 4 0 0 0 5.656 5.656 M6.343 17.657l-1.414 1.414 M6.343 6.343l-1.414 -1.414 M17.657 6.343l1.414 -1.414 M17.657 17.657l1.414 1.414 M4 12h-2 M12 4v-2 M20 12h2 M12 20v2"/></svg></button>
   </div>`;
   applyTheme(getTheme());
 }
@@ -505,7 +508,7 @@ function renderNav() {
       <button class="mob-close" onclick="toggleMobileMenu()">✕</button>
     </div>
     <div id="nav-auth-area-mobile" style="padding:12px 0 16px;border-bottom:1px solid var(--border);margin-bottom:4px"></div>
-    <a href="${NAV_BASE}index.html" class="${homeActive?'active':''}" onclick="toggleMobileMenu()">🏠 Home</a>
+    <a href="${NAV_BASE}index.html" class="${homeActive?'active':''}" onclick="toggleMobileMenu()"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M5 12l-2 0l9 -9l9 9l-2 0 M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7 M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M5 12l-2 0l9 -9l9 9l-2 0 M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7 M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" stroke="#F5A623" stroke-width="1.5"/></svg> Home</a>
     <a href="${NAV_BASE}carteira/index.html" class="${carteiraActive?'active':''}" onclick="toggleMobileMenu()">${WALLET_ICON} Carteira</a>
     <div class="mob-group-label">Ativos</div>
     <div class="mob-group-sub">Nacional</div>
@@ -526,7 +529,7 @@ function renderNav() {
     <a href="${NAV_BASE}analise.html" class="${page==='analise.html'?'active':''}" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.analise} Análise IA</a>
     <a href="${NAV_BASE}ferramentas.html" class="${page==='ferramentas.html'?'active':''}" onclick="toggleMobileMenu()">${FERRAMENTA_ICONS.outras} Outras</a>
     <a href="${NAV_BASE}artigos/index.html" class="${location.pathname.includes('/artigos/')?'active':''}" onclick="toggleMobileMenu()"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M14 3v4a1 1 0 0 0 1 1h4" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M14 3v4a1 1 0 0 0 1 1h4" stroke="#F5A623" stroke-width="1.5"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" stroke="#F5A623" stroke-width="1.5"/><path d="M9 9h1M9 13h6M9 17h6" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M9 9h1M9 13h6M9 17h6" stroke="#F5A623" stroke-width="1.5"/></svg> Artigos</a>
-    <a href="${NAV_BASE}metodologia.html" class="${page==='metodologia.html'?'active':''}" onclick="toggleMobileMenu()">📐 Metodologia</a>
+    <a href="${NAV_BASE}metodologia.html" class="${page==='metodologia.html'?'active':''}" onclick="toggleMobileMenu()"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M17 3l4 4l-14 14l-4 -4l14 -14 M16 7l-1.5 -1.5 M13 10l-1.5 -1.5 M10 13l-1.5 -1.5 M7 16l-1.5 -1.5" stroke="#F5A623" stroke-width="5" stroke-opacity="0.22"/><path d="M17 3l4 4l-14 14l-4 -4l14 -14 M16 7l-1.5 -1.5 M13 10l-1.5 -1.5 M10 13l-1.5 -1.5 M7 16l-1.5 -1.5" stroke="#F5A623" stroke-width="1.5"/></svg> Metodologia</a>
     <div class="mob-group-label">Conta</div>
     <a href="${NAV_BASE}watchlist.html" class="${watchActive?'active':''}" onclick="toggleMobileMenu()">★ Watchlist</a>
     <a href="${NAV_BASE}status.html" class="${statusActive?'active':''}" onclick="toggleMobileMenu()" style="color:var(--up)">● Status</a>
@@ -807,7 +810,7 @@ function _navAuthBtnHtml(user) {
         style="display:none;position:absolute;right:0;top:38px;background:var(--bg2,#1a1a1f);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;z-index:99999;min-width:170px;box-shadow:0 8px 32px rgba(0,0,0,0.5)">
         <div style="font-size:13px;font-weight:700;color:var(--text,#eee);margin-bottom:4px;white-space:nowrap">${name}</div>
         <div style="font-size:11px;color:var(--text3,#666);margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px">${user.email || ''}</div>
-        <a href="${NAV_BASE}carteira/index.html" style="display:block;font-size:12px;color:var(--gold,#D4A017);text-decoration:none;padding:4px 0;font-weight:600">📊 Minha Carteira</a>
+        <a href="${NAV_BASE}carteira/index.html" style="display:block;font-size:12px;color:var(--gold,#D4A017);text-decoration:none;padding:4px 0;font-weight:600"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:3px"><path d="M3 13a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -6 M15 9a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -10 M9 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -14 M4 20h14"/></svg>Minha Carteira</a>
         <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:8px 0">
         <button onclick="navLogout()"
           style="width:100%;background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--text2,#aaa);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit">
