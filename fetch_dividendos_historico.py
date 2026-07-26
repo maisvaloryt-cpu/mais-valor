@@ -315,12 +315,100 @@ def main():
     print(f"\nConcluido! {ok}/{len(tickers)} ativos, {novos_total} pagamentos novos")
     print(f"Fontes usadas: {por_fonte}")
 
+    # Units (TAEE11, KLBN11 etc.): reconstroi o historico a partir das acoes
+    # ON+PN (que tem 'tipo' confirmado), porque a fonte do Fundamentus pra
+    # ticker terminado em "11" trata como FII e nunca confirma essas.
+    aplicar_reconstrucao_units()
+
     # div12m.json: soma REAL dos proventos por acao nos ultimos 12 meses (base do
     # preco-teto de Bazin no site — substitui a estimativa DY x preco).
     gerar_div12m()
 
 
+# Units cuja fonte do Fundamentus nunca confirma 'tipo' (ticker terminado em
+# "11" tratado como FII, mesmo sendo uma Unit de acao ON+PN). Composicao
+# verificada em fontes oficiais/B3 em 2026-07-26. Faltam confirmar: BRBI11,
+# IGTI11, BRGE11, MRSA3B -- nao mexer nelas ainda.
+COMPOSICAO_UNITS = {
+    "TAEE11": ("TAEE3", 1, "TAEE4", 2),
+    "KLBN11": ("KLBN3", 1, "KLBN4", 4),
+    "SANB11": ("SANB3", 1, "SANB4", 1),
+    "ENGI11": ("ENGI3", 1, "ENGI4", 4),
+    "ALUP11": ("ALUP3", 1, "ALUP4", 2),
+    "SAPR11": ("SAPR3", 1, "SAPR4", 4),
+    "BPAC11": ("BPAC3", 1, "BPAC5", 2),
+}
+
+
+def _carregar_divs_ticker(ticker):
+    path = f"data/dividendos/{ticker}.json"
+    if not os.path.exists(path):
+        return []
+    try:
+        with open(path) as f:
+            divs = json.load(f).get("dividendos", [])
+    except Exception:
+        return []
+    return _dedup([_normalize(d) for d in divs])
+
+
+def reconstruir_unit(on_ticker, on_ratio, pn_ticker, pn_ratio):
+    """Monta o historico da Unit = on_ratio x acao ON + pn_ratio x acao PN,
+    casando pela data de pagamento (as duas classes normalmente pagam no
+    mesmo evento societario, so que com valor por acao diferente)."""
+    on_divs = {d.get("pag"): d for d in _carregar_divs_ticker(on_ticker) if d.get("pag")}
+    pn_divs = {d.get("pag"): d for d in _carregar_divs_ticker(pn_ticker) if d.get("pag")}
+    datas = sorted(set(on_divs) | set(pn_divs))
+    out = []
+    for pag in datas:
+        do = on_divs.get(pag)
+        dp = pn_divs.get(pag)
+        vo = float(do.get("value") or 0) if do else 0.0
+        vp = float(dp.get("value") or 0) if dp else 0.0
+        valor = on_ratio * vo + pn_ratio * vp
+        if valor <= 0:
+            continue
+        tipo_o = str(do.get("tipo") or "").strip() if do else ""
+        tipo_p = str(dp.get("tipo") or "").strip() if dp else ""
+        tipos = [t for t in (tipo_o, tipo_p) if t]
+        tipo = "/".join(dict.fromkeys(tipos))
+        com = (do or {}).get("com") or (dp or {}).get("com") or ""
+        out.append({"com": com, "pag": pag, "value": round(valor, 6), "tipo": tipo})
+    return out
+
+
+def aplicar_reconstrucao_units():
+    """Recalcula data/dividendos/{UNIT}.json pras Units conhecidas (ver
+    COMPOSICAO_UNITS) a partir do historico confirmado das acoes ON+PN,
+    em vez de depender da fonte do Fundamentus pra elas (que nunca confirma
+    'tipo' porque trata ticker terminado em "11" como FII)."""
+    now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-3))).strftime("%d/%m/%Y %H:%M")
+    for unit, (on_t, on_r, pn_t, pn_r) in COMPOSICAO_UNITS.items():
+        reconstruido = reconstruir_unit(on_t, on_r, pn_t, pn_r)
+        if not reconstruido:
+            continue
+        path = f"data/dividendos/{unit}.json"
+        with open(path, "w") as f:
+            json.dump({"ticker": unit, "dividendos": reconstruido, "updated_at": now,
+                       "fonte": f"calculado ({on_r}x{on_t} + {pn_r}x{pn_t})"}, f, ensure_ascii=False)
+        print(f"{unit}: reconstruido a partir de {on_t}+{pn_t} ({len(reconstruido)} pagamentos)")
+
+
 def gerar_div12m():
+    """[2026-07-26, revisado] Antes somava TODO registro (confirmado ou nao)
+    com 'pag' nos ultimos 365 dias -- uma estimativa nao-confirmada errada
+    (ex: XPHT11 com R$127,70 de estimativa quando o normal dele e ~R$1,37)
+    inflava o DY/preco-teto igual se fosse pagamento real.
+
+    Regra nova: conta pro total dos 12 meses SO pagamento CONFIRMADO (tipo
+    preenchido) -- estimativa nunca conta pro DY, porque e um valor que ainda
+    nao foi de fato pago.
+
+    Trava de seguranca: se o ticker NUNCA tem nenhum registro confirmado em
+    toda sua historia (normalmente Units ainda sem reconstrucao -- ver
+    aplicar_reconstrucao_units, que roda antes desta funcao no main()),
+    mantem o comportamento antigo pra esse ticker (soma tudo) -- e melhor
+    mostrar uma estimativa do que zerar o DY dele de repente."""
     hoje = datetime.date.today()
     corte = (hoje - datetime.timedelta(days=365)).isoformat()
     out = {}
@@ -333,8 +421,11 @@ def gerar_div12m():
         except Exception:
             continue
         tk = arq[:-5]
+        limpo = _dedup([_normalize(x) for x in divs])
+        tipados = [d for d in limpo if str(d.get("tipo") or "").strip()]
+        fonte = tipados if tipados else limpo  # trava de seguranca
         total = 0.0
-        for d in _dedup([_normalize(x) for x in divs]):
+        for d in fonte:
             pag = d.get("pag") or d.get("com") or ""
             try:
                 v = float(d.get("value") or 0)

@@ -1,7 +1,7 @@
 {
-  "updated_at": "26/07/2026 03:29",
-  "total": 445,
-  "total_registros": 49401,
+  "updated_at": "26/07/2026 04:07",
+  "total": 446,
+  "total_registros": 49273,
   "total_ativos": 1094,
   "dividendos": [
     {
@@ -626,6 +626,15 @@
       "dy": "18.83%"
     },
     {
+      "t": "SAPR11",
+      "n": "Companhia de Saneamento do Parana - Sanepar Units Cons of 1 Sh + 4 Pfd Shs",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2025-06-30",
+      "pag": "2026-06-26",
+      "val": 1.4084,
+      "dy": "46.44%"
+    },
+    {
       "t": "SAPR3",
       "n": "Companhia de Saneamento do Parana - Sanepar",
       "tipo": "JRS CAP PROPRIO",
@@ -714,15 +723,6 @@
       "pag": "2026-06-30",
       "val": 0.07,
       "dy": "7.81%"
-    },
-    {
-      "t": "ALUP11",
-      "n": "Alupar Investimento SA Unit Cons of 1 Sh + 2 Pfd Shs",
-      "tipo": "Rendimento",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.21,
-      "dy": "7.68%"
     },
     {
       "t": "BBGO11",
@@ -1067,15 +1067,6 @@
       "dy": "5.51%"
     },
     {
-      "t": "KLBN11",
-      "n": "Klabin SA Ctf de Deposito de Acoes Cons of 1 Sh + 4 Pfd Shs",
-      "tipo": "Rendimento",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.9029,
-      "dy": "61.84%"
-    },
-    {
       "t": "KNCA11",
       "n": "Kinea Credito Agro Fiagro Imobiliario",
       "tipo": "Rendimento",
@@ -1326,15 +1317,6 @@
       "pag": "2026-06-30",
       "val": 0.1,
       "dy": "13.20%"
-    },
-    {
-      "t": "TAEE11",
-      "n": "Transmissora Alianca De Energia Eletrica S.A. Unit",
-      "tipo": "Rendimento",
-      "com": "",
-      "pag": "2026-06-30",
-      "val": 0.559,
-      "dy": "16.65%"
     },
     {
       "t": "TIMS3",
@@ -1614,6 +1596,15 @@
       "pag": "2026-07-03",
       "val": 0.3514,
       "dy": "23.43%"
+    },
+    {
+      "t": "ALUP11",
+      "n": "Alupar Investimento SA Unit Cons of 1 Sh + 2 Pfd Shs",
+      "tipo": "DIVIDENDO",
+      "com": "2026-05-14",
+      "pag": "2026-07-06",
+      "val": 0.21,
+      "dy": "7.68%"
     },
     {
       "t": "ALUP3",
@@ -3677,6 +3668,15 @@
       "dy": "7.28%"
     },
     {
+      "t": "KLBN11",
+      "n": "Klabin SA Ctf de Deposito de Acoes Cons of 1 Sh + 4 Pfd Shs",
+      "tipo": "DIVIDENDO",
+      "com": "2025-12-15",
+      "pag": "2026-08-19",
+      "val": 0.228,
+      "dy": "15.62%"
+    },
+    {
       "t": "KLBN3",
       "n": "Klabin SA",
       "tipo": "DIVIDENDO",
@@ -3729,6 +3729,15 @@
       "pag": "2026-08-24",
       "val": 0.2516,
       "dy": "14.62%"
+    },
+    {
+      "t": "TAEE11",
+      "n": "Transmissora Alianca De Energia Eletrica S.A. Unit",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-05-11",
+      "pag": "2026-08-26",
+      "val": 0.5589,
+      "dy": "16.64%"
     },
     {
       "t": "TAEE3",
