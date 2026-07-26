@@ -1646,7 +1646,7 @@ function renderGerenciarCarteiras(){
       ${c.id===carteiraAtual
         ? '<span class="badge badge-b3" style="white-space:nowrap">Ativa</span>'
         : `<button class="btn btn-sm" onclick="trocarCarteira('${c.id}');renderGerenciarCarteiras()">Usar</button>`}
-      <button class="btn btn-sm" onclick="excluirCarteira('${c.id}')" title="Excluir carteira" ${carteiras.length<=1?'disabled':''}><i class="ti ti-trash" aria-hidden="true"></i></button>
+      <button class="btn btn-sm" onclick="excluirCarteira('${c.id}')" title="Excluir carteira" ${carteiras.length<=1?'disabled':''} style="width:26px;height:26px;padding:0;justify-content:center;font-size:14px;line-height:1">✕</button>
     </div>
   `).join('');
 }
