@@ -51,9 +51,15 @@ if (!new URLSearchParams(location.search).get('t')) location.replace('acoes.html
 .ind-card{background:linear-gradient(180deg,#050506 0%,#070709 100%);border:1px solid var(--border3);box-shadow:inset 0 2px 8px rgba(0,0,0,0.55);border-radius:var(--radius);padding:.85rem 1rem;transition:var(--transition)}
 .ind-card:hover{border-color:rgba(245,166,35,0.4)}
 [data-theme="light"] .ind-card{background:linear-gradient(180deg,rgba(0,0,0,0.07) 0%,rgba(0,0,0,0.03) 100%);box-shadow:inset 0 2px 6px rgba(0,0,0,0.12);border-color:rgba(0,0,0,0.15)}
-.ind-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:4px}
+.ind-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:5px}
 .ind-val{font-size:20px;font-weight:800;font-family:var(--font-mono)}
 .ind-desc{font-size:10px;color:var(--text3);margin-top:2px}
+.tooltip-container{position:relative;display:inline-flex;align-items:center}
+.tip-icon{width:13px;height:13px;border-radius:50%;background:var(--bg3);border:1px solid var(--border3);color:var(--text3);font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:default;flex-shrink:0;transition:border-color .2s,color .2s}
+.tooltip-container:hover .tip-icon{border-color:var(--gold);color:var(--gold)}
+.tooltip-box{visibility:hidden;opacity:0;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:7px;background:var(--bg4);border:1px solid var(--border3);color:var(--text2);font-size:11px;font-weight:400;line-height:1.5;text-transform:none;letter-spacing:normal;border-radius:var(--radius);padding:8px 10px;width:200px;z-index:60;transition:opacity .15s ease;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.5)}
+.tooltip-container:hover .tooltip-box{visibility:visible;opacity:1}
+@media(max-width:600px){.tooltip-box{width:150px;font-size:10.5px}}
 .section-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1.5rem}
 html:not([data-theme="light"]) .section-box{background:#0B0B0D}
 .section-box h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
@@ -664,6 +670,67 @@ function fmtRS(s){
   else o=n.toFixed(0);
   return 'R$ '+(neg?'-':'')+o;
 }
+/* Explicações em linguagem simples para quem não é do mercado financeiro.
+   Aparecem como um ícone "?" ao lado do nome do indicador. */
+const INDICATOR_TIPS = {
+  'Valor de Mercado':'Quanto vale a empresa inteira na bolsa: preço da ação multiplicado pelo número de ações.',
+  'Valor da Firma':'Valor de Mercado somado à dívida e descontado o caixa. Mostra quanto custaria comprar a empresa toda, incluindo suas dívidas.',
+  'Nº de Ações':'Quantidade total de ações que a empresa tem em circulação.',
+  'P/L':'Quantos anos de lucro a empresa levaria para pagar o preço da ação hoje. Quanto menor, mais barata ela parece.',
+  'P/VP':'Compara o preço da ação com o patrimônio da empresa. Abaixo de 1 significa que a ação custa menos do que vale o patrimônio.',
+  'P/EBIT':'Parecido com o P/L, mas usa o lucro operacional, antes de juros e impostos, no lugar do lucro líquido.',
+  'PSR':'Compara o preço da ação com a receita (faturamento) da empresa. Ajuda a avaliar empresas que ainda não têm lucro.',
+  'P/Ativos':'Compara o preço da ação com o total de bens (ativos) que a empresa possui.',
+  'P/Ativ Circ Liq':'Compara o preço da ação com o dinheiro e os bens de curto prazo da empresa, já descontando as dívidas.',
+  'Dividend Yield':'Quanto a empresa (ou fundo) pagou em dividendos nos últimos 12 meses, em porcentagem do preço atual.',
+  'EV/EBITDA':'Compara o valor total da empresa, incluindo dívidas, com o lucro operacional antes de juros, impostos e depreciação. Muito usado para comparar empresas de setores diferentes.',
+  'EV/EBIT':'Igual ao EV/EBITDA, mas sem descontar a depreciação do lucro operacional.',
+  'P/Cap Giro':'Compara o preço da ação com o capital de giro, o dinheiro que a empresa usa no dia a dia.',
+  'ROE':'Mostra quanto a empresa lucrou em relação ao patrimônio dos acionistas. Quanto maior, melhor ela usa esse dinheiro.',
+  'ROIC':'Parecido com o ROE, mas considera todo o capital investido na empresa, incluindo as dívidas.',
+  'EBIT/Ativo':'Mostra quanto a empresa gera de lucro operacional para cada real de bens (ativos) que ela tem.',
+  'Cresc. Receita 5a':'Quanto a receita (faturamento) da empresa cresceu nos últimos 5 anos.',
+  'Giro Ativos':'Mostra quantas vezes os ativos da empresa viram receita em um ano. Quanto maior, mais eficiente.',
+  'Margem Bruta':'Quanto sobra da receita depois de pagar só o custo direto do produto ou serviço, em porcentagem.',
+  'Margem EBIT':'Quanto sobra da receita depois de pagar os custos e despesas operacionais, em porcentagem.',
+  'Margem Líquida':'Quanto sobra da receita depois de pagar tudo: custos, despesas, juros e impostos. É o lucro final em porcentagem.',
+  'Liquidez Corrente':'Mostra se a empresa tem dinheiro suficiente para pagar as dívidas de curto prazo. Acima de 1 é considerado saudável.',
+  'Dív. Líq/Patrim':'Compara quanto a empresa deve, a dívida líquida, com o patrimônio dela.',
+  'Dív. Líq/EBITDA':'Quantos anos de lucro operacional a empresa levaria para quitar toda a dívida líquida.',
+  'PL/Ativos':'Mostra qual parcela dos bens da empresa é financiada com capital próprio, dos acionistas, e não com dívida.',
+  'Ativo':'Tudo o que a empresa possui: dinheiro, imóveis, equipamentos, estoques, entre outros bens e direitos.',
+  'Ativo Circulante':'Parte dos bens da empresa que pode virar dinheiro rapidamente, em até 1 ano.',
+  'Disponibilidades':'Dinheiro que a empresa tem disponível imediatamente, em caixa ou em conta.',
+  'Dívida Bruta':'Soma de tudo o que a empresa deve, sem descontar o dinheiro em caixa.',
+  'Dívida Líquida':'Dívida Bruta menos o dinheiro em caixa. Mostra quanto a empresa realmente deve.',
+  'Patrimônio':'O que sobraria para os acionistas (ou cotistas) se a empresa vendesse tudo e pagasse todas as dívidas.',
+  'Patrimônio Líquido':'O que sobraria para os acionistas (ou cotistas) se vendesse tudo e pagasse todas as dívidas.',
+  'Patrimônio Líq.':'O que sobraria para os acionistas (ou cotistas) se vendesse tudo e pagasse todas as dívidas.',
+  'Receita Líquida':'Total que a empresa faturou, já descontados impostos sobre vendas e devoluções.',
+  'EBIT':'Lucro operacional da empresa, antes de descontar juros e impostos.',
+  'Lucro Líquido':'O que sobra de lucro depois de pagar todos os custos, despesas, juros e impostos.',
+  'Segmento':'Tipo de imóvel ou mercado em que o fundo investe, como shoppings, galpões logísticos ou lajes corporativas.',
+  'Mandato':'Estratégia do fundo: por exemplo, tijolo (imóveis físicos), papel (títulos) ou híbrido.',
+  'Gestão':'Se o fundo é administrado com decisões ativas do gestor (ativa) ou apenas segue um índice (passiva).',
+  'Nº de Cotas':'Quantidade total de cotas que o fundo tem emitidas.',
+  'Nº de Cotistas':'Quantidade de pessoas que investem no fundo.',
+  'Taxa de Adm.':'Percentual cobrado por ano pela administração do fundo.',
+  'Patrim./Cota':'Quanto vale o patrimônio do fundo dividido pelo número de cotas.',
+  'Último Rendimento':'Valor pago por cota no último rendimento distribuído aos cotistas.',
+  'Vacância':'Percentual dos imóveis do fundo que estão sem inquilino.',
+  'Cap Rate':'Rendimento anual gerado pelos imóveis do fundo, em relação ao valor deles.',
+  'Qtd. Imóveis':'Quantidade de imóveis que o fundo possui.',
+  'Imóveis/PL':'Qual parcela do patrimônio do fundo está de fato investida em imóveis.',
+  'Ativos':'Tudo o que o fundo possui: imóveis, dinheiro e outros direitos.',
+  'Receita':'Total que o fundo recebeu com aluguéis e outras receitas dos imóveis.',
+  'FFO':'Fluxo de caixa operacional do fundo. Mostra quanto dinheiro ele realmente gerou para distribuir aos cotistas.',
+  'Rendimento Distribuído':'Total pago aos cotistas em rendimentos no período.',
+  'Venda de Ativos':'Valor que o fundo recebeu vendendo imóveis ou outros ativos.'
+};
+function indTip(lab){
+  const t=INDICATOR_TIPS[lab];
+  return t?`<span class="tooltip-container"><span class="tip-icon">?</span><span class="tooltip-box">${t}</span></span>`:'';
+}
 async function renderFundExtra(){
   try{
     const r=await fetch(`data/fundamentalistas/${TICKER}.json`);
@@ -674,12 +741,12 @@ async function renderFundExtra(){
     const oc=ordem.filter(k=>osc[k]).map(k=>{const v=osc[k];const neg=String(v).trim().startsWith('-');return `<div class="ind-card"><div class="ind-label">${k}</div><div class="ind-val ${neg?'dn':'up'}">${v}</div></div>`;}).join('');
     if(oc){document.getElementById('fx-osc').innerHTML=oc;document.getElementById('fx-osc-box').style.display='';}
     const bal=[['Ativo','ativo'],['Ativo Circulante','ativo_circ'],['Disponibilidades','disponibilidades'],['Dívida Bruta','div_bruta'],['Dívida Líquida','div_liquida'],['Patrimônio Líq.','patrim_liq']];
-    const bc=bal.filter(x=>d[x[1]]).map(x=>`<div class="ind-card"><div class="ind-label">${x[0]}</div><div class="ind-val">${fmtRS(d[x[1]])}</div></div>`).join('');
+    const bc=bal.filter(x=>d[x[1]]).map(x=>`<div class="ind-card"><div class="ind-label">${x[0]}${indTip(x[0])}</div><div class="ind-val">${fmtRS(d[x[1]])}</div></div>`).join('');
     if(bc){document.getElementById('fx-bal').innerHTML=bc;document.getElementById('fx-bal-box').style.display='';}
     const res=TIPO==='fii'
       ?[['Receita','receita'],['FFO','ffo'],['Rendimento Distribuído','rend_distribuido'],['Venda de Ativos','venda_ativos']]
       :[['Receita Líquida','receita_liq'],['EBIT','ebit'],['Lucro Líquido','lucro_liq']];
-    const rc=res.filter(x=>d[x[1]]).map(x=>`<div class="ind-card"><div class="ind-label">${x[0]}</div><div class="ind-val">${fmtRS(d[x[1]])}</div></div>`).join('');
+    const rc=res.filter(x=>d[x[1]]).map(x=>`<div class="ind-card"><div class="ind-label">${x[0]}${indTip(x[0])}</div><div class="ind-val">${fmtRS(d[x[1]])}</div></div>`).join('');
     if(rc){document.getElementById('fx-res').innerHTML=rc;document.getElementById('fx-res-box').style.display='';}
   }catch(e){}
 }
@@ -692,7 +759,7 @@ async function renderFundFull(){
     if(r.ok) d=await r.json();
   }catch(e){}
   const isFii=TIPO==='fii';
-  const card=(lab,val,cls)=>`<div class="ind-card"><div class="ind-label">${lab}</div><div class="ind-val ${cls||''}">${(val==null||val==='')?'—':val}</div></div>`;
+  const card=(lab,val,cls)=>`<div class="ind-card"><div class="ind-label">${lab}${indTip(lab)}</div><div class="ind-val ${cls||''}">${(val==null||val==='')?'—':val}</div></div>`;
   const box=(titulo,cards)=>`<div class="section-box" style="margin-bottom:1.25rem"><h3>${titulo}</h3><div class="ind-grid">${cards.join('')}</div></div>`;
   const osc=d.oscilacoes||{};
   const oscOrdem=['Dia','Mês','30 dias','12 meses','2026','2025','2024','2023','2022','2021','2020'];
