@@ -1,17 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-fetch_acoes_extras.py — Coleta dados "extras" de AÇÕES no statusinvest.com.br
-que NÃO vêm do Fundamentus: número de acionistas (investidores), composição
-acionária (% pessoa física / pessoa jurídica / institucional), total de
-papéis, free float, tag along, segmento de listagem (governança — Novo
-Mercado, Nível 1, Nível 2, Tradicional), setor, subsetor, segmento de
-atuação, liquidez média diária e participação no Ibovespa.
+fetch_acoes_extras.py — Coleta dados "extras" de AÇÕES no dadosdemercado.com.br
+que NÃO vêm do Fundamentus: razão social, CNPJ, código ISIN, quantidade de
+ações emitidas e classificação setorial B3 (setor/subsetor/segmento).
 
-Esses dados (governança, composição acionária, free float etc.) mudam muito
-pouco, então este script roda TODAS as ações de uma vez só — não precisa
-de rodízio diário. A ideia é agendar ele pra rodar a cada 15 dias (ver
-.github/workflows/acoes_extras.yml), no mesmo padrão do fetch_fii_extras.py.
+IMPORTANTE — histórico: a primeira versão deste script usava o
+statusinvest.com.br, que tem MUITO mais dados (nº de acionistas, free float,
+tag along, segmento de listagem/governança). Só que o statusinvest bloqueia
+com HTTP 403 qualquer requisição vinda de IP de datacenter (Cloudflare
+detecta os runners do GitHub Actions e barra, mesmo com User-Agent de
+navegador). Não existe hoje uma fonte gratuita, sem cadastro e sem proteção
+anti-bot que tenha nº de acionistas/free float/tag along — a B3 oficial só
+libera essa API pra clientes B2B cadastrados. Por isso migramos pro
+dadosdemercado.com.br, que não tem Cloudflare/anti-bot e cobre pelo menos
+CNPJ, ISIN, quantidade de ações e setor/subsetor.
+
+Esses dados mudam muito pouco, então este script roda TODAS as ações de uma
+vez só — não precisa de rodízio diário. Agendado a cada 15 dias (ver
+.github/workflows/acoes_extras.yml).
 
 Uso:
   python fetch_acoes_extras.py                # roda todas as ações
@@ -37,14 +44,14 @@ BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 OUT_FILE = DATA_DIR / "acoes_extras.json"
 
-URL_TPL = "https://statusinvest.com.br/acoes/{ticker}"
+URL_TPL = "https://www.dadosdemercado.com.br/acoes/{ticker}"
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                   "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
     "Accept-Language": "pt-BR,pt;q=0.9",
 }
 
-DELAY   = 2.0   # segundos entre requisições, pra não sobrecarregar o site
+DELAY   = 1.5   # segundos entre requisições, pra não sobrecarregar o site
 TIMEOUT = 15
 
 
@@ -59,23 +66,15 @@ def _norm(s: str) -> str:
 
 # Cada campo pode ter vários jeitos de aparecer escrito na página.
 LABEL_MAP = {
-    "numero_acionistas":    ["numero de investidores", "n de investidores", "numero de acionistas", "investidores"],
-    "pct_pessoa_fisica":    ["pessoa fisica"],
-    "pct_pessoa_juridica":  ["pessoa juridica"],
-    "pct_institucional":    ["institucional"],
-    "total_papeis":         ["n total de papeis", "numero total de papeis", "total de acoes", "quantidade de acoes"],
-    "free_float":           ["free float"],
-    "tag_along":            ["tag along"],
-    "segmento_listagem":    ["segmento de listagem", "segmento b3", "governanca corporativa"],
-    "setor":                ["setor"],
-    "subsetor":             ["subsetor"],
-    "segmento_atuacao":     ["segmento de atuacao"],
-    "liquidez_media":       ["liquidez media diaria", "liquidez diaria"],
-    "participacao_ibov":    ["participacao no ibovespa", "part. no ibovespa", "participacao ibov"],
-    "valor_mercado":        ["valor de mercado"],
-    "valor_firma":          ["valor de firma", "valor da firma", "enterprise value"],
-    "cnpj":                 ["cnpj"],
-    "controle_acionario":   ["controle acionario", "acionista controlador"],
+    "razao_social":      ["razao social"],
+    "cnpj":              ["cnpj"],
+    "isin":              ["codigo isin", "isin"],
+    "qtd_acoes":         ["quantidade de acoes", "n de acoes", "numero de acoes", "total de acoes"],
+    "classificacao_b3":  ["classificacao setorial b3", "classificacao setorial", "setor b3"],
+    "setor":             ["setor"],
+    "subsetor":          ["subsetor"],
+    "segmento":          ["segmento"],
+    "site_ri":           ["site de ri", "relacoes com investidores", "site ri"],
 }
 # Inverte pra busca rápida: rótulo normalizado -> nome do campo
 LABEL_LOOKUP = {}
@@ -85,44 +84,40 @@ for campo, variantes in LABEL_MAP.items():
 
 
 def _clean_valor(txt: str):
-    """Tenta converter '61,21 %' / '1.183.775' / 'R$ 1.136.715.427,29' em
-    número quando fizer sentido; senão devolve o texto original limpo."""
+    """Tenta converter número puro tipo '12.888.732.761' pra int; senão
+    devolve o texto original limpo (CNPJ, ISIN, setor etc. ficam como texto)."""
     if txt is None:
         return None
     t = txt.strip()
     if not t or t in ("-", "—", "N/A", "n/a"):
         return None
 
-    # Percentual: "61,21%" ou "0,75 % a.a"
-    m = re.match(r"^(-?\d+(?:[.,]\d+)?)\s*%", t)
-    if m:
-        return float(m.group(1).replace(".", "").replace(",", "."))
-
-    # Número puro com separador de milhar: "1.183.775"
+    # Número puro com separador de milhar: "12.888.732.761"
     if re.match(r"^\d{1,3}(\.\d{3})+$", t):
         return int(t.replace(".", ""))
 
-    # R$ com valor: "R$ 1.136.715.427,29"
-    m = re.match(r"^R\$\s*([\d.,]+)", t)
-    if m:
-        val = m.group(1).replace(".", "").replace(",", ".")
-        try:
-            return float(val)
-        except ValueError:
-            return t
-
-    return t  # mantém como texto (segmento, setor, CNPJ, controlador etc.)
+    return t  # mantém como texto
 
 
 def parse_acao(html: str) -> dict:
-    """Varre TODAS as tabelas/linhas rótulo→valor da página e extrai só os
-    campos que reconhecemos no LABEL_LOOKUP. Não depende de classe/id CSS
-    (o statusinvest muda o CSS com frequência), só do texto do rótulo —
-    resistente a mudanças de layout, igual ao fetch_fii_extras.py."""
+    """Varre TODOS os padrões rótulo→valor da página e extrai só os campos
+    que reconhecemos no LABEL_LOOKUP. Não depende de classe/id CSS, só do
+    texto do rótulo — resistente a mudanças de layout, igual ao
+    fetch_fii_extras.py."""
     soup = BeautifulSoup(html, "html.parser")
     dados = {}
 
-    # Padrão 1: linhas de tabela <tr><td>Rótulo</td><td>Valor</td></tr>
+    # Padrão 1: listas de definição <dt>Rótulo</dt><dd>Valor</dd> — é o
+    # formato principal do dadosdemercado.com.br pra dados cadastrais.
+    for dt in soup.find_all("dt"):
+        rotulo = _norm(dt.get_text(" ", strip=True))
+        campo = LABEL_LOOKUP.get(rotulo)
+        if campo and campo not in dados:
+            dd = dt.find_next_sibling("dd")
+            if dd:
+                dados[campo] = _clean_valor(dd.get_text(" ", strip=True))
+
+    # Padrão 2: linhas de tabela <tr><td>Rótulo</td><td>Valor</td></tr> (fallback)
     for tr in soup.find_all("tr"):
         cels = tr.find_all(["td", "th"])
         if len(cels) >= 2:
@@ -132,23 +127,24 @@ def parse_acao(html: str) -> dict:
                 valor = cels[1].get_text(" ", strip=True)
                 dados[campo] = _clean_valor(valor)
 
-    # Padrão 2: listas de definição <dt>Rótulo</dt><dd>Valor</dd>
-    for dt in soup.find_all("dt"):
-        rotulo = _norm(dt.get_text(" ", strip=True))
-        campo = LABEL_LOOKUP.get(rotulo)
-        if campo and campo not in dados:
-            dd = dt.find_next_sibling("dd")
-            if dd:
-                dados[campo] = _clean_valor(dd.get_text(" ", strip=True))
-
     # Padrão 3: blocos genéricos "Rótulo" seguido de "Valor" em elementos irmãos
-    # (o statusinvest usa muito isso — cards/divs soltos em vez de tabela/dl)
-    texto_bruto = soup.get_text("\n", strip=True).split("\n")
-    for i, linha in enumerate(texto_bruto[:-1]):
-        rotulo = _norm(linha)
-        campo = LABEL_LOOKUP.get(rotulo)
-        if campo and campo not in dados:
-            dados[campo] = _clean_valor(texto_bruto[i + 1])
+    # (só tenta se os padrões acima acharam pouca coisa)
+    if len(dados) < 3:
+        texto_bruto = soup.get_text("\n", strip=True).split("\n")
+        for i, linha in enumerate(texto_bruto[:-1]):
+            rotulo = _norm(linha)
+            campo = LABEL_LOOKUP.get(rotulo)
+            if campo and campo not in dados:
+                dados[campo] = _clean_valor(texto_bruto[i + 1])
+
+    # A "Classificação setorial B3" costuma vir como "Setor / Subsetor / Segmento"
+    # numa string só — se veio assim e ainda não temos os campos separados,
+    # tenta quebrar em 3 partes.
+    if dados.get("classificacao_b3") and not dados.get("setor"):
+        partes = [p.strip() for p in re.split(r"/", str(dados["classificacao_b3"])) if p.strip()]
+        if len(partes) >= 1: dados.setdefault("setor", partes[0])
+        if len(partes) >= 2: dados.setdefault("subsetor", partes[1])
+        if len(partes) >= 3: dados.setdefault("segmento", partes[2])
 
     return dados
 
