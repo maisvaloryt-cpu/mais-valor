@@ -786,6 +786,19 @@ async function renderFundFull(){
       d.cotas_emitidas_extra=extras.cotas_emitidas;
     }
   }
+  // Mescla dados extras das ações (CNPJ, ISIN, razão social, qtd ações, setor B3)
+  if(!isFii && typeof ACOES_EXTRAS !== 'undefined'){
+    const extrasAcao=ACOES_EXTRAS[TICKER];
+    if(extrasAcao){
+      d.razao_social=extrasAcao.razao_social;
+      d.cnpj_acao=extrasAcao.cnpj;
+      d.isin=extrasAcao.isin;
+      d.qtd_acoes_extra=extrasAcao.qtd_acoes;
+      d.setor_extra=extrasAcao.setor;
+      d.subsetor_extra=extrasAcao.subsetor;
+      d.segmento_extra=extrasAcao.segmento;
+    }
+  }
     html+=box('Informações',[
       card('Segmento',d.segmento),card('Mandato',d.mandato),card('Gestão',d.tipo_gestao),
       card('Nº de Cotas',d.cotas_emitidas||d.nro_acoes),card('Nº de Cotistas',d.num_cotistas),
@@ -820,6 +833,14 @@ async function renderFundFull(){
       card('Valor de Mercado',fmtRS(d.market_cap)),card('Valor da Firma',fmtRS(d.valor_firma)),
       card('Nº de Ações',d.nro_acoes),card('Último Balanço',d.ult_balanco),
       card('Setor',d.setor),card('Subsetor',d.subsetor)]);
+    html+=box('Dados Adicionais (Atualizados a cada 15 dias)',[
+      card('Razão Social',d.razao_social || '—'),
+      card('CNPJ',d.cnpj_acao || '—'),
+      card('Código ISIN',d.isin || '—'),
+      card('Qtd. de Ações (Extra)',d.qtd_acoes_extra ? d.qtd_acoes_extra.toLocaleString('pt-BR') : '—'),
+      card('Setor B3',d.setor_extra || '—'),
+      card('Subsetor B3',d.subsetor_extra || '—'),
+      card('Segmento B3',d.segmento_extra || '—')]);
     if(oscCards.length) html+=box('Oscilações',oscCards);
     html+=box('Indicadores de Valuation',[
       card('P/L',d.pl),card('P/VP',d.pvp),card('P/EBIT',d.p_ebit),card('PSR',d.psr),
