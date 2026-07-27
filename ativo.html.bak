@@ -766,7 +766,6 @@ async function renderFundFull(){
   const oscCards=oscOrdem.filter(k=>osc[k]).map(k=>card(k,osc[k],String(osc[k]).trim().startsWith('-')?'dn':'up'));
   let html='';
   if(isFii){
-  / Mescla dados extras dos FIIs (taxa admin, cotistas, DY acumulado, etc.)  if(isFii && FIIS_EXTRAS){    const extras=FIIS_EXTRAS[TICKER];    if(extras){      d.taxa_administracao=extras.taxa_administracao;      d.cotistas=extras.cotistas;      d.dy_12m_acum=extras.dy_12m_acum;      d.dy_3m_acum=extras.dy_3m_acum;      d.dy_6m_acum=extras.dy_6m_acum;      d.vpa=extras.vpa;      d.p_vpa=extras.p_vpa;      d.patrimonio_liquido=extras.patrimonio_liquido;      d.gestora=extras.gestora;      d.administrador=extras.administrador;    }  }
     html+=box('Informações',[
       card('Segmento',d.segmento),card('Mandato',d.mandato),card('Gestão',d.tipo_gestao),
       card('Nº de Cotas',d.cotas_emitidas||d.nro_acoes),card('Nº de Cotistas',d.num_cotistas),
@@ -784,15 +783,6 @@ async function renderFundFull(){
   } else {
     html+=box('Informações',[
       card('Valor de Mercado',fmtRS(d.market_cap)),card('Valor da Firma',fmtRS(d.valor_firma)),
-html+=box('Dados Adicionais (Atualizados a cada 15 dias)',[
-      card('Taxa de Adm.',d.taxa_administracao ? (d.taxa_administracao.toFixed(2) + '%') : d.taxa_adm),
-      card('Cotistas',d.cotistas ? d.cotistas.toLocaleString('pt-BR') : d.num_cotistas),
-      card('DY 12m Acum.',d.dy_12m_acum ? (d.dy_12m_acum.toFixed(2) + '%') : '—'),
-      card('DY 3m Acum.',d.dy_3m_acum ? (d.dy_3m_acum.toFixed(2) + '%') : '—'),
-      card('DY 6m Acum.',d.dy_6m_acum ? (d.dy_6m_acum.toFixed(2) + '%') : '—'),
-      card('VPA',d.vpa ? ('R$ ' + d.vpa.toFixed(2)) : '—'),
-      card('P/VPA',d.p_vpa ? d.p_vpa.toFixed(2) : '—'),
-      card('Gestora',d.gestora || '—')]);
       card('Nº de Ações',d.nro_acoes),card('Último Balanço',d.ult_balanco),
       card('Setor',d.setor),card('Subsetor',d.subsetor)]);
     if(oscCards.length) html+=box('Oscilações',oscCards);
