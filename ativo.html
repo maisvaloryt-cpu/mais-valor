@@ -156,35 +156,7 @@ html:not([data-theme="light"]) .section-box{background:#0B0B0D}
 
   <!-- OVERVIEW -->
   <div id="tab-overview" class="tab-content active" style="padding-top:1.5rem">
-    <div id="oportunidades" style="margin-bottom:1rem"></div>
-    <div class="ind-grid" id="ind-grid" style="display:none"></div>
-
-    <!-- PREÇO JUSTO — Graham & Bazin (só ações) -->
-    <div class="section-box" id="preco-justo-box" style="display:none">
-      <h3>Preço Justo — Graham &amp; Bazin</h3>
-      <div class="ind-grid" id="preco-justo-grid"></div>
-      <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.6">
-        Cálculos automáticos com os dados mais recentes. Métodos clássicos são ponto de partida de estudo, não recomendação de investimento.
-        <a href="artigos/graham-e-bazin.html" style="color:var(--gold)">Entenda como os métodos funcionam →</a>
-      </div>
-    </div>
-
-    <!-- SE VOCÊ TIVESSE INVESTIDO -->
-    <div class="section-box" id="investido-box" style="display:none">
-      <h3>Se você tivesse investido R$ 1.000...</h3>
-      <div class="ind-grid" id="investido-grid" style="grid-template-columns:repeat(3,1fr)"></div>
-      <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.6">
-        Cálculo real com o histórico de preços; a linha principal usa a cotação ajustada por proventos (dividendos reinvestidos). Rentabilidade passada não garante resultados futuros.
-        <a href="simulador.html" style="color:var(--gold)">Simule uma carteira completa no Simulador →</a>
-      </div>
-    </div>
-
-    <!-- CHECKLIST BUY & HOLD -->
-    <div class="section-box" id="checklist-box" style="display:none">
-      <h3>Checklist Buy &amp; Hold <span id="checklist-score" style="margin-left:auto;font-family:var(--font-mono);font-size:13px;color:var(--gold)"></span></h3>
-      <div id="checklist-content"></div>
-      <div style="font-size:11px;color:var(--text3);margin-top:10px">Critérios objetivos calculados automaticamente — um roteiro de estudo, não recomendação de compra ou venda.</div>
-    </div>
+    <!-- 1. GRÁFICO — primeiro bloco, logo após o cabeçalho do ativo -->
     <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem">
       <div>
         <div class="section-box">
@@ -219,6 +191,40 @@ html:not([data-theme="light"]) .section-box{background:#0B0B0D}
           <div id="same-sector"></div>
         </div>
       </div>
+    </div>
+
+    <!-- 2. SE VOCÊ TIVESSE INVESTIDO -->
+    <div class="section-box" id="investido-box" style="display:none;margin-top:1.5rem">
+      <h3>Se você tivesse investido R$ 1.000...</h3>
+      <div class="ind-grid" id="investido-grid" style="grid-template-columns:repeat(3,1fr)"></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.6">
+        Cálculo real com o histórico de preços; a linha principal usa a cotação ajustada por proventos (dividendos reinvestidos). Rentabilidade passada não garante resultados futuros.
+        <a href="simulador.html" style="color:var(--gold)">Simule uma carteira completa no Simulador →</a>
+      </div>
+    </div>
+
+    <!-- 3. OSCILAÇÃO DO PREÇO -->
+    <div id="oscilacao-preco-box" style="margin-top:1.5rem"></div>
+
+    <!-- 4. RESTO -->
+    <div id="oportunidades" style="margin-bottom:1rem;margin-top:1.5rem"></div>
+    <div class="ind-grid" id="ind-grid" style="display:none"></div>
+
+    <!-- PREÇO JUSTO — Graham & Bazin (só ações) -->
+    <div class="section-box" id="preco-justo-box" style="display:none">
+      <h3>Preço Justo — Graham &amp; Bazin</h3>
+      <div class="ind-grid" id="preco-justo-grid"></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.6">
+        Cálculos automáticos com os dados mais recentes. Métodos clássicos são ponto de partida de estudo, não recomendação de investimento.
+        <a href="artigos/graham-e-bazin.html" style="color:var(--gold)">Entenda como os métodos funcionam →</a>
+      </div>
+    </div>
+
+    <!-- CHECKLIST BUY & HOLD -->
+    <div class="section-box" id="checklist-box" style="display:none">
+      <h3>Checklist Buy &amp; Hold <span id="checklist-score" style="margin-left:auto;font-family:var(--font-mono);font-size:13px;color:var(--gold)"></span></h3>
+      <div id="checklist-content"></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:10px">Critérios objetivos calculados automaticamente — um roteiro de estudo, não recomendação de compra ou venda.</div>
     </div>
     <div id="fund-full" style="margin-top:1.5rem"></div>
   </div>
@@ -478,7 +484,7 @@ function renderIndicadores(d){
 }
 
 function renderIndVsSetor(){
-  const all=TIPO==='fii'?FIIS:ACOES;
+  const all=({fii:FIIS, bdr:BDRS_ATIVO, etf:ETFS_ATIVO, acao:ACOES})[TIPO] || ACOES;
   const peers=all.filter(a=>a.setor===ativo.setor&&a.t!==ativo.t);
   const el=document.getElementById('ind-vs-setor');
   if(!peers.length){el.innerHTML='<div style="color:var(--text3)">Sem outros ativos no mesmo setor para comparar.</div>';return;}
@@ -764,6 +770,9 @@ async function renderFundFull(){
   const osc=d.oscilacoes||{};
   const oscOrdem=['Dia','Mês','30 dias','12 meses','2026','2025','2024','2023','2022','2021','2020'];
   const oscCards=oscOrdem.filter(k=>osc[k]).map(k=>card(k,osc[k],String(osc[k]).trim().startsWith('-')?'dn':'up'));
+  // Oscilação do preço vai num container próprio, 3º bloco da página
+  const oscBox=document.getElementById('oscilacao-preco-box');
+  if(oscBox) oscBox.innerHTML = oscCards.length ? box('Oscilações',oscCards) : '';
   let html='';
   if(isFii){
   // Mescla dados extras dos FIIs (taxa admin, cotistas, DY acumulado, etc.)
@@ -803,14 +812,14 @@ async function renderFundFull(){
       card('Segmento',d.segmento),card('Mandato',d.mandato),card('Gestão',d.tipo_gestao),
       card('Nº de Cotas',d.cotas_emitidas||d.nro_acoes),card('Nº de Cotistas',d.num_cotistas),
       card('Valor de Mercado',fmtRS(d.market_cap)),card('Taxa de Adm.',d.taxa_adm),card('Último Balanço',d.ult_balanco)]);
-    if(oscCards.length) html+=box('Oscilações',oscCards);
+    // Oscilações agora renderiza em container próprio (#oscilacao-preco-box), não aqui
     html+=box('Indicadores',[
       card('P/VP',d.pvp),card('Dividend Yield',d.dy),card('Patrim./Cota',d.patrimonio_cota),
       card('Último Rendimento',d.ultimo_rend),card('Vacância',d.vacancia),card('Cap Rate',d.cap_rate),
       card('Qtd. Imóveis',d.qtd_imoveis),card('Imóveis/PL',d.imoveis_pl)]);
     html+=box('Patrimônio',[
       card('Ativos',fmtRS(d.ativo)),card('Patrimônio Líquido',fmtRS(d.patrim_liq||d.patrimonio_total))]);
-    html+=box('Dados Adicionais (Atualizados a cada 15 dias)',[
+    html+=box('Dados Adicionais',[
       card('Taxa de Adm.',d.taxa_administracao ? (d.taxa_administracao.toFixed(2) + '%') : d.taxa_adm),
       card('Taxa de Gestão',d.taxa_gestao ? (d.taxa_gestao.toFixed(2) + '%') : '—'),
       card('Cotistas',d.cotistas ? d.cotistas.toLocaleString('pt-BR') : d.num_cotistas),
@@ -833,7 +842,7 @@ async function renderFundFull(){
       card('Valor de Mercado',fmtRS(d.market_cap)),card('Valor da Firma',fmtRS(d.valor_firma)),
       card('Nº de Ações',d.nro_acoes),card('Último Balanço',d.ult_balanco),
       card('Setor',d.setor),card('Subsetor',d.subsetor)]);
-    html+=box('Dados Adicionais (Atualizados a cada 15 dias)',[
+    html+=box('Dados Adicionais',[
       card('Razão Social',d.razao_social || '—'),
       card('CNPJ',d.cnpj_acao || '—'),
       card('Código ISIN',d.isin || '—'),
@@ -841,7 +850,7 @@ async function renderFundFull(){
       card('Setor B3',d.setor_extra || '—'),
       card('Subsetor B3',d.subsetor_extra || '—'),
       card('Segmento B3',d.segmento_extra || '—')]);
-    if(oscCards.length) html+=box('Oscilações',oscCards);
+    // Oscilações agora renderiza em container próprio (#oscilacao-preco-box), não aqui
     html+=box('Indicadores de Valuation',[
       card('P/L',d.pl),card('P/VP',d.pvp),card('P/EBIT',d.p_ebit),card('PSR',d.psr),
       card('P/Ativos',d.p_ativos),card('P/Ativ Circ Liq',d.p_ativ_circ_liq),
@@ -907,7 +916,7 @@ function renderHistTable(){
 }
 
 function renderSameSetor(d){
-  const all=TIPO==='fii'?FIIS:ACOES;
+  const all=({fii:FIIS, bdr:BDRS_ATIVO, etf:ETFS_ATIVO, acao:ACOES})[TIPO] || ACOES;
   const peers=all.filter(a=>a.setor===d.setor&&a.t!==d.t).slice(0,5);
   document.getElementById('same-sector').innerHTML=peers.map(p=>`
     <div class="mover-item" style="cursor:pointer" onclick="location.href='ativo.html?t=${p.t}&tipo=${TIPO}'">
@@ -1196,16 +1205,47 @@ function renderAnalise(){
     </div>`).join('');
 }
 
+// BDRs e ETFs não vêm do loadData() principal (data.js só carrega ACOES/FIIS) —
+// são fontes separadas, no mesmo formato usado por bdrs.html/etfs.html.
+let BDRS_ATIVO=[], ETFS_ATIVO=[];
+async function loadBdrsEtfs(){
+  try{
+    const r=await fetch('data/bdrs.json');
+    if(r.ok){
+      const j=await r.json();
+      BDRS_ATIVO=(j.bdrs||[]).filter(b=>b.p>0).map(b=>({
+        t:b.t, n:b.n, p:b.p, v:b.v??0, dy:b.dy??0, pl:b.pl??0, v12:b.v12??0,
+        vol:'—', volNum:0, setor:b.setor??'—', origem:b.origem??'—',
+      }));
+    }
+  }catch(e){}
+  try{
+    const r=await fetch('data/etfs.json');
+    if(r.ok){
+      const j=await r.json();
+      ETFS_ATIVO=(j.etfs||[]).filter(e=>e.p>0).map(e=>({
+        t:e.t, n:e.n, p:e.p, v:e.v??0, aum:e.aum??null, ter:e.ter??0, dy:e.dy??0,
+        v12:e.v12??0, vol:'—', volNum:0, setor:e.tipo??'—', tipo:e.tipo??'—', mercado:e.mercado??'BR',
+      }));
+    }
+  }catch(e){}
+}
+
 async function init(){
   await loadData();
-  // Auto-detecta tipo: se não veio na URL, testa nas duas listas
-  let all=TIPO==='fii'?FIIS:ACOES;
+  await loadBdrsEtfs();
+  // Auto-detecta tipo: usa a lista certa conforme o parâmetro "tipo" da URL,
+  // com fallback pras outras listas se não achar (link antigo/tipo errado).
+  const listaPorTipo={fii:FIIS, bdr:BDRS_ATIVO, etf:ETFS_ATIVO, acao:ACOES};
+  let all=listaPorTipo[TIPO] || ACOES;
   ativo=all.find(a=>a.t===TICKER);
   if(!ativo){
-    // Ticker não encontrado no tipo da URL — tenta na outra lista
-    const alt=TIPO==='fii'?ACOES:FIIS;
-    ativo=alt.find(a=>a.t===TICKER);
-    if(ativo) all=alt;
+    // Ticker não encontrado no tipo da URL — tenta em todas as outras listas
+    for(const [tipoAlt, listaAlt] of Object.entries(listaPorTipo)){
+      if(tipoAlt===TIPO) continue;
+      const achou=listaAlt.find(a=>a.t===TICKER);
+      if(achou){ ativo=achou; all=listaAlt; break; }
+    }
   }
   if(!ativo){document.getElementById('ativo-nome').textContent='Ativo não encontrado';return;}
   renderHero(ativo);

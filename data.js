@@ -147,6 +147,19 @@ function sanitizeDY(v) {
   return v;
 }
 
+// [2026-07-27] A planilha intraday às vezes traz "prevClose" quebrado (ex: 0,01
+// em vez do fechamento real), o que gera variações absurdas tipo "+6414%" pra
+// um FII que na verdade não se mexeu. Movimentos diários acima de 50% são
+// extremamente raros pra ações/FIIs listados na B3 — acima disso, tratamos
+// como erro de dado e caímos no valor do fechamento diário (mais confiável).
+const CHANGE_PCT_MAX = 50;
+function sanitizeChangePct(pct, fallback) {
+  if (pct == null || !isFinite(pct) || Math.abs(pct) > CHANGE_PCT_MAX) {
+    return fallback ?? 0;
+  }
+  return pct;
+}
+
 // [1.7] Dividendos reais somados dos últimos 12 meses (R$/ação), pré-calculados
 // pelo Python em data/div12m.json. Base exata para o preço-teto de Bazin.
 // Se o arquivo não existir, cai na estimativa DY × preço.
@@ -366,7 +379,7 @@ async function loadData() {
           ticker,
           name:          live.name       || base.name    || ticker,
           price:         live.price,
-          change:        live.changePct  ?? base.change  ?? 0,
+          change:        sanitizeChangePct(live.changePct, base.change ?? 0),
           volume:        live.volume     || base.volume  || 0,
           marketCap:     live.marketCap  || base.marketCap || 0,
           dividendYield: live.dividendYield ?? base.dividendYield ?? 0,
@@ -382,7 +395,7 @@ async function loadData() {
           ticker,
           name:          live.name       || base.name    || ticker,
           price:         live.price,
-          change:        live.changePct  ?? base.change  ?? 0,
+          change:        sanitizeChangePct(live.changePct, base.change ?? 0),
           volume:        live.volume     || base.volume  || 0,
           marketCap:     live.marketCap  || base.marketCap || 0,
           dividendYield: live.dividendYield ?? base.dividendYield ?? 0,
