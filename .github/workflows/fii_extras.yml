@@ -1,0 +1,41 @@
+name: Dados Extras dos FIIs (a cada 15 dias)
+
+on:
+  schedule:
+    # Dia 1 e dia 16 de cada mês, às 21h UTC (18h Brasília) — esses dados
+    # (taxa de administração, cotistas, gestora etc.) mudam pouco, não
+    # precisa rodar todo dia.
+    - cron: '0 21 1,16 * *'
+  workflow_dispatch: {}  # Permite rodar manualmente também
+
+jobs:
+  fii-extras:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Dependências
+        run: pip install requests beautifulsoup4
+
+      - name: Coletar dados extras dos FIIs
+        run: python fetch_fii_extras.py
+
+      - name: Commit e Push
+        run: |
+          git config user.name "Mais Valor Bot"
+          git config user.email "bot@maisvalor.com"
+          git add data/fiis_extras.json
+          git diff --staged --quiet || git commit -m "📊 Dados extras dos FIIs (cotistas, taxas, DY 3/6/12m)"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push && break
+            echo "⚠️ Push falhou (tentativa $i/5) — aguardando 20s..."
+            sleep 20
+          done
