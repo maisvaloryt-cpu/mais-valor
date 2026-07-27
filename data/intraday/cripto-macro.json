@@ -1,5 +1,5 @@
 {
-  "updated_at": "27/07/2026 12:44",
+  "updated_at": "27/07/2026 13:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,8 +1128,8 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 174922.88,
-      "changePct": 0.0051,
+      "price": 174771.55,
+      "changePct": 0.0042,
       "high": 175261.95,
       "low": 174048.13
     },
@@ -1138,10 +1138,10 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3798.64,
-      "changePct": -0.0017000000000000001,
+      "price": 3798.35,
+      "changePct": -0.0018,
       "high": 3808.69,
-      "low": 3798.23
+      "low": 3798.12
     },
     {
       "ticker": "INDEXBVMF:SMLL",
@@ -1158,8 +1158,8 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 12473.69,
-      "changePct": 0.0037,
+      "price": 12468.25,
+      "changePct": 0.0032,
       "high": 12503.46,
       "low": 12397.8
     },
@@ -1188,8 +1188,8 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7396.63,
-      "changePct": -0.0021,
+      "price": 7400.18,
+      "changePct": -0.0016,
       "high": 7480.57,
       "low": 7386.55
     },
@@ -1198,8 +1198,8 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 24838.34,
-      "changePct": -0.0055000000000000005,
+      "price": 24876.84,
+      "changePct": -0.004,
       "high": 25261.91,
       "low": 24774.87
     },
@@ -1208,7 +1208,7 @@
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 52061.67,
+      "price": 52061.99,
       "changePct": 0.0022,
       "high": 52607.78,
       "low": 52003.45
@@ -1218,8 +1218,8 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2941.28,
-      "changePct": 0.0039000000000000003,
+      "price": 2934.6,
+      "changePct": 0.0016,
       "high": 2972.46,
       "low": 2931.44
     },
@@ -1248,8 +1248,8 @@
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 25422.35,
-      "changePct": 0.0129,
+      "price": 25424.41,
+      "changePct": 0.013000000000000001,
       "high": 25560.4,
       "low": 25365.52
     },
