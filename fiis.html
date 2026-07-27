@@ -241,7 +241,7 @@ function renderTable(arr) {
       <td class="r gold">${d.dy > 0 ? d.dy.toFixed(1) + '%' : '0%'}</td>
       <td class="r ${vacClass}">${vacTxt}</td>
       <td class="r" style="color:var(--text2);font-size:12px">${liqTxt}</td>
-      <td class="r" style="color:var(--text3);font-size:11px">${d.setor || '—'}</td>`;
+      <td class="r" style="color:var(--text3);font-size:11px">${(d.setores || [d.setor]).filter(Boolean).join(', ') || '—'}</td>`;
     tr.onclick = () => location.href = `ativo.html?t=${d.t}&tipo=fii`;
     tb.appendChild(tr);
   });
@@ -258,14 +258,28 @@ function filterTable() {
   const s = document.getElementById('f-setor').value;
   data = FIIS.filter(d => {
     const matchQ = d.t.toLowerCase().includes(q) || (d.n||'').toLowerCase().includes(q);
+    const setoresD = d.setores || [d.setor];
     let matchS = true;
-    if (s === '__tijolo__') matchS = SETOR_TIJOLO.includes(d.setor);
-    else if (s === '__papel__')  matchS = SETOR_PAPEL.includes(d.setor);
-    else if (s === '__outros__') matchS = SETOR_OUTROS.includes(d.setor);
-    else if (s) matchS = d.setor === s;
+    if (s === '__tijolo__') matchS = setoresD.some(x => SETOR_TIJOLO.includes(x));
+    else if (s === '__papel__')  matchS = setoresD.some(x => SETOR_PAPEL.includes(x));
+    else if (s === '__outros__') matchS = setoresD.some(x => SETOR_OUTROS.includes(x));
+    else if (s) matchS = setoresD.includes(s);
     return matchQ && matchS;
   });
   applySort(currentSort);
+  // Quando um segmento específico está selecionado (ex: "Shoppings"), prioriza
+  // os fundos "puros" nesse segmento (só atuam ali) antes dos "mistos" (também
+  // atuam em outros segmentos) — mantém a ordenação escolhida (DY, P/VP...)
+  // dentro de cada grupo, já que Array.sort é estável nos navegadores atuais.
+  if (s && s !== '__tijolo__' && s !== '__papel__' && s !== '__outros__') {
+    data.sort((a, b) => {
+      const setoresA = a.setores || [a.setor];
+      const setoresB = b.setores || [b.setor];
+      const pa = (setoresA.length === 1 && setoresA[0] === s) ? 0 : 1;
+      const pb = (setoresB.length === 1 && setoresB[0] === s) ? 0 : 1;
+      return pa - pb;
+    });
+  }
 }
 
 function applySort(k) {
@@ -297,7 +311,7 @@ function applySort(k) {
 // ── Sidebar ────────────────────────────────────────────────────────
 function renderSidebar() {
   const segs = {};
-  FIIS.forEach(d => { segs[d.setor] = (segs[d.setor] || 0) + 1; });
+  FIIS.forEach(d => (d.setores || [d.setor]).forEach(s => { segs[s] = (segs[s] || 0) + 1; }));
   document.getElementById('seg-list').innerHTML = Object.entries(segs)
     .sort((a, b) => b[1] - a[1])
     .map(([s, n]) => `

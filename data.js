@@ -4,6 +4,7 @@ let ACOES = [];
 let FIIS = [];
 let FUNDAMENTUS = {};
 let FIIS_FUND = {};
+let FIIS_SEGMENTOS_MANUAL = {};
 let DIVIDENDOS = [];
 let DATA_UPDATED_AT = null;
 let INTRADAY_UPDATED_AT = null;
@@ -238,6 +239,20 @@ async function loadFiisFundamentus() {
   } catch(e) {}
 }
 
+// Pesquisa manual dos segmentos reais dos FIIs (fundo por fundo), feita em
+// 27/07/2026 para substituir a coluna "Segmento" genérica ("Multicategoria"/
+// "Outros") do Fundamentus, que não é confiável para filtro/busca. Arquivo
+// ESTÁTICO — não é atualizado pelo GitHub Actions, só manualmente quando
+// alguém revisar a planilha de novo.
+async function loadSegmentosManual() {
+  try {
+    const r = await fetch('data/fiis_segmentos_manual.json');
+    if (!r.ok) return;
+    const j = await r.json();
+    FIIS_SEGMENTOS_MANUAL = j.fundos || {};
+  } catch(e) {}
+}
+
 async function loadIndices() {
   try {
     const r = await fetch('data/indices.json');
@@ -321,7 +336,7 @@ async function loadData() {
     // dedup considere tudo "duplicado" e esvazie as listas.
     _vistos.clear();
     // Carrega tudo em paralelo
-    await Promise.all([loadFundamentus(), loadFiisFundamentus(), loadIndices(), loadDiv12m()]);
+    await Promise.all([loadFundamentus(), loadFiisFundamentus(), loadSegmentosManual(), loadIndices(), loadDiv12m()]);
 
     // 1. JSON de fechamento diário (base)
     const resp = await fetch('data/cotacoes.json');
@@ -445,6 +460,12 @@ async function loadData() {
         const cot = mergeCot(f.ticker, 'fiis');
         if (!cot || !cot.price) return null;
         const rawDY = f.dy ? f.dy : (cot.dividendYield || 0);
+        // Segmento(s): dá prioridade à pesquisa manual (fiis_segmentos_manual.json),
+        // que cobre os fundos que o Fundamentus só classifica como "Multicategoria"/
+        // "Outros" (genérico demais pra filtro). Se o fundo não está na pesquisa manual,
+        // usa o segmento já confiável que o Fundamentus retorna (ex: Shoppings, Logística).
+        const segManual = FIIS_SEGMENTOS_MANUAL[f.ticker];
+        const setores = segManual ? segManual.segmentos : (f.segmento ? [f.segmento] : ['FII']);
         return {
           t: f.ticker, n: cot.name || f.ticker,
           p: cot.price, v: cot.change || 0,
@@ -460,7 +481,9 @@ async function loadData() {
           volNum: f.liq           || cot.volume    || 0,
           vm:     formatVM(f.valor_mercado || cot.marketCap || 0),
           pl_val: f.valor_mercado || cot.marketCap || 0,
-          setor:       f.segmento || 'FII',
+          setor:       setores[0],
+          setores:     setores,
+          pureza:      segManual ? segManual.pureza : (setores.length <= 1 ? 'Puro' : 'Misto'),
           vacancia:    f.vacancia,
           cap_rate:    f.cap_rate,
           qtd_imoveis: f.qtd_imoveis,
@@ -482,6 +505,8 @@ async function loadData() {
           volNum: cot.volume    || 0,
           pl_val: cot.marketCap || 0,
           setor: 'FII',
+          setores: ['FII'],
+          pureza: 'Puro',
           fallback: cot.fallback||false,
           stale:    cot.stale||false,
           _source:  cot._source,

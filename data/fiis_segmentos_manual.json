@@ -1,0 +1,2581 @@
+{
+ "gerado_em": "27/07/2026",
+ "metodo": "Pesquisa manual individual (fundsexplorer.com.br / investidor10.com.br), fundo por fundo. NAO e atualizado automaticamente pelo GitHub Actions.",
+ "total_fundos": 311,
+ "fundos": {
+  "AAZQ11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/aazq11",
+   "obs": "FIAGRO em CRA/CRI/FIDC/LCA/LIG/LH e cotas de outros FIAGRO/FII, sem % claro"
+  },
+  "ADSH11": {
+   "segmentos": [
+    "Shoppings",
+    "Varejo"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://investidor10.com.br/fiis/adsh11/",
+   "obs": "fundo misto (híbrido), foco em shoppings/varejo, sem % claro"
+  },
+  "AEFI11": {
+   "segmentos": [
+    "Educacional"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/aefi11",
+   "obs": "100% imóveis educacionais (SP, MG, MT, MA)"
+  },
+  "AFCR11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/afcr11",
+   "obs": "fundo de papel/CRI; convertido para CACR11 em 16/11/2021, ticker inativo"
+  },
+  "AFHF11": {
+   "segmentos": [
+    "Multiestratégia"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.clubefii.com.br/ofertas-publicas-fundos-imobiliarios/primeira-emissao-afhf11",
+   "obs": "nome oficial \"AF Invest Real Estate Multiestrategia\"; detalhe de carteira não encontrado"
+  },
+  "AFHI11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/afhi11",
+   "obs": "majoritariamente CRIs, poucos imóveis físicos (MT, MS, AC, RO), sem % claro"
+  },
+  "AGRX11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/agrx11",
+   "obs": "FIAGRO em CRA e títulos ligados ao agronegócio, sem % claro"
+  },
+  "ALZC11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/alzc11",
+   "obs": "carteira de crédito imobiliário (papel), sem imóveis físicos, sem % claro"
+  },
+  "ALZR11": {
+   "segmentos": [
+    "Logística",
+    "Varejo",
+    "Hospital",
+    "Educacional",
+    "Híbrido"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/alzr11",
+   "obs": "diversificado: logística (Femsa, Mercado Livre, APTIV), varejo (Decathlon, Assaí), saúde (Dasa), educação (Pueri Domus), sem % claro"
+  },
+  "ARCT11": {
+   "segmentos": [
+    "Logística",
+    "Industrial",
+    "Híbrido"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/arct11",
+   "obs": "site classifica como híbrido industrial/logístico; regulamento permite outros segmentos, sem % claro"
+  },
+  "AROA11": {
+   "segmentos": [
+    "Logística",
+    "Industrial"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/aroa11",
+   "obs": "imóveis industriais/logísticos no Ceará, sem % claro por tipo"
+  },
+  "ARRI11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/arri11",
+   "obs": "100% papel/recebíveis imobiliários"
+  },
+  "ARXD11": {
+   "segmentos": [
+    "CRI / Papel",
+    "Outros"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/arxd11",
+   "obs": "majoritariamente CRIs, também possui imóveis físicos comerciais (MS, MT, AC, RO), sem % claro"
+  },
+  "ASMT11": {
+   "segmentos": [
+    "Lajes Corporativas",
+    "Escritórios"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/asmt11",
+   "obs": "100% escritórios (SP e RS)"
+  },
+  "ASRF11": {
+   "segmentos": [
+    "Escritórios",
+    "Híbrido"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/asrf11",
+   "obs": "site classifica como híbrido/outros; imóveis são edifícios comerciais de retrofit em SP (Vila Mariana)"
+  },
+  "AVUR11": {
+   "segmentos": [
+    "Multiestratégia",
+    "Residencial"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.clubefii.com.br/fiis/AVUR11",
+   "obs": "site classifica como multiestratégia; nome \"Unidades Residenciais\" sugere foco residencial; carteira detalhada não disponível"
+  },
+  "BARI11": {
+   "segmentos": [
+    "CRI / Papel",
+    "FOF"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/bari11",
+   "obs": "fundo de papel; também aplica em cotas de outros FIIs e possui 2 imóveis físicos em SP, sem % claro"
+  },
+  "BBFO11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/bbfo11",
+   "obs": "carteira diversificada de cotas de FIIs, seleção baseada no IFIX"
+  },
+  "BBGO11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/bbgo11",
+   "obs": "FIAGRO em CRA/LCA/CRI/Debêntures ligados ao agronegócio, sem % claro"
+  },
+  "BBRC11": {
+   "segmentos": [
+    "Agências"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/bbrc11",
+   "obs": "100% agências do Banco do Brasil (imóveis em SP)"
+  },
+  "BCIA11": {
+   "segmentos": [
+    "FOF",
+    "CRI / Papel"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://investidor10.com.br/fiis/bcia11/",
+   "obs": "FOF com cotas de outros FIIs (diversos segmentos) + CRI/renda fixa, sem % claro"
+  },
+  "BCRI11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/bcri11",
+   "obs": "100% papel (CRI, LCI, LH, debêntures), sem imóveis físicos"
+  },
+  "BIME11": {
+   "segmentos": [
+    "Multiestratégia",
+    "FOF"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/bime11",
+   "obs": "carteira majoritariamente cotas de outros FIIs (BICE11, BRIM11, BRIP11, BIPD11), mandato multiestratégia"
+  },
+  "BLMG11": {
+   "segmentos": [
+    "Logística",
+    "Industrial"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/blmg11",
+   "obs": "Setor \"Imóveis Industriais e Logísticos\" no site (classificação ANBIMA consta como \"Outros\"), sem % claro"
+  },
+  "BLOG11": {
+   "segmentos": [
+    "Logística",
+    "Industrial"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/blog11",
+   "obs": "galpões logísticos/industriais (BlueCap Pacatuba, Camaçari, Igarassu), sem % claro"
+  },
+  "BMLC11": {
+   "segmentos": [
+    "Escritórios",
+    "Lajes Corporativas"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/bmlc11",
+   "obs": "100% laje corporativa (Torre Rio Sul, RJ)"
+  },
+  "BPFF11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/bpff11",
+   "obs": "investe preferencialmente em cotas de outros FIIs, parte menor em LCI/LH/CRI"
+  },
+  "BPML11": {
+   "segmentos": [
+    "Shoppings"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/bpml11",
+   "obs": "100% shopping centers (Londrina Norte, Contagem, Ilha Plaza, Capim Dourado)"
+  },
+  "BPRP11": {
+   "segmentos": [
+    "Logística",
+    "Industrial"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/bprp11",
+   "obs": "100% logístico (Galpão Aurora, Arujá-SP)"
+  },
+  "BRCR11": {
+   "segmentos": [
+    "Escritórios",
+    "Lajes Corporativas"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/brcr11",
+   "obs": "100% escritórios (Morumbi Corporate, Eldorado, Montreal)"
+  },
+  "BROF11": {
+   "segmentos": [
+    "Escritórios",
+    "Lajes Corporativas"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/brof11",
+   "obs": "100% laje corporativa (Edifício Passeio Corporate)"
+  },
+  "BTCI11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/btci11",
+   "obs": "100% crédito imobiliário high grade (CRI), sem % detalhado"
+  },
+  "BTHF11": {
+   "segmentos": [
+    "FOF",
+    "Multiestratégia"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/bthf11",
+   "obs": "FOF que transita entre FIIs de vários segmentos (BTHI11 hotel, BTCI11 papel, BTYU11 incorporação, CNES11/BRCR11/BMLC11 lajes, BTAL11/BTLG11 logística, BPML11 shopping, BTRA11 agro), sem % claro"
+  },
+  "BTLG11": {
+   "segmentos": [
+    "Logística",
+    "Industrial"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/btlg11",
+   "obs": "armazéns logísticos/plantas industriais em múltiplos estados"
+  },
+  "BTRA11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/btra11",
+   "obs": "Fiagro, fazendas produtivas (MT, BA), sem % claro"
+  },
+  "BTSI11": {
+   "segmentos": [
+    "Logística",
+    "Outros"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/btsi11",
+   "obs": "condomínios logísticos + participações em outros fundos (ex.: BIDB11 15,25%), classificação \"Misto\"/ANBIMA \"Outros\""
+  },
+  "BTYU11": {
+   "segmentos": [
+    "Residencial"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/btyu11",
+   "obs": "incorporação imobiliária em parceria com a incorporadora residencial You Inc.; classificação ANBIMA \"Híbrido\""
+  },
+  "CACR11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/cacr11",
+   "obs": "100% papel (CRI, LH, LCI, LIG), excepcionalmente pode deter imóveis"
+  },
+  "CARE11": {
+   "segmentos": [
+    "Outros"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.clubefii.com.br/fiis/CARE11",
+   "obs": "fundo de cemitérios/crematórios (death care), não se encaixa em nenhum segmento padrão"
+  },
+  "CCME11": {
+   "segmentos": [
+    "Multiestratégia"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/ccme11",
+   "obs": "\"1º FII Multiestratégia\" - imóveis diretos, CRI, cotas de FII, ações e projetos imobiliários, sem % claro"
+  },
+  "CFHI11": {
+   "segmentos": [
+    "Residencial"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://statusinvest.com.br/fundos-imobiliarios/cfhi11",
+   "obs": "fundo de desenvolvimento, apartamentos residenciais destinados à venda, sem % explícito"
+  },
+  "CFII11": {
+   "segmentos": [
+    "Híbrido"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://investidor10.com.br/fiis/cfii11/",
+   "obs": "fundo de desenvolvimento (renda + venda + SPEs), ativos mistos (shopping/escritório), diversificado sem % claro"
+  },
+  "CLIN11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/clin11",
+   "obs": "Clave Índices de Preços, carteira diversificada de CRIs, sem % explícito"
+  },
+  "COPP11": {
+   "segmentos": [
+    "Lajes Corporativas"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/copp11",
+   "obs": "escritórios, sem % explícito"
+  },
+  "CORM11": {
+   "segmentos": [
+    "Lajes Corporativas"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/corm11",
+   "obs": "Core Metropolis, fundo convertido/incorporado para ASMT11 em 2022"
+  },
+  "CPOF11": {
+   "segmentos": [
+    "Lajes Corporativas",
+    "FOF"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://statusinvest.com.br/fundos-imobiliarios/cpof11",
+   "obs": "escritórios + cotas de outros FIIs (MCCI11 27,94%, CPTS11 26,94%, HBCR11, CPFF11, TRXF11)"
+  },
+  "CPTR11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/cptr11",
+   "obs": "FIAGRO, não investe em ativos reais, foco em CRA/CRI do agronegócio"
+  },
+  "CPTS11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/cpts11",
+   "obs": "Capitânia Securities II, carteira majoritariamente em CRIs"
+  },
+  "CPUR11": {
+   "segmentos": [
+    "Varejo",
+    "Hospital"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/cpur11",
+   "obs": "supermercados Assaí/GPA/Sodimac + centro médico Barra Medical Center, sem % explícito"
+  },
+  "CRFF11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/crff11",
+   "obs": "fundo de fundos, sem % explícito"
+  },
+  "CVBI11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/cvbi11",
+   "obs": "VBI CRI, mínimo regulamentar de 67% em CRIs, sem % atual explícito"
+  },
+  "CXCI11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://investidor10.com.br/fiis/cxci11/",
+   "obs": "Caixa Carteira Imobiliária, mais de 90% em cotas de outros FIIs"
+  },
+  "CXCO11": {
+   "segmentos": [
+    "Agências"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/cxco11",
+   "obs": "10 agências bancárias da Caixa Econômica Federal via sale-leaseback, 100% locado a um único inquilino"
+  },
+  "CXRI11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/cxri11",
+   "obs": "investimentos majoritariamente em cotas de outros FIIs, sem % explícito"
+  },
+  "DAMA11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.clubefii.com.br/fiis/DAMA11",
+   "obs": "classificado como fundo de recebíveis imobiliários (CRI), sem % explícito"
+  },
+  "DAYM11": {
+   "segmentos": [
+    "Lajes Corporativas"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/daym11",
+   "obs": "Daycoval Real Estate, edifícios de escritórios em SP e Porto Alegre, sem % explícito"
+  },
+  "DCRA11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/dcra11",
+   "obs": "CRA/CRI do agronegócio, sem imóveis diretos"
+  },
+  "DEVA11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/deva11",
+   "obs": "Devant Recebíveis Imobiliários, foco em CRIs, sem % explícito"
+  },
+  "DOMC11": {
+   "segmentos": [
+    "Lajes Corporativas",
+    "Industrial"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/domc11",
+   "obs": "detém Ed. Domo Corporate (escritórios, SBC) e galpão industrial (Queimados/RJ), sem % explícito"
+  },
+  "DPRO11": {
+   "segmentos": [
+    "Logística"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.devantasset.com.br/fundo/dpro11/",
+   "obs": "Devant Properties, \"fundo de properties (galpões logísticos)\" da Devant"
+  },
+  "DVFF11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/dvff11",
+   "obs": "aplica em cotas de outros FIIs e CRIs, sem % explícito"
+  },
+  "EDGA11": {
+   "segmentos": [
+    "Lajes Corporativas",
+    "Varejo"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/edga11",
+   "obs": "detém 100% do Edifício Galeria (RJ): 8 andares corporativos + mall/lojas no térreo"
+  },
+  "EDGE11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fiis.pro/funds/EDGE11",
+   "obs": "carteira 76,16% em cotas de FIIs, não detém imóveis diretos"
+  },
+  "EIRA11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/eira11",
+   "obs": "Aroeira FII, fundo de crédito estruturado/CRI, sem % explícito"
+  },
+  "EMET11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://investidor10.com.br/fiis/emet11/",
+   "obs": "cotas de outros FIIs (papel, escritórios RECT11, logística RELG11, FOF RECX11), diversificado sem % claro"
+  },
+  "EQIN11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/eqin11",
+   "obs": "NCH Brasil Recebíveis Imobiliários, fundo descontinuado/não negociado"
+  },
+  "EQIR11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/eqir11",
+   "obs": "CRI, também via cotas de FIIs de papel (VRTA11 18,12%, RINV11 14,66%, MCCI11 8,48%)"
+  },
+  "ERPA11": {
+   "segmentos": [
+    "Lajes Corporativas"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/erpa11",
+   "obs": "Europa 105, edifício corporativo em São Paulo, sem % explícito"
+  },
+  "EVBI11": {
+   "segmentos": [
+    "Varejo",
+    "Hospital"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/evbi11",
+   "obs": "VBI Consumo Essencial: lojas Pão de Açúcar/Assaí/Sodimac (varejo) e Barra Medical Center (hospital), sem % explícito"
+  },
+  "EXES11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://investidor10.com.br/fiis/exes11/",
+   "obs": "fundo de papel, foco em CRI middle grade/sênior, diversos setores lastro"
+  },
+  "FAED11": {
+   "segmentos": [
+    "Educacional"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/faed11",
+   "obs": "100% educacional, campi Anhanguera em Leme, Taboão da Serra e Valinhos"
+  },
+  "FATN11": {
+   "segmentos": [
+    "Lajes Corporativas"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/fatn11",
+   "obs": "17 lajes corporativas em 11 prédios (SP), contratos built-to-suit"
+  },
+  "FCFL11": {
+   "segmentos": [
+    "Educacional"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/fcfl11",
+   "obs": "100% um único imóvel, campus do Insper (SP)"
+  },
+  "FEXC11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/fexc11",
+   "obs": "CRI/LCI/LH, sem % explícito"
+  },
+  "FGAA11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/fgaa11",
+   "obs": "CRA do agronegócio, sem % explícito"
+  },
+  "FIXX11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/fixx11",
+   "obs": "fundo de fundos, investe em cotas de outros FIIs + CRI/LCI/LH"
+  },
+  "FLCR11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/flcr11",
+   "obs": "CRI, sem % explícito"
+  },
+  "FPNG11": {
+   "segmentos": [
+    "Lajes Corporativas",
+    "Shoppings"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://statusinvest.com.br/fundos-imobiliarios/fpng11",
+   "obs": "escritórios (Renaissance Tower, Berlioz, Century Tower) + Shopping Diamond Mall, sem % explícito"
+  },
+  "FRBR11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundamentus.com.br/detalhes.php?papel=FRBR11",
+   "obs": "0 imóveis físicos, nome sugere fundo de crédito imobiliário estruturado; dado limitado"
+  },
+  "FTCA11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundamentus.com.br/detalhes.php?papel=FTCA11",
+   "obs": "\"Fyto Recebíveis do Agronegócio - FIAGRO Imobiliário\", 0 imóveis físicos"
+  },
+  "FTCE11": {
+   "segmentos": [
+    "Multicategoria",
+    "FOF"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/ftce11",
+   "obs": "fundo híbrido/misto, carteira atual composta por cotas de outros FIIs (RECT11, RELG11, OBAL11, PEMA11), diversificado sem % clara por segmento"
+  },
+  "FYTO11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/fyto11",
+   "obs": "100% CRIs, lastro diversificado (loteamentos, residencial pulverizado, aluguel, corporativo, multipropriedade), mín. 60% créditos pulverizados"
+  },
+  "FZDA11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/fzda11",
+   "obs": "Fiagro, aquisição e arrendamento de terras agrícolas"
+  },
+  "FZDB11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/fzdb11",
+   "obs": "FIAGRO híbrido, aquisição de terras agrícolas para locação"
+  },
+  "GALG11": {
+   "segmentos": [
+    "Logística"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/galg11",
+   "obs": "galpões logísticos/industriais em RS, SP e BA"
+  },
+  "GAME11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/game11",
+   "obs": "crédito imobiliário highgrade via títulos e valores mobiliários (estratégia Beta 60-90%/Alpha 10-40%), lastro em imóveis de varejo no interior (MS, MT, AC, RO)"
+  },
+  "GARE11": {
+   "segmentos": [
+    "Logística",
+    "FOF",
+    "CRI / Papel"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://reidosdividendos.com.br/fiis/GARE11/portfolio",
+   "obs": "diversificado: imóveis logísticos próprios + cotas de FIIs (18,84%+14,10% em fundos) + CRI/CRA, sem % predominante claro"
+  },
+  "GCRA11": {
+   "segmentos": [
+    "Agrícola",
+    "FOF"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/gcra11",
+   "obs": "FIAGRO de cadeias produtivas (recebíveis do agronegócio), carteira composta por cotas de outros FIIs (GCFF11, GCOI11, GCRI11, HOMS11)"
+  },
+  "GCRI11": {
+   "segmentos": [
+    "CRI / Papel",
+    "FOF"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/gcri11",
+   "obs": "Galapagos Recebíveis Imobiliários, CRIs mais cotas de outros FIIs (HOMS11, GCFF11, GCRA11, GCOI11), sem % claro"
+  },
+  "GGRC11": {
+   "segmentos": [
+    "Industrial",
+    "Logística"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/ggrc11",
+   "obs": "galpões logísticos/industriais, operações built to suit, retrofit e sale-leaseback"
+  },
+  "GLCR11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/glcr11",
+   "obs": "Galapagos Crédito Estruturado, classificado como \"Papéis\", sem detalhamento de carteira disponível"
+  },
+  "GRWA11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/grwa11",
+   "obs": "FIAGRO-Imobiliário, Certificados de Recebíveis do Agronegócio (CRA)"
+  },
+  "GZIT11": {
+   "segmentos": [
+    "Shoppings"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/gzit11",
+   "obs": "100% shoppings (Prado Boulevard, Light, Morumbi Town, Internacional Shopping)"
+  },
+  "HABT11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://investidor10.com.br/fiis/habt11/",
+   "obs": "fundo de papel, foco em CRI pulverizados (residencial, incorporação, resorts)"
+  },
+  "HBCR11": {
+   "segmentos": [
+    "Varejo",
+    "CRI / Papel"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://investidor10.com.br/fiis/hbcr11/",
+   "obs": "HBC Renda Urbana, híbrido tijolo+papel: centros de distribuição/varejo (SP e CE) mais operações estruturadas com CRI na alavancagem"
+  },
+  "HBRH11": {
+   "segmentos": [
+    "Lajes Corporativas"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/hbrh11",
+   "obs": "escritórios/lajes corporativas em SP e RJ (Barra Private, Cittyplex Osasco, Neolink Office, Helbor Trilogy, One Eleven)"
+  },
+  "HCHG11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/hchg11",
+   "obs": "Hectare Higher Grade, investe preponderantemente em CRI"
+  },
+  "HCTR11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fiis.pro/funds/HCTR11",
+   "obs": "fundo de papel Hectare CE, gestão ativa em CRI"
+  },
+  "HFOF11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/hfof11",
+   "obs": "fundo de fundos, cotas de FIIs de shopping, logística, escritórios e papel"
+  },
+  "HGAG11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/hgag11",
+   "obs": "FIAGRO, alocação em crédito agro via CRAs"
+  },
+  "HGCR11": {
+   "segmentos": [
+    "Títulos e Val. Mob."
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/hgcr11",
+   "obs": "fundo de CRI (papel); parte da carteira em cotas de FIIs de logística e lajes corporativas, sem % claro"
+  },
+  "HGFF11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/hgff11",
+   "obs": "fundo de fundos com cotas em lajes corporativas (HGPO11 70%), logística (HGLG11), papéis (HGCR11) e misto (HGRU11)"
+  },
+  "HGIC11": {
+   "segmentos": [
+    "Títulos e Val. Mob.",
+    "Híbrido"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/hgic11",
+   "obs": "investe via CRI, cotas de FII e imóveis próprios; ANBIMA classifica como Híbrido, dados de carteira limitados"
+  },
+  "HGLG11": {
+   "segmentos": [
+    "Logística"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/hglg11",
+   "obs": "galpões logísticos/industriais em SP, MG, RJ, PE, SC"
+  },
+  "HGRU11": {
+   "segmentos": [
+    "Varejo",
+    "Educacional"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/hgru11",
+   "obs": "misto urbano institucional/comercial: supermercados, universidades, cinemas; sem % claro por segmento"
+  },
+  "HIRE11": {
+   "segmentos": [
+    "Logística"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://metroquadrado.com/investimentos/trxf11-ancora-oferta-de-novo-fii-de-renda-da-hire-capital/",
+   "obs": "5 galpões logísticos (SP/RJ), ancorado por TRXF11; gestor planeja diversificar para escritórios no futuro"
+  },
+  "HRDF11": {
+   "segmentos": [
+    "Híbrido"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/hrdf11",
+   "obs": "Hedge Realty Development, fundo de desenvolvimento em escritórios, shoppings/varejo e logística/industrial"
+  },
+  "HREC11": {
+   "segmentos": [
+    "Títulos e Val. Mob."
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/hrec11",
+   "obs": "fundo de CRI (papel)"
+  },
+  "HRES11": {
+   "segmentos": [
+    "Residencial"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/hres11",
+   "obs": "~13 imóveis residenciais em cidades do interior (AC, RO, MS, MT)"
+  },
+  "HSAF11": {
+   "segmentos": [
+    "Títulos e Val. Mob."
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/hsaf11",
+   "obs": "CRI + LCI/LIG/CEPAC + cotas de outros FIIs"
+  },
+  "HSRE11": {
+   "segmentos": [
+    "Híbrido"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://investidor10.com.br/fiis/hsre11/",
+   "obs": "HSI Renda Imobiliária: 25 imóveis comerciais/varejo/escritórios diversificados + built-to-suit + cotas de FII/FIP"
+  },
+  "HUSC11": {
+   "segmentos": [
+    "Hospital"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/husc11",
+   "obs": "100% hospital (Unimed Sul Capixaba), ativo único"
+  },
+  "HYPI11": {
+   "segmentos": [
+    "Outros"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/hypi11",
+   "obs": "Hire Properties I; dados de carteira limitados, vendeu imóvel comercial em Pinheiros-SP"
+  },
+  "IAAG11": {
+   "segmentos": [
+    "FOF",
+    "Agrícola"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/fiagros/iaag11",
+   "obs": "Inter Amerra Fiagro - Imobiliário; FOF que investe em cotas de outros FIIs (logística, papel, desenvolvimento, industrial)"
+  },
+  "IAGR11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/iagr11",
+   "obs": "SFI Investimentos do Agronegócio FIAGRO Imobiliário; composição de carteira não detalhada na fonte"
+  },
+  "IBCR11": {
+   "segmentos": [
+    "Títulos e Val. Mob."
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/ibcr11",
+   "obs": "fundo de CRI (papel)"
+  },
+  "ICRI11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.clubefii.com.br/fiis/ICRI11",
+   "obs": "Itaú Crédito Imobiliário IPCA, 100% CRI"
+  },
+  "IFID11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/ifid11",
+   "obs": "fundo de fundos; fundo encerrado/transferido para ITIP11 em 2022, dados desatualizados"
+  },
+  "IFIE11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/ifie11",
+   "obs": "fundo inativo, migrou para ITIT11 em 05/01/2022, replicava índice IFI-E (30 maiores FIIs)"
+  },
+  "IRDM11": {
+   "segmentos": [
+    "Títulos e Val. Mob."
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/irdm11",
+   "obs": "Iridium Recebíveis Imobiliários; fundo de CRI (papel), 67-100% em CRIs"
+  },
+  "IRIM11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://investidor10.com.br/fiis/irim11/",
+   "obs": "fundo de papel Iridium, foco em CRI com lastro diversificado (residencial, shopping, logística, escritórios, saúde)"
+  },
+  "ISCJ11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.clubefii.com.br/fiis/ISCJ11",
+   "obs": "Invista SCJ, fundo de fundos (estratégia papel), sem detalhamento de % nas fontes gratuitas"
+  },
+  "ITIP11": {
+   "segmentos": [
+    "FOF",
+    "CRI / Papel"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/itip11",
+   "obs": "FOF que replica índice Teva de FIIs de Papel, mín. 60% em cotas de FII de papel"
+  },
+  "ITIT11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/itit11",
+   "obs": "fundo de fundos passivo, replica índice Teva de FIIs de tijolo + CRI/LCI/LH complementar"
+  },
+  "ITRI11": {
+   "segmentos": [
+    "Multiestratégia"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://investidor10.com.br/fiis/itri11/",
+   "obs": "gestão ativa diversificada: shoppings (XPML11, VISC11), lajes (RBRY11), CRI, ações imobiliárias, desenvolvimento"
+  },
+  "JFLL11": {
+   "segmentos": [
+    "Residencial"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://investidor10.com.br/fiis/jfll11/",
+   "obs": "100% residencial, 2 imóveis em SP (VHouse Faria Lima, VO699), renda + venda de unidades"
+  },
+  "JGPX11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/jgpx11",
+   "obs": "Fiagro de crédito do agronegócio (CRA/debêntures), sem imóveis físicos"
+  },
+  "JPPA11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/jppa11",
+   "obs": "até 100% do PL em CRI, também pode alocar em FIDC, cotas de FII, LCI/LIG"
+  },
+  "JPPC11": {
+   "segmentos": [
+    "Híbrido"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/jppc11",
+   "obs": "\"fundo de desenvolvimento\" (misto), sem detalhamento claro do tipo de imóvel/empreendimento"
+  },
+  "JSAF11": {
+   "segmentos": [
+    "Multiestratégia",
+    "FOF"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/jsaf11",
+   "obs": "3 frentes: cotas de outros FIIs, CRI, ações imobiliárias, sem % divulgado"
+  },
+  "JSCR11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/jscr11",
+   "obs": "CRI + cotas de fundos de CRI"
+  },
+  "JSRE11": {
+   "segmentos": [
+    "Lajes Corporativas"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.safra.com.br/safra-asset/fundo-imobiliario/js-real-estate.htm",
+   "obs": "carteira atual 100% escritórios AAA (Tower Bridge, Ed. Paulista, Rochaverá Ebony/Marble, WTNU III, Botafogo); regulamento permite híbrido"
+  },
+  "KCRE11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/kcre11",
+   "obs": "dedicado a ativos de renda fixa imobiliária, especialmente CRI"
+  },
+  "KDOL11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.kinea.com.br/fundos/kinea-agro-income-kdol11/",
+   "obs": "Kinea Agro Income USD, Fiagro dolarizado (FIDC Fiagro e CRA)"
+  },
+  "KFEN11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.kinea.com.br/wp-content/uploads/2026/07/KFEN_Carta-do-Gestor_06-2026.pdf",
+   "obs": "100%+ em CRI; lastro: 60% logística, ~29% residencial (incl. home equity), 8% escritórios, 3% shoppings"
+  },
+  "KFOF11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/kfof11",
+   "obs": ">50% do PL em cotas de outros FIIs (majoritariamente fundos Kinea), complementar CRI/LCI/LH"
+  },
+  "KISU11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/kisu11",
+   "obs": "mín. 80% em cotas de FII, replica índice SUNO30"
+  },
+  "KIVO11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/kivo11",
+   "obs": "mín. 67% do PL em CRI"
+  },
+  "KNCR11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/kncr11",
+   "obs": "Kinea Rendimentos Imobiliários, fundo papel clássico, >50% em CRI"
+  },
+  "KNHF11": {
+   "segmentos": [
+    "Escritórios",
+    "FOF"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/knhf11",
+   "obs": "imóveis diretos (Ed. Condomínio São Luiz, Ed. HL Faria Lima) + cotas de outros fundos Kinea (KFOF11, KNRI11, KNCR11)"
+  },
+  "KNHY11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/knhy11",
+   "obs": "fundo de papel Kinea, +50% em CRI, restante debêntures/FIDC/LIG"
+  },
+  "KNIP11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/knip11",
+   "obs": "Kinea Índices de Preços, segue IMA-B, predominante em CRI"
+  },
+  "KNPR11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://investidor10.com.br/fiis/knpr11/",
+   "obs": "fundo de fundos Kinea, investe em cotas de FIIs (ex.: RCRB11, JSRE11, TEPP11), diversificado sem % claro"
+  },
+  "KNRI11": {
+   "segmentos": [
+    "Escritórios",
+    "Logística"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/knri11",
+   "obs": "híbrido: edifícios corporativos (SP/RJ/MG) + centros de distribuição, também pontos de varejo/agências, sem % claro"
+  },
+  "KNSC11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/knsc11",
+   "obs": "investe em CRI e cotas de FII, sem % claro"
+  },
+  "KNUQ11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/knuq11",
+   "obs": "portfólio dedicado a CRI pós-fixado"
+  },
+  "KORE11": {
+   "segmentos": [
+    "Escritórios",
+    "Lajes Corporativas"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/kore11",
+   "obs": "100% edifícios corporativos (SP/RJ): Corporate Plaza, Centro Empresarial Botafogo, Morumbi Office Tower, Alameda Santos"
+  },
+  "LAFI11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.clubefii.com.br/fiis/LAFI11",
+   "obs": "Lavoura I, Fiagro categoria Agronegócio, sem detalhamento de % de ativos"
+  },
+  "LKDV11": {
+   "segmentos": [
+    "Escritórios"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/lkdv11",
+   "obs": "fundo \"Development V1\", ativo identificado é laje corporativa (SKY Galleria, Campinas)"
+  },
+  "LLAO11": {
+   "segmentos": [
+    "Residencial"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/llao11",
+   "obs": "apartamentos residenciais em São Paulo (Indianópolis e entorno), desenvolvimento para venda"
+  },
+  "LMAI11": {
+   "segmentos": [
+    "Lajes Corporativas",
+    "Industrial"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/lmai11",
+   "obs": "ex-RMAI11 (Labina/Reag), possui Domo Corporate (escritório SBC) + galpão industrial (Queimados-RJ), sem % claro"
+  },
+  "LRDI11": {
+   "segmentos": [
+    "Híbrido"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.clubefii.com.br/fiis/LRDI11",
+   "obs": "Leblon Realty Desenvolvimento I, classificação ANBIMA Híbrido/Desenvolvimento, composição detalhada não divulgada"
+  },
+  "LSOP11": {
+   "segmentos": [
+    "Multiestratégia"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/lsop11",
+   "obs": "LCP Special Opportunities III, fundo novo (registrado nov/2025), classificado como multiestratégia, sem detalhes de carteira"
+  },
+  "LSPA11": {
+   "segmentos": [
+    "Residencial"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://blog.grana.capital/2022/05/16/lspa11-conheca-o-fundo-imobiliario-leste-riva-que-investe-em-empreendimentos-residenciais",
+   "obs": "Leste Riva Equity Preferencial, concentrado em SPE residencial (Napoli Empreendimentos)"
+  },
+  "LTMT11": {
+   "segmentos": [
+    "Residencial"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/ltmt11",
+   "obs": "Speciale Blue Real, segmento \"Imóveis Residenciais\", ANBIMA Residencial, tipo Desenvolvimento para Venda"
+  },
+  "MANA11": {
+   "segmentos": [
+    "Multiestratégia",
+    "CRI / Papel"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://investidor10.com.br/fiis/mana11/",
+   "obs": "Manati Capital, mistura CRI, cotas de FII, ações imobiliárias e operações estruturadas, sem % claro"
+  },
+  "MAXR11": {
+   "segmentos": [
+    "Shoppings",
+    "Varejo"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/maxr11",
+   "obs": "Max Retail, imóveis comerciais de varejo/shopping em 6 estados, sem % claro"
+  },
+  "MBRF11": {
+   "segmentos": [
+    "Agências"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://dividendosfiis.com.br/fundo-imobiliario/mbrf11",
+   "obs": "Mercantil do Brasil (Rio Bravo), imóveis locados a agência bancária (sede BH + 25% agência RJ); ticker migrou para RBOP11"
+  },
+  "MCCI11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/mcci11",
+   "obs": "Mauá Capital Recebíveis Imobiliários, mínimo 67% em CRI"
+  },
+  "MCEM11": {
+   "segmentos": [
+    "Outros"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://merito.inc/fundo/mcem11-merito-cemiterios-fii-fundo-de-investimento-imobiliario/",
+   "obs": "Mérito Cemitérios, segmento funerário/\"death care\" (cemitérios), não se encaixa nas categorias-padrão"
+  },
+  "MCHY11": {
+   "segmentos": [
+    "CRI / Papel",
+    "FOF",
+    "Logística"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/mchy11",
+   "obs": "ticker migrou para MCRE11 em nov/2024 (mesmo fundo); ~47% CRI, ~36% FOF, ~17% imóvel logístico"
+  },
+  "MCRE11": {
+   "segmentos": [
+    "CRI / Papel",
+    "FOF",
+    "Logística"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://statusinvest.com.br/fundos-imobiliarios/mcre11",
+   "obs": "ex-MCHY11; carteira dez/2025: 46,97% CRI, 36,40% cotas de FIIs, 16,63% imóvel logístico (Galpão Santa Cruz)"
+  },
+  "MFII11": {
+   "segmentos": [
+    "Híbrido"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/mfii11",
+   "obs": "fundo de desenvolvimento (comercial, shopping e logística) para venda; ANBIMA híbrido"
+  },
+  "MGHT11": {
+   "segmentos": [
+    "Hotel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/mght11",
+   "obs": "foco em hotéis (Hotel Villa Madalena) e CRIs ligados ao setor hoteleiro"
+  },
+  "MIDW11": {
+   "segmentos": [
+    "Shoppings"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.clubefii.com.br/fiis/MIDW11",
+   "obs": "fundo do Midway Mall (shopping center)"
+  },
+  "MINT11": {
+   "segmentos": [
+    "Educacional"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/mint11",
+   "obs": "3 escolas em BH/RJ/SP, 100% receita de imóveis educacionais"
+  },
+  "MMPD11": {
+   "segmentos": [
+    "Residencial"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.clubefii.com.br/fiis/MMPD11",
+   "obs": "fundo de desenvolvimento/incorporação residencial para venda"
+  },
+  "NAUI11": {
+   "segmentos": [
+    "Outros"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/naui11",
+   "obs": "segmento ANBIMA \"Outros\", fundo de desenvolvimento sem detalhamento público de ativos"
+  },
+  "NAVT11": {
+   "segmentos": [
+    "CRI / Papel",
+    "FOF"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/navt11",
+   "obs": "fundo de papel multiestratégia: cotas de FII, CRI e outros ativos imobiliários, sem % divulgado"
+  },
+  "NCRA11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://fiis.com.br/ncra11/",
+   "obs": "Fiagro (NCH EQI Recebíveis do Agronegócio), foco em recebíveis do agronegócio"
+  },
+  "NCRI11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/ncri11",
+   "obs": "fundo de crédito imobiliário (CRI), não é Fiagro"
+  },
+  "NEWL11": {
+   "segmentos": [
+    "Logística",
+    "Industrial"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/newl11",
+   "obs": "galpões logísticos e centros de distribuição/fábricas"
+  },
+  "NEWU11": {
+   "segmentos": [
+    "Lajes Corporativas"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/newu11",
+   "obs": "escritórios/lajes corporativas, ANBIMA híbrido"
+  },
+  "NEXG11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/nexg11",
+   "obs": "Fiagro de crédito agro (CRA/LCA/CRI agro)"
+  },
+  "NPAR11": {
+   "segmentos": [
+    "Hotel",
+    "FOF"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://statusinvest.com.br/fundos-imobiliarios/npar11",
+   "obs": "hotel Ibis Guarulhos em carteira + cotas de FIIs (ex: BLMG11 7,51%), fundo multiestratégia, ANBIMA \"Outros\""
+  },
+  "OCRE11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/ocre11",
+   "obs": "fundo de papel (Octo FII), Títulos e Val. Mob./Recebíveis Imobiliários"
+  },
+  "OIAG11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://renovainvest.com.br/blog/oiag11-detalhes-do-fundo-ourinvest-innovation-fiagro/",
+   "obs": "Fiagro (Ourinvest Innovation Fiagro Imobiliário), investe em CRA/CRI do agronegócio"
+  },
+  "ONDA11": {
+   "segmentos": [
+    "Multiestratégia"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/onda11",
+   "obs": "Onda Invest Multiestratégia FII; cotas de FII, CRI, ações de SPEs e Fiagro"
+  },
+  "ONDV11": {
+   "segmentos": [
+    "Multiestratégia"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/ondv11",
+   "obs": "mesmo fundo que ONDA11 (ticker trocado em jan/2026, CNPJ inalterado)"
+  },
+  "ORPD11": {
+   "segmentos": [
+    "Multicategoria"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/orpd11",
+   "obs": "fundo de desenvolvimento (loteamentos/imóveis p/ venda) em MS, MT, AC, RO, sem % claro por segmento"
+  },
+  "OUJP11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/oujp11",
+   "obs": "até 100% do PL em CRI sênior/única classe, até 15% subordinada"
+  },
+  "OXRL11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://fundamentei.com/fiis/oxrl11",
+   "obs": "fundo de fundos (Oxigênio 2); segmento oficial do site é \"Multicategoria\""
+  },
+  "PATA11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.patagoniacapital.com.br/fundos/fii-pata11",
+   "obs": "crédito privado com lastro imobiliário, foco middle market, fundo de papel"
+  },
+  "PATC11": {
+   "segmentos": [
+    "Lajes Corporativas"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/patc11",
+   "obs": "100% escritórios em SP (RM Square, Central Vila Olímpia, Sky Corporate, Cetenco Plaza)"
+  },
+  "PATL11": {
+   "segmentos": [
+    "Logística"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/patl11",
+   "obs": "galpões logísticos/industriais em SP/MG/RJ, ~151 mil m²"
+  },
+  "PCIP11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/pcip11",
+   "obs": "mín. 2/3 do PL em CRI, LH, LCI, LIG, cotas de FII, CEPAC, FIDC"
+  },
+  "PDBM11": {
+   "segmentos": [
+    "Shoppings"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/pdbm11",
+   "obs": "100% shopping a céu aberto Porto da Barra (Búzios/RJ)"
+  },
+  "PEMA11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.clubefii.com.br/fiis/PEMA11",
+   "obs": "classificado como \"Recebíveis Imobiliários\"/Títulos e Val. Mob.; carteira detalhada não confirmada"
+  },
+  "PLAG11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://fundamentei.com/fiis/plag11",
+   "obs": "FII tijolo agro (grãos/fibras, açúcar/álcool, indústrias, logística agro); tecnicamente não é Fiagro formal"
+  },
+  "PLCR11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/plcr11",
+   "obs": "mín. 67% do PL em CRI/títulos de origem imobiliária"
+  },
+  "PLRI11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/plri11",
+   "obs": "fundo de papel, predominante em CRIs"
+  },
+  "PMFO11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.suno.com.br/analitica/fundos-imobiliarios/pmfo11/",
+   "obs": "Speciale Real Estate Fund of Funds; composição específica não detalhada"
+  },
+  "PMIS11": {
+   "segmentos": [
+    "Multiestratégia"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://paramis.com.br/asset-management/fundo-hedge-fund-fii-pmis11/",
+   "obs": "\"hedge fund\" imobiliário: CRI, debêntures, LCI, LH, cotas de FII"
+  },
+  "PMRL11": {
+   "segmentos": [
+    "Shoppings"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.clubefii.com.br/ativos/fii/PMRL11/patria-malls-fundo-de-investimento-imobiliario-responsabilidade-ltd",
+   "obs": "Patria Malls, categoria \"Shoppings/Varejo\" (participações em shopping centers)"
+  },
+  "PNDL11": {
+   "segmentos": [
+    "Logística"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://investidor10.com.br/fiis/pndl11/",
+   "obs": "Panorama Desenvolvimento Logístico: URDI Barueri e URDI Castello Branco (galpões)"
+  },
+  "PNPR11": {
+   "segmentos": [
+    "Logística"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fiis.pro/funds/PNPR11",
+   "obs": "classificação interna \"Imóveis Logísticos\"; segmento oficial do site é \"Multicategoria\""
+  },
+  "PNRC11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.azqpanorama.com.br/pnrc11-panorama-real-estate-credito-fii",
+   "obs": "nome \"Real Estate Crédito\" indica fundo de crédito/papel imobiliário (família AZ Quest Panorama)"
+  },
+  "PORD11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/pord11",
+   "obs": "fundo de papel, predominante em CRIs"
+  },
+  "PRSN11": {
+   "segmentos": [
+    "Multicategoria"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://reidosdividendos.com.br/fiis/PRSN11/perfil",
+   "obs": "fundo de desenvolvimento para venda (Personale I), escopo comercial/residencial/industrial, sem carteira detalhada confiável"
+  },
+  "PSEC11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/psec11",
+   "obs": "Patria Securities (ex-RVBI11): primordialmente cotas de outros FIIs + CRI/LH/LCI/LIG complementar"
+  },
+  "PULV11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.clubefii.com.br/fiis/PULV11",
+   "obs": "RBR Crédito Pulverizado; fundo de papel (crédito imobiliário pulverizado), 100% papel"
+  },
+  "QAGR11": {
+   "segmentos": [
+    "Agrícola",
+    "Logística"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://fiagro.com.br/qagr11/",
+   "obs": "Quasar Agro FII, Fiagro que investe em armazéns/silos para cadeia do agronegócio (grãos, açúcar/álcool, indústrias, operadores logísticos)"
+  },
+  "RBED11": {
+   "segmentos": [
+    "Educacional"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/rbed11",
+   "obs": "Rio Bravo Renda Educacional; carteira 100% imóveis educacionais (universidades, faculdades, escolas técnicas)"
+  },
+  "RBFF11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/rbff11",
+   "obs": "Rio Bravo Fundo de Fundos; mín. 80% do PL em cotas de FIIs do IFIX, 100% FOF"
+  },
+  "RBFM11": {
+   "segmentos": [
+    "FOF",
+    "Multiestratégia"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.riobravo.com.br/fundos/",
+   "obs": "Rio Bravo Multiestratégia; \"portfólio diversificado de fundos imobiliários\", sem % claro por segmento"
+  },
+  "RBHG11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.clubefii.com.br/fiis/RBHG11",
+   "obs": "Rio Bravo Crédito Imobiliário High Grade; carteira majoritariamente CRI de alta qualidade de crédito"
+  },
+  "RBHY11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.riobravo.com.br/fundos/fii-rio-bravo-credito-imobiliario-high-yield/",
+   "obs": "Rio Bravo Crédito Imobiliário High Yield; CRI/LH/LCI/LIG de maior risco de crédito"
+  },
+  "RBIV11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/rbiv11",
+   "obs": "Rio Bravo Crédito Imobiliário IV; mín. 51% do PL em CRI, fundo de papel (encerrado/sem negociação recente)"
+  },
+  "RBOP11": {
+   "segmentos": [
+    "Lajes Corporativas"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/rbop11",
+   "obs": "Rio Bravo Oportunidades Imobiliárias; 2 imóveis de escritórios (Edifício Sede BH e Ed. Banco Mercantil RJ), 100% lajes corporativas"
+  },
+  "RBRD11": {
+   "segmentos": [
+    "Multicategoria"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.rbasset.com/imobiliario/fii-rb-capital-renda-ii-rbrd11/",
+   "obs": "RB Capital Renda II; imóveis comerciais built-to-suit para empresas diversas, sem % clara por tipo de imóvel"
+  },
+  "RBRF11": {
+   "segmentos": [
+    "FOF",
+    "Multiestratégia"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://statusinvest.com.br/fundos-imobiliarios/rbrf11",
+   "obs": "RBR Alpha Multiestratégia Real Estate (RBR Alpha Fundo de Fundos); mín. 67% do PL em cotas de FII, diversificado"
+  },
+  "RBRI11": {
+   "segmentos": [
+    "Residencial"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.rbrasset.com.br/en/fundos/rbr-desenvolvimento-residencial-iii/",
+   "obs": "RBR Desenvolvimento Residencial III; fundo de desenvolvimento (incorporação) 100% residencial"
+  },
+  "RBRP11": {
+   "segmentos": [
+    "Lajes Corporativas"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/rbrp11",
+   "obs": "RBR Properties; carteira de edifícios de escritórios em SP e RJ (Celebration, Delta Plaza, River One, Cerp Venezuela, Castello Branco), mais posições em outros FIIs"
+  },
+  "RBRR11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/rbrr11",
+   "obs": "RBR Rendimento High Grade; mín. 67% do PL em CRI, fundo de papel high grade"
+  },
+  "RBRX11": {
+   "segmentos": [
+    "FOF",
+    "Multiestratégia"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.clubefii.com.br/fiis/RBRX11",
+   "obs": "RBR Plus Multiestratégia Real Estate; FOF ativo multi-estratégia (cotas de FII, CRI, SPEs, ativos diretos), sem % clara atual"
+  },
+  "RBRY11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://statusinvest.com.br/fundos-imobiliarios/rbry11",
+   "obs": "RBR Crédito Imobiliário Estruturado (RBR Private Crédito Imobiliário); carteira de CRI/LH/LCI/LIG"
+  },
+  "RBTS11": {
+   "segmentos": [
+    "Residencial"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.rbasset.com/imobiliario/rb-capital-tfo-situs/",
+   "obs": "RB Capital TFO Situs; mandato de \"Desenvolvimento Residencial\" (permutas físicas/financeiras e SPEs residenciais), 100% residencial"
+  },
+  "RCFF11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.clubefii.com.br/fiis/RCFF11",
+   "obs": "RBR Desenvolvimento Comercial Feeder FOF; feeder que investe no Fundo de Desenvolvimento Comercial I, 100% FOF"
+  },
+  "RCRI11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://statusinvest.com.br/fundos-imobiliarios/rcri11",
+   "obs": "Real Investor Recebíveis Imobiliários FII; carteira de CRI e cotas de FIIs de recebíveis"
+  },
+  "RDES11": {
+   "segmentos": [
+    "Escritórios"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/rdes11",
+   "obs": "Renda de Escritórios FII (RD ESCRI); imóveis comerciais não residenciais/lajes corporativas, fundo atualmente sem negociação"
+  },
+  "RDIV11": {
+   "segmentos": [
+    "Outros"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/rdiv11",
+   "obs": "segmento \"Outros\" (ANBIMA), página não detalha ativos/percentuais"
+  },
+  "RDPD11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/rdpd11",
+   "obs": "fundo de \"Papéis\", investe em recebíveis imobiliários, sem % detalhado"
+  },
+  "RECD11": {
+   "segmentos": [
+    "FOF",
+    "CRI / Papel",
+    "Lajes Corporativas",
+    "Logística"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/recd11",
+   "obs": "FOF que aloca em RECR11 13,4% (CRI), RECT11 14,5% (escritórios), RELG11 14,2% (logística), RECM11 17,4% (papel), EMET11 19,2% (CRI/LCI)"
+  },
+  "RECM11": {
+   "segmentos": [
+    "FOF",
+    "CRI / Papel",
+    "Lajes Corporativas",
+    "Logística"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/recm11",
+   "obs": "FOF (ANBIMA \"Híbrido\") alocando em RECR11 13,2% (CRI), RECT11 14,0% (escritórios), RELG11 14,2% (logística), RECD11 15,5% (papel), EMET11 17,9% (CRI/LCI)"
+  },
+  "RECR11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/recr11",
+   "obs": "fundo de papel: CRI, LCI, LH, LIG e cotas de outros FIIs, sem % detalhado"
+  },
+  "RECT11": {
+   "segmentos": [
+    "Lajes Corporativas"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/rect11",
+   "obs": "7 imóveis de escritórios/comerciais (Canopus Corporate, Edifício Barra da Tijuca etc.), concentrado em SP/RJ"
+  },
+  "REIT11": {
+   "segmentos": [
+    "Títulos e Val. Mob."
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/reit11",
+   "obs": "segmento \"Papéis\"/TVM (ANBIMA classifica como \"Outros\"), sem detalhe de ativos ou %"
+  },
+  "RELG11": {
+   "segmentos": [
+    "Logística",
+    "FOF"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/relg11",
+   "obs": "5 galpões logísticos/industriais próprios (Camaçari, Contagem, Extrema, Cotia, Queimados) + cotas de RECT11/OBAL11/PBLV11"
+  },
+  "REME11": {
+   "segmentos": [
+    "Multiestratégia"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://statusinvest.com.br/fundos-imobiliarios/reme11",
+   "obs": "nome oficial \"RB Multiestratégia Imobiliária FII\""
+  },
+  "RENV11": {
+   "segmentos": [
+    "Outros"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://fiibrasil.com.br/fii/renv11/",
+   "obs": "fundo \"CPV Energia\", foco em imóveis ligados a energia renovável; segmento classificado como \"Outros\", descrição incompleta na fonte"
+  },
+  "RFOF11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://fiis.com.br/noticias/fundo-imobiliario-rfof11-explica-estrategia-atual-carteira-57-fiis-jvj/",
+   "obs": "\"RB Capital I Fundo de Fundos\", carteira com 57 FIIs"
+  },
+  "RINV11": {
+   "segmentos": [
+    "Multiestratégia"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.clubefiinews.com.br/hibrido/rinv11-a-estrategia-do-fii-que-investe-em-cotas-cris-e-acoes",
+   "obs": "\"Real Investor FII\" investe em cotas de FIIs, CRIs e ações"
+  },
+  "RMAI11": {
+   "segmentos": [
+    "Lajes Corporativas",
+    "Industrial"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/rmai11",
+   "obs": "\"REAG Multi Ativos Imobiliários\": Edifício Domo Corporate (escritórios, 30.600 m², SBC/SP) + galpão industrial em Queimados/RJ (8.545 m²)"
+  },
+  "RMBS11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.clubefii.com.br/fiis/RMBS11",
+   "obs": "nome oficial \"REC Master Fundo de CRI Cotas Amortizáveis\""
+  },
+  "ROOF11": {
+   "segmentos": [
+    "Residencial"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/roof11",
+   "obs": "fundo de desenvolvimento para venda; apartamentos residenciais em SP + espaços comerciais menores, sem % detalhado"
+  },
+  "RPRI11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/rpri11",
+   "obs": "\"RBR Premium Recebíveis Imobiliários\", foco em aquisição de CRIs"
+  },
+  "RRCI11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/rrci11",
+   "obs": "\"RB Capital Recebíveis Imobiliários\", investe majoritariamente em CRI, também LCI e cotas de FII"
+  },
+  "RVBI11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/rvbi11",
+   "obs": "FOF diversificado em HGLG11 (logística), HGPO11/HGRE11/CBOP11 (escritórios), HGCR11/CVBI11 (papel), HGRU11 (híbrido/varejo), fundos de desenvolvimento e PLAG11 (agro), sem % consolidado claro"
+  },
+  "RZAK11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://investidor10.com.br/fiis/rzak11/",
+   "obs": "\"Riza Akin FII\" (gestão BTG Pactual), setor \"Recebíveis Imobiliários\""
+  },
+  "RZAT11": {
+   "segmentos": [
+    "Logística",
+    "Industrial"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/rzat11",
+   "obs": "ativos industriais/logísticos (galpões em SP, MT, CE, MS, DF), ANBIMA \"Híbrido\""
+  },
+  "RZEO11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/rzeo11",
+   "obs": "Fiagro (Riza EOS), imóveis rurais no norte do Tocantins, exposição a soja/milho, sem % claro"
+  },
+  "RZLC11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://investidor10.com.br/fiis/rzlc11/",
+   "obs": "fundo de papel/crédito imobiliário, não investe em imóveis físicos, diversificado sem % claro"
+  },
+  "RZTR11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://investidor10.com.br/fiis/rztr11/",
+   "obs": "investe diretamente em fazendas (soja, milho, algodão, sorgo, café) via sale & leaseback e land equity"
+  },
+  "SADI11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.clubefii.com.br/fiis/SADI11",
+   "obs": "mínimo 67% do patrimônio em CRI, sem % detalhado por outros ativos"
+  },
+  "SAPI11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/sapi11",
+   "obs": "investe majoritariamente em CRIs indexados a IPCA/CDI, baixo risco de crédito"
+  },
+  "SARE11": {
+   "segmentos": [
+    "Logística",
+    "Escritórios"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.santanderassetmanagement.com.br/pessoa-fisica/fundos-de-investimento/imobiliario/sare11",
+   "obs": "galpões logísticos (Santo André, Barueri) e lajes corporativas (WT Morumbi, Work Bela Cintra), sem % explícito"
+  },
+  "SEED11": {
+   "segmentos": [
+    "FOF",
+    "CRI / Papel"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/seed11",
+   "obs": "fundo de fundos que também investe em CRI, sem % explícito por classe"
+  },
+  "SHPP11": {
+   "segmentos": [
+    "Shoppings"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/shpp11",
+   "obs": "100% shopping center (Shopping Pátio Paulista)"
+  },
+  "SIGR11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://fiibrasil.com/fundo/sigr11/",
+   "obs": "fundo de recebíveis pulverizados (CRIs), ANBIMA Títulos e Valores Mobiliários, sem % divulgado"
+  },
+  "SMRE11": {
+   "segmentos": [
+    "Híbrido"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/smre11",
+   "obs": "incorporações/desenvolvimento via SPEs, sem % claro por tipo de imóvel"
+  },
+  "SNAG11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://investidor10.com.br/fiis/snag11/",
+   "obs": "Fiagro com CRA, propriedades rurais e participações no agronegócio, sem % fixo"
+  },
+  "SNCI11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/snci11",
+   "obs": "segmento Papéis/Títulos e Valores Mobiliários, majoritariamente CRIs, sem % detalhado"
+  },
+  "SNCR11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://fiis.com.br/sncr11",
+   "obs": "ticker inativo/renomeado (SNCR11→AFCR11→CACR11), era fundo de papel/CRI"
+  },
+  "SNEL11": {
+   "segmentos": [
+    "Outros"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/snel11",
+   "obs": "fundo de energias limpas/renováveis (geração de energia elétrica), não é segmento imobiliário tradicional"
+  },
+  "SNFF11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/snff11",
+   "obs": "100% fundo de fundos (cotas de outros FIIs)"
+  },
+  "SNFZ11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/snfz11",
+   "obs": "Fiagro: valorização de fazendas, arrendamento de terras e crédito do agro (CRA/CPR/LCA)"
+  },
+  "SNME11": {
+   "segmentos": [
+    "Multiestratégia"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/snme11",
+   "obs": "aloca em crédito, ações, CRI, FIDC, SPEs e cotas de FIIs, sem % claro"
+  },
+  "SOFF11": {
+   "segmentos": [
+    "Outros"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/soff11",
+   "obs": "fundo de energia solar fotovoltaica (geração distribuída), classificado ANBIMA \"Outros\""
+  },
+  "SPMO11": {
+   "segmentos": [
+    "Híbrido"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/spmo11",
+   "obs": "cotas de outros FIIs (LAFI11, FATN11, TJKB11, FLMA11, FPNG11, SCPF11) + imóveis diretos MS/MT/AC/RO, sem % claro do total"
+  },
+  "SPTW11": {
+   "segmentos": [
+    "Lajes Corporativas"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/sptw11",
+   "obs": "100% concentrado no Edifício Badaró (SP), laje corporativa, 0% vacância"
+  },
+  "SPXS11": {
+   "segmentos": [
+    "Multiestratégia"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/spxs11",
+   "obs": "regulamento amplo (CRI, ações imob., cotas FII, imóveis, debêntures, SPE, FIA, CEPAC, FIDC, LH/LCI/LIG); nome \"SPX SYN Multiestratégia\""
+  },
+  "SRVD11": {
+   "segmentos": [
+    "Títulos e Val. Mob."
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/srvd11",
+   "obs": "setor \"Indefinido\", classificação ANBIMA \"TVM\"; dados de imóveis específicos não confiáveis, mantido conservador"
+  },
+  "TELM11": {
+   "segmentos": [
+    "Multiestratégia"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/telm11",
+   "obs": "nome \"Tellus Multiestratégia\"; objeto amplo (imóveis, CRI, LCI, LIG, LH, CEPAC, SPE, FIP, FIDC, cotas FII)"
+  },
+  "TGAR11": {
+   "segmentos": [
+    "Híbrido"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/tgar11",
+   "obs": "\"Fundo de Desenvolvimento\", ANBIMA Híbrido; equity em incorporação/loteamento + crédito imobiliário, com exposição a shopping"
+  },
+  "TMPS11": {
+   "segmentos": [
+    "FOF",
+    "CRI / Papel"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/tmps11",
+   "obs": "setor \"Fundo de Fundos\" (ANBIMA Outros); compra cotas de FII com desconto + ativos de crédito imobiliário"
+  },
+  "TOPP11": {
+   "segmentos": [
+    "Lajes Corporativas"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/topp11",
+   "obs": "2 edifícios corporativos (Metropolitan e Platinum) no Itaim Bibi, SP, 100% escritórios"
+  },
+  "TORD11": {
+   "segmentos": [
+    "Híbrido"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/tord11",
+   "obs": "setor \"Misto\", ANBIMA Híbrido; mistura CRI, equity em projetos e cotas de FII"
+  },
+  "TRCO11": {
+   "segmentos": [
+    "Lajes Corporativas"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.clubefii.com.br/fiis/TRCO11",
+   "obs": "\"Torre Rio Claro Offices\", setor \"Lajes Comerciais\""
+  },
+  "TRXB11": {
+   "segmentos": [
+    "Varejo"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/trxb11",
+   "obs": "\"TRX Real Estate II\", imóveis leased para Assaí/Extra/Pão de Açúcar (sale-and-leaseback), 100% varejo alimentar"
+  },
+  "TRXF11": {
+   "segmentos": [
+    "Varejo",
+    "Logística",
+    "Hospital",
+    "Escritórios"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/trxf11",
+   "obs": "portfólio diversificado: Carrefour/Extra/Assaí/Atacadão (varejo predominante), Decathlon/Leroy Merlin, shoppings, Hospital Einstein/Sírio-Libanês, escritório Link Corporate Garden; sem percentuais exatos"
+  },
+  "TRXL11": {
+   "segmentos": [
+    "Logística"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://investidor10.com.br/fiis/trxl11/",
+   "obs": "galpões logísticos/industriais e varejo; fundo inativo/não negociado desde 2019"
+  },
+  "TRXY11": {
+   "segmentos": [
+    "Híbrido"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/trxy11",
+   "obs": "mistura CRI, cotas de FII, ações, debêntures e SPE/permutas, incluindo ativos de varejo e logística"
+  },
+  "TSNC11": {
+   "segmentos": [
+    "Lajes Corporativas"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/tsnc11",
+   "obs": "setor confirmado \"Lajes Corporativas\" nas duas fontes"
+  },
+  "UBSR11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://investidor10.com.br/fiis/ubsr11/",
+   "obs": "\"UBS (BR) Recebíveis Imobiliários\" - CRI, LH, LCI, LIG; fundo inativo/não negociado desde 2020"
+  },
+  "URHF11": {
+   "segmentos": [
+    "Híbrido"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/urhf11",
+   "obs": "setor \"Outros\", ANBIMA Híbrido; investe em CRI, Notas Comerciais e Imóveis"
+  },
+  "URPR11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/urpr11",
+   "obs": "setor \"Papéis\"; CRI pulverizados de recebíveis residenciais (loteamentos, prédios, casas), até 100% do PL em CRI"
+  },
+  "VCJR11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/vcjr11",
+   "obs": "setor \"Papéis\"; mais de 50% do PL em CRI, restante em debêntures/FIDC/LIG/LCI/LH/cotas FII"
+  },
+  "VCRI11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/vcri11",
+   "obs": "setor \"Papéis\", ANBIMA TVM; mínimo 2/3 do PL em CRI/LCI/LIG/LH/debêntures/FIDC/cotas FII"
+  },
+  "VERE11": {
+   "segmentos": [
+    "Logística",
+    "Industrial"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/vere11",
+   "obs": "setor \"Imóveis Industriais e Logísticos\"; galpões (maior parte da ABL) + auto shopping + loja comercial em MG"
+  },
+  "VGHF11": {
+   "segmentos": [
+    "Multiestratégia"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/vghf11",
+   "obs": "setor \"Misto\"; instrumentos diversos (ações, debêntures, SPE, FIP/FIA, CEPAC, cotas FII, CRI, FIDC, LH/LCI); citado por outras fontes como \"fundo multiestratégia\""
+  },
+  "VGIA11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/vgia11",
+   "obs": "FIAGRO, predominantemente CRA (recebíveis do agronegócio)"
+  },
+  "VGII11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.organizesee.com.br/explorar/fiis/VGII11",
+   "obs": "fundo de papel, carteira predominantemente formada por CRIs"
+  },
+  "VGIP11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/vgip11",
+   "obs": "fundo de papel, investe em CRIs"
+  },
+  "VGIR11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/vgir11",
+   "obs": "mínimo 67% do PL em CRIs"
+  },
+  "VGRI11": {
+   "segmentos": [
+    "Lajes Corporativas"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://investidor10.com.br/fiis/vgri11/",
+   "obs": "fundo de tijolo, seis edifícios corporativos (SP e RJ), vacância 21,8%"
+  },
+  "VHFA11": {
+   "segmentos": [
+    "Agrícola",
+    "FOF"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/vhfa11",
+   "obs": "FIAGRO que investe em CRA/CRI agro, imóveis rurais e cotas de FIAGRO/FII/FIM/FIDC; classificado \"Misto\", sem % claro"
+  },
+  "VINO11": {
+   "segmentos": [
+    "Lajes Corporativas"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/vino11",
+   "obs": "100% escritórios (Vinci Offices), 9 imóveis comerciais em SP e RJ"
+  },
+  "VIUR11": {
+   "segmentos": [
+    "Varejo",
+    "Hospital",
+    "Educacional"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/viur11",
+   "obs": "diversificado em imóveis urbanos: varejo, saúde e educação; classificado \"Misto\", sem % claro"
+  },
+  "VJFD11": {
+   "segmentos": [
+    "Varejo",
+    "Outros"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://statusinvest.com.br/fundos-imobiliarios/vjfd11",
+   "obs": "lojas/áreas comerciais e terrenos em MG/BA/ES; classificação ANBIMA \"Outros\", sem % claro"
+  },
+  "VOTS11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/vots11",
+   "obs": "fundo de papel: CRI, LCI, LH e cotas de outros FIIs/FIDC"
+  },
+  "VRTA11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/vrta11",
+   "obs": "fundo de papel: CRI, LCI, LH, FIDC, debêntures, cotas de FII"
+  },
+  "VRTM11": {
+   "segmentos": [
+    "Multiestratégia"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/vrtm11",
+   "obs": "mistura residencial/comercial com CRI/FIDC/LH/LCI/cotas de FII, sem % claro"
+  },
+  "VSLH11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/vslh11",
+   "obs": "majoritariamente CRI; até 33% do PL em equities/outros FIIs"
+  },
+  "VTPL11": {
+   "segmentos": [
+    "Logística"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/vtpl11",
+   "obs": "único ativo é galpão logístico em São Bernardo do Campo, 0% vacância, indexado a IPCA"
+  },
+  "VVCR11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/vvcr11",
+   "obs": "\"BB Renda de Papéis Imobiliários II\": CRI, LCI e cotas de outros FIIs, sem % claro"
+  },
+  "VVMR11": {
+   "segmentos": [
+    "Lajes Corporativas",
+    "Residencial",
+    "Híbrido"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/vvmr11",
+   "obs": "portfólio urbano com escritórios (Neolink Office, One Eleven) e residencial/serviços (Helbor Trilogy); ANBIMA Híbrido, sem % claro"
+  },
+  "VVRI11": {
+   "segmentos": [
+    "Varejo",
+    "Logística",
+    "Industrial"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/vvri11",
+   "obs": "carteira mista: loja (varejo), imóvel industrial e galpão logístico; ANBIMA Híbrido, sem % claro"
+  },
+  "VXXV11": {
+   "segmentos": [
+    "Shoppings",
+    "Multiestratégia"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/vxxv11",
+   "obs": "\"VX XVI - Genesis Multiestratégia FII\", detém Shopping Iguatemi São Carlos; ANBIMA \"Outros\"/Fundo de Desenvolvimento"
+  },
+  "WHGR11": {
+   "segmentos": [
+    "Híbrido"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/whgr11",
+   "obs": "\"WHG Real Estate FII\"; regulamento permite imóveis diretos, CRI e cotas de outros FIIs, sem % claro"
+  },
+  "WSEC11": {
+   "segmentos": [
+    "Varejo"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/wsec11",
+   "obs": "\"Warren Securities FDO DE INV IMOB\", imóveis comerciais/lojas no interior (AC, MT, MS, RO); ANBIMA \"Outros\""
+  },
+  "WTSP11": {
+   "segmentos": [
+    "Lajes Corporativas"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/wtsp11",
+   "obs": "único ativo: 9% do WTC Nações Unidas (SP), edifício de escritórios; site classifica genericamente como Misto/Híbrido"
+  },
+  "XLPR11": {
+   "segmentos": [
+    "CRI / Papel",
+    "FOF"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/xlpr11",
+   "obs": "fundo de papel (CRI, LCI, LH) e cotas de outros FIIs, sem % detalhado"
+  },
+  "XPCA11": {
+   "segmentos": [
+    "Agrícola"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/xpca11",
+   "obs": "FIAGRO de crédito agro (CRA, LCA, FIDC Agro), sem % detalhado"
+  },
+  "XPCI11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/xpci11",
+   "obs": "fundo de papel, lastros diversos (varejo, incorporação, shopping, hospital, logística), sem % detalhado"
+  },
+  "XPSF11": {
+   "segmentos": [
+    "FOF"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/xpsf11",
+   "obs": "fundo de fundos, carteira com FIIs de papel, logística/industrial, shopping e agro"
+  },
+  "XTED11": {
+   "segmentos": [
+    "Lajes Corporativas"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/xted11",
+   "obs": "100% escritórios corporativos"
+  },
+  "YCHY11": {
+   "segmentos": [
+    "Multicategoria"
+   ],
+   "pureza": "Puro",
+   "fonte": "(nenhuma fonte confiável encontrada)",
+   "obs": "segmento listado como \"Indefinido\" no FundsExplorer, fundo não é negociado atualmente, dado insuficiente"
+  },
+  "ZAGH11": {
+   "segmentos": [
+    "Multiestratégia",
+    "Híbrido"
+   ],
+   "pureza": "Misto",
+   "fonte": "https://www.fundsexplorer.com.br/funds/zagh11",
+   "obs": "Zagros Multiestratégia: CRI, cotas de FII, ações do setor, SPEs e imóveis diretos (comercial e educacional), sem % detalhado"
+  },
+  "ZAVC11": {
+   "segmentos": [
+    "CRI / Papel"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.clubefii.com.br/fiis/ZAVC11",
+   "obs": "Zavit Crédito Imobiliário, fundo de recebíveis/crédito imobiliário"
+  },
+  "ZAVI11": {
+   "segmentos": [
+    "Híbrido"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/zavi11",
+   "obs": "ativos logísticos, industriais, comerciais e de renda urbana (contratos atípicos), sem % detalhado"
+  },
+  "ZIFI11": {
+   "segmentos": [
+    "Outros"
+   ],
+   "pureza": "Puro",
+   "fonte": "https://www.fundsexplorer.com.br/funds/zifi11",
+   "obs": "classificado como \"Fundo de Desenvolvimento\"; imóveis comerciais no interior do Brasil, tipo de inquilino não detalhado"
+  }
+ }
+}
