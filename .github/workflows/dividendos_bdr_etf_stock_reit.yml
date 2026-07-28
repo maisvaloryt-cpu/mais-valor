@@ -1,0 +1,47 @@
+name: Dividendos de BDRs, ETFs, Stocks e REITs (a cada 15 dias)
+
+on:
+  schedule:
+    # Dia 2 e dia 17 de cada mês, às 22h UTC (19h Brasília) — 1h depois do
+    # acoes_extras, pra não disputar recursos no mesmo horário. Dividendos
+    # desses ativos não mudam todo dia, não precisa rodar com mais frequência.
+    - cron: '0 22 2,17 * *'
+  workflow_dispatch: {}  # Permite rodar manualmente também
+
+jobs:
+  dividendos-bdr-etf-stock-reit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Dependências
+        run: pip install requests
+
+      - name: Coletar dividendos de BDRs, ETFs, Stocks e REITs
+        env:
+          BRAPI_TOKEN_1: ${{ secrets.BRAPI_TOKEN_1 }}
+          BRAPI_TOKEN_2: ${{ secrets.BRAPI_TOKEN_2 }}
+          BRAPI_TOKEN_3: ${{ secrets.BRAPI_TOKEN_3 }}
+          BRAPI_TOKEN_4: ${{ secrets.BRAPI_TOKEN_4 }}
+          BRAPI_TOKEN_5: ${{ secrets.BRAPI_TOKEN_5 }}
+        run: python fetch_dividendos_bdr_etf_stock_reit.py
+
+      - name: Commit e Push
+        run: |
+          git config user.name "Mais Valor Bot"
+          git config user.email "bot@maisvalor.com"
+          git add data/dividendos/
+          git diff --staged --quiet || git commit -m "💰 Dividendos de BDRs, ETFs, Stocks e REITs"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push && break
+            echo "⚠️ Push falhou (tentativa $i/5) — aguardando 20s..."
+            sleep 20
+          done

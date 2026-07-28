@@ -145,7 +145,7 @@ function calcScore(d, tipo) {
   // se aplicam a eles) — sem 'tipo' explícito, cai no palpite antigo por
   // sufixo do ticker (mantém compat com index.html/comparador.html, que só
   // lidam com ações/FIIs hoje).
-  if (tipo === 'bdr' || tipo === 'etf') return null;
+  if (tipo === 'bdr' || tipo === 'etf' || tipo === 'stock' || tipo === 'reit') return null;
   let pts = 0, max = 0;
   const isFii = tipo ? tipo === 'fii' : (d.t && /\d{2}$/.test(d.t));
   // Base FIXA: dado faltando NÃO infla mais o score. Antes o total possível só
