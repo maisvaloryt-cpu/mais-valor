@@ -5,50 +5,47 @@ Estratégia complementar (busca TODAS as fontes e mergeia):
   BDRs (.SA): Yahoo(.SA) + Brapi com rodízio
 
 Salva em data/historico/{TICKER}.json  (ex: AAPL34.json)
+
+IMPORTANTE — sobre os tickers desta lista:
+Os códigos de BDR na B3 quase nunca são "sigla da empresa nos EUA + 34"
+(ex: McDonald's NÃO é MCD34 — é MCDC34; Bristol-Myers Squibb NÃO é BMY34 —
+é BMYB34). Cada BDR tem um código específico atribuído pelo banco
+depositário, muitas vezes com prefixo numérico (ex: A1MD34 pra AMD).
+Esta lista foi corrigida em 28/07/2026 cruzando a lista antiga (que tinha
+~98 tickers errados/inexistentes, causando "SEM DADOS" no histórico) com a
+planilha oficial "BDRs Listados B3" (Empresa / Ticker EUA / Ticker BDR).
+Removidos desta lista (não confirmados na planilha oficial, evitar chutar
+ticker errado): PANW (Palo Alto), CRWD (CrowdStrike), LYFT (Lyft), TTE
+(TotalEnergies), SHEL (Shell — trocou de código após unificação em 2022),
+005930.KS (Samsung), NIO, LVMH, BMW, VOW (Volkswagen), BAYRY (Bayer).
+Se algum desses BDRs for confirmado, adicionar de volta com o ticker certo.
 """
 import datetime, os, sys, time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fetch_utils import fetch_yahoo_mensal, fetch_brapi_mensal, merge_historico
 
-# ── Lista de BDRs ─────────────────────────────────────────────────────────────
+# ── Lista de BDRs (tickers reais da B3, confirmados na planilha oficial) ──────
 BDR_LIST = [
-    # Tech EUA
-    "AAPL34","MSFT34","AMZO34","GOGL34","NVDC34","TSLA34","META34",
-    "INTC34","CSCO34","IBM34","ORCL34","ADBE34","QCOM34","TXN34",
-    "AMAT34","MU34","AMD34","AVGO34","PANW34","CRWD34","INTU34",
-    "SNOW34","DDOG34","KLAC34","LRCX34",
-    # Pagamentos / Fintech
-    "VISA34","MAST34","PYPL34","AMEX34","COIN34","SQ34",
-    # Bancos EUA
-    "JPMC34","BACR34","GSGI34","MSBR34","CITI34","WFC34",
-    "BLK34","SCHW34","CME34",
-    # Saúde / Farmacêutica
-    "JNJB34","PFIZ34","MRNA34","ABBV34","MRK34","UNH34","AMGN34",
-    "GILD34","BMY34","LLY34","ABT34","MDT34","BIIB34","VRTX34",
-    "REGN34","ISRG34","ZTS34","TMO34","DHR34","ILMN34",
-    # Consumo EUA
-    "MCD34","COCA34","NIKE34","WMT34","COST34","TGT34","HD34","LOW34",
-    "SBUX34","PEP34","PM34","MDLZ34","YUM34","CMG34","KHC34","COLG34",
-    "PG34","EBAY34",
-    # Digital / Plataformas
-    "NFLX34","DISB34","ATVI34","EA34","RBLX34","SPOT34","UBER34",
-    "ABNB34","SHOP34","DOCU34","ZM34","ROKU34","DASH34","LYFT34",
-    # Telecom / Mídia
-    "T34","VZ34","CMCS34",
-    # Industrial / Aeroespacial
-    "BOEI34","CAT34","MMM34","GE34","UPS34","FDX34","LMT34","RTX34",
-    "HON34","DE34","EMR34","NOC34",
-    # Energia
-    "CVX34","EXXO34","TOTF34","SHEL34","BP34",
-    # Diversificados / Outros EUA
-    "BERK34","MSCI34","SPGI34","MCO34","ADP34","FISV34","ROST34",
-    "TJX34","DLTR34","UL34","NTES34",
-    # Ásia
-    "SAMS34","TOYT34","HOND34","TSMC34","BABA34","NIO34","SONY34",
-    # Europa
-    "LVMH34","SAP34","ASML34","NOVN34","AZN34","NVO34","BMW34","VOW34",
-    "BAYB34","HSBC34","GSK34","UBS34","AIRB34","BNTX34",
+    "AAPL34","MSFT34","AMZO34","GOGL34","NVDC34","TSLA34","FBOK34",
+    "ITLC34","CSCO34","IBMB34","ORCL34","ADBE34","QCOM34","TEXA34",
+    "A1MT34","MUTC34","A1MD34","AVGO34","INTU34","S2NW34","D1DG34",
+    "K1LA34","L1RC34","VISA34","MSCD34","PYPL34","AXPB34","C2OI34",
+    "S2QU34","JPMC34","BOAC34","GSGI34","MSBR34","CTGP34","WFCO34",
+    "BLAK34","SCHW34","CHME34","JNJB34","PFIZ34","M1RN34","ABBV34",
+    "MRCK34","UNHH34","AMGN34","GILD34","BMYB34","LILY34","ABTT34",
+    "MDTC34","BIIB34","VRTX34","REGN34","I1SR34","Z1TS34","TMOS34",
+    "DHER34","I1LM34","MCDC34","COCA34","NIKE34","WALM34","COWC34",
+    "TGTB34","HOME34","LOWC34","SBUB34","PEPB34","PHMO34","MDLZ34",
+    "YUMR34","C1MG34","KHCB34","COLG34","PGCO34","EBAY34","NFLX34",
+    "DISB34","ATVI34","EAIN34","R2BL34","S1PO34","U1BE34","AIRB34",
+    "S2HO34","D1OC34","Z1OM34","R1KU34","D2AS34","ATTB34","VERZ34",
+    "CMCS34","BOEI34","CATP34","MMMC34","GEOO34","UPSS34","FDXB34",
+    "LMTB34","RYTT34","HONB34","DEEC34","E1MR34","NOCG34","CHVX34",
+    "EXXO34","B1PP34","BERK34","M1SC34","SPGI34","MCOR34","ADPR34",
+    "F1IS34","ROST34","TJXC34","DLTR34","ULEV34","NETE34","TMCO34",
+    "HOND34","TSMC34","BABA34","SNEC34","SAPP34","ASML34","N1VS34",
+    "A1ZN34","N1VO34","H1SB34","G1SK34","UBSG34","B1NT34",
 ]
 
 
