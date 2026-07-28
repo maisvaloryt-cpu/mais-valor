@@ -5,6 +5,8 @@ on:
     - cron: '0 21 * * 1-5'   # dias úteis às 21h UTC → atualização diária
     - cron: '0 6 * * 6'      # sábados às 6h UTC → reconstrói o histórico dos gráficos
     - cron: '0 8 * * 0'      # domingos às 8h UTC → atualiza histórico de dividendos (3 fontes)
+    - cron: '0 5 1,16 * *'   # dia 1 e 16 às 5h UTC → reconstrói histórico de ETFs
+    - cron: '0 6 1,16 * *'   # dia 1 e 16 às 6h UTC → reconstrói histórico de BDRs (1h depois, evita disputa de recursos)
   workflow_dispatch:
     inputs:
       modo:
@@ -40,6 +42,12 @@ jobs:
           elif [ "${{ github.event.schedule }}" = "0 8 * * 0" ]; then
             # Domingo: atualiza o histórico de dividendos (3 fontes em cascata)
             echo "modo=dividendos" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "0 5 1,16 * *" ]; then
+            # Dia 1 e 16: reconstrói histórico de ETFs (BR + EUA)
+            echo "modo=hist-etfs" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "0 6 1,16 * *" ]; then
+            # Dia 1 e 16 (1h depois dos ETFs): reconstrói histórico de BDRs
+            echo "modo=hist-bdrs" >> $GITHUB_OUTPUT
           else
             # Dias úteis: SEMPRE a atualização diária — nunca depende da contagem de FIIs
             echo "modo=diario" >> $GITHUB_OUTPUT
