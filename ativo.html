@@ -310,7 +310,7 @@ window.MV_LOGO_SVG = '<svg viewBox="0 0 530 530" xmlns="http://www.w3.org/2000/s
 <script>
 const params = new URLSearchParams(location.search);
 const TICKER = (params.get('t') || 'PETR4').toUpperCase();
-const TIPO = params.get('tipo') || 'acao';
+let TIPO = params.get('tipo') || 'acao';
 let ativo=null, mainChart=null, currentRange='1A', histData=[], divData=[], chartMode='padrao';
 
 function switchTab(id,el){
@@ -422,7 +422,7 @@ function renderHero(d){
       loading="lazy">`;
   document.getElementById('ativo-titulo').textContent=d.t;
   // Score badge
-  document.getElementById('ativo-score-badge').innerHTML=scoreBadge(d);
+  document.getElementById('ativo-score-badge').innerHTML=scoreBadge(d,TIPO);
   document.getElementById('ativo-nome').textContent=d.n;
   document.getElementById('ativo-setor').textContent=d.setor;
   const isUp=d.v>=0;
@@ -438,6 +438,8 @@ function fmt(v,s=''){return v!=null?v.toFixed(2)+s:'—';}
 
 function renderIndicadores(d){
   const isFii=TIPO==='fii';
+  const isBdr=TIPO==='bdr';
+  const isEtf=TIPO==='etf';
   const inds=isFii?[
     {label:'DY 12m',val:fmtPct(d.dy),desc:'Dividend Yield anual',cls:d.dy>10?'gold':''},
     {label:'P/VP',val:fmt(d.pvp),desc:'Preço/Valor Patrimonial',cls:d.pvp&&d.pvp<1?'up':d.pvp&&d.pvp>1.1?'dn':''},
@@ -447,6 +449,24 @@ function renderIndicadores(d){
     {label:'Volume',val:d.vol,desc:'Volume médio diário'},
     {label:'Variação 7d',val:d.v7==null?'—':(d.v7>=0?'+':'')+fmt(d.v7,'%'),desc:'Últimos 7 dias',cls:d.v7==null?'':(d.v7>=0?'up':'dn')},
     {label:'Variação 30d',val:d.v30==null?'—':(d.v30>=0?'+':'')+fmt(d.v30,'%'),desc:'Últimos 30 dias',cls:d.v30==null?'':(d.v30>=0?'up':'dn')},
+  ]:isBdr?[
+    {label:'Variação hoje',val:(d.v>=0?'+':'')+fmt(d.v,'%'),desc:'Variação do dia',cls:d.v>=0?'up':'dn'},
+    {label:'P/L',val:d.pl?d.pl.toFixed(1)+'x':'—',desc:'Preço/Lucro da empresa de origem'},
+    {label:'DY 12m',val:d.dy?fmtPct(d.dy):'—',desc:'Dividend Yield, quando disponível'},
+    {label:'Variação 12m',val:d.v12==null?'—':(d.v12>=0?'+':'')+fmt(d.v12,'%'),desc:'Últimos 12 meses',cls:d.v12==null?'':(d.v12>=0?'up':'dn')},
+    {label:'Variação 7d',val:d.v7==null?'—':(d.v7>=0?'+':'')+fmt(d.v7,'%'),desc:'Últimos 7 dias',cls:d.v7==null?'':(d.v7>=0?'up':'dn')},
+    {label:'Variação 30d',val:d.v30==null?'—':(d.v30>=0?'+':'')+fmt(d.v30,'%'),desc:'Últimos 30 dias',cls:d.v30==null?'':(d.v30>=0?'up':'dn')},
+    {label:'País de Origem',val:d.origem||'—',desc:'País da empresa listada'},
+    {label:'Setor',val:d.setor||'—',desc:'Setor de atuação'},
+  ]:isEtf?[
+    {label:'Variação hoje',val:(d.v>=0?'+':'')+fmt(d.v,'%'),desc:'Variação do dia',cls:d.v>=0?'up':'dn'},
+    {label:'Taxa de Adm. (TER)',val:d.ter?fmt(d.ter,'%'):'—',desc:'Custo anual cobrado pelo fundo',cls:d.ter&&d.ter<0.5?'up':''},
+    {label:'DY 12m',val:d.dy?fmtPct(d.dy):'—',desc:'Dividend Yield, quando disponível'},
+    {label:'Variação 12m',val:d.v12==null?'—':(d.v12>=0?'+':'')+fmt(d.v12,'%'),desc:'Últimos 12 meses',cls:d.v12==null?'':(d.v12>=0?'up':'dn')},
+    {label:'Variação 7d',val:d.v7==null?'—':(d.v7>=0?'+':'')+fmt(d.v7,'%'),desc:'Últimos 7 dias',cls:d.v7==null?'':(d.v7>=0?'up':'dn')},
+    {label:'Variação 30d',val:d.v30==null?'—':(d.v30>=0?'+':'')+fmt(d.v30,'%'),desc:'Últimos 30 dias',cls:d.v30==null?'':(d.v30>=0?'up':'dn')},
+    {label:'Categoria',val:d.tipo||'—',desc:'Tipo de exposição do fundo'},
+    {label:'Mercado',val:d.mercado==='BR'?'Brasil':(d.mercado||'—'),desc:'Onde o ETF é listado'},
   ]:[
     {label:'DY 12m',val:fmtPct(d.dy),desc:'Dividend Yield anual',cls:d.dy>8?'gold':''},
     {label:'P/L',val:d.pl?d.pl.toFixed(1)+'x':'—',desc:'Preço/Lucro'},
@@ -465,8 +485,12 @@ function renderIndicadores(d){
       <div class="ind-desc">${i.desc}</div>
     </div>`).join('');
 
-  // Oportunidades
+  // Oportunidades — só pra ações/FIIs (BDR/ETF não têm P/L, ROE etc. estruturados aqui)
   const ops=[];
+  if(isBdr||isEtf){
+    if(ops.length) document.getElementById('oportunidades').innerHTML='';
+    return;
+  }
   if(d.dy>8&&d.dy<=50) ops.push({label:`DY ${d.dy.toFixed(1)}%`,color:'var(--gold)',bg:'var(--gold-dim)',icon:'💰'});
   if(d.pvp&&d.pvp<1) ops.push({label:`P/VP ${d.pvp.toFixed(2)} (abaixo do VP)`,color:'var(--up)',bg:'var(--up-bg)',icon:'📊'});
   if(d.pl&&d.pl>0&&d.pl<8) ops.push({label:`P/L ${d.pl.toFixed(1)}x (barato)`,color:'var(--up)',bg:'var(--up-bg)',icon:'📈'});
@@ -759,14 +783,50 @@ async function renderFundExtra(){
 async function renderFundFull(){
   const cont=document.getElementById('fund-full');
   if(!cont) return;
+  const isFii=TIPO==='fii';
+  const isBdr=TIPO==='bdr';
+  const isEtf=TIPO==='etf';
+  const card=(lab,val,cls)=>`<div class="ind-card"><div class="ind-label">${lab}${indTip(lab)}</div><div class="ind-val ${cls||''}">${(val==null||val==='')?'—':val}</div></div>`;
+  const box=(titulo,cards)=>`<div class="section-box" style="margin-bottom:1.25rem"><h3>${titulo}</h3><div class="ind-grid">${cards.join('')}</div></div>`;
+
+  // BDR e ETF não têm data/fundamentalistas/{TICKER}.json (isso é só pra
+  // ações/FIIs pelo Fundamentus) — usam fontes próprias.
+  if(isBdr||isEtf){
+    await loadBdrB3Info();
+    let html='';
+    if(isBdr){
+      const info=BDR_B3_INFO[TICKER]||{};
+      html+=box('Sobre este BDR',[
+        card('Empresa',info.empresa||ativo?.n||'—'),
+        card('Ticker de Origem',info.ticker_origem||'—'),
+        card('Bolsa de Origem',info.bolsa_origem||'—'),
+        card('País',info.pais||ativo?.origem||'—'),
+        card('Paridade',info.paridade||'—'),
+        card('Banco Depositário',info.banco_depositario||'—'),
+        card('Tipo de Investidor',info.tipo_investidor||'—'),
+        card('Setor',info.setor||ativo?.setor||'—'),
+      ]);
+      html+=box('Códigos',[
+        card('ISIN do BDR',info.isin_bdr||'—'),
+        card('ISIN da Ação de Origem',info.isin_origem||'—'),
+      ]);
+    } else if(isEtf){
+      html+=box('Sobre este ETF',[
+        card('Categoria',ativo?.tipo||'—'),
+        card('Mercado',ativo?.mercado==='BR'?'Brasil':(ativo?.mercado||'—')),
+        card('Taxa de Administração (TER)',ativo?.ter?ativo.ter.toFixed(2)+'% ao ano':'—'),
+        card('Dividend Yield 12m',ativo?.dy?ativo.dy.toFixed(2)+'%':'—'),
+      ]);
+    }
+    cont.innerHTML=html;
+    return;
+  }
+
   let d={};
   try{
     const r=await fetch(`data/fundamentalistas/${TICKER}.json`);
     if(r.ok) d=await r.json();
   }catch(e){}
-  const isFii=TIPO==='fii';
-  const card=(lab,val,cls)=>`<div class="ind-card"><div class="ind-label">${lab}${indTip(lab)}</div><div class="ind-val ${cls||''}">${(val==null||val==='')?'—':val}</div></div>`;
-  const box=(titulo,cards)=>`<div class="section-box" style="margin-bottom:1.25rem"><h3>${titulo}</h3><div class="ind-grid">${cards.join('')}</div></div>`;
   const osc=d.oscilacoes||{};
   const oscOrdem=['Dia','Mês','30 dias','12 meses','2026','2025','2024','2023','2022','2021','2020'];
   const oscCards=oscOrdem.filter(k=>osc[k]).map(k=>card(k,osc[k],String(osc[k]).trim().startsWith('-')?'dn':'up'));
@@ -819,7 +879,7 @@ async function renderFundFull(){
       card('Qtd. Imóveis',d.qtd_imoveis),card('Imóveis/PL',d.imoveis_pl)]);
     html+=box('Patrimônio',[
       card('Ativos',fmtRS(d.ativo)),card('Patrimônio Líquido',fmtRS(d.patrim_liq||d.patrimonio_total))]);
-    html+=box('Dados Adicionais',[
+    html+=box('Taxas e Gestão',[
       card('Taxa de Adm.',d.taxa_administracao ? (d.taxa_administracao.toFixed(2) + '%') : d.taxa_adm),
       card('Taxa de Gestão',d.taxa_gestao ? (d.taxa_gestao.toFixed(2) + '%') : '—'),
       card('Cotistas',d.cotistas ? d.cotistas.toLocaleString('pt-BR') : d.num_cotistas),
@@ -829,7 +889,7 @@ async function renderFundFull(){
       card('DY 6m Acum.',d.dy_6m_acum ? (d.dy_6m_acum.toFixed(2) + '%') : '—'),
       card('VPA',d.vpa ? ('R$ ' + d.vpa.toFixed(2)) : '—'),
       card('P/VPA',d.p_vpa ? d.p_vpa.toFixed(2) : '—'),
-      card('Patrimônio Líq. (Extra)',typeof d.patrimonio_liquido === 'number' ? fmtRS(d.patrimonio_liquido) : (d.patrimonio_liquido || '—')),
+      card('Patrimônio Líquido',typeof d.patrimonio_liquido === 'number' ? fmtRS(d.patrimonio_liquido) : (d.patrimonio_liquido || fmtRS(d.patrim_liq||d.patrimonio_total))),
       card('Gestora',d.gestora || '—'),
       card('Administrador',d.administrador || '—'),
       card('CNPJ',d.cnpj || '—'),
@@ -842,13 +902,13 @@ async function renderFundFull(){
       card('Valor de Mercado',fmtRS(d.market_cap)),card('Valor da Firma',fmtRS(d.valor_firma)),
       card('Nº de Ações',d.nro_acoes),card('Último Balanço',d.ult_balanco),
       card('Setor',d.setor),card('Subsetor',d.subsetor)]);
-    html+=box('Dados Adicionais',[
+    html+=box('Identificação',[
       card('Razão Social',d.razao_social || '—'),
       card('CNPJ',d.cnpj_acao || '—'),
       card('Código ISIN',d.isin || '—'),
-      card('Qtd. de Ações (Extra)',d.qtd_acoes_extra ? d.qtd_acoes_extra.toLocaleString('pt-BR') : '—'),
-      card('Setor B3',d.setor_extra || '—'),
-      card('Subsetor B3',d.subsetor_extra || '—'),
+      card('Qtd. de Ações',d.qtd_acoes_extra ? d.qtd_acoes_extra.toLocaleString('pt-BR') : (d.nro_acoes || '—')),
+      card('Setor B3',d.setor_extra || d.setor || '—'),
+      card('Subsetor B3',d.subsetor_extra || d.subsetor || '—'),
       card('Segmento B3',d.segmento_extra || '—')]);
     // Oscilações agora renderiza em container próprio (#oscilacao-preco-box), não aqui
     html+=box('Indicadores de Valuation',[
@@ -1015,7 +1075,7 @@ async function renderInvestido(){
 
 /* ── CHECKLIST BUY & HOLD (ações) ── */
 async function renderChecklist(){
-  if(TIPO==='fii')return;
+  if(TIPO==='fii'||TIPO==='bdr'||TIPO==='etf')return;
   const box=document.getElementById('checklist-box');
   if(!box)return;
   let f={};
@@ -1086,7 +1146,7 @@ function renderRadar(){
 }
 
 function renderPrecoJusto(d){
-  if(TIPO==='fii')return;
+  if(TIPO==='fii'||TIPO==='bdr'||TIPO==='etf')return;
   const box=document.getElementById('preco-justo-box');
   if(!box)return;
   const p=d.p;
@@ -1123,20 +1183,69 @@ function renderPrecoJusto(d){
 }
 
 function renderAbout(d){
+  const isBdr=TIPO==='bdr', isEtf=TIPO==='etf';
+  const labelSetor=TIPO==='fii'?'Segmento':(isEtf?'Categoria':'Setor');
+  const setorVal=isEtf?(d.tipo||d.setor):d.setor;
+  const fonte=isBdr?'Dados via B3 e Yahoo Finance'
+    :isEtf?'Dados via B3 e Yahoo Finance'
+    :'Dados via Fundamentus.com.br e Yahoo Finance';
   document.getElementById('about-content').innerHTML=`
     <div style="margin-bottom:.75rem"><strong style="color:var(--text)">Ticker:</strong> ${d.t}</div>
     <div style="margin-bottom:.75rem"><strong style="color:var(--text)">Nome:</strong> ${d.n}</div>
-    <div style="margin-bottom:.75rem"><strong style="color:var(--text)">${TIPO==='fii'?'Segmento':'Setor'}:</strong> ${d.setor}</div>
+    <div style="margin-bottom:.75rem"><strong style="color:var(--text)">${labelSetor}:</strong> ${setorVal||'—'}</div>
+    ${isBdr&&d.origem?`<div style="margin-bottom:.75rem"><strong style="color:var(--text)">País de Origem:</strong> ${d.origem}</div>`:''}
+    ${isEtf&&d.mercado?`<div style="margin-bottom:.75rem"><strong style="color:var(--text)">Mercado:</strong> ${d.mercado==='BR'?'Brasil':d.mercado}</div>`:''}
     ${d.vm&&d.vm!=='—'?`<div style="margin-bottom:.75rem"><strong style="color:var(--text)">Valor de Mercado:</strong> ${d.vm}</div>`:''}
     ${d.qtd_imoveis?`<div style="margin-bottom:.75rem"><strong style="color:var(--text)">Qtd. Imóveis:</strong> ${d.qtd_imoveis}</div>`:''}
     <div style="margin-top:auto;padding-top:1rem;border-top:1px solid var(--border);font-size:11px;color:var(--text3)">
-      Dados via Fundamentus.com.br e Yahoo Finance · Atualizado diariamente · Não constitui recomendação de investimento.
+      ${fonte} · Atualizado diariamente · Não constitui recomendação de investimento.
     </div>`;
 }
 
 function renderAnalise(){
   const d=ativo;
   const isFii=TIPO==='fii';
+  const isBdr=TIPO==='bdr';
+  const isEtf=TIPO==='etf';
+
+  // BDR e ETF não têm indicadores fundamentalistas consolidados aqui
+  // (P/L, ROE, vacância etc. não existem ou não fazem sentido pra eles) —
+  // mostra um resumo direto em vez de forçar um score que não reflete nada real.
+  if(isBdr||isEtf){
+    const linhas=[];
+    linhas.push({ok:d.v>=0,txt:`Variação hoje: ${d.v>=0?'+':''}${d.v.toFixed(2)}%`});
+    if(d.v30!=null) linhas.push({ok:d.v30>=0,txt:`Variação 30 dias: ${d.v30>=0?'+':''}${d.v30.toFixed(2)}%`});
+    if(d.v12!=null) linhas.push({ok:d.v12>=0,txt:`Variação 12 meses: ${d.v12>=0?'+':''}${d.v12.toFixed(2)}%`});
+    if(isBdr){
+      if(d.pl) linhas.push({ok:d.pl>0&&d.pl<25,txt:`P/L da empresa de origem: ${d.pl.toFixed(1)}x`});
+      linhas.push({ok:true,txt:`País de origem: ${d.origem||'—'}`});
+    }
+    if(isEtf){
+      if(d.ter) linhas.push({ok:d.ter<1,txt:`Taxa de administração: ${d.ter.toFixed(2)}% ao ano`});
+      linhas.push({ok:true,txt:`Categoria: ${d.tipo||'—'}`});
+    }
+    document.getElementById('score-content').innerHTML=`
+      <div style="font-size:12px;color:var(--text3);margin-bottom:1rem">
+        ${isBdr?'BDRs replicam o preço de uma ação negociada no exterior — não há indicadores fundamentalistas próprios da empresa disponíveis aqui.':'ETFs seguem um índice ou cesta de ativos — os principais pontos de atenção são custo (taxa de administração) e o que o fundo replica.'}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        ${linhas.map(c=>`
+          <div style="display:flex;align-items:flex-start;gap:8px;padding:8px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)">
+            <span style="color:${c.ok?'var(--up)':'var(--dn)'};flex-shrink:0">${c.ok?'✓':'✗'}</span>
+            <span style="font-size:12px;color:var(--text)">${c.txt}</span>
+          </div>`).join('')}
+      </div>`;
+    const alertas=[];
+    if(d.v30&&d.v30<-15) alertas.push({type:'warn',txt:`Queda de ${Math.abs(d.v30).toFixed(1)}% nos últimos 30 dias`});
+    if(isEtf&&d.ter&&d.ter>1) alertas.push({type:'warn',txt:`Taxa de administração de ${d.ter.toFixed(2)}% ao ano é relativamente alta pra um ETF`});
+    if(!alertas.length) alertas.push({type:'ok',txt:'Nenhum alerta identificado nos indicadores disponíveis'});
+    document.getElementById('alertas-content').innerHTML=alertas.map(a=>`
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:8px;margin-bottom:8px;background:${a.type==='ok'?'var(--up-bg)':'var(--dn-bg)'};border:1px solid ${a.type==='ok'?'rgba(34,200,122,0.2)':'rgba(232,80,58,0.2)'}">
+        <span style="color:${a.type==='ok'?'var(--up)':'var(--dn)'}">${a.type==='ok'?'✓':'⚠️'}</span>
+        <span style="font-size:13px">${a.txt}</span>
+      </div>`).join('');
+    return;
+  }
 
   // Score simples de qualidade
   let score=0; const criterios=[];
@@ -1208,6 +1317,23 @@ function renderAnalise(){
 // BDRs e ETFs não vêm do loadData() principal (data.js só carrega ACOES/FIIS) —
 // são fontes separadas, no mesmo formato usado por bdrs.html/etfs.html.
 let BDRS_ATIVO=[], ETFS_ATIVO=[];
+// Cadastro oficial B3 de BDRs (empresa de origem, ISIN, paridade, bolsa,
+// banco depositário) — usado pra montar o box "Sobre este BDR" na página do ativo.
+let BDR_B3_INFO={}, _bdrB3InfoLoaded=false;
+async function loadBdrB3Info(){
+  if(_bdrB3InfoLoaded) return BDR_B3_INFO;
+  _bdrB3InfoLoaded=true;
+  try{
+    const r=await fetch('data/bdrs_b3_completo.json');
+    if(r.ok){
+      const j=await r.json();
+      (j.bdrs||[]).forEach(item=>{
+        if(item.ticker_bdr) BDR_B3_INFO[item.ticker_bdr]=item;
+      });
+    }
+  }catch(e){}
+  return BDR_B3_INFO;
+}
 async function loadBdrsEtfs(){
   try{
     const r=await fetch('data/bdrs.json');
@@ -1241,10 +1367,12 @@ async function init(){
   ativo=all.find(a=>a.t===TICKER);
   if(!ativo){
     // Ticker não encontrado no tipo da URL — tenta em todas as outras listas
+    // e corrige TIPO também, senão a página renderiza com o template errado
+    // (ex: BDR caindo no template de ação porque a URL tinha tipo=acao).
     for(const [tipoAlt, listaAlt] of Object.entries(listaPorTipo)){
       if(tipoAlt===TIPO) continue;
       const achou=listaAlt.find(a=>a.t===TICKER);
-      if(achou){ ativo=achou; all=listaAlt; break; }
+      if(achou){ ativo=achou; all=listaAlt; TIPO=tipoAlt; break; }
     }
   }
   if(!ativo){document.getElementById('ativo-nome').textContent='Ativo não encontrado';return;}
@@ -1264,7 +1392,7 @@ async function init(){
   ativo.v30=calcVarPeriodo(30);
   renderIndicadores(ativo);
   const sbEl=document.getElementById('ativo-score-badge');
-  if(sbEl&&typeof scoreBadge==='function')sbEl.innerHTML=scoreBadge(ativo);
+  if(sbEl&&typeof scoreBadge==='function')sbEl.innerHTML=scoreBadge(ativo,TIPO);
   renderHistTable();
 }
 init();

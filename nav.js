@@ -139,10 +139,15 @@ function logoHtml(ticker, size = 32, cls = 'asset-logo') {
 window.logoHtml = logoHtml;
 
 // ── Score fundamentalista ─────────────────────────────────────────
-function calcScore(d) {
+function calcScore(d, tipo) {
   if (!d) return null;
+  // BDRs e ETFs não têm score fundamentalista (indicadores de ação/FII não
+  // se aplicam a eles) — sem 'tipo' explícito, cai no palpite antigo por
+  // sufixo do ticker (mantém compat com index.html/comparador.html, que só
+  // lidam com ações/FIIs hoje).
+  if (tipo === 'bdr' || tipo === 'etf') return null;
   let pts = 0, max = 0;
-  const isFii = d.t && /\d{2}$/.test(d.t);
+  const isFii = tipo ? tipo === 'fii' : (d.t && /\d{2}$/.test(d.t));
   // Base FIXA: dado faltando NÃO infla mais o score. Antes o total possível só
   // contava indicadores presentes, então microcap com poucos dados chegava a 100.
   // Agora cada indicador ausente simplesmente não pontua (mas conta na base).
@@ -165,8 +170,8 @@ function calcScore(d) {
 }
 window.calcScore = calcScore;
 
-function scoreBadge(d) {
-  const s = calcScore(d);
+function scoreBadge(d, tipo) {
+  const s = calcScore(d, tipo);
   if (s === null) return '';
   const cls = s >= 65 ? 'score-a' : s >= 40 ? 'score-b' : 'score-c';
   const lbl = s >= 65 ? 'A' : s >= 40 ? 'B' : 'C';
