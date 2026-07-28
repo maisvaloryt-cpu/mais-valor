@@ -1,5 +1,11 @@
 User-agent: *
 Allow: /
+Allow: /carteira/rentabilidade.html
+Allow: /carteira/lancamentos.html
+Allow: /carteira/patrimonio.html
+Allow: /carteira/metas.html
+Allow: /carteira/irpf.html
+Allow: /carteira/aporte.html
 Disallow: /carteira/
 Disallow: /data/
 Disallow: /api/
