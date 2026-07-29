@@ -1,5 +1,5 @@
 {
-  "updated_at": "28/07/2026 17:44",
+  "updated_at": "29/07/2026 10:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1209,7 +1209,7 @@
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
       "price": 52747.32,
-      "changePct": 0.0103,
+      "changePct": 0,
       "high": 52901.87,
       "low": 52443.52
     },
@@ -1238,20 +1238,20 @@
       "stale": false,
       "descricao": "FTSE 100 (Reino Unido)",
       "tipo": "Índice Global",
-      "price": 10871.02,
-      "changePct": 0.0083,
-      "high": 10884.32,
-      "low": 10770.29
+      "price": 10901.49,
+      "changePct": 0.0028000000000000004,
+      "high": 10951.06,
+      "low": 10864.11
     },
     {
       "ticker": "INDEXDB:DAX",
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 25464.01,
-      "changePct": 0.0040999999999999995,
-      "high": 25553.47,
-      "low": 25307.17
+      "price": 25493.07,
+      "changePct": 0.0011,
+      "high": 25571.45,
+      "low": 25336.39
     },
     {
       "ticker": "INDEXEURO:SX5E",
@@ -1268,20 +1268,20 @@
       "stale": false,
       "descricao": "Nikkei 225 (Japão)",
       "tipo": "Índice Global",
-      "price": 62364.92,
-      "changePct": -0.0395,
-      "high": 64573.18,
-      "low": 61923.6
+      "price": 61434.19,
+      "changePct": -0.0149,
+      "high": 63138.04,
+      "low": 60448.9
     },
     {
       "ticker": "INDEXHANGSENG:HSI",
       "stale": false,
       "descricao": "Hang Seng (HK)",
       "tipo": "Índice Global",
-      "price": 25310.85,
-      "changePct": 0.0040999999999999995,
-      "high": 25440.68,
-      "low": 25069.85
+      "price": 25807.92,
+      "changePct": 0.0196,
+      "high": 25808.93,
+      "low": 25487.16
     },
     {
       "ticker": "SHA:000001",
