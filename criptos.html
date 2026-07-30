@@ -278,7 +278,7 @@ function renderSidebar(){
   document.getElementById('top-gainers').innerHTML = gainers.map(c=>`
     <div class="mover-item" style="cursor:pointer" onclick="window.location.href='cripto-detalhe.html?id=${c.id}'">
       <div style="display:flex;align-items:center;gap:8px">
-        <img src="${c.image}" loading="lazy" style="width:26px;height:26px;border-radius:50%;object-fit:contain" onerror="this.style.display='none'">
+        <img src="${c.image}" alt="${c.symbol.toUpperCase()}" loading="lazy" style="width:26px;height:26px;border-radius:50%;object-fit:contain" onerror="this.style.display='none'">
         <div><div class="mover-ticker">${c.symbol.toUpperCase()}</div><div class="mover-name">${fmtUSD(c.current_price)}</div></div>
       </div>
       <span class="pill up-pill">+${(c.price_change_percentage_24h||0).toFixed(2)}%</span>
@@ -287,7 +287,7 @@ function renderSidebar(){
   document.getElementById('top-losers').innerHTML = losers.map(c=>`
     <div class="mover-item" style="cursor:pointer" onclick="window.location.href='cripto-detalhe.html?id=${c.id}'">
       <div style="display:flex;align-items:center;gap:8px">
-        <img src="${c.image}" loading="lazy" style="width:26px;height:26px;border-radius:50%;object-fit:contain" onerror="this.style.display='none'">
+        <img src="${c.image}" alt="${c.symbol.toUpperCase()}" loading="lazy" style="width:26px;height:26px;border-radius:50%;object-fit:contain" onerror="this.style.display='none'">
         <div><div class="mover-ticker">${c.symbol.toUpperCase()}</div><div class="mover-name">${fmtUSD(c.current_price)}</div></div>
       </div>
       <span class="pill dn-pill">${(c.price_change_percentage_24h||0).toFixed(2)}%</span>
