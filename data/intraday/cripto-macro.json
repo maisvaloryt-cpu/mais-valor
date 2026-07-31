@@ -1,5 +1,5 @@
 {
-  "updated_at": "31/07/2026 11:14",
+  "updated_at": "31/07/2026 11:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1188,40 +1188,40 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7405.3,
-      "changePct": -0.0043,
+      "price": 7438.51,
+      "changePct": 0.0001,
       "high": 7489.52,
-      "low": 7403.85
+      "low": 7399.83
     },
     {
       "ticker": "INDEXNASDAQ:.IXIC",
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 25015.74,
-      "changePct": -0.0042,
+      "price": 25175.07,
+      "changePct": 0.0021,
       "high": 25457.46,
-      "low": 25014.33
+      "low": 25004.33
     },
     {
       "ticker": "INDEXDJX:.DJI",
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 52031.68,
-      "changePct": -0.0034000000000000002,
+      "price": 52198.98,
+      "changePct": -0.0002,
       "high": 52477.96,
-      "low": 52009.44
+      "low": 51996.32
     },
     {
       "ticker": "INDEXRUSSELL:RUT",
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2925.41,
-      "changePct": -0.006999999999999999,
+      "price": 2915.03,
+      "changePct": -0.0105,
       "high": 2955.83,
-      "low": 2925.25
+      "low": 2902.47
     },
     {
       "ticker": "CBOE:VIX",
@@ -1238,20 +1238,20 @@
       "stale": false,
       "descricao": "FTSE 100 (Reino Unido)",
       "tipo": "Índice Global",
-      "price": 10839.02,
-      "changePct": -0.0053,
+      "price": 10873.2,
+      "changePct": -0.0022,
       "high": 10989.45,
-      "low": 10837.63
+      "low": 10829.34
     },
     {
       "ticker": "INDEXDB:DAX",
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 25595.72,
-      "changePct": -0.0006,
+      "price": 25634.38,
+      "changePct": 0.0009,
       "high": 25891.51,
-      "low": 25565.04
+      "low": 25549.53
     },
     {
       "ticker": "INDEXEURO:SX5E",
