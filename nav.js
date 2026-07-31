@@ -1,4 +1,4 @@
-// ── Sentry — monitoramento de erros ──────────────────────────────
+// ── Sentry — monitoramento de erros (não é anúncio/rastreamento de terceiros, mantém sempre ligado) ──
 (function() {
   const s = document.createElement('script');
   s.src = 'https://browser.sentry-cdn.com/7.99.0/bundle.min.js';
@@ -15,8 +15,16 @@
   document.head.appendChild(s);
 })();
 
-// ── Google Analytics ─────────────────────────────────────────────
-(function() {
+// ── Consentimento de cookies (AdSense + Google Analytics) ─────────
+const MV_COOKIE_KEY = 'mv_cookie_consent'; // 'accepted' | 'rejected'
+function mvGetCookieConsent() {
+  try { return localStorage.getItem(MV_COOKIE_KEY); } catch (e) { return null; }
+}
+function mvSetCookieConsent(value) {
+  try { localStorage.setItem(MV_COOKIE_KEY, value); } catch (e) {}
+}
+function mvLoadGoogleAnalytics() {
+  if (document.querySelector('script[src*="googletagmanager.com/gtag"]')) return;
   const s = document.createElement('script');
   s.async = true;
   s.src = 'https://www.googletagmanager.com/gtag/js?id=G-MXYNF830JM';
@@ -26,6 +34,51 @@
   window.gtag = gtag;
   gtag('js', new Date());
   gtag('config', 'G-MXYNF830JM');
+}
+function mvLoadAdsense() {
+  if (document.querySelector('script[src*="adsbygoogle"]')) return;
+  const ad = document.createElement('script');
+  ad.async = true;
+  ad.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8043391674129748';
+  ad.crossOrigin = 'anonymous';
+  document.head.appendChild(ad);
+}
+function mvApplyCookieConsent(value) {
+  mvSetCookieConsent(value);
+  if (value === 'accepted') { mvLoadGoogleAnalytics(); mvLoadAdsense(); }
+  const banner = document.getElementById('mv-cookie-banner');
+  if (banner) banner.remove();
+}
+function mvRenderCookieBanner() {
+  if (mvGetCookieConsent()) return; // já escolheu antes
+  const el = document.createElement('div');
+  el.id = 'mv-cookie-banner';
+  el.setAttribute('role', 'dialog');
+  el.setAttribute('aria-label', 'Aviso de cookies');
+  el.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#111113;border-top:1px solid rgba(245,166,35,.22);padding:16px 20px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:center;font-family:var(--font-body,sans-serif)';
+  el.innerHTML = `
+    <p style="margin:0;color:#c9c8c4;font-size:13.5px;line-height:1.6;max-width:640px;flex:1 1 320px">
+      Usamos cookies próprios e de parceiros (incluindo o Google, para anúncios e estatísticas de uso) para
+      melhorar a sua experiência no Mais Valor. Saiba mais na nossa
+      <a href="/privacidade.html" style="color:#F5A623;text-decoration:underline">Política de Privacidade</a>.
+    </p>
+    <div style="display:flex;gap:10px;flex-shrink:0">
+      <button id="mv-cookie-reject" style="padding:9px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.16);background:transparent;color:#c9c8c4;font-size:13px;font-weight:600;cursor:pointer">Recusar</button>
+      <button id="mv-cookie-accept" style="padding:9px 18px;border-radius:8px;border:none;background:linear-gradient(135deg,#F5A623,#e8920a);color:#0A0A0A;font-size:13px;font-weight:800;cursor:pointer">Aceitar</button>
+    </div>`;
+  document.body.appendChild(el);
+  document.getElementById('mv-cookie-accept').addEventListener('click', () => mvApplyCookieConsent('accepted'));
+  document.getElementById('mv-cookie-reject').addEventListener('click', () => mvApplyCookieConsent('rejected'));
+}
+(function() {
+  const consent = mvGetCookieConsent();
+  if (consent === 'accepted') { mvLoadGoogleAnalytics(); mvLoadAdsense(); }
+  // Se 'rejected' ou nunca escolheu: não carrega Analytics/AdSense ainda.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mvRenderCookieBanner);
+  } else {
+    mvRenderCookieBanner();
+  }
 })();
 
 const LOGO_SVG_BASE = `<svg preserveAspectRatio="xMidYMid meet" viewBox="0 0 577 549" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="display:block;fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><defs>
@@ -990,12 +1043,5 @@ document.addEventListener('DOMContentLoaded', () => {
   if ('serviceWorker' in navigator){
     window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(()=>{}));
   }
-  /* Google AdSense — carrega o anúncio em todas as páginas (sem duplicar onde já está no HTML) */
-  if (head && !document.querySelector('script[src*="adsbygoogle"]')){
-    const ad = document.createElement('script');
-    ad.async = true;
-    ad.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8043391674129748';
-    ad.crossOrigin = 'anonymous';
-    head.appendChild(ad);
-  }
+  /* Google AdSense: carregado só depois do consentimento de cookies, ver mvLoadAdsense() no topo deste arquivo. */
 })();
