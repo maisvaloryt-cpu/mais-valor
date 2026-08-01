@@ -48,22 +48,32 @@
 
   <h2>O que é <em>a B3</em></h2>
   <p>Nascida da fusão da Bovespa (ações) com a BM&amp;F (derivativos) e a Cetip (registros), a <strong>B3 (Brasil, Bolsa, Balcão)</strong> é o ambiente onde se negociam ações, FIIs, ETFs, BDRs e derivativos no país. Curiosidade: a própria B3 é uma empresa listada nela mesma (B3SA3). Não é ela quem "define os preços": eles nascem do encontro entre ordens de compra e venda de milhões de participantes.</p>
+  <p>Para ter noção de tamanho: só no mercado à vista (ações negociadas no dia a dia, sem contar derivativos), a B3 movimentou em média mais de R$ 26 bilhões por dia nos primeiros meses de 2026, cerca de 41% a mais que a média diária de 2025. E há um ponto que confunde muita gente: a B3 é dona do mercado, a empresa que organiza o pregão, o sistema de negociação e a custódia, mas quem regula e fiscaliza tudo isso, inclusive a própria B3, é a <strong>CVM</strong> (Comissão de Valores Mobiliários), autarquia do governo federal. A B3 aplica as regras do próprio pregão; a CVM investiga fraudes, pune administradores e protege o investidor de fora para dentro.</p>
 
   <h2>Horários do <em>pregão</em></h2>
-  <ul>
-    <li><strong>Pré-abertura (10h00-10h30... na verdade 9h45-10h):</strong> leilão que define o preço de abertura. As ordens entram, mas os negócios ainda não fecham.</li>
-    <li><strong>Pregão contínuo (10h às 17h/18h, conforme horário de verão americano):</strong> o mercado de verdade, com ordens casando em tempo real.</li>
-    <li><strong>Leilão de fechamento (~5 min finais):</strong> define o preço oficial de fechamento, referência do dia.</li>
-    <li><strong>After-market:</strong> sessão curta no fim do dia, com limites de oscilação, para ajustes.</li>
-  </ul>
+  <p>A B3 ajusta os horários do pregão cerca de duas vezes por ano, acompanhando as mudanças do horário de verão nos Estados Unidos, o que evita que o fechamento da bolsa brasileira fique descolado do horário de Nova York. A tabela abaixo mostra os horários do mercado à vista (ações, FIIs, ETFs e BDRs) em vigor desde o ajuste de março de 2026; quando o horário de verão americano termina, em novembro, a B3 costuma antecipar tudo em uma hora. Antes de operar perto desses horários, vale conferir o calendário oficial da bolsa.</p>
+  <table class="art-table">
+    <thead><tr><th>Sessão</th><th>Horário</th><th>O que acontece</th></tr></thead>
+    <tbody>
+      <tr><td>Pré-abertura</td><td>9h45 às 10h00</td><td>Leilão que forma o preço de abertura. As ordens entram na fila, mas nenhum negócio fecha ainda.</td></tr>
+      <tr><td>Pregão regular</td><td>10h00 às 16h55</td><td>O mercado de verdade, com ordens casando em tempo real, minuto a minuto.</td></tr>
+      <tr><td>Leilão de fechamento</td><td>16h55 às 17h00</td><td>Define o preço oficial de fechamento do dia, referência para tudo, inclusive para os limites do after-market.</td></tr>
+      <tr><td>After-market</td><td>17h30 às 18h00</td><td>Sessão extra só para ações do Ibovespa, IBrX-50, IBrX-100 e IFIX, com oscilação limitada a 2% sobre o fechamento e limite de R$ 900 mil por dia para pessoa física.</td></tr>
+    </tbody>
+  </table>
+  <p>Um detalhe pouco conhecido: o after-market só roda enquanto vigora o horário de verão nos Estados Unidos. Quando ele termina, a B3 costuma suspender a sessão até o próximo ajuste sazonal. Fora desses horários, mesmo com o aplicativo da corretora aberto, nenhuma ordem é executada; ela só entra na fila para o pregão seguinte.</p>
 
   <h2>Da ordem ao <em>negócio</em></h2>
   <ol>
     <li>Você envia a ordem pelo <strong>home broker</strong> da corretora (a mercado = executa no preço disponível; limitada = só no seu preço ou melhor).</li>
     <li>A corretora repassa ao <strong>livro de ofertas</strong> da B3, onde compras e vendas se enfileiram por preço e ordem de chegada.</li>
     <li>Preços se cruzam → negócio fechado, em milissegundos.</li>
-    <li><strong>Liquidação em D+2:</strong> o dinheiro e os papéis trocam de mãos oficialmente dois dias úteis depois. É por isso que a venda "demora" a virar saldo disponível.</li>
+    <li><strong>Liquidação em D+2:</strong> o dinheiro e os papéis trocam de mãos oficialmente dois dias úteis depois, num processo tocado pela câmara de compensação da B3. É por isso que o valor da venda demora a virar saldo disponível na corretora; veja a seguir o que acontece por trás da tela nesses dois dias.</li>
   </ol>
+
+  <h2>Por que a liquidação leva <em>D+2</em></h2>
+  <p>Por trás de cada negócio fechado existe uma câmara de compensação: o sistema de compensação, liquidação e gerenciamento de riscos da própria B3, herdeiro da antiga CBLC (Companhia Brasileira de Liquidação e Custódia), que a bolsa incorporou. A função dela é ser a <strong>contraparte central</strong> de toda operação: no instante em que sua ordem de compra encontra uma ordem de venda, a câmara entra no meio e passa a ser a compradora para quem vendeu e a vendedora para quem comprou. Na prática, isso significa que, se a outra ponta da negociação quebrar antes de pagar, você recebe suas ações do mesmo jeito; quem assume o prejuízo é a câmara, protegida por garantias que as próprias corretoras são obrigadas a depositar para poder operar.</p>
+  <p>Esse é o motivo prático do D+2: a câmara usa esses dois dias úteis para calcular quanto cada corretora deve pagar ou receber no total do dia (a chamada compensação multilateral, que reduz milhões de operações a um único valor líquido por corretora), cobrar garantias extras de quem opera alavancado e só então movimentar o dinheiro pelo Sistema de Transferência de Reservas do Banco Central. Já a titularidade das ações muda quase na hora: assim que o negócio fecha, o papel já é seu na custódia da B3, mesmo que o dinheiro da operação ainda esteja em trânsito. É por isso que dá para vender uma ação que você comprou há poucos minutos, mesmo sem o dinheiro daquela compra ter caído na conta.</p>
 
   <h2>Decifrando os <em>códigos</em></h2>
   <table class="art-table">
@@ -78,10 +88,16 @@
   </table>
   <p>O <strong>fracionário</strong> (final F) permite comprar de 1 a 99 ações, o que é essencial para começar com pouco. A liquidez é menor e o preço pode divergir centavos do lote-padrão, mas para o pequeno investidor de longo prazo funciona perfeitamente. (Mais sobre classes no artigo <a href="acoes-on-pn-units.html">ON, PN e Units</a>.)</p>
 
+  <div class="art-box">
+    <p><strong>Exemplo prático:</strong> imagine PETR4 cotada a R$ 38,50. No lote padrão, a ordem mínima é de 100 ações, ou seja, R$ 3.850,00 de uma vez. No mercado fracionário, o mesmo papel negocia como PETR4F, e você pode comprar de 1 a 99 ações: 10 ações saem por R$ 385,00, e dá para começar com uma única ação, por R$ 38,50, mais eventual corretagem. É a porta de entrada natural para quem faz <a href="preco-medio-e-aportes.html">aportes mensais pequenos</a> sempre no mesmo ativo.</p>
+    <p>O preço segue a mesma referência dos dois mercados; o que muda é só o tamanho mínimo do lote. Na prática, como menos gente negocia no fracionário, o <a href="liquidez-nos-investimentos.html">spread entre compra e venda</a> costuma ser um pouco maior, principalmente em ações menos populares. Quando suas compras no fracionário somam 100 ações (ou um múltiplo de 100), elas podem ser agrupadas e negociadas depois como lote padrão, se você quiser.</p>
+  </div>
+
   <h2>Suas <em>proteções</em></h2>
   <ul>
     <li><strong>Custódia em seu CPF:</strong> as ações ficam registradas em SEU nome na B3. Se a corretora quebrar, seus ativos continuam seus; basta transferi-los a outra corretora.</li>
-    <li><strong>Circuit breaker:</strong> queda de 10% no Ibovespa pausa o pregão por 30 min (15% → 1h). É o freio de emergência contra pânicos em cascata.</li>
+    <li><strong>Circuit breaker:</strong> queda de 10% no Ibovespa pausa o pregão por 30 minutos; se a queda chegar a 15%, a pausa sobe para 1 hora; e uma queda de 20% pode suspender o pregão por tempo indeterminado, com a própria B3 decidindo quando reabrir. É o freio de emergência contra pânicos em cascata, o mesmo mecanismo acionado em crises como a de março de 2020.</li>
+    <li><strong>CVM, a fiscalizadora do mercado:</strong> a B3 organiza o pregão, mas quem regula, investiga e pune fraudes é a Comissão de Valores Mobiliários. Denúncias de golpes envolvendo promessas de retorno garantido na bolsa devem ir para lá, não para a B3; veja os sinais de alerta no artigo sobre <a href="golpes-financeiros.html">golpes financeiros</a>.</li>
     <li><strong>Área do investidor da B3:</strong> portal oficial onde você confere, direto na fonte, tudo que está no seu CPF.</li>
   </ul>
 
