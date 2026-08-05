@@ -1,5 +1,5 @@
 {
-  "gerado_em": "04/08/2026 19:27",
+  "gerado_em": "05/08/2026 19:28",
   "historico_mensal": {
     "total": 1590,
     "ok": 1582,
@@ -47,61 +47,62 @@
       {
         "ticker": "BREV11",
         "ultimo": "2026-06-20",
-        "dias_atras": 45
+        "dias_atras": 46
       },
       {
         "ticker": "BRIM11",
         "ultimo": "2026-06-11",
-        "dias_atras": 54
+        "dias_atras": 55
       },
       {
         "ticker": "GLOG11",
         "ultimo": "2026-06-21",
-        "dias_atras": 44
+        "dias_atras": 45
       },
       {
         "ticker": "HGPO11",
         "ultimo": "2026-06-08",
-        "dias_atras": 57
+        "dias_atras": 58
       },
       {
         "ticker": "NEOE3",
         "ultimo": "2026-07-04",
-        "dias_atras": 31
+        "dias_atras": 32
       },
       {
         "ticker": "PLOG11",
         "ultimo": "2026-06-21",
-        "dias_atras": 44
+        "dias_atras": 45
       },
       {
         "ticker": "PTNT3",
         "ultimo": "2026-07-28",
-        "dias_atras": 7
+        "dias_atras": 8
       },
       {
         "ticker": "PTNT4",
         "ultimo": "2026-07-29",
-        "dias_atras": 6
+        "dias_atras": 7
       },
       {
         "ticker": "TKNO4",
         "ultimo": "2026-06-21",
-        "dias_atras": 44
+        "dias_atras": 45
       },
       {
         "ticker": "TRAD3",
         "ultimo": "2026-07-17",
-        "dias_atras": 18
+        "dias_atras": 19
       }
     ]
   },
   "cotacoes": {
-    "atualizado_em": "04/08/2026 19:05",
+    "atualizado_em": "05/08/2026 19:06",
     "total_acoes": 460,
     "total_fiis": 498,
-    "fallbacks": 10,
+    "fallbacks": 11,
     "tickers_fallback": [
+      "MRSA6B",
       "NEOE3",
       "PTNT3",
       "PTNT4",
@@ -115,13 +116,13 @@
     ]
   },
   "fundamentus": {
-    "atualizado_em": "04/08/2026 19:05",
+    "atualizado_em": "05/08/2026 19:06",
     "total_acoes": 994,
     "total_fiis": 553,
-    "atualizado_fiis": "04/08/2026 19:05"
+    "atualizado_fiis": "05/08/2026 19:06"
   },
   "criptos": {
-    "atualizado_em": "04/08/2026 19:39 UTC",
+    "atualizado_em": "05/08/2026 19:37 UTC",
     "total_moedas": 100,
     "com_dados": 100,
     "sem_dados": 0,
