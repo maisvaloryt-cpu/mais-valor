@@ -1,5 +1,5 @@
 {
-  "updated_at": "05/08/2026 19:05",
+  "updated_at": "06/08/2026 21:59",
   "cdi": {
     "diario": 0.052531,
     "anual": 14.15,
@@ -8,8 +8,8 @@
     "stale": false
   },
   "selic": {
-    "diario": 0.052531,
-    "anual": 14.15,
+    "diario": 0.05166,
+    "anual": 13.9,
     "historico": [],
     "stale": false
   },
@@ -19,7 +19,7 @@
     "stale": false
   },
   "poupanca": {
-    "mensal": 0.6737,
+    "mensal": 0.6734,
     "anual": 8.39,
     "stale": false
   }
