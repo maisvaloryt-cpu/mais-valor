@@ -1,5 +1,5 @@
 {
-  "gerado_em": "06/08/2026 22:22",
+  "gerado_em": "07/08/2026 18:51",
   "historico_mensal": {
     "total": 1590,
     "ok": 1582,
@@ -41,63 +41,68 @@
   },
   "historico_diario": {
     "total": 959,
-    "atualizados": 949,
-    "desatualizados": 10,
+    "atualizados": 948,
+    "desatualizados": 11,
     "lista_desatualizados": [
       {
         "ticker": "BREV11",
         "ultimo": "2026-06-20",
-        "dias_atras": 47
+        "dias_atras": 48
       },
       {
         "ticker": "BRIM11",
         "ultimo": "2026-06-11",
-        "dias_atras": 56
+        "dias_atras": 57
+      },
+      {
+        "ticker": "ELET5",
+        "ultimo": "2026-08-03",
+        "dias_atras": 4
       },
       {
         "ticker": "GLOG11",
         "ultimo": "2026-06-21",
-        "dias_atras": 46
+        "dias_atras": 47
       },
       {
         "ticker": "HGPO11",
         "ultimo": "2026-06-08",
-        "dias_atras": 59
+        "dias_atras": 60
       },
       {
         "ticker": "NEOE3",
         "ultimo": "2026-07-04",
-        "dias_atras": 33
+        "dias_atras": 34
       },
       {
         "ticker": "PLOG11",
         "ultimo": "2026-06-21",
-        "dias_atras": 46
+        "dias_atras": 47
       },
       {
         "ticker": "PTNT3",
         "ultimo": "2026-07-28",
-        "dias_atras": 9
+        "dias_atras": 10
       },
       {
         "ticker": "PTNT4",
         "ultimo": "2026-07-29",
-        "dias_atras": 8
+        "dias_atras": 9
       },
       {
         "ticker": "TKNO4",
         "ultimo": "2026-06-21",
-        "dias_atras": 46
+        "dias_atras": 47
       },
       {
         "ticker": "TRAD3",
         "ultimo": "2026-07-17",
-        "dias_atras": 20
+        "dias_atras": 21
       }
     ]
   },
   "cotacoes": {
-    "atualizado_em": "06/08/2026 22:01",
+    "atualizado_em": "07/08/2026 18:30",
     "total_acoes": 460,
     "total_fiis": 498,
     "fallbacks": 11,
@@ -106,8 +111,8 @@
       "NEOE3",
       "PTNT3",
       "PTNT4",
-      "TKNO4",
       "ELET5",
+      "TKNO4",
       "BREV11",
       "BRIM11",
       "GLOG11",
@@ -116,13 +121,13 @@
     ]
   },
   "fundamentus": {
-    "atualizado_em": "05/08/2026 19:06",
+    "atualizado_em": "07/08/2026 18:30",
     "total_acoes": 994,
     "total_fiis": 553,
-    "atualizado_fiis": "05/08/2026 19:06"
+    "atualizado_fiis": "07/08/2026 18:30"
   },
   "criptos": {
-    "atualizado_em": "07/08/2026 00:03 UTC",
+    "atualizado_em": "07/08/2026 18:59 UTC",
     "total_moedas": 100,
     "com_dados": 100,
     "sem_dados": 0,
