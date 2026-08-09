@@ -1,81 +1,9 @@
 {
-  "updated_at": "07/08/2026 18:51",
-  "total": 383,
-  "total_registros": 68341,
+  "updated_at": "09/08/2026 05:53",
+  "total": 400,
+  "total_registros": 68228,
   "total_ativos": 1619,
   "dividendos": [
-    {
-      "t": "CSCO34",
-      "n": "CSCO34",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-03",
-      "val": 0.2888,
-      "dy": ""
-    },
-    {
-      "t": "CSCO34",
-      "n": "CSCO34",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-03",
-      "val": 0.2987,
-      "dy": ""
-    },
-    {
-      "t": "GEOO34",
-      "n": "GEOO34",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-03",
-      "val": 0.0854,
-      "dy": ""
-    },
-    {
-      "t": "JOPA3",
-      "n": "Josapar Joaquim Oliveira SA Participacoes",
-      "tipo": "DIVIDENDO",
-      "com": "2026-05-04",
-      "pag": "2026-07-03",
-      "val": 0.3194,
-      "dy": "22.41%"
-    },
-    {
-      "t": "JOPA4",
-      "n": "JOSAPAR Joaquim Oliveira S.A. Participações",
-      "tipo": "DIVIDENDO",
-      "com": "2026-05-04",
-      "pag": "2026-07-03",
-      "val": 0.3514,
-      "dy": "23.43%"
-    },
-    {
-      "t": "JPMC34",
-      "n": "JPMC34",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-03",
-      "val": 0.526,
-      "dy": ""
-    },
-    {
-      "t": "MUTC34",
-      "n": "MUTC34",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-03",
-      "val": 0.0886,
-      "dy": ""
-    },
-    {
-      "t": "MUTC34",
-      "n": "MUTC34",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-03",
-      "val": 0.0908,
-      "dy": ""
-    },
     {
       "t": "ALUP11",
       "n": "Alupar Investimento SA Unit Cons of 1 Sh + 2 Pfd Shs",
@@ -2939,6 +2867,15 @@
       "dy": "0.54%"
     },
     {
+      "t": "MBRF11",
+      "n": "Fundo de Investimento Imobiliario Rio Bravo Oportunidades Imobiliarias FII",
+      "tipo": "Rendimento",
+      "com": "",
+      "pag": "2026-08-03",
+      "val": 1.45,
+      "dy": "7.70%"
+    },
+    {
       "t": "ALOS3",
       "n": "Allos S.A.",
       "tipo": "DIVIDENDO",
@@ -2946,6 +2883,15 @@
       "pag": "2026-08-04",
       "val": 0.2919,
       "dy": "13.00%"
+    },
+    {
+      "t": "FIQE3",
+      "n": "Unifique Telecomunicacoes SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-07-24",
+      "pag": "2026-08-05",
+      "val": 0.077,
+      "dy": "17.57%"
     },
     {
       "t": "SBFG3",
@@ -2993,6 +2939,15 @@
       "dy": "22.96%"
     },
     {
+      "t": "JHSF3",
+      "n": "JHSF Participacoes S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-07-30",
+      "pag": "2026-08-10",
+      "val": 0.0692,
+      "dy": "7.70%"
+    },
+    {
       "t": "ABCB4",
       "n": "Banco ABC Brasil SA Conv Pfd",
       "tipo": "JRS CAP PROPRIO",
@@ -3009,6 +2964,15 @@
       "pag": "2026-08-12",
       "val": 0.4128,
       "dy": "10.29%"
+    },
+    {
+      "t": "INTB3",
+      "n": "Intelbras SA Industria de Telecomunicacao Eletronica Brasileir",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-03",
+      "pag": "2026-08-14",
+      "val": 0.2856,
+      "dy": "23.28%"
     },
     {
       "t": "RBIR11",
@@ -3047,6 +3011,51 @@
       "dy": "7.28%"
     },
     {
+      "t": "CXSE3",
+      "n": "Caixa Seguridade Participacoes SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-03",
+      "pag": "2026-08-17",
+      "val": 0.35,
+      "dy": "21.74%"
+    },
+    {
+      "t": "TGMA3",
+      "n": "Tegma Gestao Logistica S.A.",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-06",
+      "pag": "2026-08-18",
+      "val": 0.29,
+      "dy": "10.39%"
+    },
+    {
+      "t": "TGMA3",
+      "n": "Tegma Gestao Logistica S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-06",
+      "pag": "2026-08-18",
+      "val": 0.85,
+      "dy": "30.47%"
+    },
+    {
+      "t": "BPAR3",
+      "n": "Banco do Estado do Pará S.A",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-03",
+      "pag": "2026-08-19",
+      "val": 1.7674,
+      "dy": "11.78%"
+    },
+    {
+      "t": "BPAR3",
+      "n": "Banco do Estado do Pará S.A",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-03",
+      "pag": "2026-08-19",
+      "val": 2.1357,
+      "dy": "14.24%"
+    },
+    {
       "t": "KLBN11",
       "n": "Klabin SA Ctf de Deposito de Acoes Cons of 1 Sh + 4 Pfd Shs",
       "tipo": "DIVIDENDO",
@@ -3072,6 +3081,15 @@
       "pag": "2026-08-19",
       "val": 0.0456,
       "dy": "15.24%"
+    },
+    {
+      "t": "LUXM4",
+      "n": "Trevisa Investimentos SA Pfd",
+      "tipo": "DIVIDENDO",
+      "com": "2026-04-29",
+      "pag": "2026-08-19",
+      "val": 0.1369,
+      "dy": "60.84%"
     },
     {
       "t": "PETR3",
@@ -3153,6 +3171,42 @@
       "pag": "2026-08-28",
       "val": 0.062,
       "dy": "6.73%"
+    },
+    {
+      "t": "ITUB3",
+      "n": "Itau Unibanco Holding S.A.",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-03-19",
+      "pag": "2026-08-28",
+      "val": 0.3489,
+      "dy": "9.59%"
+    },
+    {
+      "t": "ITUB3",
+      "n": "Itau Unibanco Holding S.A.",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-06-18",
+      "pag": "2026-08-28",
+      "val": 0.3619,
+      "dy": "9.95%"
+    },
+    {
+      "t": "ITUB4",
+      "n": "Itau Unibanco Holding SA Pfd",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-03-19",
+      "pag": "2026-08-28",
+      "val": 0.3489,
+      "dy": "10.27%"
+    },
+    {
+      "t": "ITUB4",
+      "n": "Itau Unibanco Holding SA Pfd",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-06-18",
+      "pag": "2026-08-28",
+      "val": 0.3619,
+      "dy": "10.66%"
     },
     {
       "t": "CEAB3",
@@ -3254,6 +3308,51 @@
       "dy": "0.84%"
     },
     {
+      "t": "BBDC3",
+      "n": "Banco Bradesco SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-03",
+      "pag": "2026-09-01",
+      "val": 0.0172,
+      "dy": "1.36%"
+    },
+    {
+      "t": "BBDC4",
+      "n": "Banco Bradesco SA Pfd",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-03",
+      "pag": "2026-09-01",
+      "val": 0.019,
+      "dy": "1.32%"
+    },
+    {
+      "t": "BEES3",
+      "n": "Banestes S.A. - Banco do Estado do Espirito Santo",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-03",
+      "pag": "2026-09-01",
+      "val": 0.0288,
+      "dy": "3.94%"
+    },
+    {
+      "t": "BEES4",
+      "n": "Banestes SA Banco do Estado do Espirito Santo Pfd",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-03",
+      "pag": "2026-09-01",
+      "val": 0.0288,
+      "dy": "3.77%"
+    },
+    {
+      "t": "ITUB3",
+      "n": "Itau Unibanco Holding S.A.",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-07-31",
+      "pag": "2026-09-01",
+      "val": 0.0182,
+      "dy": "0.50%"
+    },
+    {
       "t": "ITUB4",
       "n": "Itau Unibanco Holding SA Pfd",
       "tipo": "JCP",
@@ -3263,6 +3362,15 @@
       "dy": "0.54%"
     },
     {
+      "t": "BBSE3",
+      "n": "BB Seguridade Participacoes SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-06",
+      "pag": "2026-09-03",
+      "val": 1.9833,
+      "dy": "62.01%"
+    },
+    {
       "t": "GRND3",
       "n": "Grendene S.A.",
       "tipo": "DIVIDENDO",
@@ -3270,6 +3378,51 @@
       "pag": "2026-09-09",
       "val": 0.1995,
       "dy": "67.25%"
+    },
+    {
+      "t": "MOVI3",
+      "n": "Movida Participacoes SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2025-12-19",
+      "pag": "2026-09-11",
+      "val": 0.7519,
+      "dy": "116.27%"
+    },
+    {
+      "t": "BBDC3",
+      "n": "Banco Bradesco SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-04-06",
+      "pag": "2026-09-15",
+      "val": 0.2703,
+      "dy": "21.41%"
+    },
+    {
+      "t": "BBDC3",
+      "n": "Banco Bradesco SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-07-03",
+      "pag": "2026-09-15",
+      "val": 0.3154,
+      "dy": "24.98%"
+    },
+    {
+      "t": "BBDC4",
+      "n": "Banco Bradesco SA Pfd",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-04-06",
+      "pag": "2026-09-15",
+      "val": 0.2973,
+      "dy": "20.61%"
+    },
+    {
+      "t": "BBDC4",
+      "n": "Banco Bradesco SA Pfd",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-07-03",
+      "pag": "2026-09-15",
+      "val": 0.3469,
+      "dy": "24.05%"
     },
     {
       "t": "ETER3",
