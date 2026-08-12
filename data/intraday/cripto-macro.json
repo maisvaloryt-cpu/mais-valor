@@ -1,5 +1,5 @@
 {
-  "updated_at": "11/08/2026 17:44",
+  "updated_at": "12/08/2026 10:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1189,9 +1189,9 @@
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
       "price": 7728.2,
-      "changePct": -0.0032,
-      "high": 7767.51,
-      "low": 7717.25
+      "changePct": 0,
+      "high": null,
+      "low": null
     },
     {
       "ticker": "INDEXNASDAQ:.IXIC",
@@ -1209,9 +1209,9 @@
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
       "price": 53791.85,
-      "changePct": -0.0034000000000000002,
-      "high": 54222.85,
-      "low": 53746.43
+      "changePct": 0,
+      "high": null,
+      "low": null
     },
     {
       "ticker": "INDEXRUSSELL:RUT",
@@ -1238,20 +1238,20 @@
       "stale": false,
       "descricao": "FTSE 100 (Reino Unido)",
       "tipo": "Índice Global",
-      "price": 10844.19,
-      "changePct": -0.0017000000000000001,
-      "high": 10893.22,
-      "low": 10825.39
+      "price": 10821.48,
+      "changePct": -0.0021,
+      "high": 10863.81,
+      "low": 10820.64
     },
     {
       "ticker": "INDEXDB:DAX",
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 26391.42,
-      "changePct": 0.0026,
-      "high": 26504.54,
-      "low": 26245.57
+      "price": 26478.34,
+      "changePct": 0.0033,
+      "high": 26573.5,
+      "low": 26401.96
     },
     {
       "ticker": "INDEXEURO:SX5E",
@@ -1268,20 +1268,20 @@
       "stale": false,
       "descricao": "Nikkei 225 (Japão)",
       "tipo": "Índice Global",
-      "price": 66970.22,
-      "changePct": 0.0208,
-      "high": 67006.84,
-      "low": 65848.58
+      "price": 67524.06,
+      "changePct": 0.0083,
+      "high": 67569.36,
+      "low": 66735.76
     },
     {
       "ticker": "INDEXHANGSENG:HSI",
       "stale": false,
       "descricao": "Hang Seng (HK)",
       "tipo": "Índice Global",
-      "price": 25652.82,
-      "changePct": -0.011000000000000001,
-      "high": 26060.32,
-      "low": 25647.66
+      "price": 25440.17,
+      "changePct": -0.0083,
+      "high": 25498.39,
+      "low": 25323.33
     },
     {
       "ticker": "SHA:000001",
