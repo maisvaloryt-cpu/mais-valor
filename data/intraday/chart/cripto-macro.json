@@ -196,7 +196,14 @@
       "INDEXDB:DAX": 25983.04,
       "INDEXNIKKEI:NI225": 66216.79,
       "INDEXHANGSENG:HSI": 25698.49
+    },
+    {
+      "t": "17:14",
+      "INDEXNASDAQ:.IXIC": 26067.17,
+      "INDEXRUSSELL:RUT": 2992.18,
+      "INDEXNIKKEI:NI225": 66216.79,
+      "INDEXHANGSENG:HSI": 25698.49
     }
   ],
-  "updated_at": "20/08/2026 16:44"
+  "updated_at": "20/08/2026 17:14"
 }
