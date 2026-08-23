@@ -1,54 +1,9 @@
 {
-  "updated_at": "21/08/2026 18:37",
-  "total": 265,
-  "total_registros": 68573,
+  "updated_at": "23/08/2026 05:36",
+  "total": 289,
+  "total_registros": 68463,
   "total_ativos": 1620,
   "dividendos": [
-    {
-      "t": "EOG",
-      "n": "EOG",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-17",
-      "val": 1.02,
-      "dy": ""
-    },
-    {
-      "t": "RVTY",
-      "n": "RVTY",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-17",
-      "val": 0.07,
-      "dy": ""
-    },
-    {
-      "t": "UDR",
-      "n": "UDR",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-17",
-      "val": 0.145,
-      "dy": ""
-    },
-    {
-      "t": "WSM",
-      "n": "WSM",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-17",
-      "val": 0.76,
-      "dy": ""
-    },
-    {
-      "t": "Z1TS34",
-      "n": "Z1TS34",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-17",
-      "val": 0.1166,
-      "dy": ""
-    },
     {
       "t": "APTO11",
       "n": "Navi Residencial Fundo de Investimento Imobiliario",
@@ -1427,6 +1382,33 @@
       "dy": ""
     },
     {
+      "t": "BPAC11",
+      "n": "Banco BTG Pactual SA Units Cons of 1 Sh + 2 Pfd Shs A",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-10",
+      "pag": "2026-08-14",
+      "val": 0.7767,
+      "dy": "17.98%"
+    },
+    {
+      "t": "BPAC3",
+      "n": "Banco BTG Pactual SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-10",
+      "pag": "2026-08-14",
+      "val": 0.2589,
+      "dy": "14.65%"
+    },
+    {
+      "t": "BPAC5",
+      "n": "Banco BTG Pactual SA Pfd A",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-10",
+      "pag": "2026-08-14",
+      "val": 0.2589,
+      "dy": "17.03%"
+    },
+    {
       "t": "CF",
       "n": "CF",
       "tipo": "Dividendo",
@@ -1796,6 +1778,24 @@
       "dy": "29.67%"
     },
     {
+      "t": "BMEB3",
+      "n": "BCO Mercantil do Brasil SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-07",
+      "pag": "2026-08-19",
+      "val": 1.4887,
+      "dy": "34.41%"
+    },
+    {
+      "t": "BMEB4",
+      "n": "BCO Mercantil do Brasil SA Non-Cum Perp Pfd Registered Shs",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-07",
+      "pag": "2026-08-19",
+      "val": 1.6375,
+      "dy": "31.99%"
+    },
+    {
       "t": "BPAR3",
       "n": "Banco do Estado do Pará S.A",
       "tipo": "JRS CAP PROPRIO",
@@ -1868,6 +1868,15 @@
       "dy": "9.49%"
     },
     {
+      "t": "RANI3",
+      "n": "Irani Papel e Embalagem SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-07",
+      "pag": "2026-08-20",
+      "val": 0.0344,
+      "dy": "5.33%"
+    },
+    {
       "t": "RENT3",
       "n": "Localiza Rent A Car SA",
       "tipo": "JRS CAP PROPRIO",
@@ -1877,6 +1886,42 @@
       "dy": "18.93%"
     },
     {
+      "t": "MTRE3",
+      "n": "Mitre Realty Empreendimentos e Participacoes SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-12",
+      "pag": "2026-08-21",
+      "val": 0.0284,
+      "dy": "11.44%"
+    },
+    {
+      "t": "ENGI11",
+      "n": "Energisa SA Units Cons of 1 Sh + 4 Pfd Shs",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-11",
+      "pag": "2026-08-24",
+      "val": 0.5,
+      "dy": "13.40%"
+    },
+    {
+      "t": "ENGI3",
+      "n": "Energisa SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-11",
+      "pag": "2026-08-24",
+      "val": 0.1,
+      "dy": "10.05%"
+    },
+    {
+      "t": "ENGI4",
+      "n": "Energisa SA Pfd Shs Non-Voting",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-11",
+      "pag": "2026-08-24",
+      "val": 0.1,
+      "dy": "14.46%"
+    },
+    {
       "t": "FRAS3",
       "n": "Fras-Le S.A.",
       "tipo": "JRS CAP PROPRIO",
@@ -1884,6 +1929,42 @@
       "pag": "2026-08-24",
       "val": 0.2516,
       "dy": "12.96%"
+    },
+    {
+      "t": "PATI3",
+      "n": "Panatlantica S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-04-28",
+      "pag": "2026-08-24",
+      "val": 0.4337,
+      "dy": "18.39%"
+    },
+    {
+      "t": "PATI4",
+      "n": "Panatlantica S.A. Pfd",
+      "tipo": "DIVIDENDO",
+      "com": "2026-04-28",
+      "pag": "2026-08-24",
+      "val": 1.8604,
+      "dy": "73.03%"
+    },
+    {
+      "t": "PATI4",
+      "n": "Panatlantica S.A. Pfd",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-17",
+      "pag": "2026-08-24",
+      "val": 3.4854,
+      "dy": "136.82%"
+    },
+    {
+      "t": "BMOB3",
+      "n": "Bemobi Mobile Tech SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-14",
+      "pag": "2026-08-26",
+      "val": 0.1918,
+      "dy": "10.09%"
     },
     {
       "t": "TAEE11",
@@ -1913,6 +1994,24 @@
       "dy": "17.55%"
     },
     {
+      "t": "RECV3",
+      "n": "Petroreconcavo SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-17",
+      "pag": "2026-08-27",
+      "val": 0.3407,
+      "dy": "38.90%"
+    },
+    {
+      "t": "BRBI11",
+      "n": "BRBI BR Partners S.A. Units Cons of 1 Sh and 2 Pfd Shs",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-14",
+      "pag": "2026-08-28",
+      "val": 0.18,
+      "dy": "17.78%"
+    },
+    {
       "t": "EALT3",
       "n": "Electro Aco Altona SA",
       "tipo": "DIVIDENDO",
@@ -1929,6 +2028,51 @@
       "pag": "2026-08-28",
       "val": 0.062,
       "dy": "7.05%"
+    },
+    {
+      "t": "EZTC3",
+      "n": "EZ TEC Empreendimentos e Participacoes SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-13",
+      "pag": "2026-08-28",
+      "val": 0.0946,
+      "dy": "10.07%"
+    },
+    {
+      "t": "ITSA3",
+      "n": "Itausa SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-03-19",
+      "pag": "2026-08-28",
+      "val": 0.116,
+      "dy": "10.75%"
+    },
+    {
+      "t": "ITSA3",
+      "n": "Itausa SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-06-18",
+      "pag": "2026-08-28",
+      "val": 0.138,
+      "dy": "12.79%"
+    },
+    {
+      "t": "ITSA4",
+      "n": "Itausa SA Non-Cum Perp Pfd Registered Shs",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-03-19",
+      "pag": "2026-08-28",
+      "val": 0.116,
+      "dy": "11.14%"
+    },
+    {
+      "t": "ITSA4",
+      "n": "Itausa SA Non-Cum Perp Pfd Registered Shs",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-06-18",
+      "pag": "2026-08-28",
+      "val": 0.138,
+      "dy": "13.25%"
     },
     {
       "t": "ITUB3",
@@ -2066,6 +2210,15 @@
       "dy": "0.84%"
     },
     {
+      "t": "VLID3",
+      "n": "Valid Solucoes SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-12",
+      "pag": "2026-08-31",
+      "val": 0.1801,
+      "dy": "12.47%"
+    },
+    {
       "t": "BBDC3",
       "n": "Banco Bradesco SA",
       "tipo": "JRS CAP PROPRIO",
@@ -2120,6 +2273,24 @@
       "dy": "0.57%"
     },
     {
+      "t": "VALE3",
+      "n": "Vale S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-11",
+      "pag": "2026-09-02",
+      "val": 0.462,
+      "dy": "7.39%"
+    },
+    {
+      "t": "VALE3",
+      "n": "Vale S.A.",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-11",
+      "pag": "2026-09-02",
+      "val": 1.5687,
+      "dy": "25.09%"
+    },
+    {
       "t": "BBSE3",
       "n": "BB Seguridade Participacoes SA",
       "tipo": "DIVIDENDO",
@@ -2127,6 +2298,15 @@
       "pag": "2026-09-03",
       "val": 1.9833,
       "dy": "63.99%"
+    },
+    {
+      "t": "CURY3",
+      "n": "Cury Construtora e Incorporadora SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-14",
+      "pag": "2026-09-08",
+      "val": 0.6168,
+      "dy": "24.75%"
     },
     {
       "t": "GRND3",
@@ -2280,6 +2460,42 @@
       "pag": "2026-10-01",
       "val": 0.0182,
       "dy": "0.57%"
+    },
+    {
+      "t": "FLRY3",
+      "n": "Fleury SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-11",
+      "pag": "2026-10-02",
+      "val": 0.4007,
+      "dy": "25.74%"
+    },
+    {
+      "t": "ALUP11",
+      "n": "Alupar Investimento SA Unit Cons of 1 Sh + 2 Pfd Shs",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-13",
+      "pag": "2026-10-05",
+      "val": 0.21,
+      "dy": "7.84%"
+    },
+    {
+      "t": "ALUP3",
+      "n": "Alupar Investimento SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-13",
+      "pag": "2026-10-05",
+      "val": 0.07,
+      "dy": "7.53%"
+    },
+    {
+      "t": "ALUP4",
+      "n": "Alupar Investimento SA Pfd Shs",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-13",
+      "pag": "2026-10-05",
+      "val": 0.07,
+      "dy": "8.08%"
     },
     {
       "t": "B3SA3",
