@@ -1,5 +1,5 @@
 {
-  "updated_at": "26/08/2026 16:44",
+  "updated_at": "26/08/2026 17:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,8 +1128,8 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 174730.81,
-      "changePct": 0.0009,
+      "price": 174399.38,
+      "changePct": -0.001,
       "high": 176296.48,
       "low": 174208.48
     },
@@ -1138,8 +1138,8 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3694.08,
-      "changePct": -0.0018,
+      "price": 3699.57,
+      "changePct": -0.0003,
       "high": 3708.55,
       "low": 3693.24
     },
@@ -1158,8 +1158,8 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 12227.17,
-      "changePct": 0.0015,
+      "price": 12214.89,
+      "changePct": 0.0005,
       "high": 12316.2,
       "low": 12182.9
     },
@@ -1188,8 +1188,8 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7684.51,
-      "changePct": 0.0009,
+      "price": 7675.7,
+      "changePct": -0.0002,
       "high": 7690.73,
       "low": 7657.41
     },
@@ -1198,8 +1198,8 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 26147.26,
-      "changePct": -0.0002,
+      "price": 26130.2,
+      "changePct": -0.0008,
       "high": 26189.81,
       "low": 26021.63
     },
@@ -1208,8 +1208,8 @@
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 53520.56,
-      "changePct": -0.0011,
+      "price": 53463.88,
+      "changePct": -0.0021,
       "high": 53639.75,
       "low": 53379.4
     },
@@ -1218,8 +1218,8 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 3008.38,
-      "changePct": -0.0005,
+      "price": 3006.16,
+      "changePct": -0.0013,
       "high": 3014.88,
       "low": 2999.91
     },
