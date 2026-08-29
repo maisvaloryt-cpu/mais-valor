@@ -1,5 +1,5 @@
 {
-  "gerado_em": "28/08/2026 02:22",
+  "gerado_em": "29/08/2026 00:19",
   "historico_mensal": {
     "total": 1590,
     "ok": 1587,
@@ -27,82 +27,82 @@
       {
         "ticker": "AXIA6",
         "ultimo": "2026-08-07",
-        "dias_atras": 21
+        "dias_atras": 22
       },
       {
         "ticker": "BREV11",
         "ultimo": "2026-06-20",
-        "dias_atras": 69
+        "dias_atras": 70
       },
       {
         "ticker": "BRIM11",
         "ultimo": "2026-06-11",
-        "dias_atras": 78
+        "dias_atras": 79
       },
       {
         "ticker": "CCRF11",
         "ultimo": "2026-08-19",
-        "dias_atras": 9
+        "dias_atras": 10
       },
       {
         "ticker": "ELET5",
         "ultimo": "2026-08-03",
-        "dias_atras": 25
+        "dias_atras": 26
       },
       {
         "ticker": "GLOG11",
         "ultimo": "2026-06-21",
-        "dias_atras": 68
+        "dias_atras": 69
       },
       {
         "ticker": "HGPO11",
         "ultimo": "2026-06-08",
-        "dias_atras": 81
+        "dias_atras": 82
       },
       {
         "ticker": "MRSA5B",
         "ultimo": "2026-08-14",
-        "dias_atras": 14
+        "dias_atras": 15
       },
       {
         "ticker": "NEOE3",
         "ultimo": "2026-07-04",
-        "dias_atras": 55
+        "dias_atras": 56
       },
       {
         "ticker": "PLOG11",
         "ultimo": "2026-06-21",
-        "dias_atras": 68
+        "dias_atras": 69
       },
       {
         "ticker": "PTNT3",
         "ultimo": "2026-07-28",
-        "dias_atras": 31
+        "dias_atras": 32
       },
       {
         "ticker": "PTNT4",
         "ultimo": "2026-07-29",
-        "dias_atras": 30
+        "dias_atras": 31
       },
       {
         "ticker": "SPG211",
         "ultimo": "2026-08-19",
-        "dias_atras": 9
+        "dias_atras": 10
       },
       {
         "ticker": "TKNO4",
         "ultimo": "2026-06-21",
-        "dias_atras": 68
+        "dias_atras": 69
       },
       {
         "ticker": "TRAD3",
         "ultimo": "2026-07-17",
-        "dias_atras": 42
+        "dias_atras": 43
       }
     ]
   },
   "cotacoes": {
-    "atualizado_em": "28/08/2026 02:03",
+    "atualizado_em": "28/08/2026 23:57",
     "total_acoes": 476,
     "total_fiis": 498,
     "fallbacks": 14,
@@ -124,13 +124,13 @@
     ]
   },
   "fundamentus": {
-    "atualizado_em": "26/08/2026 21:21",
+    "atualizado_em": "28/08/2026 23:57",
     "total_acoes": 994,
     "total_fiis": 553,
-    "atualizado_fiis": "26/08/2026 21:21"
+    "atualizado_fiis": "28/08/2026 23:57"
   },
   "criptos": {
-    "atualizado_em": "28/08/2026 02:04 UTC",
+    "atualizado_em": "28/08/2026 18:19 UTC",
     "total_moedas": 100,
     "com_dados": 100,
     "sem_dados": 0,
