@@ -1,7 +1,7 @@
 {
-  "updated_at": "29/08/2026 00:19",
-  "total": 261,
-  "total_registros": 68463,
+  "updated_at": "30/08/2026 10:43",
+  "total": 295,
+  "total_registros": 68501,
   "total_ativos": 1620,
   "dividendos": [
     {
@@ -1544,6 +1544,15 @@
       "dy": "66.24%"
     },
     {
+      "t": "EGIE3",
+      "n": "ENGIE Brasil Energia S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-20",
+      "pag": "2026-08-20",
+      "val": 0.5442,
+      "dy": "22.67%"
+    },
+    {
       "t": "PETR3",
       "n": "Petroleo Brasileiro SA",
       "tipo": "JRS CAP PROPRIO",
@@ -1661,6 +1670,15 @@
       "dy": "9.29%"
     },
     {
+      "t": "BNBR3",
+      "n": "Banco do Nordeste do Brasil S.A.",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-19",
+      "pag": "2026-08-26",
+      "val": 2.6917,
+      "dy": "30.76%"
+    },
+    {
       "t": "TAEE11",
       "n": "Transmissora Alianca De Energia Eletrica S.A. Unit",
       "tipo": "JRS CAP PROPRIO",
@@ -1695,6 +1713,15 @@
       "pag": "2026-08-27",
       "val": 0.3407,
       "dy": "38.46%"
+    },
+    {
+      "t": "BMOB3",
+      "n": "Bemobi Mobile Tech SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-14",
+      "pag": "2026-08-28",
+      "val": 0.1918,
+      "dy": "9.29%"
     },
     {
       "t": "BRBI11",
@@ -1805,6 +1832,15 @@
       "dy": "11.08%"
     },
     {
+      "t": "CAMB3",
+      "n": "Cambuci SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-18",
+      "pag": "2026-08-31",
+      "val": 0.15,
+      "dy": "21.58%"
+    },
+    {
       "t": "CEAB3",
       "n": "C&A Modas SA",
       "tipo": "JRS CAP PROPRIO",
@@ -1812,6 +1848,42 @@
       "pag": "2026-08-31",
       "val": 0.5216,
       "dy": "75.78%"
+    },
+    {
+      "t": "EQPA3",
+      "n": "Equatorial Para Distribuidora de Energia SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-19",
+      "pag": "2026-08-31",
+      "val": 0.0958,
+      "dy": "20.71%"
+    },
+    {
+      "t": "EQPA5",
+      "n": "Equatorial Para Distribuidora de Energia SA Pfd Registered Shs A",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-19",
+      "pag": "2026-08-31",
+      "val": 0.0958,
+      "dy": "11.62%"
+    },
+    {
+      "t": "EQPA6",
+      "n": "Equatorial Pará Distribuidora de Energia S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-19",
+      "pag": "2026-08-31",
+      "val": 0.0958,
+      "dy": "17.44%"
+    },
+    {
+      "t": "EQPA7",
+      "n": "Equatorial Pará Distribuidora de Energia S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-19",
+      "pag": "2026-08-31",
+      "val": 0.0958,
+      "dy": "11.50%"
     },
     {
       "t": "ITSA3",
@@ -1886,6 +1958,24 @@
       "dy": "11.08%"
     },
     {
+      "t": "LWSA3",
+      "n": "LWSA S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-18",
+      "pag": "2026-08-31",
+      "val": 0.0427,
+      "dy": "11.89%"
+    },
+    {
+      "t": "MDIA3",
+      "n": "M. Dias Branco SA Industria e Comercio de Alimentos",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-21",
+      "pag": "2026-08-31",
+      "val": 0.03,
+      "dy": "2.10%"
+    },
+    {
       "t": "ODER3",
       "n": "ODER3",
       "tipo": "JRS CAP PROPRIO",
@@ -1911,6 +2001,24 @@
       "pag": "2026-08-31",
       "val": 0.1801,
       "dy": "12.41%"
+    },
+    {
+      "t": "WLMM3",
+      "n": "WLM Participacoes e Comercio de Maquinas e Veiculos SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-24",
+      "pag": "2026-08-31",
+      "val": 0.2604,
+      "dy": "15.87%"
+    },
+    {
+      "t": "WLMM4",
+      "n": "WLM Participacoes e Comercio de Maquinas e Veiculos SA Pfd",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-24",
+      "pag": "2026-08-31",
+      "val": 0.2865,
+      "dy": "20.60%"
     },
     {
       "t": "BBDC3",
@@ -1967,6 +2075,15 @@
       "dy": "0.56%"
     },
     {
+      "t": "ALOS3",
+      "n": "Allos S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-21",
+      "pag": "2026-09-02",
+      "val": 0.2919,
+      "dy": "13.26%"
+    },
+    {
       "t": "VALE3",
       "n": "Vale S.A.",
       "tipo": "DIVIDENDO",
@@ -1994,6 +2111,33 @@
       "dy": "59.47%"
     },
     {
+      "t": "UGPA3",
+      "n": "Ultrapar Participacoes S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-24",
+      "pag": "2026-09-03",
+      "val": 1.0,
+      "dy": "35.68%"
+    },
+    {
+      "t": "BMGB4",
+      "n": "Banco Bmg SA BMG Pfd Registered Shs -144A- Reg S",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-21",
+      "pag": "2026-09-04",
+      "val": 0.1,
+      "dy": "23.26%"
+    },
+    {
+      "t": "AURA33",
+      "n": "Aura Minerals Inc Shs Unsponsored Brazilian Depositary Receipt Repr 1 Sh",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-18",
+      "pag": "2026-09-08",
+      "val": 1.2178,
+      "dy": "10.16%"
+    },
+    {
       "t": "CURY3",
       "n": "Cury Construtora e Incorporadora SA",
       "tipo": "DIVIDENDO",
@@ -2001,6 +2145,42 @@
       "pag": "2026-09-08",
       "val": 0.6168,
       "dy": "22.62%"
+    },
+    {
+      "t": "DESK3",
+      "n": "Desktop SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-27",
+      "pag": "2026-09-08",
+      "val": 0.0395,
+      "dy": "2.55%"
+    },
+    {
+      "t": "DESK3",
+      "n": "Desktop SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-04-29",
+      "pag": "2026-09-08",
+      "val": 0.0439,
+      "dy": "2.83%"
+    },
+    {
+      "t": "GRND3",
+      "n": "Grendene S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-21",
+      "pag": "2026-09-09",
+      "val": 0.0317,
+      "dy": "10.99%"
+    },
+    {
+      "t": "GRND3",
+      "n": "Grendene S.A.",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-21",
+      "pag": "2026-09-09",
+      "val": 0.0333,
+      "dy": "11.55%"
     },
     {
       "t": "GRND3",
@@ -2012,6 +2192,78 @@
       "dy": "69.19%"
     },
     {
+      "t": "POMO3",
+      "n": "Marcopolo SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-25",
+      "pag": "2026-09-09",
+      "val": 0.13,
+      "dy": "37.59%"
+    },
+    {
+      "t": "POMO4",
+      "n": "Marcopolo SA Pfd",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-25",
+      "pag": "2026-09-09",
+      "val": 0.13,
+      "dy": "35.29%"
+    },
+    {
+      "t": "EKTR3",
+      "n": "Elektro Redes S.A.",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-06-24",
+      "pag": "2026-09-10",
+      "val": 0.1258,
+      "dy": "2.93%"
+    },
+    {
+      "t": "EKTR3",
+      "n": "Elektro Redes S.A.",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-03-10",
+      "pag": "2026-09-10",
+      "val": 0.1486,
+      "dy": "3.46%"
+    },
+    {
+      "t": "EKTR4",
+      "n": "Elektro Redes S.A. Pfd Shs",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-06-24",
+      "pag": "2026-09-10",
+      "val": 0.1384,
+      "dy": "4.47%"
+    },
+    {
+      "t": "EKTR4",
+      "n": "Elektro Redes S.A. Pfd Shs",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-03-10",
+      "pag": "2026-09-10",
+      "val": 0.1635,
+      "dy": "5.28%"
+    },
+    {
+      "t": "GGBR3",
+      "n": "Gerdau S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-19",
+      "pag": "2026-09-11",
+      "val": 0.23,
+      "dy": "13.67%"
+    },
+    {
+      "t": "GGBR4",
+      "n": "Gerdau S.A. Pfd",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-19",
+      "pag": "2026-09-11",
+      "val": 0.23,
+      "dy": "11.60%"
+    },
+    {
       "t": "MOVI3",
       "n": "Movida Participacoes SA",
       "tipo": "JRS CAP PROPRIO",
@@ -2019,6 +2271,24 @@
       "pag": "2026-09-11",
       "val": 0.7519,
       "dy": "129.27%"
+    },
+    {
+      "t": "GOAU3",
+      "n": "Metalurgica Gerdau S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-19",
+      "pag": "2026-09-14",
+      "val": 0.11,
+      "dy": "14.07%"
+    },
+    {
+      "t": "GOAU4",
+      "n": "Metalurgica Gerdau SA Pfd",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-19",
+      "pag": "2026-09-14",
+      "val": 0.11,
+      "dy": "12.67%"
     },
     {
       "t": "BBDC3",
@@ -2156,6 +2426,15 @@
       "dy": "0.56%"
     },
     {
+      "t": "LOGG3",
+      "n": "Log Commercial Properties e Participacoes SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-18",
+      "pag": "2026-10-01",
+      "val": 0.1594,
+      "dy": "7.94%"
+    },
+    {
       "t": "FLRY3",
       "n": "Fleury SA",
       "tipo": "JRS CAP PROPRIO",
@@ -2199,6 +2478,15 @@
       "pag": "2026-10-07",
       "val": 0.0745,
       "dy": "5.57%"
+    },
+    {
+      "t": "RPAD5",
+      "n": "Alfa Holdings SA Pfd A",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-19",
+      "pag": "2026-10-07",
+      "val": 0.0804,
+      "dy": "12.39%"
     },
     {
       "t": "QUAL3",
@@ -2298,6 +2586,24 @@
       "pag": "2026-11-12",
       "val": 0.0456,
       "dy": "14.59%"
+    },
+    {
+      "t": "PETR3",
+      "n": "Petroleo Brasileiro SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-21",
+      "pag": "2026-11-23",
+      "val": 0.6741,
+      "dy": "16.77%"
+    },
+    {
+      "t": "PETR4",
+      "n": "Petroleo Brasileiro SA Pfd",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-21",
+      "pag": "2026-11-23",
+      "val": 0.6741,
+      "dy": "18.57%"
     },
     {
       "t": "TAEE11",
