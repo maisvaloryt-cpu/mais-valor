@@ -1,5 +1,5 @@
 {
-  "updated_at": "03/09/2026 15:14",
+  "updated_at": "03/09/2026 15:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,8 +1128,8 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 184915.08,
-      "changePct": -0.0016,
+      "price": 184952.03,
+      "changePct": -0.0014000000000000002,
       "high": 188891.5,
       "low": 184718.36
     },
@@ -1138,8 +1138,8 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3758.5,
-      "changePct": 0.0012,
+      "price": 3757.4,
+      "changePct": 0.0009,
       "high": 3759.24,
       "low": 3752.46
     },
@@ -1158,8 +1158,8 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 12998.34,
-      "changePct": 0.0016,
+      "price": 13004.38,
+      "changePct": 0.0021,
       "high": 13270.18,
       "low": 12977.57
     },
@@ -1188,9 +1188,9 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7755.79,
-      "changePct": 0.0116,
-      "high": 7755.83,
+      "price": 7752.25,
+      "changePct": 0.011200000000000002,
+      "high": 7756.76,
       "low": 7686.71
     },
     {
@@ -1198,9 +1198,9 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 26637.07,
-      "changePct": 0.016,
-      "high": 26638.45,
+      "price": 26620.18,
+      "changePct": 0.015300000000000001,
+      "high": 26644.57,
       "low": 26325.06
     },
     {
@@ -1208,8 +1208,8 @@
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 53707.96,
-      "changePct": 0.012199999999999999,
+      "price": 53665.47,
+      "changePct": 0.011399999999999999,
       "high": 53746.5,
       "low": 53286.15
     },
@@ -1218,8 +1218,8 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2967.64,
-      "changePct": 0.0049,
+      "price": 2965.58,
+      "changePct": 0.0042,
       "high": 2976.62,
       "low": 2951.29
     },
