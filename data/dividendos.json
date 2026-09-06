@@ -1,234 +1,9 @@
 {
-  "updated_at": "04/09/2026 20:00",
-  "total": 406,
-  "total_registros": 68808,
+  "updated_at": "06/09/2026 09:10",
+  "total": 396,
+  "total_registros": 68679,
   "total_ativos": 1621,
   "dividendos": [
-    {
-      "t": "ADC",
-      "n": "ADC",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-31",
-      "val": 0.267,
-      "dy": ""
-    },
-    {
-      "t": "AES",
-      "n": "AES",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-31",
-      "val": 0.176,
-      "dy": ""
-    },
-    {
-      "t": "AOS",
-      "n": "AOS",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-31",
-      "val": 0.36,
-      "dy": ""
-    },
-    {
-      "t": "BBDC3",
-      "n": "Banco Bradesco SA",
-      "tipo": "JRS CAP PROPRIO",
-      "com": "2025-12-29",
-      "pag": "2026-07-31",
-      "val": 0.3512,
-      "dy": "26.66%"
-    },
-    {
-      "t": "BBDC4",
-      "n": "Banco Bradesco SA Pfd",
-      "tipo": "JRS CAP PROPRIO",
-      "com": "2025-12-29",
-      "pag": "2026-07-31",
-      "val": 0.3863,
-      "dy": "25.90%"
-    },
-    {
-      "t": "CASY",
-      "n": "CASY",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-31",
-      "val": 0.65,
-      "dy": ""
-    },
-    {
-      "t": "CTGP34",
-      "n": "CTGP34",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-31",
-      "val": 0.3958,
-      "dy": ""
-    },
-    {
-      "t": "IRBR3",
-      "n": "IRB Brasil Resseguros SA",
-      "tipo": "JRS CAP PROPRIO",
-      "com": "2026-06-30",
-      "pag": "2026-07-31",
-      "val": 0.3201,
-      "dy": "6.17%"
-    },
-    {
-      "t": "LNT",
-      "n": "LNT",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-31",
-      "val": 0.535,
-      "dy": ""
-    },
-    {
-      "t": "MDIA3",
-      "n": "M. Dias Branco SA Industria e Comercio de Alimentos",
-      "tipo": "DIVIDENDO",
-      "com": "2026-07-23",
-      "pag": "2026-07-31",
-      "val": 0.03,
-      "dy": "2.02%"
-    },
-    {
-      "t": "MS",
-      "n": "MS",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-31",
-      "val": 1.15,
-      "dy": ""
-    },
-    {
-      "t": "MSBR34",
-      "n": "MSBR34",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-31",
-      "val": 0.834,
-      "dy": ""
-    },
-    {
-      "t": "MSBR34",
-      "n": "MSBR34",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-31",
-      "val": 1.1666,
-      "dy": ""
-    },
-    {
-      "t": "NI",
-      "n": "NI",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-31",
-      "val": 0.3,
-      "dy": ""
-    },
-    {
-      "t": "NNN",
-      "n": "NNN",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-31",
-      "val": 0.62,
-      "dy": ""
-    },
-    {
-      "t": "O",
-      "n": "O",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-31",
-      "val": 0.271,
-      "dy": ""
-    },
-    {
-      "t": "ODER3",
-      "n": "ODER3",
-      "tipo": "JRS CAP PROPRIO",
-      "com": "2025-05-06",
-      "pag": "2026-07-31",
-      "val": 0.07,
-      "dy": ""
-    },
-    {
-      "t": "ODER4",
-      "n": "Conservas Oderich S.A.",
-      "tipo": "JRS CAP PROPRIO",
-      "com": "2025-05-06",
-      "pag": "2026-07-31",
-      "val": 0.07,
-      "dy": "0.84%"
-    },
-    {
-      "t": "SMFT3",
-      "n": "Smartfit Escola de Ginastica e Danca SA",
-      "tipo": "JRS CAP PROPRIO",
-      "com": "2026-06-03",
-      "pag": "2026-07-31",
-      "val": 0.0652,
-      "dy": "4.35%"
-    },
-    {
-      "t": "TEXA34",
-      "n": "TEXA34",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-31",
-      "val": 0.3373,
-      "dy": ""
-    },
-    {
-      "t": "TEXA34",
-      "n": "TEXA34",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-31",
-      "val": 0.4817,
-      "dy": ""
-    },
-    {
-      "t": "TRGP",
-      "n": "TRGP",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-31",
-      "val": 1.25,
-      "dy": ""
-    },
-    {
-      "t": "TXN",
-      "n": "TXN",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-31",
-      "val": 1.42,
-      "dy": ""
-    },
-    {
-      "t": "VLO",
-      "n": "VLO",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-07-31",
-      "val": 1.2,
-      "dy": ""
-    },
-    {
-      "t": "WIZC3",
-      "n": "WIZ Co Participacoes e Corretagem de Seguros SA",
-      "tipo": "DIVIDENDO",
-      "com": "2025-12-26",
-      "pag": "2026-07-31",
-      "val": 0.3161,
-      "dy": "46.83%"
-    },
     {
       "t": "AMP",
       "n": "AMP",
@@ -2912,6 +2687,15 @@
       "dy": ""
     },
     {
+      "t": "MBRF11",
+      "n": "Fundo de Investimento Imobiliario Rio Bravo Oportunidades Imobiliarias FII",
+      "tipo": "Rendimento",
+      "com": "",
+      "pag": "2026-09-01",
+      "val": 1.45,
+      "dy": "8.11%"
+    },
+    {
       "t": "MCD",
       "n": "MCD",
       "tipo": "Dividendo",
@@ -3110,6 +2894,15 @@
       "dy": "2.79%"
     },
     {
+      "t": "CAML3",
+      "n": "Camil Alimentos SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-31",
+      "pag": "2026-09-09",
+      "val": 0.0733,
+      "dy": "17.81%"
+    },
+    {
       "t": "GRND3",
       "n": "Grendene S.A.",
       "tipo": "DIVIDENDO",
@@ -3135,6 +2928,15 @@
       "pag": "2026-09-09",
       "val": 0.1995,
       "dy": "65.05%"
+    },
+    {
+      "t": "JHSF3",
+      "n": "JHSF Participacoes S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-28",
+      "pag": "2026-09-09",
+      "val": 0.0692,
+      "dy": "7.25%"
     },
     {
       "t": "POMO3",
@@ -3189,6 +2991,24 @@
       "pag": "2026-09-10",
       "val": 0.1635,
       "dy": "5.16%"
+    },
+    {
+      "t": "BBAS3",
+      "n": "Banco do Brasil S.A.",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-09-01",
+      "pag": "2026-09-11",
+      "val": 0.0345,
+      "dy": "1.84%"
+    },
+    {
+      "t": "BBAS3",
+      "n": "Banco do Brasil S.A.",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-09-01",
+      "pag": "2026-09-11",
+      "val": 0.1025,
+      "dy": "5.46%"
     },
     {
       "t": "GGBR3",
@@ -3299,6 +3119,15 @@
       "dy": "8.93%"
     },
     {
+      "t": "SEER3",
+      "n": "Grupo Ser Educacional SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-31",
+      "pag": "2026-09-25",
+      "val": 0.2028,
+      "dy": "18.00%"
+    },
+    {
       "t": "CPLE3",
       "n": "Companhia Paranaense de Energia",
       "tipo": "JRS CAP PROPRIO",
@@ -3360,6 +3189,69 @@
       "pag": "2026-09-30",
       "val": 0.3765,
       "dy": "25.27%"
+    },
+    {
+      "t": "BBDC3",
+      "n": "Banco Bradesco SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-09-01",
+      "pag": "2026-10-01",
+      "val": 0.0172,
+      "dy": "1.31%"
+    },
+    {
+      "t": "BBDC4",
+      "n": "Banco Bradesco SA Pfd",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-09-01",
+      "pag": "2026-10-01",
+      "val": 0.019,
+      "dy": "1.27%"
+    },
+    {
+      "t": "BEES3",
+      "n": "Banestes S.A. - Banco do Estado do Espirito Santo",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-09-01",
+      "pag": "2026-10-01",
+      "val": 0.0288,
+      "dy": "3.91%"
+    },
+    {
+      "t": "BEES4",
+      "n": "Banestes SA Banco do Estado do Espirito Santo Pfd",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-09-01",
+      "pag": "2026-10-01",
+      "val": 0.0288,
+      "dy": "3.85%"
+    },
+    {
+      "t": "ITSA3",
+      "n": "Itausa SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-31",
+      "pag": "2026-10-01",
+      "val": 0.0242,
+      "dy": "2.07%"
+    },
+    {
+      "t": "ITSA4",
+      "n": "Itausa SA Non-Cum Perp Pfd Registered Shs",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-31",
+      "pag": "2026-10-01",
+      "val": 0.0242,
+      "dy": "2.08%"
+    },
+    {
+      "t": "ITUB3",
+      "n": "Itau Unibanco Holding S.A.",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-31",
+      "pag": "2026-10-01",
+      "val": 0.0182,
+      "dy": "0.48%"
     },
     {
       "t": "ITUB4",
@@ -3495,6 +3387,24 @@
       "pag": "2026-10-30",
       "val": 0.062,
       "dy": "6.65%"
+    },
+    {
+      "t": "SEER3",
+      "n": "Grupo Ser Educacional SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-08-31",
+      "pag": "2026-10-30",
+      "val": 0.2028,
+      "dy": "18.00%"
+    },
+    {
+      "t": "SMFT3",
+      "n": "Smartfit Escola de Ginastica e Danca SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-09-03",
+      "pag": "2026-10-30",
+      "val": 0.0654,
+      "dy": "4.37%"
     },
     {
       "t": "ITUB4",
