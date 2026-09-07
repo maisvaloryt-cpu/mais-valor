@@ -1,5 +1,5 @@
 {
-  "updated_at": "07/09/2026 10:14",
+  "updated_at": "07/09/2026 10:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1238,9 +1238,9 @@
       "stale": false,
       "descricao": "FTSE 100 (Reino Unido)",
       "tipo": "Índice Global",
-      "price": 10860.19,
-      "changePct": 0.0027,
-      "high": 10863.16,
+      "price": 10847.6,
+      "changePct": 0.0015,
+      "high": 10868.27,
       "low": 10794.17
     },
     {
@@ -1248,8 +1248,8 @@
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 25966.86,
-      "changePct": -0.0031,
+      "price": 25990.31,
+      "changePct": -0.0022,
       "high": 26069.99,
       "low": 25919.61
     },
