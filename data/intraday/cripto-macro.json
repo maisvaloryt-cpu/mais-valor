@@ -1,5 +1,5 @@
 {
-  "updated_at": "07/09/2026 13:14",
+  "updated_at": "07/09/2026 13:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1248,8 +1248,8 @@
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 25981.79,
-      "changePct": -0.0025,
+      "price": 26006.53,
+      "changePct": -0.0015,
       "high": 26069.99,
       "low": 25919.61
     },
