@@ -1,5 +1,5 @@
 {
-  "updated_at": "07/09/2026 11:38",
+  "updated_at": "07/09/2026 12:08",
   "stocks": [
     {
       "ticker": "AAPL",
@@ -261,7 +261,7 @@
       "low": 1675.93,
       "prevClose": 1646.19,
       "volume": 1289622,
-      "marketCap": 582692574359,
+      "marketCap": 583702161519,
       "shares": 388148000,
       "eps": 31.99,
       "pe": 53.61,
