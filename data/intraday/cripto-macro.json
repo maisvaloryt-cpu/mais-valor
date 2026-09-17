@@ -1,5 +1,5 @@
 {
-  "updated_at": "17/09/2026 12:14",
+  "updated_at": "17/09/2026 12:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,8 +1128,8 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 185236.72,
-      "changePct": -0.0017000000000000001,
+      "price": 185825.94,
+      "changePct": 0.0015,
       "high": 186203.7,
       "low": 183242.38
     },
@@ -1138,8 +1138,8 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3743.84,
-      "changePct": 0.0003,
+      "price": 3742.23,
+      "changePct": -0.0001,
       "high": 3751.02,
       "low": 3741.08
     },
@@ -1158,8 +1158,8 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 12961.39,
-      "changePct": -0.0062,
+      "price": 13011.64,
+      "changePct": -0.0023,
       "high": 13077.09,
       "low": 12836.82
     },
@@ -1188,8 +1188,8 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7621.65,
-      "changePct": 0.0092,
+      "price": 7635.96,
+      "changePct": 0.0111,
       "high": 7646.6,
       "low": 7611.81
     },
@@ -1198,8 +1198,8 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 26350.2,
-      "changePct": 0.0143,
+      "price": 26400.06,
+      "changePct": 0.016200000000000003,
       "high": 26417.91,
       "low": 26289.94
     },
@@ -1208,8 +1208,8 @@
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 51719.8,
-      "changePct": 0.005,
+      "price": 51801.33,
+      "changePct": 0.0066,
       "high": 51935.97,
       "low": 51607.65
     },
@@ -1218,8 +1218,8 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2890.63,
-      "changePct": 0.0111,
+      "price": 2888.44,
+      "changePct": 0.0104,
       "high": 2901.33,
       "low": 2883.2
     },
@@ -1238,8 +1238,8 @@
       "stale": false,
       "descricao": "FTSE 100 (Reino Unido)",
       "tipo": "Índice Global",
-      "price": 10816.83,
-      "changePct": 0.012,
+      "price": 10816.14,
+      "changePct": 0.011899999999999999,
       "high": 10823,
       "low": 10688.91
     },
@@ -1248,8 +1248,8 @@
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 25746.82,
-      "changePct": 0.008199999999999999,
+      "price": 25733.7,
+      "changePct": 0.0077,
       "high": 25800.62,
       "low": 25596.05
     },
