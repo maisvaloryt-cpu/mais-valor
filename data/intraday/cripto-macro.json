@@ -1,5 +1,5 @@
 {
-  "updated_at": "18/09/2026 14:14",
+  "updated_at": "18/09/2026 14:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,8 +1128,8 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 185165.7,
-      "changePct": -0.0044,
+      "price": 185079.77,
+      "changePct": -0.0049,
       "high": 185991.47,
       "low": 184460.9
     },
@@ -1138,8 +1138,8 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3736.4,
-      "changePct": -0.003,
+      "price": 3737.87,
+      "changePct": -0.0026,
       "high": 3751.11,
       "low": 3735.1
     },
@@ -1158,8 +1158,8 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 12956.13,
-      "changePct": -0.0038,
+      "price": 12953.04,
+      "changePct": -0.0040999999999999995,
       "high": 13005.67,
       "low": 12901.71
     },
@@ -1188,8 +1188,8 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7623.45,
-      "changePct": -0.0019,
+      "price": 7627.21,
+      "changePct": -0.0014000000000000002,
       "high": 7657.17,
       "low": 7610.52
     },
@@ -1198,8 +1198,8 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 26398.73,
-      "changePct": -0.0007000000000000001,
+      "price": 26415.55,
+      "changePct": -0.0001,
       "high": 26544.93,
       "low": 26333.98
     },
@@ -1208,8 +1208,8 @@
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 51554.69,
-      "changePct": -0.0043,
+      "price": 51592.67,
+      "changePct": -0.0036,
       "high": 51826.78,
       "low": 51497.47
     },
@@ -1218,8 +1218,8 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2851.42,
-      "changePct": -0.008100000000000001,
+      "price": 2852.2,
+      "changePct": -0.0078000000000000005,
       "high": 2874.49,
       "low": 2846.7
     },
