@@ -1,63 +1,63 @@
 {
-  "updated_at": "21/09/2026 20:43",
+  "updated_at": "22/09/2026 20:22",
   "ibov": {
-    "val": 186595.59,
-    "chg": 0.74,
-    "chg_pts": 1366.42,
+    "val": 187422.92,
+    "chg": 0.44,
+    "chg_pts": 827.32,
     "stale": false
   },
   "ifix": {
-    "val": 13.3,
-    "chg": 0.38,
-    "chg_pts": 0.05,
+    "val": 13.2,
+    "chg": -0.75,
+    "chg_pts": -0.1,
     "stale": false
   },
   "small": {
-    "val": 112.0,
-    "chg": 2.11,
-    "chg_pts": 2.31,
+    "val": 112.04,
+    "chg": 0.04,
+    "chg_pts": 0.04,
     "stale": false
   },
   "idiv": {
-    "val": 132.96,
-    "chg": 0.61,
-    "chg_pts": 0.8,
+    "val": 133.39,
+    "chg": 0.32,
+    "chg_pts": 0.43,
     "stale": false
   },
   "ibra": {
-    "val": 183.95,
-    "chg": 0.81,
-    "chg_pts": 1.48,
+    "val": 184.3,
+    "chg": 0.19,
+    "chg_pts": 0.35,
     "stale": false
   },
   "ifnc": {
-    "val": 193.5,
-    "chg": 1.53,
-    "chg_pts": 2.92,
+    "val": 193.64,
+    "chg": 0.07,
+    "chg_pts": 0.14,
     "stale": false
   },
   "sp500": {
-    "val": 7764.7,
-    "chg": 1.49,
-    "chg_pts": 114.2,
+    "val": 7764.64,
+    "chg": -0.0,
+    "chg_pts": -0.06,
     "stale": false
   },
   "nasdaq": {
-    "val": 27122.09,
-    "chg": 2.26,
-    "chg_pts": 599.55,
+    "val": 27244.28,
+    "chg": 0.45,
+    "chg_pts": 122.18,
     "stale": false
   },
   "dow": {
-    "val": 52048.83,
-    "chg": 0.71,
-    "chg_pts": 366.19,
+    "val": 51863.69,
+    "chg": -0.36,
+    "chg_pts": -185.14,
     "stale": false
   },
   "russell": {
-    "val": 2875.36,
-    "chg": 0.52,
-    "chg_pts": 14.96,
+    "val": 2889.92,
+    "chg": 0.51,
+    "chg_pts": 14.56,
     "stale": false
   }
 }
