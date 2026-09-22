@@ -1,26 +1,26 @@
 {
-  "updated_at": "31/07/2026 18:57",
+  "updated_at": "21/09/2026 20:43",
   "cdi": {
-    "diario": 0.052531,
-    "anual": 14.15,
+    "diario": 0.050788,
+    "anual": 13.65,
     "historico": [],
     "acumulado": [],
     "stale": false
   },
   "selic": {
-    "diario": 0.052531,
-    "anual": 14.15,
+    "diario": 0.050788,
+    "anual": 13.65,
     "historico": [],
     "stale": false
   },
   "ipca": {
     "historico": [],
-    "acumulado_12m": 4.64,
+    "acumulado_12m": 4.22,
     "stale": false
   },
   "poupanca": {
-    "mensal": 0.6739,
-    "anual": 8.39,
+    "mensal": 0.6388,
+    "anual": 7.94,
     "stale": false
   }
 }
