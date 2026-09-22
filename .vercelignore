@@ -1,0 +1,16 @@
+# Originais de edição: as páginas usam imagens/Artigos/otimizadas/*.webp.
+/imagens/*.png
+/imagens/Artigos/selecionadas/
+
+# Coletores e documentação são usados no GitHub Actions, não no site publicado.
+/.github/
+/tests/
+/__pycache__/
+/*.py
+/*.sh
+/*.md
+/ANALISE_PROFUNDA_*.txt
+/prompts-imagens-*.txt
+/*.bak
+/ativo_updated.html
+/AppScript_CotacoesGitHub.js

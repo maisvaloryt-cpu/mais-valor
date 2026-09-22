@@ -8,6 +8,7 @@ Inclui:
   - fetch_ativo_cascata(): tenta todas as fontes em ordem até conseguir
 """
 import json, datetime, os, time, requests
+from brapi_access import feature_enabled, get_paid_quote
 
 YAHOO_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -136,14 +137,15 @@ def fetch_yahoo_mensal(symbol: str, anos: int = 12) -> list:
 
 def fetch_brapi_mensal(ticker: str) -> list:
     """Busca histórico mensal via Brapi. ticker ex: 'PETR4'"""
+    if not feature_enabled("history"):
+        return []
     token = _next_brapi_token()   # rodízio entre as chaves
     if not token:
         return []
-    token_param = f"?token={token}"
-    url = f"https://brapi.dev/api/quote/{ticker}{token_param}&range=10y&interval=1mo"
     try:
-        r = requests.get(url, headers=YAHOO_HEADERS, timeout=20)
-        if r.status_code != 200:
+        r = get_paid_quote(ticker, token, "history", {"range": "10y", "interval": "1mo"},
+                           headers=YAHOO_HEADERS, timeout=20)
+        if r is None:
             return []
         data = r.json()
         results = data.get("results", [])

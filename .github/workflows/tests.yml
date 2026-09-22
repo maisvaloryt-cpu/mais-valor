@@ -9,6 +9,8 @@ on:
       - 'data.js'
       - 'ferramentas.html'
       - 'tests/**'
+      - '*.py'
+      - '.github/workflows/**'
   pull_request:
   workflow_dispatch:
 
@@ -28,3 +30,10 @@ jobs:
           node --check carteira/common.js
       - name: Testes dos motores
         run: node tests/test_motores.js
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Dependências dos coletores
+        run: pip install requests
+      - name: Testes de limites da brapi (sem chamadas externas)
+        run: python -m unittest discover -s tests -p 'test_brapi_access.py' -v

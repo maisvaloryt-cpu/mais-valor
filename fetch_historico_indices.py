@@ -20,6 +20,7 @@ import json, datetime, os, sys, time, requests
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fetch_utils import merge_historico
+from brapi_access import feature_enabled, get_paid_quote
 
 # ── Tokens Brapi (rodizio) ────────────────────────────────────────────────────
 BRAPI_TOKENS = [
@@ -113,19 +114,16 @@ def fetch_yahoo(symbol, anos=15):
 
 def fetch_brapi_hist(symbol, anos=15):
     """Busca historico mensal via Brapi, alternando tokens."""
-    end_dt = datetime.date.today()
-    start_dt = end_dt.replace(year=end_dt.year - anos)
-    for attempt in range(len(BRAPI_TOKENS) or 1):
+    if not feature_enabled("history"):
+        return []
+    for attempt in range(len(BRAPI_TOKENS)):
         token = next_token()
-        token_param = f"&token={token}" if token else ""
-        url = f"https://brapi.dev/api/quote/{symbol}?range=5y&interval=1mo&fundamental=false{token_param}"
         try:
-            r = requests.get(url, headers=YAHOO_HEADERS, timeout=20)
-            if r.status_code in (400, 401, 404, 429):
-                print(f"    [brapi] token {attempt+1} falhou ({r.status_code})", end=" ")
-                time.sleep(0.5)
+            r = get_paid_quote(symbol, token, "history",
+                               {"range": "5y", "interval": "1mo", "fundamental": "false"},
+                               headers=YAHOO_HEADERS, timeout=20)
+            if r is None:
                 continue
-            r.raise_for_status()
             results = r.json().get("results", [])
             if not results:
                 continue
@@ -140,8 +138,8 @@ def fetch_brapi_hist(symbol, anos=15):
             if pts:
                 print(f"    [brapi] token {attempt+1} OK", end=" ")
                 return pts
-        except Exception as e:
-            print(f"    [brapi] token {attempt+1} erro: {e}", end=" ")
+        except Exception:
+            print(f"    [brapi] token {attempt+1}: resposta inválida", end=" ")
             time.sleep(0.5)
     return []
 

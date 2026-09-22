@@ -14,6 +14,11 @@ on:
         required: false
         default: 'diario'
 
+# Recursos pagos só são consultados quando habilitados nas Variables do repositório.
+env:
+  BRAPI_HISTORY_ENABLED: ${{ vars.BRAPI_HISTORY_ENABLED || 'false' }}
+  BRAPI_DIVIDENDS_ENABLED: ${{ vars.BRAPI_DIVIDENDS_ENABLED || 'false' }}
+
 jobs:
   update-data:
     runs-on: ubuntu-latest
