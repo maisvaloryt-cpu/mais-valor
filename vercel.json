@@ -1,4 +1,10 @@
 {
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    }
+  ],
   "redirects": [
     { "source": "/Consolidador/:page(acoes|fiis|bdrs|etfs|criptos|rankings|dividendos|watchlist|ferramentas|simulador|stocks|reits|comparador).html", "destination": "/:page.html", "permanent": true },
     { "source": "/carteira/:page(acoes|fiis|bdrs|etfs|criptos|rankings|dividendos|watchlist|ferramentas|simulador|stocks|reits|comparador).html", "destination": "/:page.html", "permanent": true },
