@@ -1,7 +1,7 @@
 {
-  "updated_at": "25/09/2026 21:05",
-  "total": 683,
-  "total_registros": 69734,
+  "updated_at": "27/09/2026 10:42",
+  "total": 717,
+  "total_registros": 69784,
   "total_ativos": 1631,
   "dividendos": [
     {
@@ -2528,10 +2528,28 @@
       "t": "EKTR3",
       "n": "Elektro Redes S.A.",
       "tipo": "JRS CAP PROPRIO",
+      "com": "2025-12-30",
+      "pag": "2026-09-10",
+      "val": 0.131,
+      "dy": "3.05%"
+    },
+    {
+      "t": "EKTR3",
+      "n": "Elektro Redes S.A.",
+      "tipo": "JRS CAP PROPRIO",
       "com": "2026-03-10",
       "pag": "2026-09-10",
       "val": 0.1486,
       "dy": "3.46%"
+    },
+    {
+      "t": "EKTR3",
+      "n": "Elektro Redes S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-04-10",
+      "pag": "2026-09-10",
+      "val": 0.959,
+      "dy": "22.34%"
     },
     {
       "t": "EKTR4",
@@ -2546,10 +2564,28 @@
       "t": "EKTR4",
       "n": "Elektro Redes S.A. Pfd Shs",
       "tipo": "JRS CAP PROPRIO",
+      "com": "2025-12-30",
+      "pag": "2026-09-10",
+      "val": 0.1441,
+      "dy": "4.71%"
+    },
+    {
+      "t": "EKTR4",
+      "n": "Elektro Redes S.A. Pfd Shs",
+      "tipo": "JRS CAP PROPRIO",
       "com": "2026-03-10",
       "pag": "2026-09-10",
       "val": 0.1635,
       "dy": "5.34%"
+    },
+    {
+      "t": "EKTR4",
+      "n": "Elektro Redes S.A. Pfd Shs",
+      "tipo": "DIVIDENDO",
+      "com": "2026-04-10",
+      "pag": "2026-09-10",
+      "val": 1.0549,
+      "dy": "34.46%"
     },
     {
       "t": "ELV",
@@ -5468,6 +5504,33 @@
       "dy": "4.35%"
     },
     {
+      "t": "ALZR11",
+      "n": "Alianza Trust Renda Imobiliaria Fundo Investimento Imobiliario Investor",
+      "tipo": "Rendimento",
+      "com": "2026-09-18",
+      "pag": "2026-09-25",
+      "val": 0.08,
+      "dy": "9.71%"
+    },
+    {
+      "t": "APXM11",
+      "n": "Fundo de Investimento Imobiliario Apex Malls FII",
+      "tipo": "Rendimento",
+      "com": "2026-09-18",
+      "pag": "2026-09-25",
+      "val": 0.26,
+      "dy": "6.12%"
+    },
+    {
+      "t": "BPML11",
+      "n": "Fundo de Investimento Imobiliario BTG Pactual Shoppings",
+      "tipo": "Rendimento",
+      "com": "2026-09-18",
+      "pag": "2026-09-25",
+      "val": 0.92,
+      "dy": "12.42%"
+    },
+    {
       "t": "BTLG11",
       "n": "BTG Pactual Logistica Fundo de Investimento Imobiliario Responsabilidade Limitada",
       "tipo": "Rendimento",
@@ -5475,6 +5538,42 @@
       "pag": "2026-09-25",
       "val": 0.81,
       "dy": "9.76%"
+    },
+    {
+      "t": "BTRU11",
+      "n": "BTG Pactual Renda Urbana Fundo de Investimento Imobiliario Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-09-18",
+      "pag": "2026-09-25",
+      "val": 0.85,
+      "dy": "11.35%"
+    },
+    {
+      "t": "EQIR11",
+      "n": "EQI Recebiveis Imobiliarios Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-09-18",
+      "pag": "2026-09-25",
+      "val": 0.1,
+      "dy": "14.91%"
+    },
+    {
+      "t": "EXES11",
+      "n": "Exes Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-09-18",
+      "pag": "2026-09-25",
+      "val": 0.13,
+      "dy": "16.54%"
+    },
+    {
+      "t": "FCFL11",
+      "n": "Fundo de Investimento Imobiliario - FII Campus Faria Lima Responsabilidade Limitada Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-09-18",
+      "pag": "2026-09-25",
+      "val": 0.92,
+      "dy": "9.17%"
     },
     {
       "t": "ICNE11",
@@ -5502,6 +5601,15 @@
       "pag": "2026-09-25",
       "val": 0.07,
       "dy": "13.93%"
+    },
+    {
+      "t": "MMPD11",
+      "n": "Fundo De Investimento Imobiliario Maua Capital MPD Desenvolvimento Residencial",
+      "tipo": "Rendimento",
+      "com": "2026-09-18",
+      "pag": "2026-09-25",
+      "val": 0.64,
+      "dy": "11.31%"
     },
     {
       "t": "SEER3",
@@ -5558,6 +5666,24 @@
       "dy": "13.87%"
     },
     {
+      "t": "XPIN11",
+      "n": "Xp Industrial Fundo Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-09-18",
+      "pag": "2026-09-25",
+      "val": 0.35,
+      "dy": "6.77%"
+    },
+    {
+      "t": "XPML11",
+      "n": "XP Malls Fundo Investimento Imobiliario Investor",
+      "tipo": "Rendimento",
+      "com": "2026-09-18",
+      "pag": "2026-09-25",
+      "val": 0.92,
+      "dy": "11.19%"
+    },
+    {
       "t": "BRSR3",
       "n": "Banco do Estado do Rio Grande do Sul SA",
       "tipo": "JRS CAP PROPRIO",
@@ -5585,6 +5711,15 @@
       "dy": "17.41%"
     },
     {
+      "t": "FLRY3",
+      "n": "Fleury SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-08-11",
+      "pag": "2026-09-28",
+      "val": 0.4007,
+      "dy": "22.12%"
+    },
+    {
       "t": "BCIA11",
       "n": "Bradesco Carteira Imobiliatia Ative- Fundo de Fundos de Investimento Imobiliario- FII Cotas",
       "tipo": "Rendimento",
@@ -5603,6 +5738,33 @@
       "dy": "64.88%"
     },
     {
+      "t": "BTML11",
+      "n": "Barra Malls Fundo De Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-09-22",
+      "pag": "2026-09-29",
+      "val": 0.21,
+      "dy": "2.26%"
+    },
+    {
+      "t": "LRDI11",
+      "n": "Fundo De Investimento Imobiliario - Leblon Realty Desenvolvimento I",
+      "tipo": "Rendimento",
+      "com": "2026-09-22",
+      "pag": "2026-09-29",
+      "val": 10.68,
+      "dy": "65.72%"
+    },
+    {
+      "t": "BTSI11",
+      "n": "BTSP II Fundo de Investimento Imobiliario FII",
+      "tipo": "Rendimento",
+      "com": "2026-09-23",
+      "pag": "2026-09-30",
+      "val": 0.83,
+      "dy": "9.05%"
+    },
+    {
       "t": "CAMB3",
       "n": "Cambuci SA",
       "tipo": "JRS CAP PROPRIO",
@@ -5619,6 +5781,51 @@
       "pag": "2026-09-30",
       "val": 0.2377,
       "dy": "18.08%"
+    },
+    {
+      "t": "EDGA11",
+      "n": "Fundo De Investimento Imobiliario - FII Edificio Galeria Responsabilidade Limitada Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-09-23",
+      "pag": "2026-09-30",
+      "val": 0.09,
+      "dy": "8.24%"
+    },
+    {
+      "t": "GZIT11",
+      "n": "Gazit Malls Fundo De Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-09-23",
+      "pag": "2026-09-30",
+      "val": 0.36,
+      "dy": "12.24%"
+    },
+    {
+      "t": "IDUA11",
+      "n": "Fundo De Investimento Imobiliario De Unidades Autonomas IV",
+      "tipo": "Rendimento",
+      "com": "2026-09-22",
+      "pag": "2026-09-30",
+      "val": 0.05,
+      "dy": "2.06%"
+    },
+    {
+      "t": "IDUA11",
+      "n": "Fundo De Investimento Imobiliario De Unidades Autonomas IV",
+      "tipo": "Amortização",
+      "com": "2026-09-22",
+      "pag": "2026-09-30",
+      "val": 0.09,
+      "dy": "3.72%"
+    },
+    {
+      "t": "MDIA3",
+      "n": "M. Dias Branco SA Industria e Comercio de Alimentos",
+      "tipo": "DIVIDENDO",
+      "com": "2026-09-22",
+      "pag": "2026-09-30",
+      "val": 0.03,
+      "dy": "2.20%"
     },
     {
       "t": "MDNE3",
@@ -5765,6 +5972,15 @@
       "dy": "7.73%"
     },
     {
+      "t": "ALOS3",
+      "n": "Allos S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-09-22",
+      "pag": "2026-10-02",
+      "val": 0.2919,
+      "dy": "12.09%"
+    },
+    {
       "t": "FLRY3",
       "n": "Fleury SA",
       "tipo": "JRS CAP PROPRIO",
@@ -5801,6 +6017,15 @@
       "dy": "7.98%"
     },
     {
+      "t": "RDOR3",
+      "n": "Rede D'Or Sao Luiz SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-09-24",
+      "pag": "2026-10-06",
+      "val": 0.1841,
+      "dy": "5.91%"
+    },
+    {
       "t": "B3SA3",
       "n": "B3 SA - Brasil, Bolsa, Balcao",
       "tipo": "JRS CAP PROPRIO",
@@ -5808,6 +6033,24 @@
       "pag": "2026-10-07",
       "val": 0.0745,
       "dy": "4.98%"
+    },
+    {
+      "t": "B3SA3",
+      "n": "B3 SA - Brasil, Bolsa, Balcao",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-09-22",
+      "pag": "2026-10-07",
+      "val": 0.0759,
+      "dy": "5.07%"
+    },
+    {
+      "t": "B3SA3",
+      "n": "B3 SA - Brasil, Bolsa, Balcao",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-09-22",
+      "pag": "2026-10-07",
+      "val": 0.1507,
+      "dy": "10.07%"
     },
     {
       "t": "RPAD5",
@@ -5819,6 +6062,15 @@
       "dy": "12.06%"
     },
     {
+      "t": "TOTS3",
+      "n": "TOTVS S.A.",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-09-23",
+      "pag": "2026-10-08",
+      "val": 0.15,
+      "dy": "5.16%"
+    },
+    {
       "t": "QUAL3",
       "n": "Qualicorp Consultoria e Corretora de Seguros S.A.",
       "tipo": "DIVIDENDO",
@@ -5828,6 +6080,33 @@
       "dy": "6.92%"
     },
     {
+      "t": "SMRE11",
+      "n": "Fundo De Investimento Imobiliario Smart Real Estate - FII Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-09-30",
+      "pag": "2026-10-12",
+      "val": 1.0,
+      "dy": "21.24%"
+    },
+    {
+      "t": "SMRE11",
+      "n": "Fundo De Investimento Imobiliario Smart Real Estate - FII Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-09-30",
+      "pag": "2026-10-13",
+      "val": 1.0,
+      "dy": "21.24%"
+    },
+    {
+      "t": "LREN3",
+      "n": "Lojas Renner S.A.",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-09-22",
+      "pag": "2026-10-14",
+      "val": 0.2407,
+      "dy": "25.97%"
+    },
+    {
       "t": "FIQE3",
       "n": "Unifique Telecomunicacoes SA",
       "tipo": "DIVIDENDO",
@@ -5835,6 +6114,15 @@
       "pag": "2026-10-16",
       "val": 0.0779,
       "dy": "18.44%"
+    },
+    {
+      "t": "HBCR11",
+      "n": "Fundo de Investimento Imobiliario HBC Renda Urbana",
+      "tipo": "Amortização",
+      "com": "2026-09-22",
+      "pag": "2026-10-27",
+      "val": 8.13,
+      "dy": "68.02%"
     },
     {
       "t": "SHUL4",
@@ -5907,6 +6195,15 @@
       "pag": "2026-11-03",
       "val": 0.0182,
       "dy": "0.52%"
+    },
+    {
+      "t": "CSMG3",
+      "n": "Companhia de Saneamento de Minas Gerais",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-09-21",
+      "pag": "2026-11-09",
+      "val": 0.2556,
+      "dy": "5.30%"
     },
     {
       "t": "KLBN11",
@@ -6060,6 +6357,15 @@
       "pag": "2026-12-01",
       "val": 0.0884,
       "dy": "5.84%"
+    },
+    {
+      "t": "MTSA4",
+      "n": "Metisa Metalurgica Timboense SA Pfd",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-09-21",
+      "pag": "2026-12-10",
+      "val": 0.55,
+      "dy": "14.62%"
     },
     {
       "t": "CEGR3",
