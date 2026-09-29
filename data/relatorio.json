@@ -1,5 +1,5 @@
 {
-  "gerado_em": "25/09/2026 21:05",
+  "gerado_em": "28/09/2026 22:07",
   "historico_mensal": {
     "total": 1593,
     "ok": 1590,
@@ -21,116 +21,116 @@
   },
   "historico_diario": {
     "total": 986,
-    "atualizados": 929,
-    "desatualizados": 57,
+    "atualizados": 928,
+    "desatualizados": 58,
     "lista_desatualizados": [
       {
         "ticker": "ADHM3",
         "ultimo": "2026-09-18",
-        "dias_atras": 7
+        "dias_atras": 10
       },
       {
         "ticker": "AEFI11",
         "ultimo": "2026-09-18",
-        "dias_atras": 7
+        "dias_atras": 10
       },
       {
         "ticker": "AFOF11",
         "ultimo": "2026-09-18",
-        "dias_atras": 7
+        "dias_atras": 10
       },
       {
         "ticker": "AXIA6",
         "ultimo": "2026-08-07",
-        "dias_atras": 49
+        "dias_atras": 52
       },
       {
         "ticker": "BPHA3",
         "ultimo": "2026-09-18",
-        "dias_atras": 7
+        "dias_atras": 10
       },
       {
         "ticker": "BREV11",
         "ultimo": "2026-06-20",
-        "dias_atras": 97
+        "dias_atras": 100
       },
       {
         "ticker": "BRGE11",
         "ultimo": "2026-09-18",
-        "dias_atras": 7
+        "dias_atras": 10
       },
       {
         "ticker": "BRGE12",
         "ultimo": "2026-09-18",
-        "dias_atras": 7
+        "dias_atras": 10
       },
       {
         "ticker": "BRGE3",
         "ultimo": "2026-09-18",
-        "dias_atras": 7
+        "dias_atras": 10
       },
       {
         "ticker": "BRGE5",
         "ultimo": "2026-09-18",
-        "dias_atras": 7
+        "dias_atras": 10
       },
       {
         "ticker": "BRGE6",
         "ultimo": "2026-09-18",
-        "dias_atras": 7
+        "dias_atras": 10
       },
       {
         "ticker": "BRGE7",
         "ultimo": "2026-09-18",
-        "dias_atras": 7
+        "dias_atras": 10
       },
       {
         "ticker": "BRGE8",
         "ultimo": "2026-09-18",
-        "dias_atras": 7
+        "dias_atras": 10
       },
       {
         "ticker": "BRIM11",
         "ultimo": "2026-06-11",
-        "dias_atras": 106
+        "dias_atras": 109
       },
       {
         "ticker": "BRIV3",
         "ultimo": "2026-09-18",
-        "dias_atras": 7
+        "dias_atras": 10
       },
       {
         "ticker": "BRIV4",
         "ultimo": "2026-09-18",
-        "dias_atras": 7
+        "dias_atras": 10
       },
       {
         "ticker": "BRPR3",
         "ultimo": "2026-09-18",
-        "dias_atras": 7
+        "dias_atras": 10
       },
       {
         "ticker": "CCRF11",
         "ultimo": "2026-08-19",
-        "dias_atras": 37
+        "dias_atras": 40
       },
       {
         "ticker": "CORR3",
         "ultimo": "2026-09-18",
-        "dias_atras": 7
+        "dias_atras": 10
       },
       {
         "ticker": "CORR4",
         "ultimo": "2026-09-18",
-        "dias_atras": 7
+        "dias_atras": 10
       }
     ]
   },
   "cotacoes": {
-    "atualizado_em": "25/09/2026 20:42",
+    "atualizado_em": "28/09/2026 21:45",
     "total_acoes": 476,
     "total_fiis": 508,
-    "fallbacks": 56,
+    "fallbacks": 57,
     "tickers_fallback": [
       "NGRD3",
       "ECPR4",
@@ -152,8 +152,8 @@
       "BRGE6",
       "BRGE7",
       "BRGE8",
-      "BRGE11",
       "BRGE5",
+      "BRGE11",
       "BRGE12",
       "BRGE3",
       "CRIV4",
@@ -173,6 +173,7 @@
       "GWIR11",
       "HGPO11",
       "HMOC11",
+      "HSRE11",
       "IBFF11",
       "MGCR11",
       "MGIM11",
@@ -191,18 +192,18 @@
     ]
   },
   "fundamentus": {
-    "atualizado_em": "25/09/2026 20:42",
+    "atualizado_em": "28/09/2026 21:45",
     "total_acoes": 994,
     "total_fiis": 563,
-    "atualizado_fiis": "25/09/2026 20:42"
+    "atualizado_fiis": "28/09/2026 21:45"
   },
   "criptos": {
-    "atualizado_em": "25/09/2026 21:13 UTC",
+    "atualizado_em": "28/09/2026 23:01 UTC",
     "total_moedas": 100,
     "com_dados": 100,
     "sem_dados": 0,
     "tickers_sem_dados": [],
-    "historico_ok": 125,
+    "historico_ok": 126,
     "historico_falhou": 1,
     "historico_falhou_lista": [
       {
