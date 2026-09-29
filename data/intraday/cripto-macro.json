@@ -1,5 +1,5 @@
 {
-  "updated_at": "29/09/2026 13:14",
+  "updated_at": "29/09/2026 13:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,8 +1128,8 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 182380.66,
-      "changePct": -0.0033,
+      "price": 182534.14,
+      "changePct": -0.0025,
       "high": 182996.69,
       "low": 181562.23
     },
@@ -1138,8 +1138,8 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3733.38,
-      "changePct": -0.001,
+      "price": 3733.84,
+      "changePct": -0.0009,
       "high": 3737.86,
       "low": 3728.04
     },
@@ -1158,8 +1158,8 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 12677.33,
-      "changePct": -0.0029,
+      "price": 12693.67,
+      "changePct": -0.0016,
       "high": 12713.87,
       "low": 12617.11
     },
@@ -1188,8 +1188,8 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7659.69,
-      "changePct": -0.0031,
+      "price": 7658.32,
+      "changePct": -0.0033,
       "high": 7699.6,
       "low": 7655.55
     },
@@ -1198,18 +1198,18 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 26770.09,
-      "changePct": -0.0019,
+      "price": 26753.41,
+      "changePct": -0.0025,
       "high": 26919.73,
-      "low": 26757
+      "low": 26752.01
     },
     {
       "ticker": "INDEXDJX:.DJI",
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 51161.21,
-      "changePct": -0.0062,
+      "price": 51201.8,
+      "changePct": -0.0054,
       "high": 51505.19,
       "low": 51129.18
     },
@@ -1218,10 +1218,10 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2797.78,
-      "changePct": -0.0070999999999999995,
+      "price": 2798.9,
+      "changePct": -0.0067,
       "high": 2825.37,
-      "low": 2797.78
+      "low": 2796.81
     },
     {
       "ticker": "CBOE:VIX",
@@ -1248,8 +1248,8 @@
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 25375.29,
-      "changePct": 0,
+      "price": 25399.21,
+      "changePct": 0.001,
       "high": 25617.31,
       "low": 25338.03
     },
