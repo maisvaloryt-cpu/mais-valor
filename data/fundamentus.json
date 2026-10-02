@@ -1,5 +1,5 @@
 {
-  "updated_at": "30/09/2026 21:16",
+  "updated_at": "01/10/2026 21:21",
   "acoes": {
     "CLAN3": {
       "ticker": "CLAN3",
@@ -85,20 +85,6 @@
       "mrg_liq": -362.66,
       "cresc5a": -41.11
     },
-    "CFLU4": {
-      "ticker": "CFLU4",
-      "preco": 1000.0,
-      "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
-      "dy": 0.0,
-      "roic": 17.68,
-      "roe": 32.15,
-      "liq": 0.0,
-      "patrim": 60351000.0,
-      "mrg_liq": 10.72,
-      "cresc5a": 8.14
-    },
     "CSTB3": {
       "ticker": "CSTB3",
       "preco": 150.0,
@@ -112,6 +98,20 @@
       "patrim": 8420670000.0,
       "mrg_liq": 28.98,
       "cresc5a": 31.91
+    },
+    "CFLU4": {
+      "ticker": "CFLU4",
+      "preco": 1000.0,
+      "pl": 0.0,
+      "pvp": 0.0,
+      "psr": 0.0,
+      "dy": 0.0,
+      "roic": 17.68,
+      "roe": 32.15,
+      "liq": 0.0,
+      "patrim": 60351000.0,
+      "mrg_liq": 10.72,
+      "cresc5a": 8.14
     },
     "POPR4": {
       "ticker": "POPR4",
@@ -4411,34 +4411,6 @@
       "mrg_liq": 0.0,
       "cresc5a": -59.85
     },
-    "REPA3": {
-      "ticker": "REPA3",
-      "preco": 1.0,
-      "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
-      "dy": 0.0,
-      "roic": 4.05,
-      "roe": 1.91,
-      "liq": 0.0,
-      "patrim": 378378000.0,
-      "mrg_liq": 1.22,
-      "cresc5a": 1.09
-    },
-    "EQMA5B": {
-      "ticker": "EQMA5B",
-      "preco": 0.0,
-      "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
-      "dy": 0.0,
-      "roic": 0.0,
-      "roe": 0.0,
-      "liq": 0.0,
-      "patrim": 4940330000.0,
-      "mrg_liq": 0.0,
-      "cresc5a": 9.05
-    },
     "SEBB3": {
       "ticker": "SEBB3",
       "preco": 0.0,
@@ -4494,6 +4466,34 @@
       "patrim": -160477000.0,
       "mrg_liq": 0.0,
       "cresc5a": 20.36
+    },
+    "REPA3": {
+      "ticker": "REPA3",
+      "preco": 1.0,
+      "pl": 0.0,
+      "pvp": 0.0,
+      "psr": 0.0,
+      "dy": 0.0,
+      "roic": 4.05,
+      "roe": 1.91,
+      "liq": 0.0,
+      "patrim": 378378000.0,
+      "mrg_liq": 1.22,
+      "cresc5a": 1.09
+    },
+    "EQMA5B": {
+      "ticker": "EQMA5B",
+      "preco": 0.0,
+      "pl": 0.0,
+      "pvp": 0.0,
+      "psr": 0.0,
+      "dy": 0.0,
+      "roic": 0.0,
+      "roe": 0.0,
+      "liq": 0.0,
+      "patrim": 4940330000.0,
+      "mrg_liq": 0.0,
+      "cresc5a": 9.05
     },
     "VGOR3": {
       "ticker": "VGOR3",
@@ -4761,20 +4761,6 @@
       "mrg_liq": 0.0,
       "cresc5a": 0.0
     },
-    "ESTC4": {
-      "ticker": "ESTC4",
-      "preco": 0.0,
-      "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
-      "dy": 0.0,
-      "roic": 11.35,
-      "roe": 3.89,
-      "liq": 0.0,
-      "patrim": 2916530000.0,
-      "mrg_liq": 2.02,
-      "cresc5a": 5.6
-    },
     "VSPT4": {
       "ticker": "VSPT4",
       "preco": 0.0,
@@ -4845,33 +4831,19 @@
       "mrg_liq": 0.0,
       "cresc5a": 0.0
     },
-    "REPA4": {
-      "ticker": "REPA4",
-      "preco": 1.08,
-      "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
-      "dy": 0.0,
-      "roic": 4.05,
-      "roe": 1.91,
-      "liq": 0.0,
-      "patrim": 378378000.0,
-      "mrg_liq": 1.22,
-      "cresc5a": 1.09
-    },
-    "EQMA6B": {
-      "ticker": "EQMA6B",
+    "ESTC4": {
+      "ticker": "ESTC4",
       "preco": 0.0,
       "pl": 0.0,
       "pvp": 0.0,
       "psr": 0.0,
       "dy": 0.0,
-      "roic": 0.0,
-      "roe": 0.0,
+      "roic": 11.35,
+      "roe": 3.89,
       "liq": 0.0,
-      "patrim": 4940330000.0,
-      "mrg_liq": 0.0,
-      "cresc5a": 9.05
+      "patrim": 2916530000.0,
+      "mrg_liq": 2.02,
+      "cresc5a": 5.6
     },
     "SEBB4": {
       "ticker": "SEBB4",
@@ -4956,6 +4928,34 @@
       "patrim": -155957000.0,
       "mrg_liq": 7.55,
       "cresc5a": 62.11
+    },
+    "REPA4": {
+      "ticker": "REPA4",
+      "preco": 1.08,
+      "pl": 0.0,
+      "pvp": 0.0,
+      "psr": 0.0,
+      "dy": 0.0,
+      "roic": 4.05,
+      "roe": 1.91,
+      "liq": 0.0,
+      "patrim": 378378000.0,
+      "mrg_liq": 1.22,
+      "cresc5a": 1.09
+    },
+    "EQMA6B": {
+      "ticker": "EQMA6B",
+      "preco": 0.0,
+      "pl": 0.0,
+      "pvp": 0.0,
+      "psr": 0.0,
+      "dy": 0.0,
+      "roic": 0.0,
+      "roe": 0.0,
+      "liq": 0.0,
+      "patrim": 4940330000.0,
+      "mrg_liq": 0.0,
+      "cresc5a": 9.05
     },
     "MLPA3": {
       "ticker": "MLPA3",
