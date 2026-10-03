@@ -1,8 +1,8 @@
 {
-  "gerado_em": "01/10/2026 21:40",
+  "gerado_em": "02/10/2026 21:25",
   "historico_mensal": {
-    "total": 1593,
-    "ok": 1590,
+    "total": 1596,
+    "ok": 1593,
     "poucos_dados": 3,
     "lista_poucos": [
       {
@@ -27,107 +27,107 @@
       {
         "ticker": "ADHM3",
         "ultimo": "2026-09-18",
-        "dias_atras": 13
+        "dias_atras": 14
       },
       {
         "ticker": "AEFI11",
         "ultimo": "2026-09-18",
-        "dias_atras": 13
+        "dias_atras": 14
       },
       {
         "ticker": "AFOF11",
         "ultimo": "2026-09-18",
-        "dias_atras": 13
+        "dias_atras": 14
       },
       {
         "ticker": "BPHA3",
         "ultimo": "2026-09-18",
-        "dias_atras": 13
+        "dias_atras": 14
       },
       {
         "ticker": "BREV11",
         "ultimo": "2026-06-20",
-        "dias_atras": 103
+        "dias_atras": 104
       },
       {
         "ticker": "BRGE11",
         "ultimo": "2026-09-18",
-        "dias_atras": 13
+        "dias_atras": 14
       },
       {
         "ticker": "BRGE12",
         "ultimo": "2026-09-18",
-        "dias_atras": 13
+        "dias_atras": 14
       },
       {
         "ticker": "BRGE3",
         "ultimo": "2026-09-18",
-        "dias_atras": 13
+        "dias_atras": 14
       },
       {
         "ticker": "BRGE5",
         "ultimo": "2026-09-18",
-        "dias_atras": 13
+        "dias_atras": 14
       },
       {
         "ticker": "BRGE6",
         "ultimo": "2026-09-18",
-        "dias_atras": 13
+        "dias_atras": 14
       },
       {
         "ticker": "BRGE7",
         "ultimo": "2026-09-18",
-        "dias_atras": 13
+        "dias_atras": 14
       },
       {
         "ticker": "BRGE8",
         "ultimo": "2026-09-18",
-        "dias_atras": 13
+        "dias_atras": 14
       },
       {
         "ticker": "BRIM11",
         "ultimo": "2026-06-11",
-        "dias_atras": 112
+        "dias_atras": 113
       },
       {
         "ticker": "BRIV3",
         "ultimo": "2026-09-18",
-        "dias_atras": 13
+        "dias_atras": 14
       },
       {
         "ticker": "BRIV4",
         "ultimo": "2026-09-18",
-        "dias_atras": 13
+        "dias_atras": 14
       },
       {
         "ticker": "BRPR3",
         "ultimo": "2026-09-18",
-        "dias_atras": 13
+        "dias_atras": 14
       },
       {
         "ticker": "CCRF11",
         "ultimo": "2026-08-19",
-        "dias_atras": 43
+        "dias_atras": 44
       },
       {
         "ticker": "CORR3",
         "ultimo": "2026-09-18",
-        "dias_atras": 13
+        "dias_atras": 14
       },
       {
         "ticker": "CORR4",
         "ultimo": "2026-09-18",
-        "dias_atras": 13
+        "dias_atras": 14
       },
       {
         "ticker": "CRIV3",
         "ultimo": "2026-09-18",
-        "dias_atras": 13
+        "dias_atras": 14
       }
     ]
   },
   "cotacoes": {
-    "atualizado_em": "01/10/2026 21:21",
+    "atualizado_em": "02/10/2026 21:05",
     "total_acoes": 476,
     "total_fiis": 508,
     "fallbacks": 55,
@@ -190,28 +190,32 @@
     ]
   },
   "fundamentus": {
-    "atualizado_em": "01/10/2026 21:21",
+    "atualizado_em": "02/10/2026 21:05",
     "total_acoes": 994,
     "total_fiis": 563,
-    "atualizado_fiis": "01/10/2026 21:21"
+    "atualizado_fiis": "02/10/2026 21:05"
   },
   "criptos": {
-    "atualizado_em": "01/10/2026 22:26 UTC",
+    "atualizado_em": "02/10/2026 21:56 UTC",
     "total_moedas": 100,
     "com_dados": 100,
     "sem_dados": 0,
     "tickers_sem_dados": [],
     "historico_ok": 126,
-    "historico_falhou": 1,
+    "historico_falhou": 2,
     "historico_falhou_lista": [
       {
         "symbol": "marscat-token",
         "pontos": 3
+      },
+      {
+        "symbol": "open-usd",
+        "pontos": 4
       }
     ]
   },
   "resumo": {
-    "acoes_com_historico": 1590,
+    "acoes_com_historico": 1593,
     "fiis_com_historico": 413,
     "cotacoes_atuais": 984,
     "indicadores_fundamentus": 1557,
