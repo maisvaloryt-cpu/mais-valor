@@ -1,5 +1,5 @@
 {
-  "updated_at": "02/10/2026 17:44",
+  "updated_at": "05/10/2026 10:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1209,16 +1209,16 @@
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
       "price": 51176.96,
-      "changePct": 0.0049,
-      "high": 51382.88,
-      "low": 50950.61
+      "changePct": 0,
+      "high": null,
+      "low": null
     },
     {
       "ticker": "INDEXRUSSELL:RUT",
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2832.9,
+      "price": 2832.89,
       "changePct": 0.009399999999999999,
       "high": 2852.5,
       "low": 2825.23
@@ -1238,20 +1238,20 @@
       "stale": false,
       "descricao": "FTSE 100 (Reino Unido)",
       "tipo": "Índice Global",
-      "price": 10461.95,
-      "changePct": 0.0032,
-      "high": 10503.15,
-      "low": 10413.37
+      "price": 10506.24,
+      "changePct": 0.0042,
+      "high": 10527.46,
+      "low": 10451.73
     },
     {
       "ticker": "INDEXDB:DAX",
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 25231.2,
-      "changePct": 0.011699999999999999,
-      "high": 25303.6,
-      "low": 24970.91
+      "price": 25272.49,
+      "changePct": 0.0016,
+      "high": 25324.7,
+      "low": 25143.26
     },
     {
       "ticker": "INDEXEURO:SX5E",
@@ -1268,20 +1268,20 @@
       "stale": false,
       "descricao": "Nikkei 225 (Japão)",
       "tipo": "Índice Global",
-      "price": 68309.46,
-      "changePct": -0.009399999999999999,
-      "high": 68741.49,
-      "low": 68132.16
+      "price": 69946.86,
+      "changePct": 0.024,
+      "high": 70072.13,
+      "low": 69050.23
     },
     {
       "ticker": "INDEXHANGSENG:HSI",
       "stale": false,
       "descricao": "Hang Seng (HK)",
       "tipo": "Índice Global",
-      "price": 23972.29,
-      "changePct": -0.026000000000000002,
-      "high": 24099.73,
-      "low": 23865.33
+      "price": 24040.34,
+      "changePct": 0.0028000000000000004,
+      "high": 24040.34,
+      "low": 23835.68
     },
     {
       "ticker": "SHA:000001",
