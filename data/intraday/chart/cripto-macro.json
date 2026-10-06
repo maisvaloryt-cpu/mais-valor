@@ -112,7 +112,21 @@
       "INDEXDB:DAX": 25449.19,
       "INDEXNIKKEI:NI225": 70683.98,
       "INDEXHANGSENG:HSI": 24280.56
+    },
+    {
+      "t": "14:14",
+      "INDEXBVMF:IBOV": 205729.4,
+      "INDEXBVMF:IFIX": 3893.14,
+      "INDEXBVMF:IDIV": 14265.01,
+      "INDEXSP:.INX": 7824.86,
+      "INDEXNASDAQ:.IXIC": 27635.6,
+      "INDEXDJX:.DJI": 51525.13,
+      "INDEXRUSSELL:RUT": 2837.9,
+      "INDEXFTSE:UKX": 10541.69,
+      "INDEXDB:DAX": 25449.19,
+      "INDEXNIKKEI:NI225": 70683.98,
+      "INDEXHANGSENG:HSI": 24280.56
     }
   ],
-  "updated_at": "06/10/2026 13:44"
+  "updated_at": "06/10/2026 14:14"
 }
