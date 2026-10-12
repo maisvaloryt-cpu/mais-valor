@@ -1,5 +1,5 @@
 {
-  "updated_at": "12/10/2026 16:14",
+  "updated_at": "12/10/2026 16:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1188,8 +1188,8 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7799.39,
-      "changePct": -0.0016,
+      "price": 7804.36,
+      "changePct": -0.0009,
       "high": 7821.67,
       "low": 7796.94
     },
@@ -1198,8 +1198,8 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 27228.43,
-      "changePct": -0.005,
+      "price": 27250.33,
+      "changePct": -0.0042,
       "high": 27376.66,
       "low": 27219.42
     },
@@ -1208,7 +1208,7 @@
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 51832.55,
+      "price": 51829.37,
       "changePct": 0.0034000000000000002,
       "high": 51928.1,
       "low": 51718.6
@@ -1218,10 +1218,10 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2796.89,
-      "changePct": -0.0036,
+      "price": 2795.49,
+      "changePct": -0.0040999999999999995,
       "high": 2805.84,
-      "low": 2796.35
+      "low": 2795.49
     },
     {
       "ticker": "CBOE:VIX",
