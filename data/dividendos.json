@@ -1,5 +1,5 @@
 {
-  "updated_at": "11/10/2026 11:50",
+  "updated_at": "12/10/2026 23:40",
   "total": 865,
   "total_registros": 70100,
   "total_ativos": 1633,
@@ -1671,7 +1671,7 @@
     },
     {
       "t": "EDFO11",
-      "n": "Fundo de Investimento Imobiliario Edificio Ourinvest Cotas",
+      "n": "Fundo de Investimento Imobiliário Edifício Ourinvest",
       "tipo": "Rendimento",
       "com": "2026-08-31",
       "pag": "2026-09-15",
@@ -2238,7 +2238,7 @@
     },
     {
       "t": "OXRL11",
-      "n": "Oxigenio 2 Fundo de Investimento Imobiliario Responsabilidade Limitada",
+      "n": "Oxrl - Oxigenio 2 Fundo De Investimento Imobiliario – Responsabilidade Limitada",
       "tipo": "Rendimento",
       "com": "2026-09-04",
       "pag": "2026-09-15",
@@ -3372,7 +3372,7 @@
     },
     {
       "t": "NAVT11",
-      "n": "FII NAVI TOTCI",
+      "n": "VINCI IMOBILIARIO TOTAL RETURN F II",
       "tipo": "Rendimento",
       "com": "2026-09-14",
       "pag": "2026-09-21",
@@ -3588,7 +3588,7 @@
     },
     {
       "t": "HBCR11",
-      "n": "Fundo de Investimento Imobiliario HBC Renda Urbana",
+      "n": "Fundo De Investimento Imobiliario Hbc Renda Urbana",
       "tipo": "Rendimento",
       "com": "2026-09-15",
       "pag": "2026-09-22",
@@ -5766,7 +5766,7 @@
     },
     {
       "t": "EDFO11",
-      "n": "Fundo de Investimento Imobiliario Edificio Ourinvest Cotas",
+      "n": "Fundo de Investimento Imobiliário Edifício Ourinvest",
       "tipo": "Rendimento",
       "com": "2026-09-30",
       "pag": "2026-10-15",
@@ -6189,7 +6189,7 @@
     },
     {
       "t": "OXRL11",
-      "n": "Oxigenio 2 Fundo de Investimento Imobiliario Responsabilidade Limitada",
+      "n": "Oxrl - Oxigenio 2 Fundo De Investimento Imobiliario – Responsabilidade Limitada",
       "tipo": "Rendimento",
       "com": "2026-10-06",
       "pag": "2026-10-15",
@@ -6747,7 +6747,7 @@
     },
     {
       "t": "HBCR11",
-      "n": "Fundo de Investimento Imobiliario HBC Renda Urbana",
+      "n": "Fundo De Investimento Imobiliario Hbc Renda Urbana",
       "tipo": "Amortização",
       "com": "2026-09-22",
       "pag": "2026-10-27",
