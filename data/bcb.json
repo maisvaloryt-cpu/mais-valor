@@ -1,5 +1,5 @@
 {
-  "updated_at": "13/10/2026 21:01",
+  "updated_at": "14/10/2026 20:32",
   "cdi": {
     "diario": 0.050788,
     "anual": 13.65,
@@ -16,11 +16,11 @@
   "ipca": {
     "historico": [],
     "acumulado_12m": 4.58,
-    "stale": true
+    "stale": false
   },
   "poupanca": {
-    "mensal": 0.5883,
-    "anual": 7.29,
+    "mensal": 0.6704,
+    "anual": 8.35,
     "stale": false
   }
 }
