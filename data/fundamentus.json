@@ -1,19 +1,19 @@
 {
-  "updated_at": "19/10/2026 21:04",
+  "updated_at": "20/10/2026 20:33",
   "acoes": {
-    "MNSA3": {
-      "ticker": "MNSA3",
-      "preco": 0.42,
+    "CFLU4": {
+      "ticker": "CFLU4",
+      "preco": 1000.0,
       "pl": 0.0,
       "pvp": 0.0,
       "psr": 0.0,
       "dy": 0.0,
-      "roic": -13.5,
-      "roe": 145.7,
+      "roic": 17.68,
+      "roe": 32.15,
       "liq": 0.0,
-      "patrim": -9105000.0,
-      "mrg_liq": -362.66,
-      "cresc5a": -41.11
+      "patrim": 60351000.0,
+      "mrg_liq": 10.72,
+      "cresc5a": 8.14
     },
     "CSTB3": {
       "ticker": "CSTB3",
@@ -28,20 +28,6 @@
       "patrim": 8420670000.0,
       "mrg_liq": 28.98,
       "cresc5a": 31.91
-    },
-    "CFLU4": {
-      "ticker": "CFLU4",
-      "preco": 1000.0,
-      "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
-      "dy": 0.0,
-      "roic": 17.68,
-      "roe": 32.15,
-      "liq": 0.0,
-      "patrim": 60351000.0,
-      "mrg_liq": 10.72,
-      "cresc5a": 8.14
     },
     "POPR4": {
       "ticker": "POPR4",
@@ -140,6 +126,20 @@
       "patrim": 1083050000.0,
       "mrg_liq": 0.0,
       "cresc5a": 20.67
+    },
+    "MNSA3": {
+      "ticker": "MNSA3",
+      "preco": 0.42,
+      "pl": 0.0,
+      "pvp": 0.0,
+      "psr": 0.0,
+      "dy": 0.0,
+      "roic": -13.5,
+      "roe": 145.7,
+      "liq": 0.0,
+      "patrim": -9105000.0,
+      "mrg_liq": -362.66,
+      "cresc5a": -41.11
     },
     "BBTG12": {
       "ticker": "BBTG12",
@@ -4271,132 +4271,6 @@
       "mrg_liq": -16.77,
       "cresc5a": 13.26
     },
-    "SLCP3": {
-      "ticker": "SLCP3",
-      "preco": 610.02,
-      "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
-      "dy": 0.0,
-      "roic": 0.0,
-      "roe": 0.0,
-      "liq": 0.0,
-      "patrim": 0.0,
-      "mrg_liq": 0.0,
-      "cresc5a": 0.0
-    },
-    "DAYC3": {
-      "ticker": "DAYC3",
-      "preco": 0.0,
-      "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
-      "dy": 0.0,
-      "roic": 0.0,
-      "roe": 17.33,
-      "liq": 0.0,
-      "patrim": 3009030000.0,
-      "mrg_liq": 0.0,
-      "cresc5a": 8.15
-    },
-    "PTIP3": {
-      "ticker": "PTIP3",
-      "preco": 22.0,
-      "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
-      "dy": 0.0,
-      "roic": 23.13,
-      "roe": -121.74,
-      "liq": 0.0,
-      "patrim": -155957000.0,
-      "mrg_liq": 7.55,
-      "cresc5a": 62.11
-    },
-    "REPA4": {
-      "ticker": "REPA4",
-      "preco": 1.08,
-      "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
-      "dy": 0.0,
-      "roic": 4.05,
-      "roe": 1.91,
-      "liq": 0.0,
-      "patrim": 378378000.0,
-      "mrg_liq": 1.22,
-      "cresc5a": 1.09
-    },
-    "EQMA6B": {
-      "ticker": "EQMA6B",
-      "preco": 0.0,
-      "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
-      "dy": 0.0,
-      "roic": 0.0,
-      "roe": 0.0,
-      "liq": 0.0,
-      "patrim": 4940330000.0,
-      "mrg_liq": 0.0,
-      "cresc5a": 9.05
-    },
-    "SEBB4": {
-      "ticker": "SEBB4",
-      "preco": 0.0,
-      "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
-      "dy": 0.0,
-      "roic": 24.15,
-      "roe": 23.01,
-      "liq": 0.0,
-      "patrim": 145783000.0,
-      "mrg_liq": 7.4,
-      "cresc5a": 50.04
-    },
-    "MSAN3": {
-      "ticker": "MSAN3",
-      "preco": 6.44,
-      "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
-      "dy": 0.0,
-      "roic": 11.78,
-      "roe": 11.81,
-      "liq": 0.0,
-      "patrim": 2533030000.0,
-      "mrg_liq": 2.42,
-      "cresc5a": 101.35
-    },
-    "GALO3": {
-      "ticker": "GALO3",
-      "preco": 0.0,
-      "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
-      "dy": 0.0,
-      "roic": 39.37,
-      "roe": 7.62,
-      "liq": 0.0,
-      "patrim": -60607000.0,
-      "mrg_liq": -184.58,
-      "cresc5a": -28.97
-    },
-    "SGEN3": {
-      "ticker": "SGEN3",
-      "preco": 5.0,
-      "pl": 0.0,
-      "pvp": 0.77,
-      "psr": 593.76,
-      "dy": 0.0,
-      "roic": -1.59,
-      "roe": 0.0,
-      "liq": 0.0,
-      "patrim": 156981000.0,
-      "mrg_liq": 0.0,
-      "cresc5a": -59.85
-    },
     "DUFB11": {
       "ticker": "DUFB11",
       "preco": 0.0,
@@ -4453,6 +4327,20 @@
       "mrg_liq": 0.0,
       "cresc5a": 2.82
     },
+    "SGEN3": {
+      "ticker": "SGEN3",
+      "preco": 5.0,
+      "pl": 0.0,
+      "pvp": 0.77,
+      "psr": 593.76,
+      "dy": 0.0,
+      "roic": -1.59,
+      "roe": 0.0,
+      "liq": 0.0,
+      "patrim": 156981000.0,
+      "mrg_liq": 0.0,
+      "cresc5a": -59.85
+    },
     "CCHI3": {
       "ticker": "CCHI3",
       "preco": 0.02,
@@ -4466,20 +4354,6 @@
       "patrim": -160477000.0,
       "mrg_liq": 0.0,
       "cresc5a": 20.36
-    },
-    "SFSA3": {
-      "ticker": "SFSA3",
-      "preco": 0.0,
-      "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
-      "dy": 0.0,
-      "roic": 0.0,
-      "roe": 6.25,
-      "liq": 0.0,
-      "patrim": 739524000.0,
-      "mrg_liq": 0.0,
-      "cresc5a": 0.15
     },
     "PRBC3": {
       "ticker": "PRBC3",
@@ -4508,6 +4382,20 @@
       "patrim": 129346000.0,
       "mrg_liq": 14.18,
       "cresc5a": 4.66
+    },
+    "SFSA3": {
+      "ticker": "SFSA3",
+      "preco": 0.0,
+      "pl": 0.0,
+      "pvp": 0.0,
+      "psr": 0.0,
+      "dy": 0.0,
+      "roic": 0.0,
+      "roe": 6.25,
+      "liq": 0.0,
+      "patrim": 739524000.0,
+      "mrg_liq": 0.0,
+      "cresc5a": 0.15
     },
     "CZRS3": {
       "ticker": "CZRS3",
@@ -4621,20 +4509,6 @@
       "mrg_liq": 0.0,
       "cresc5a": 0.0
     },
-    "CSPC4": {
-      "ticker": "CSPC4",
-      "preco": 1.2,
-      "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
-      "dy": 0.0,
-      "roic": 29.18,
-      "roe": 45.33,
-      "liq": 0.0,
-      "patrim": 2126670000.0,
-      "mrg_liq": 18.85,
-      "cresc5a": 41.15
-    },
     "BOVH3": {
       "ticker": "BOVH3",
       "preco": 15.71,
@@ -4663,6 +4537,20 @@
       "mrg_liq": 0.0,
       "cresc5a": 1.08
     },
+    "CSPC4": {
+      "ticker": "CSPC4",
+      "preco": 1.2,
+      "pl": 0.0,
+      "pvp": 0.0,
+      "psr": 0.0,
+      "dy": 0.0,
+      "roic": 29.18,
+      "roe": 45.33,
+      "liq": 0.0,
+      "patrim": 2126670000.0,
+      "mrg_liq": 18.85,
+      "cresc5a": 41.15
+    },
     "ARND3": {
       "ticker": "ARND3",
       "preco": 0.67,
@@ -4676,34 +4564,6 @@
       "patrim": 125211000.0,
       "mrg_liq": 0.0,
       "cresc5a": -0.88
-    },
-    "GALO4": {
-      "ticker": "GALO4",
-      "preco": 0.25,
-      "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
-      "dy": 0.0,
-      "roic": 39.37,
-      "roe": 7.62,
-      "liq": 0.0,
-      "patrim": -60607000.0,
-      "mrg_liq": -184.58,
-      "cresc5a": -28.97
-    },
-    "BBTG13": {
-      "ticker": "BBTG13",
-      "preco": 0.0,
-      "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
-      "dy": 0.0,
-      "roic": 0.0,
-      "roe": -42.86,
-      "liq": 0.0,
-      "patrim": 7000.0,
-      "mrg_liq": 0.0,
-      "cresc5a": 0.0
     },
     "INHA3": {
       "ticker": "INHA3",
@@ -4775,19 +4635,33 @@
       "mrg_liq": 2.42,
       "cresc5a": 101.35
     },
-    "SGEN4": {
-      "ticker": "SGEN4",
-      "preco": 0.6,
+    "GALO4": {
+      "ticker": "GALO4",
+      "preco": 0.25,
       "pl": 0.0,
-      "pvp": 0.09,
-      "psr": 71.251,
+      "pvp": 0.0,
+      "psr": 0.0,
       "dy": 0.0,
-      "roic": -1.59,
-      "roe": 0.0,
+      "roic": 39.37,
+      "roe": 7.62,
       "liq": 0.0,
-      "patrim": 156981000.0,
+      "patrim": -60607000.0,
+      "mrg_liq": -184.58,
+      "cresc5a": -28.97
+    },
+    "BBTG13": {
+      "ticker": "BBTG13",
+      "preco": 0.0,
+      "pl": 0.0,
+      "pvp": 0.0,
+      "psr": 0.0,
+      "dy": 0.0,
+      "roic": 0.0,
+      "roe": -42.86,
+      "liq": 0.0,
+      "patrim": 7000.0,
       "mrg_liq": 0.0,
-      "cresc5a": -59.85
+      "cresc5a": 0.0
     },
     "VSPT3": {
       "ticker": "VSPT3",
@@ -4803,19 +4677,19 @@
       "mrg_liq": 0.0,
       "cresc5a": 4.92
     },
-    "BBTG11": {
-      "ticker": "BBTG11",
-      "preco": 15.01,
+    "SGEN4": {
+      "ticker": "SGEN4",
+      "preco": 0.6,
       "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
+      "pvp": 0.09,
+      "psr": 71.251,
       "dy": 0.0,
-      "roic": 0.0,
+      "roic": -1.59,
       "roe": 0.0,
       "liq": 0.0,
-      "patrim": 0.0,
+      "patrim": 156981000.0,
       "mrg_liq": 0.0,
-      "cresc5a": 0.0
+      "cresc5a": -59.85
     },
     "JFAB4": {
       "ticker": "JFAB4",
@@ -4887,19 +4761,19 @@
       "mrg_liq": 7.4,
       "cresc5a": 50.04
     },
-    "GPIV33": {
-      "ticker": "GPIV33",
-      "preco": 4.42,
+    "BBTG11": {
+      "ticker": "BBTG11",
+      "preco": 15.01,
       "pl": 0.0,
-      "pvp": 0.23,
-      "psr": -6.068,
+      "pvp": 0.0,
+      "psr": 0.0,
       "dy": 0.0,
-      "roic": -6.05,
+      "roic": 0.0,
       "roe": 0.0,
       "liq": 0.0,
-      "patrim": 1318490000.0,
+      "patrim": 0.0,
       "mrg_liq": 0.0,
-      "cresc5a": -40.99
+      "cresc5a": 0.0
     },
     "ECIS4": {
       "ticker": "ECIS4",
@@ -4957,19 +4831,19 @@
       "mrg_liq": -4.59,
       "cresc5a": 4.77
     },
-    "BERG3": {
-      "ticker": "BERG3",
-      "preco": 33.0,
+    "GPIV33": {
+      "ticker": "GPIV33",
+      "preco": 4.42,
       "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
+      "pvp": 0.23,
+      "psr": -6.068,
       "dy": 0.0,
-      "roic": -5.58,
-      "roe": -102.71,
+      "roic": -6.05,
+      "roe": 0.0,
       "liq": 0.0,
-      "patrim": 9538000.0,
-      "mrg_liq": -32.6,
-      "cresc5a": -8.0
+      "patrim": 1318490000.0,
+      "mrg_liq": 0.0,
+      "cresc5a": -40.99
     },
     "JBDU3": {
       "ticker": "JBDU3",
@@ -5027,6 +4901,20 @@
       "mrg_liq": 4.13,
       "cresc5a": 24.53
     },
+    "BERG3": {
+      "ticker": "BERG3",
+      "preco": 33.0,
+      "pl": 0.0,
+      "pvp": 0.0,
+      "psr": 0.0,
+      "dy": 0.0,
+      "roic": -5.58,
+      "roe": -102.71,
+      "liq": 0.0,
+      "patrim": 9538000.0,
+      "mrg_liq": -32.6,
+      "cresc5a": -8.0
+    },
     "BMEF3": {
       "ticker": "BMEF3",
       "preco": 11.0,
@@ -5069,20 +4957,6 @@
       "mrg_liq": 0.0,
       "cresc5a": 0.0
     },
-    "ODER3": {
-      "ticker": "ODER3",
-      "preco": 0.0,
-      "pl": 0.0,
-      "pvp": 0.0,
-      "psr": 0.0,
-      "dy": 0.0,
-      "roic": 0.0,
-      "roe": 0.0,
-      "liq": 0.0,
-      "patrim": 609518000.0,
-      "mrg_liq": 0.0,
-      "cresc5a": 3.17
-    },
     "ARPS3": {
       "ticker": "ARPS3",
       "preco": 0.3,
@@ -5097,19 +4971,19 @@
       "mrg_liq": -11.59,
       "cresc5a": -17.53
     },
-    "CSPC3": {
-      "ticker": "CSPC3",
-      "preco": 1.24,
+    "ODER3": {
+      "ticker": "ODER3",
+      "preco": 0.0,
       "pl": 0.0,
       "pvp": 0.0,
       "psr": 0.0,
       "dy": 0.0,
-      "roic": 29.18,
-      "roe": 45.33,
+      "roic": 0.0,
+      "roe": 0.0,
       "liq": 0.0,
-      "patrim": 2126670000.0,
-      "mrg_liq": 18.85,
-      "cresc5a": 41.15
+      "patrim": 609518000.0,
+      "mrg_liq": 0.0,
+      "cresc5a": 3.17
     },
     "ABCB3": {
       "ticker": "ABCB3",
@@ -5152,6 +5026,20 @@
       "patrim": 144676000.0,
       "mrg_liq": -37.76,
       "cresc5a": 0.0
+    },
+    "CSPC3": {
+      "ticker": "CSPC3",
+      "preco": 1.24,
+      "pl": 0.0,
+      "pvp": 0.0,
+      "psr": 0.0,
+      "dy": 0.0,
+      "roic": 29.18,
+      "roe": 45.33,
+      "liq": 0.0,
+      "patrim": 2126670000.0,
+      "mrg_liq": 18.85,
+      "cresc5a": 41.15
     },
     "ICPI3": {
       "ticker": "ICPI3",
@@ -5236,6 +5124,118 @@
       "patrim": 153407000.0,
       "mrg_liq": 0.0,
       "cresc5a": 13.32
+    },
+    "DAYC3": {
+      "ticker": "DAYC3",
+      "preco": 0.0,
+      "pl": 0.0,
+      "pvp": 0.0,
+      "psr": 0.0,
+      "dy": 0.0,
+      "roic": 0.0,
+      "roe": 17.33,
+      "liq": 0.0,
+      "patrim": 3009030000.0,
+      "mrg_liq": 0.0,
+      "cresc5a": 8.15
+    },
+    "PTIP3": {
+      "ticker": "PTIP3",
+      "preco": 22.0,
+      "pl": 0.0,
+      "pvp": 0.0,
+      "psr": 0.0,
+      "dy": 0.0,
+      "roic": 23.13,
+      "roe": -121.74,
+      "liq": 0.0,
+      "patrim": -155957000.0,
+      "mrg_liq": 7.55,
+      "cresc5a": 62.11
+    },
+    "REPA4": {
+      "ticker": "REPA4",
+      "preco": 1.08,
+      "pl": 0.0,
+      "pvp": 0.0,
+      "psr": 0.0,
+      "dy": 0.0,
+      "roic": 4.05,
+      "roe": 1.91,
+      "liq": 0.0,
+      "patrim": 378378000.0,
+      "mrg_liq": 1.22,
+      "cresc5a": 1.09
+    },
+    "EQMA6B": {
+      "ticker": "EQMA6B",
+      "preco": 0.0,
+      "pl": 0.0,
+      "pvp": 0.0,
+      "psr": 0.0,
+      "dy": 0.0,
+      "roic": 0.0,
+      "roe": 0.0,
+      "liq": 0.0,
+      "patrim": 4940330000.0,
+      "mrg_liq": 0.0,
+      "cresc5a": 9.05
+    },
+    "SEBB4": {
+      "ticker": "SEBB4",
+      "preco": 0.0,
+      "pl": 0.0,
+      "pvp": 0.0,
+      "psr": 0.0,
+      "dy": 0.0,
+      "roic": 24.15,
+      "roe": 23.01,
+      "liq": 0.0,
+      "patrim": 145783000.0,
+      "mrg_liq": 7.4,
+      "cresc5a": 50.04
+    },
+    "MSAN3": {
+      "ticker": "MSAN3",
+      "preco": 6.44,
+      "pl": 0.0,
+      "pvp": 0.0,
+      "psr": 0.0,
+      "dy": 0.0,
+      "roic": 11.78,
+      "roe": 11.81,
+      "liq": 0.0,
+      "patrim": 2533030000.0,
+      "mrg_liq": 2.42,
+      "cresc5a": 101.35
+    },
+    "GALO3": {
+      "ticker": "GALO3",
+      "preco": 0.0,
+      "pl": 0.0,
+      "pvp": 0.0,
+      "psr": 0.0,
+      "dy": 0.0,
+      "roic": 39.37,
+      "roe": 7.62,
+      "liq": 0.0,
+      "patrim": -60607000.0,
+      "mrg_liq": -184.58,
+      "cresc5a": -28.97
+    },
+    "SLCP3": {
+      "ticker": "SLCP3",
+      "preco": 610.02,
+      "pl": 0.0,
+      "pvp": 0.0,
+      "psr": 0.0,
+      "dy": 0.0,
+      "roic": 0.0,
+      "roe": 0.0,
+      "liq": 0.0,
+      "patrim": 0.0,
+      "mrg_liq": 0.0,
+      "cresc5a": 0.0
     },
     "ENER5": {
       "ticker": "ENER5",
@@ -7463,8 +7463,8 @@
       "mrg_liq": 7.46,
       "cresc5a": -2.81
     },
-    "CIQU4": {
-      "ticker": "CIQU4",
+    "CIQU3": {
+      "ticker": "CIQU3",
       "preco": 12.49,
       "pl": 6.63,
       "pvp": 1.05,
@@ -7477,8 +7477,8 @@
       "mrg_liq": 6.22,
       "cresc5a": 16.23
     },
-    "CIQU3": {
-      "ticker": "CIQU3",
+    "CIQU4": {
+      "ticker": "CIQU4",
       "preco": 12.49,
       "pl": 6.63,
       "pvp": 1.05,
@@ -8317,8 +8317,8 @@
       "mrg_liq": 6.99,
       "cresc5a": 2.82
     },
-    "AESL4": {
-      "ticker": "AESL4",
+    "AESL3": {
+      "ticker": "AESL3",
       "preco": 10081.9,
       "pl": 8.33,
       "pvp": 1.65,
@@ -8331,8 +8331,8 @@
       "mrg_liq": 10.72,
       "cresc5a": 7.6
     },
-    "AESL3": {
-      "ticker": "AESL3",
+    "AESL4": {
+      "ticker": "AESL4",
       "preco": 10081.9,
       "pl": 8.33,
       "pvp": 1.65,
