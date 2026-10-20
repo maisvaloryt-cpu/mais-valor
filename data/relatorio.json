@@ -1,5 +1,5 @@
 {
-  "gerado_em": "16/10/2026 20:30",
+  "gerado_em": "19/10/2026 21:24",
   "historico_mensal": {
     "total": 1596,
     "ok": 1593,
@@ -20,117 +20,117 @@
     ]
   },
   "historico_diario": {
-    "total": 986,
-    "atualizados": 929,
+    "total": 989,
+    "atualizados": 932,
     "desatualizados": 57,
     "lista_desatualizados": [
       {
         "ticker": "ADHM3",
         "ultimo": "2026-09-18",
-        "dias_atras": 28
+        "dias_atras": 31
       },
       {
         "ticker": "AEFI11",
         "ultimo": "2026-09-18",
-        "dias_atras": 28
+        "dias_atras": 31
       },
       {
         "ticker": "AFOF11",
         "ultimo": "2026-09-18",
-        "dias_atras": 28
+        "dias_atras": 31
       },
       {
         "ticker": "BPHA3",
         "ultimo": "2026-09-18",
-        "dias_atras": 28
+        "dias_atras": 31
       },
       {
         "ticker": "BREV11",
         "ultimo": "2026-06-20",
-        "dias_atras": 118
+        "dias_atras": 121
       },
       {
         "ticker": "BRGE11",
         "ultimo": "2026-09-18",
-        "dias_atras": 28
+        "dias_atras": 31
       },
       {
         "ticker": "BRGE12",
         "ultimo": "2026-09-18",
-        "dias_atras": 28
+        "dias_atras": 31
       },
       {
         "ticker": "BRGE3",
         "ultimo": "2026-09-18",
-        "dias_atras": 28
+        "dias_atras": 31
       },
       {
         "ticker": "BRGE5",
         "ultimo": "2026-09-18",
-        "dias_atras": 28
+        "dias_atras": 31
       },
       {
         "ticker": "BRGE6",
         "ultimo": "2026-09-18",
-        "dias_atras": 28
+        "dias_atras": 31
       },
       {
         "ticker": "BRGE7",
         "ultimo": "2026-09-18",
-        "dias_atras": 28
+        "dias_atras": 31
       },
       {
         "ticker": "BRGE8",
         "ultimo": "2026-09-18",
-        "dias_atras": 28
+        "dias_atras": 31
       },
       {
         "ticker": "BRIM11",
         "ultimo": "2026-06-11",
-        "dias_atras": 127
+        "dias_atras": 130
       },
       {
         "ticker": "BRIV3",
         "ultimo": "2026-09-18",
-        "dias_atras": 28
+        "dias_atras": 31
       },
       {
         "ticker": "BRIV4",
         "ultimo": "2026-09-18",
-        "dias_atras": 28
+        "dias_atras": 31
       },
       {
         "ticker": "BRPR3",
         "ultimo": "2026-09-18",
-        "dias_atras": 28
+        "dias_atras": 31
       },
       {
         "ticker": "CCRF11",
         "ultimo": "2026-08-19",
-        "dias_atras": 58
+        "dias_atras": 61
       },
       {
         "ticker": "CORR3",
         "ultimo": "2026-09-18",
-        "dias_atras": 28
+        "dias_atras": 31
       },
       {
         "ticker": "CORR4",
         "ultimo": "2026-09-18",
-        "dias_atras": 28
+        "dias_atras": 31
       },
       {
         "ticker": "CRIV3",
         "ultimo": "2026-09-18",
-        "dias_atras": 28
+        "dias_atras": 31
       }
     ]
   },
   "cotacoes": {
-    "atualizado_em": "16/10/2026 20:08",
+    "atualizado_em": "19/10/2026 21:04",
     "total_acoes": 476,
-    "total_fiis": 508,
-    "fallbacks": 56,
+    "total_fiis": 511,
+    "fallbacks": 55,
     "tickers_fallback": [
       "NGRD3",
       "ECPR4",
@@ -152,8 +152,8 @@
       "BRGE6",
       "BRGE7",
       "BRGE8",
-      "BRGE11",
       "BRGE5",
+      "BRGE11",
       "BRGE12",
       "BRGE3",
       "CRIV4",
@@ -167,7 +167,6 @@
       "CCRF11",
       "DMAC11",
       "DOMC11",
-      "EDFO11",
       "GLOG11",
       "GRLV11",
       "GTLG11",
@@ -191,18 +190,18 @@
     ]
   },
   "fundamentus": {
-    "atualizado_em": "14/10/2026 20:33",
+    "atualizado_em": "19/10/2026 21:04",
     "total_acoes": 994,
-    "total_fiis": 563,
-    "atualizado_fiis": "14/10/2026 20:33"
+    "total_fiis": 566,
+    "atualizado_fiis": "19/10/2026 21:04"
   },
   "criptos": {
-    "atualizado_em": "16/10/2026 20:37 UTC",
+    "atualizado_em": "19/10/2026 22:05 UTC",
     "total_moedas": 100,
     "com_dados": 100,
     "sem_dados": 0,
     "tickers_sem_dados": [],
-    "historico_ok": 132,
+    "historico_ok": 133,
     "historico_falhou": 1,
     "historico_falhou_lista": [
       {
@@ -214,8 +213,8 @@
   "resumo": {
     "acoes_com_historico": 1593,
     "fiis_com_historico": 413,
-    "cotacoes_atuais": 984,
-    "indicadores_fundamentus": 1557,
+    "cotacoes_atuais": 987,
+    "indicadores_fundamentus": 1560,
     "criptos_atuais": 100,
     "status_geral": "✅ OK"
   }
