@@ -1,1746 +1,9 @@
 {
-  "updated_at": "20/10/2026 20:55",
-  "total": 862,
+  "updated_at": "21/10/2026 21:10",
+  "total": 669,
   "total_registros": 70327,
   "total_ativos": 1634,
   "dividendos": [
-    {
-      "t": "ALLE",
-      "n": "ALLE",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 0.55,
-      "dy": ""
-    },
-    {
-      "t": "AME",
-      "n": "AME",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 0.34,
-      "dy": ""
-    },
-    {
-      "t": "ARXD11",
-      "n": "ARX Dover Recebiveis Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.09,
-      "dy": "13.48%"
-    },
-    {
-      "t": "ATSA11",
-      "n": "CSHG Atrium Shopping Santo Andre Fundo de Investimento Imobiliario-FII Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.2,
-      "dy": "4.00%"
-    },
-    {
-      "t": "AZPL11",
-      "n": "AZ Quest Panorama Logistica Fundo De Investimento Imobiliario Renda",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.08,
-      "dy": "13.24%"
-    },
-    {
-      "t": "BBDC3",
-      "n": "Banco Bradesco SA",
-      "tipo": "JRS CAP PROPRIO",
-      "com": "2026-04-06",
-      "pag": "2026-09-15",
-      "val": 0.2703,
-      "dy": "17.79%"
-    },
-    {
-      "t": "BBDC3",
-      "n": "Banco Bradesco SA",
-      "tipo": "JRS CAP PROPRIO",
-      "com": "2026-07-03",
-      "pag": "2026-09-15",
-      "val": 0.3154,
-      "dy": "20.76%"
-    },
-    {
-      "t": "BBDC4",
-      "n": "Banco Bradesco SA Pfd",
-      "tipo": "JRS CAP PROPRIO",
-      "com": "2026-04-06",
-      "pag": "2026-09-15",
-      "val": 0.2973,
-      "dy": "17.25%"
-    },
-    {
-      "t": "BBDC4",
-      "n": "Banco Bradesco SA Pfd",
-      "tipo": "JRS CAP PROPRIO",
-      "com": "2026-07-03",
-      "pag": "2026-09-15",
-      "val": 0.3469,
-      "dy": "20.13%"
-    },
-    {
-      "t": "BBFO11",
-      "n": "BB Fundos de Fundos Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.95,
-      "dy": "16.57%"
-    },
-    {
-      "t": "BBIG11",
-      "n": "BB Premium Malls Fundo de Investimento Imobiliario de Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.03,
-      "dy": "6.15%"
-    },
-    {
-      "t": "BBRC11",
-      "n": "BB Renda Corporativa Fundo de Investimento Imobiliario Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 1.05,
-      "dy": "12.23%"
-    },
-    {
-      "t": "BCRI11",
-      "n": "Banestes Recebiveis Imobiliarios Fundo de Investimento Imobiliario- FII Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.75,
-      "dy": "15.38%"
-    },
-    {
-      "t": "BIME11",
-      "n": "Brio Multiestrategia Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-09-04",
-      "pag": "2026-09-15",
-      "val": 0.06,
-      "dy": "13.90%"
-    },
-    {
-      "t": "BIPE11",
-      "n": "Brio Real Estate V - Fundo De Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 29.78,
-      "dy": "35.74%"
-    },
-    {
-      "t": "BLMG11",
-      "n": "Bluemacaw Logistica Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.39,
-      "dy": "14.44%"
-    },
-    {
-      "t": "BLMO11",
-      "n": "Bluemacaw Office Fund II Fundo De Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.35,
-      "dy": "4.38%"
-    },
-    {
-      "t": "BMLC11",
-      "n": "Fundo de Investimento BM Brascan Lages Corporativas - FII Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.79,
-      "dy": "9.54%"
-    },
-    {
-      "t": "BNFS11",
-      "n": "Banrisul Novas Fronteiras Fundo de Investimento Imobiliario - FII Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.4,
-      "dy": "13.16%"
-    },
-    {
-      "t": "BRCO11",
-      "n": "Bresco - Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.91,
-      "dy": "9.77%"
-    },
-    {
-      "t": "BRCR11",
-      "n": "Fundo de Investimento Imobiliario - FII BTG Pactual Corporate Office Fund Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.41,
-      "dy": "10.75%"
-    },
-    {
-      "t": "BTCI11",
-      "n": "FII BTG Pactual Credito Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.1,
-      "dy": "13.16%"
-    },
-    {
-      "t": "BTHF11",
-      "n": "BTG Pactual Real Estate Hedge Fund FII Fundo de Investimento Imobiliario Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.1,
-      "dy": "13.45%"
-    },
-    {
-      "t": "BTHI11",
-      "n": "XP Hoteis - Fundo de Investimento Imobiliario - FII Shs",
-      "tipo": "Rendimento",
-      "com": "2026-09-03",
-      "pag": "2026-09-15",
-      "val": 0.45,
-      "dy": "11.30%"
-    },
-    {
-      "t": "BTML11",
-      "n": "Barra Malls Fundo De Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 1.1,
-      "dy": "11.86%"
-    },
-    {
-      "t": "BTWR11",
-      "n": "Btowers Fundo Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.6,
-      "dy": "8.00%"
-    },
-    {
-      "t": "CBOP11",
-      "n": "Castello Branco Office Park - Fundo de Investime nto Imobiliario - Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.2,
-      "dy": "8.64%"
-    },
-    {
-      "t": "CCI",
-      "n": "CCI",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 1.063,
-      "dy": ""
-    },
-    {
-      "t": "CEOC11",
-      "n": "Fundo de Investimento Imobiliario - FII CEO Cyrela Comercial Properties Responsabilidade Limitada Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.49,
-      "dy": "13.87%"
-    },
-    {
-      "t": "CJCT11",
-      "n": "Cidade Jardim Continental Tower Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.24,
-      "dy": "3.74%"
-    },
-    {
-      "t": "COCA34",
-      "n": "COCA34",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 0.4503,
-      "dy": ""
-    },
-    {
-      "t": "COCA34",
-      "n": "COCA34",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 0.4578,
-      "dy": ""
-    },
-    {
-      "t": "CXCE11",
-      "n": "Fundo de Investimento Imobiliario Caixa Cedae Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.48,
-      "dy": "14.05%"
-    },
-    {
-      "t": "CXCI11",
-      "n": "Fundo de Investimento Imobiliario Caixa Carteira Imobiliaria",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.75,
-      "dy": "13.38%"
-    },
-    {
-      "t": "CXCO11",
-      "n": "Fundo de Investimento Imobiliario Caixa Imoveis Corporativos",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.75,
-      "dy": "12.49%"
-    },
-    {
-      "t": "CXTL11",
-      "n": "Fundo de Investimento Imobiliario TRX Caixa Logistica Renda Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 2.31,
-      "dy": "8.15%"
-    },
-    {
-      "t": "DEVA11",
-      "n": "Devant Recebiveis Imobiliarios Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.3,
-      "dy": "19.83%"
-    },
-    {
-      "t": "DLR",
-      "n": "DLR",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 1.22,
-      "dy": ""
-    },
-    {
-      "t": "DPRO11",
-      "n": "Devant Properties Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.06,
-      "dy": "13.48%"
-    },
-    {
-      "t": "DPZ",
-      "n": "DPZ",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 1.99,
-      "dy": ""
-    },
-    {
-      "t": "DVFF11",
-      "n": "Fundo de Investimento Imobiliario Devant Fundo de Fundos Imobiliarios",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.07,
-      "dy": "15.03%"
-    },
-    {
-      "t": "DVN",
-      "n": "DVN",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 0.32,
-      "dy": ""
-    },
-    {
-      "t": "ECL",
-      "n": "ECL",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 0.73,
-      "dy": ""
-    },
-    {
-      "t": "EDFO11",
-      "n": "Fundo de Investimento Imobiliario Edificio Ourinvest Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.84,
-      "dy": "8.33%"
-    },
-    {
-      "t": "EIRA11",
-      "n": "Aroeira Fundo de Investimento Imobiliario Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 1.16,
-      "dy": "13.31%"
-    },
-    {
-      "t": "EMET11",
-      "n": "Emet Multiestrategia Fundo De Investimento I Mobiliario Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.09,
-      "dy": "10.55%"
-    },
-    {
-      "t": "ERPA11",
-      "n": "Europa 105 Fundo Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.94,
-      "dy": "9.02%"
-    },
-    {
-      "t": "EURO11",
-      "n": "Fundo de Investimento Imobiliario Europar Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 1.9,
-      "dy": "7.50%"
-    },
-    {
-      "t": "EXR",
-      "n": "EXR",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 1.62,
-      "dy": ""
-    },
-    {
-      "t": "FAED11",
-      "n": "Fundo de Investimeno Imobiliario FII Anhanguera Educacional Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 1.78,
-      "dy": "13.68%"
-    },
-    {
-      "t": "FATN11",
-      "n": "BRC Renda Corporativa Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-09-04",
-      "pag": "2026-09-15",
-      "val": 0.8,
-      "dy": "10.67%"
-    },
-    {
-      "t": "FIGS11",
-      "n": "General Shopping Ativo e Renda Fundo de Investimento Imobiliario Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.48,
-      "dy": "11.21%"
-    },
-    {
-      "t": "FIIP11",
-      "n": "Fundo de Investimento Imobiliario RB Capital Renda I Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 1.42,
-      "dy": "11.82%"
-    },
-    {
-      "t": "FISC11",
-      "n": "Fundo Investimento Imobiliario SC 401",
-      "tipo": "Rendimento",
-      "com": "2026-09-04",
-      "pag": "2026-09-15",
-      "val": 0.58,
-      "dy": "9.94%"
-    },
-    {
-      "t": "FLCR11",
-      "n": "Faria Lima Capital Recebiveis Imobiliarios I FII",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 1.0,
-      "dy": "13.19%"
-    },
-    {
-      "t": "FLMA11",
-      "n": "Fundo Invest Imobiliario Continental Square Faria Lima",
-      "tipo": "Rendimento",
-      "com": "2026-09-04",
-      "pag": "2026-09-15",
-      "val": 1.22,
-      "dy": "9.18%"
-    },
-    {
-      "t": "FLRP11",
-      "n": "Hedge Floripa Shopping Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.15,
-      "dy": "8.56%"
-    },
-    {
-      "t": "FVPQ11",
-      "n": "Fundo de Investimentos Imobiliario Bamerindus - Via Parque Shopping Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.45,
-      "dy": "11.49%"
-    },
-    {
-      "t": "FYTO11",
-      "n": "FUNDO DE INVESTIMENTO IMOBILIARIO FYTO RECEBIVEIS IMOBILIARIOS",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.1,
-      "dy": "14.58%"
-    },
-    {
-      "t": "GILD",
-      "n": "GILD",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 0.82,
-      "dy": ""
-    },
-    {
-      "t": "GLPF11",
-      "n": "Galapagos Feeder Logistico Fundo de Investimento Imobiliario Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.68,
-      "dy": "7.36%"
-    },
-    {
-      "t": "GTWR11",
-      "n": "Fundo Investimento Imobiliario Green Towers",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.9,
-      "dy": "13.47%"
-    },
-    {
-      "t": "HCTR11",
-      "n": "Fundo de Investimento Imobiliario Hectare CE",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.21,
-      "dy": "18.60%"
-    },
-    {
-      "t": "HFOF11",
-      "n": "Hedge Top Fofii 3 Fundo Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.06,
-      "dy": "10.73%"
-    },
-    {
-      "t": "HGBL11",
-      "n": "Hedge Brasil Logistico Industrial Fundo de Investimento Imobiliario de Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.07,
-      "dy": "9.01%"
-    },
-    {
-      "t": "HGBS11",
-      "n": "CSHG Brasil Shopping Fundo de Investimento Imobiliario Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.17,
-      "dy": "10.55%"
-    },
-    {
-      "t": "HGCR11",
-      "n": "CSHG Recebiveis Imobiliarios - Fundo de Investimento Imobiliario - FII Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 1.0,
-      "dy": "12.14%"
-    },
-    {
-      "t": "HGLG11",
-      "n": "Patria Log - Fundo de Investimento Imobiliario - Responsabilidade Limitada Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 1.17,
-      "dy": "8.98%"
-    },
-    {
-      "t": "HGRE11",
-      "n": "Patria Escritorios - Fundo de Investimento Imobi liario - Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.85,
-      "dy": "7.93%"
-    },
-    {
-      "t": "HGRU11",
-      "n": "Patria Renda Urbana Fundo de Investimento Imobiliario Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.95,
-      "dy": "9.06%"
-    },
-    {
-      "t": "HILG11",
-      "n": "Hire Log I Fundo De Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 22.75,
-      "dy": "146.14%"
-    },
-    {
-      "t": "HIRE11",
-      "n": "Hire Fundo De Investimento Imobiliario Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.95,
-      "dy": "11.36%"
-    },
-    {
-      "t": "HJCT11",
-      "n": "Hedge JHSF Capital Prime Offices Fundo de Investimento Imobiliario de Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 1.07,
-      "dy": "9.88%"
-    },
-    {
-      "t": "HLOG11",
-      "n": "Hedge Logistica Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.07,
-      "dy": "9.00%"
-    },
-    {
-      "t": "HPDP11",
-      "n": "Hedge Shopping Parque Dom Pedro Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.61,
-      "dy": "8.12%"
-    },
-    {
-      "t": "HREC11",
-      "n": "Hedge Recebiveis Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.1,
-      "dy": "14.27%"
-    },
-    {
-      "t": "HSLG11",
-      "n": "HSI Logistica Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.75,
-      "dy": "10.57%"
-    },
-    {
-      "t": "HUSI11",
-      "n": "Husi Fundo De Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 9.57,
-      "dy": "9.57%"
-    },
-    {
-      "t": "INHF11",
-      "n": "Inter Hedge Fundo de Investimento Imobiliario Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.1,
-      "dy": "14.91%"
-    },
-    {
-      "t": "INLG11",
-      "n": "Inter Logistico Fundo De Investimento Imobiliario FII",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.6,
-      "dy": "11.00%"
-    },
-    {
-      "t": "INRD11",
-      "n": "Inter Residence Fundo DE Investimento Imobiliario FII",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.72,
-      "dy": "11.89%"
-    },
-    {
-      "t": "IRM",
-      "n": "IRM",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 0.864,
-      "dy": ""
-    },
-    {
-      "t": "ITIP11",
-      "n": "Ifi D Inter Fundo De Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.92,
-      "dy": "20.37%"
-    },
-    {
-      "t": "ITIT11",
-      "n": "Inter Teva Indice de Tijolo Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.62,
-      "dy": "11.28%"
-    },
-    {
-      "t": "JFLL11",
-      "n": "JFL Living Fundo de Iinvestimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.2,
-      "dy": "4.75%"
-    },
-    {
-      "t": "JPPA11",
-      "n": "JPP Allocation Mogno - Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 1.2,
-      "dy": "18.00%"
-    },
-    {
-      "t": "JSAF11",
-      "n": "JS Ativos Financeiros Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.08,
-      "dy": "12.72%"
-    },
-    {
-      "t": "JSCR11",
-      "n": "JS Recebiveis Imobiliarios Fundo De Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.1,
-      "dy": "14.91%"
-    },
-    {
-      "t": "JSRE11",
-      "n": "JS Real Estate Multigestao-FII Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.5,
-      "dy": "8.89%"
-    },
-    {
-      "t": "KEVE11",
-      "n": "Even II Kinea Fundo De Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 14.89,
-      "dy": "34.03%"
-    },
-    {
-      "t": "KFOF11",
-      "n": "Kinea Fundo Fundos de Investimento Imobiliario -FII",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.8,
-      "dy": "11.61%"
-    },
-    {
-      "t": "KIVO11",
-      "n": "Kilima Volkano Recebiveis Imobiliarios Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.9,
-      "dy": "18.62%"
-    },
-    {
-      "t": "KNRI11",
-      "n": "Kinea Renda Imobiliaria Fundo de Investimento Imobiliario - FII Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 1.1,
-      "dy": "8.05%"
-    },
-    {
-      "t": "KO",
-      "n": "KO",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 0.53,
-      "dy": ""
-    },
-    {
-      "t": "KORE11",
-      "n": "Kinea Oportunidades Real Estate Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.6,
-      "dy": "9.66%"
-    },
-    {
-      "t": "LDOS",
-      "n": "LDOS",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 0.43,
-      "dy": ""
-    },
-    {
-      "t": "LPLP11",
-      "n": "Lago da Pedra Fundo Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-09-04",
-      "pag": "2026-09-15",
-      "val": 2.66,
-      "dy": "11.23%"
-    },
-    {
-      "t": "MAXR11",
-      "n": "Fundo de Investimento Imobiliario - FII Max Retail Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.4,
-      "dy": "8.86%"
-    },
-    {
-      "t": "MFII11",
-      "n": "Merito Recebiveis Imobiliarios FII-Fundo de Investimento",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.3,
-      "dy": "9.50%"
-    },
-    {
-      "t": "MO",
-      "n": "MO",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 1.11,
-      "dy": ""
-    },
-    {
-      "t": "MRK",
-      "n": "MRK",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 0.85,
-      "dy": ""
-    },
-    {
-      "t": "MXRF11",
-      "n": "Maxi Renda Fundo de Investimento Imobiliario Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.1,
-      "dy": "12.68%"
-    },
-    {
-      "t": "NCRI11",
-      "n": "Vinci Credito Imobiliario Fundo de Investimento Imobiliario - Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-09-04",
-      "pag": "2026-09-15",
-      "val": 0.11,
-      "dy": "15.55%"
-    },
-    {
-      "t": "NEWL11",
-      "n": "Newport Logistica Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 1.0,
-      "dy": "10.86%"
-    },
-    {
-      "t": "NEWU11",
-      "n": "Newport Renda Urbana Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.7,
-      "dy": "7.64%"
-    },
-    {
-      "t": "OUJP11",
-      "n": "Ourinvest JPP Fundo de Investimento Imobiliario - FII",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 1.2,
-      "dy": "20.44%"
-    },
-    {
-      "t": "OXRL11",
-      "n": "Oxrl - Oxigenio 2 Fundo De Investimento Imobiliario – Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-09-04",
-      "pag": "2026-09-15",
-      "val": 0.99,
-      "dy": "9.04%"
-    },
-    {
-      "t": "PEMA11",
-      "n": "Performa Real Estate Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.22,
-      "dy": "10.56%"
-    },
-    {
-      "t": "PHM",
-      "n": "PHM",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 0.26,
-      "dy": ""
-    },
-    {
-      "t": "PKG",
-      "n": "PKG",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 1.5,
-      "dy": ""
-    },
-    {
-      "t": "PMFO11",
-      "n": "Daycoval Ans Fundo De Investimento Em Renda Fixa Credito Privado",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.88,
-      "dy": "12.60%"
-    },
-    {
-      "t": "PMIS11",
-      "n": "PARAMIS HEDGE FUND FUNDO DE INVESTIMENTO IMOBILIARIO - FII",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.09,
-      "dy": "13.50%"
-    },
-    {
-      "t": "PMLL11",
-      "n": "Patria Malls Fundo de Investimento Imobiliario Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 1.0,
-      "dy": "10.91%"
-    },
-    {
-      "t": "PNPR11",
-      "n": "Panorama Properties Fundo De Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 1.63,
-      "dy": "41.62%"
-    },
-    {
-      "t": "PQAG11",
-      "n": "RB Capital Anhanguera Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.49,
-      "dy": "10.41%"
-    },
-    {
-      "t": "PSA",
-      "n": "PSA",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 3.0,
-      "dy": ""
-    },
-    {
-      "t": "PSKY",
-      "n": "PSKY",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 0.05,
-      "dy": ""
-    },
-    {
-      "t": "RBFM11",
-      "n": "Rio Bravo Multiestrategia Fundo de Investimento Imobiliario de Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.11,
-      "dy": "12.56%"
-    },
-    {
-      "t": "RBHG11",
-      "n": "Rio Bravo Credito Imobiliario High Grade Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.78,
-      "dy": "14.93%"
-    },
-    {
-      "t": "RBHY11",
-      "n": "Rio Bravo Credito Imobiliario High Yield Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.95,
-      "dy": "18.38%"
-    },
-    {
-      "t": "RBIR11",
-      "n": "RB Capital Desenvolvimento Residencial IV Fundo de Investimento Imobiliario - FII",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 2.49,
-      "dy": "40.37%"
-    },
-    {
-      "t": "RBOP11",
-      "n": "Fundo de Investimento Imobiliario Rio Bravo Oportunidades Imobiliarias FII",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 1.45,
-      "dy": "8.92%"
-    },
-    {
-      "t": "RBRD11",
-      "n": "RB Capital Renda II Fundo de Investimento Imobiliario - FII Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.55,
-      "dy": "16.87%"
-    },
-    {
-      "t": "RBRL11",
-      "n": "Patria Logistica II",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.6,
-      "dy": "8.47%"
-    },
-    {
-      "t": "RBRP11",
-      "n": "Patria Properties",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.35,
-      "dy": "8.00%"
-    },
-    {
-      "t": "RBRS11",
-      "n": "RIO Bravo Renda Residencial Fundo de Investimentos Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.18,
-      "dy": "4.90%"
-    },
-    {
-      "t": "RBVA11",
-      "n": "Fundo de Investimento Imobiliario Rio Bravo Renda Varejo - FII",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.09,
-      "dy": "11.91%"
-    },
-    {
-      "t": "RCRB11",
-      "n": "Fundo de Investimento Imobiliario Rio Bravo de Renda Corporativa",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 1.3,
-      "dy": "10.93%"
-    },
-    {
-      "t": "RECD11",
-      "n": "Rec Fundo De Cri Cotas Amortizaveis - Fundo De Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.05,
-      "dy": "10.89%"
-    },
-    {
-      "t": "RECM11",
-      "n": "Rec Multiestrategia Fundo De Investimento Imobiliario - Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.1,
-      "dy": "16.88%"
-    },
-    {
-      "t": "RECR11",
-      "n": "Fundo de Investimento Imobiliario FII REC Recebiveis Imobiliarios",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.74,
-      "dy": "11.61%"
-    },
-    {
-      "t": "RECT11",
-      "n": "Fundo de Investimento Imobiliario FII REC Renda Imobiliaria",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.45,
-      "dy": "15.43%"
-    },
-    {
-      "t": "REME11",
-      "n": "FII REME CI ER",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.9,
-      "dy": "12.42%"
-    },
-    {
-      "t": "RENV11",
-      "n": "CPV Energia Fundo De Investimento Imobiliario Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.08,
-      "dy": "16.05%"
-    },
-    {
-      "t": "RMBS11",
-      "n": "REC Master Fundo de CRI Cotas Amortizaveis Investimento Imobiliario - Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.08,
-      "dy": "12.39%"
-    },
-    {
-      "t": "RNGO11",
-      "n": "Fundo de Investimento Imobiliario Rio Negro - FII Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.52,
-      "dy": "11.64%"
-    },
-    {
-      "t": "RSPD11",
-      "n": "RB Capital Desenvolvimento Residencial III Fundo de Investimento Imobiliario - FII",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 46.98,
-      "dy": "86.07%"
-    },
-    {
-      "t": "SAPI11",
-      "n": "Santander Papeis Imobiliarios Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.11,
-      "dy": "14.93%"
-    },
-    {
-      "t": "SEED11",
-      "n": "Hedge Seed Fundo De Investimeto Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.64,
-      "dy": "7.68%"
-    },
-    {
-      "t": "SEQR11",
-      "n": "Sequoia III Renda Imobiliaria Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.59,
-      "dy": "13.05%"
-    },
-    {
-      "t": "SHPH11",
-      "n": "Fundo de Investimento Imobiliario Shopping Patio Higienopolis Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 4.5,
-      "dy": "5.53%"
-    },
-    {
-      "t": "SKYD",
-      "n": "SKYD",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 0.05,
-      "dy": ""
-    },
-    {
-      "t": "SPXS11",
-      "n": "Fundo de Investimento Imobiliario - SPX SYN Multiestrategia",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.1,
-      "dy": "15.11%"
-    },
-    {
-      "t": "TEPP11",
-      "n": "Tellus Properties - Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.07,
-      "dy": "10.84%"
-    },
-    {
-      "t": "TGAR11",
-      "n": "Fundo de Investimento Imobiliario TG Ativo Real Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.7,
-      "dy": "16.25%"
-    },
-    {
-      "t": "TKO",
-      "n": "TKO",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 0.79,
-      "dy": ""
-    },
-    {
-      "t": "TMO",
-      "n": "TMO",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 0.47,
-      "dy": ""
-    },
-    {
-      "t": "TORD11",
-      "n": "Tordesilhas EI Fundo De Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.01,
-      "dy": "12.12%"
-    },
-    {
-      "t": "TRBL11",
-      "n": "Fundo de Investimento Imobiliario Tellus Rio Bravo Renda Logidtica FII",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.44,
-      "dy": "9.78%"
-    },
-    {
-      "t": "TROW",
-      "n": "TROW",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 1.3,
-      "dy": ""
-    },
-    {
-      "t": "TRXB11",
-      "n": "TRX Real Estate II Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 1.0,
-      "dy": "6.15%"
-    },
-    {
-      "t": "TRXF11",
-      "n": "TRX Real Estate Fundo Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.93,
-      "dy": "15.54%"
-    },
-    {
-      "t": "TRXY11",
-      "n": "TRX Hedge Fund Fundo de Investimento Imobiliario Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.11,
-      "dy": "17.17%"
-    },
-    {
-      "t": "TSER11",
-      "n": "Tishman Speyer Renda Corporativa Fundo De Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 1.64,
-      "dy": "18.22%"
-    },
-    {
-      "t": "TSMC34",
-      "n": "TSMC34",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 0.5386,
-      "dy": ""
-    },
-    {
-      "t": "TVRI11",
-      "n": "Tivio Renda Imobiliaria Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 1.05,
-      "dy": "14.18%"
-    },
-    {
-      "t": "UDR",
-      "n": "UDR",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 0.145,
-      "dy": ""
-    },
-    {
-      "t": "URHF11",
-      "n": "Urca Hedge Fund Estrategia Imobiliaaria Fundo De Investimento Imobiliario - Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 1.0,
-      "dy": "22.61%"
-    },
-    {
-      "t": "URPR11",
-      "n": "URCA Prime Renda Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.3,
-      "dy": "16.76%"
-    },
-    {
-      "t": "VCRI11",
-      "n": "Vinci Credit Securities Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.1,
-      "dy": "16.02%"
-    },
-    {
-      "t": "VCRR11",
-      "n": "Vectis Renda Residencial Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.32,
-      "dy": "6.84%"
-    },
-    {
-      "t": "VILG11",
-      "n": "Vinci Logistica Fundo de Investimento Imobiliario - FII",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.82,
-      "dy": "9.62%"
-    },
-    {
-      "t": "VINO11",
-      "n": "Vinci Offices Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.04,
-      "dy": "10.23%"
-    },
-    {
-      "t": "VISC11",
-      "n": "Vinci Shopping Centers Fundo de Investimento Imobiliario - FII Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.84,
-      "dy": "8.88%"
-    },
-    {
-      "t": "VJFD11",
-      "n": "JFDCAM Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.88,
-      "dy": "7.82%"
-    },
-    {
-      "t": "VOTS11",
-      "n": "Votorantim Securities Master Fundo de Investimento Imobiliario FII",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 1.2,
-      "dy": "13.40%"
-    },
-    {
-      "t": "VRSK",
-      "n": "VRSK",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 0.5,
-      "dy": ""
-    },
-    {
-      "t": "VRTA11",
-      "n": "Fator Verita Fundo de Investimento Imobiliario - FII Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.85,
-      "dy": "13.37%"
-    },
-    {
-      "t": "VRTM11",
-      "n": "Fator Verita Multiestrategia Fundo De Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.09,
-      "dy": "15.77%"
-    },
-    {
-      "t": "VSLH11",
-      "n": "Versalhes Recebiveis Imobiliarios Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.02,
-      "dy": "14.63%"
-    },
-    {
-      "t": "VVDI11",
-      "n": "V2 Recebiveis CDI Fundo De Investimento Imobiliario Responsabilidade Limitad",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-15",
-      "val": 0.11,
-      "dy": "13.33%"
-    },
-    {
-      "t": "WHGR11",
-      "n": "WHG Real Estate Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.1,
-      "dy": "13.06%"
-    },
-    {
-      "t": "WPLZ11",
-      "n": "Fundo de Investimento Imobiliario Shopping West Plaza Cotas",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.37,
-      "dy": "8.88%"
-    },
-    {
-      "t": "XEL",
-      "n": "XEL",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-15",
-      "val": 0.593,
-      "dy": ""
-    },
-    {
-      "t": "XLPR11",
-      "n": "FII XLPR RI CI",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.44,
-      "dy": "7.09%"
-    },
-    {
-      "t": "XPCI11",
-      "n": "XP Credito Imobiliario - Fundo De Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.9,
-      "dy": "13.09%"
-    },
-    {
-      "t": "XPLG11",
-      "n": "XP Log Fundo Investimento Imobiliario FII",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.82,
-      "dy": "9.73%"
-    },
-    {
-      "t": "XPSF11",
-      "n": "XP Selection Fundo de Fundos de Investimento Imobiliario - FII",
-      "tipo": "Rendimento",
-      "com": "2026-08-31",
-      "pag": "2026-09-15",
-      "val": 0.07,
-      "dy": "12.75%"
-    },
-    {
-      "t": "AIG",
-      "n": "AIG",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-16",
-      "val": 0.5,
-      "dy": ""
-    },
-    {
-      "t": "ARES",
-      "n": "ARES",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-16",
-      "val": 1.35,
-      "dy": ""
-    },
-    {
-      "t": "ARTE11",
-      "n": "Artemis Fundo de Investimento Imobiliario Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-09-09",
-      "pag": "2026-09-16",
-      "val": 0.11,
-      "dy": "19.85%"
-    },
-    {
-      "t": "BLCA11",
-      "n": "Patria - VBI Asset Management Ltda",
-      "tipo": "Rendimento",
-      "com": "2026-09-09",
-      "pag": "2026-09-16",
-      "val": 0.55,
-      "dy": "6.95%"
-    },
-    {
-      "t": "CCME11",
-      "n": "Canuma Capital Multiestrategia Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-09-09",
-      "pag": "2026-09-16",
-      "val": 0.09,
-      "dy": "11.64%"
-    },
-    {
-      "t": "CLIN11",
-      "n": "Clave Indices de Precos Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-09-09",
-      "pag": "2026-09-16",
-      "val": 0.95,
-      "dy": "12.17%"
-    },
-    {
-      "t": "FPAB11",
-      "n": "Fundo De Investimento Imobiliario Projeto Agua Branca",
-      "tipo": "Rendimento",
-      "com": "2026-09-09",
-      "pag": "2026-09-16",
-      "val": 1.8,
-      "dy": "10.59%"
-    },
-    {
-      "t": "HCA",
-      "n": "HCA",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-16",
-      "val": 0.78,
-      "dy": ""
-    },
-    {
-      "t": "IBBP11",
-      "n": "Invista Brazilian Business Park Fundo De Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-09-08",
-      "pag": "2026-09-16",
-      "val": 0.08,
-      "dy": "11.82%"
-    },
-    {
-      "t": "ICE",
-      "n": "ICE",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-16",
-      "val": 0.52,
-      "dy": ""
-    },
-    {
-      "t": "MSI",
-      "n": "MSI",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-16",
-      "val": 1.21,
-      "dy": ""
-    },
-    {
-      "t": "NXPI",
-      "n": "NXPI",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-16",
-      "val": 1.014,
-      "dy": ""
-    },
-    {
-      "t": "PCIP11",
-      "n": "Patria Credito Imobiliario Indice de Precos Fundo de Investimento Imobiliario Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-09-09",
-      "pag": "2026-09-16",
-      "val": 0.8,
-      "dy": "11.78%"
-    },
-    {
-      "t": "PLD",
-      "n": "PLD",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-16",
-      "val": 1.07,
-      "dy": ""
-    },
-    {
-      "t": "PSEC11",
-      "n": "Patria Securities Fundo de Investimento Imobiliario Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-09-09",
-      "pag": "2026-09-16",
-      "val": 0.6,
-      "dy": "13.44%"
-    },
     {
       "t": "BBY",
       "n": "BBY",
@@ -1766,7 +29,7 @@
       "com": "2026-08-31",
       "pag": "2026-09-17",
       "val": 0.72,
-      "dy": "11.66%"
+      "dy": "11.70%"
     },
     {
       "t": "HBAN",
@@ -1793,7 +56,7 @@
       "com": "2026-09-10",
       "pag": "2026-09-17",
       "val": 0.59,
-      "dy": "14.98%"
+      "dy": "15.06%"
     },
     {
       "t": "IRIM11",
@@ -1829,7 +92,7 @@
       "com": "2026-09-10",
       "pag": "2026-09-17",
       "val": 1.0,
-      "dy": "13.31%"
+      "dy": "13.65%"
     },
     {
       "t": "RCL",
@@ -1874,7 +137,7 @@
       "com": "2026-03-30",
       "pag": "2026-09-18",
       "val": 0.0854,
-      "dy": "28.71%"
+      "dy": "29.11%"
     },
     {
       "t": "HCRI11",
@@ -1928,7 +191,7 @@
       "com": "2026-09-08",
       "pag": "2026-09-18",
       "val": 0.0284,
-      "dy": "8.69%"
+      "dy": "8.97%"
     },
     {
       "t": "OMC",
@@ -1946,7 +209,7 @@
       "com": "2026-08-31",
       "pag": "2026-09-18",
       "val": 13.01,
-      "dy": "6.04%"
+      "dy": "6.01%"
     },
     {
       "t": "RZZR11",
@@ -1955,7 +218,7 @@
       "com": "2026-09-11",
       "pag": "2026-09-18",
       "val": 1.24,
-      "dy": "11.05%"
+      "dy": "11.19%"
     },
     {
       "t": "TELM11",
@@ -1964,7 +227,7 @@
       "com": "2026-09-11",
       "pag": "2026-09-18",
       "val": 0.1,
-      "dy": "12.63%"
+      "dy": "12.68%"
     },
     {
       "t": "VGIP11",
@@ -1973,7 +236,7 @@
       "com": "2026-09-11",
       "pag": "2026-09-18",
       "val": 0.88,
-      "dy": "13.40%"
+      "dy": "13.52%"
     },
     {
       "t": "VGIR11",
@@ -1982,7 +245,7 @@
       "com": "2026-09-11",
       "pag": "2026-09-18",
       "val": 0.13,
-      "dy": "16.22%"
+      "dy": "16.32%"
     },
     {
       "t": "APTO11",
@@ -1991,7 +254,7 @@
       "com": "2026-08-31",
       "pag": "2026-09-21",
       "val": 0.09,
-      "dy": "16.00%"
+      "dy": "16.05%"
     },
     {
       "t": "AURB11",
@@ -2054,7 +317,7 @@
       "com": "2026-09-14",
       "pag": "2026-09-21",
       "val": 0.85,
-      "dy": "14.23%"
+      "dy": "14.15%"
     },
     {
       "t": "HRES11",
@@ -2072,7 +335,7 @@
       "com": "2026-09-14",
       "pag": "2026-09-21",
       "val": 1.77,
-      "dy": "14.30%"
+      "dy": "14.17%"
     },
     {
       "t": "JCI",
@@ -2108,7 +371,7 @@
       "com": "2025-09-26",
       "pag": "2026-09-21",
       "val": 0.2456,
-      "dy": "7.76%"
+      "dy": "7.91%"
     },
     {
       "t": "NAVT11",
@@ -2126,7 +389,7 @@
       "com": "2026-06-01",
       "pag": "2026-09-21",
       "val": 0.3505,
-      "dy": "6.49%"
+      "dy": "6.50%"
     },
     {
       "t": "PETR4",
@@ -2135,7 +398,7 @@
       "com": "2026-06-01",
       "pag": "2026-09-21",
       "val": 0.3505,
-      "dy": "7.23%"
+      "dy": "7.28%"
     },
     {
       "t": "RCFF11",
@@ -2153,7 +416,7 @@
       "com": "2026-09-14",
       "pag": "2026-09-21",
       "val": 1.1,
-      "dy": "12.86%"
+      "dy": "12.85%"
     },
     {
       "t": "RINV11",
@@ -2162,16 +425,16 @@
       "com": "2026-09-14",
       "pag": "2026-09-21",
       "val": 1.05,
-      "dy": "11.78%"
+      "dy": "11.83%"
     },
     {
       "t": "RZZI11",
-      "n": "Raizz Desenvolvimento Ii Fundo De Investimento Imobiliario Responsabilidade Limitada",
+      "n": "Raizz Desenvolvimento II Fundo De Investimento Imobiliario Responsabilidade Limitada",
       "tipo": "Rendimento",
       "com": "2026-09-14",
       "pag": "2026-09-21",
       "val": 8.0,
-      "dy": "9.14%"
+      "dy": "7.38%"
     },
     {
       "t": "RZZV11",
@@ -2189,7 +452,7 @@
       "com": "2026-09-14",
       "pag": "2026-09-21",
       "val": 0.45,
-      "dy": "7.60%"
+      "dy": "7.48%"
     },
     {
       "t": "VST",
@@ -2216,7 +479,7 @@
       "com": "2026-09-08",
       "pag": "2026-09-21",
       "val": 0.05,
-      "dy": "8.00%"
+      "dy": "8.01%"
     },
     {
       "t": "AFHF11",
@@ -2225,7 +488,7 @@
       "com": "2026-09-15",
       "pag": "2026-09-22",
       "val": 0.12,
-      "dy": "13.85%"
+      "dy": "13.78%"
     },
     {
       "t": "AFHI11",
@@ -2234,7 +497,7 @@
       "com": "2026-09-15",
       "pag": "2026-09-22",
       "val": 1.0,
-      "dy": "12.51%"
+      "dy": "12.49%"
     },
     {
       "t": "AJFI11",
@@ -2243,7 +506,7 @@
       "com": "2026-09-15",
       "pag": "2026-09-22",
       "val": 0.07,
-      "dy": "9.76%"
+      "dy": "9.77%"
     },
     {
       "t": "APH",
@@ -2261,7 +524,7 @@
       "com": "2026-09-15",
       "pag": "2026-09-22",
       "val": 0.13,
-      "dy": "14.08%"
+      "dy": "14.02%"
     },
     {
       "t": "CPSH11",
@@ -2270,7 +533,7 @@
       "com": "2026-09-15",
       "pag": "2026-09-22",
       "val": 0.11,
-      "dy": "13.12%"
+      "dy": "13.04%"
     },
     {
       "t": "CPTS11",
@@ -2288,7 +551,7 @@
       "com": "2026-09-15",
       "pag": "2026-09-22",
       "val": 0.1,
-      "dy": "11.62%"
+      "dy": "11.82%"
     },
     {
       "t": "DAYM11",
@@ -2297,7 +560,7 @@
       "com": "2026-09-15",
       "pag": "2026-09-22",
       "val": 0.04,
-      "dy": "11.91%"
+      "dy": "12.03%"
     },
     {
       "t": "EBTA11",
@@ -2315,7 +578,7 @@
       "com": "2026-09-10",
       "pag": "2026-09-22",
       "val": 0.1,
-      "dy": "14.02%"
+      "dy": "13.84%"
     },
     {
       "t": "GLCR11",
@@ -2369,7 +632,7 @@
       "com": "2026-08-31",
       "pag": "2026-09-22",
       "val": 0.12,
-      "dy": "15.40%"
+      "dy": "15.53%"
     },
     {
       "t": "MIDW11",
@@ -2387,7 +650,7 @@
       "com": "2026-09-15",
       "pag": "2026-09-22",
       "val": 0.1,
-      "dy": "15.40%"
+      "dy": "15.52%"
     },
     {
       "t": "RZAK11",
@@ -2396,7 +659,7 @@
       "com": "2026-09-15",
       "pag": "2026-09-22",
       "val": 1.05,
-      "dy": "15.76%"
+      "dy": "15.85%"
     },
     {
       "t": "RZAT11",
@@ -2414,7 +677,7 @@
       "com": "2026-09-15",
       "pag": "2026-09-22",
       "val": 0.05,
-      "dy": "4.46%"
+      "dy": "4.62%"
     },
     {
       "t": "WTSP11",
@@ -2423,7 +686,7 @@
       "com": "2026-09-15",
       "pag": "2026-09-22",
       "val": 0.42,
-      "dy": "7.58%"
+      "dy": "7.41%"
     },
     {
       "t": "ALZC11",
@@ -2495,7 +758,7 @@
       "com": "2026-09-15",
       "pag": "2026-09-23",
       "val": 0.09,
-      "dy": "14.14%"
+      "dy": "14.12%"
     },
     {
       "t": "BROF11",
@@ -2504,7 +767,7 @@
       "com": "2026-09-17",
       "pag": "2026-09-24",
       "val": 0.56,
-      "dy": "10.66%"
+      "dy": "10.75%"
     },
     {
       "t": "ERCR11",
@@ -2558,7 +821,7 @@
       "com": "2026-09-17",
       "pag": "2026-09-24",
       "val": 0.1,
-      "dy": "13.33%"
+      "dy": "13.65%"
     },
     {
       "t": "VVRI11",
@@ -2567,7 +830,7 @@
       "com": "2026-09-17",
       "pag": "2026-09-24",
       "val": 0.03,
-      "dy": "4.86%"
+      "dy": "4.68%"
     },
     {
       "t": "ALZR11",
@@ -2576,16 +839,16 @@
       "com": "2026-09-18",
       "pag": "2026-09-25",
       "val": 0.08,
-      "dy": "9.24%"
+      "dy": "9.22%"
     },
     {
       "t": "APXM11",
-      "n": "Fundo de Investimento Imobiliario Apex Malls FII",
+      "n": "Vinci Malls II Fundo de Investimento Imobiliario Responsabilidade Limitada",
       "tipo": "Rendimento",
       "com": "2026-09-18",
       "pag": "2026-09-25",
       "val": 0.26,
-      "dy": "6.27%"
+      "dy": "6.24%"
     },
     {
       "t": "BPML11",
@@ -2594,7 +857,7 @@
       "com": "2026-09-18",
       "pag": "2026-09-25",
       "val": 0.92,
-      "dy": "12.08%"
+      "dy": "12.11%"
     },
     {
       "t": "BTLG11",
@@ -2603,7 +866,7 @@
       "com": "2026-09-15",
       "pag": "2026-09-25",
       "val": 0.81,
-      "dy": "9.27%"
+      "dy": "9.34%"
     },
     {
       "t": "BTRU11",
@@ -2612,7 +875,7 @@
       "com": "2026-09-18",
       "pag": "2026-09-25",
       "val": 0.85,
-      "dy": "11.93%"
+      "dy": "12.27%"
     },
     {
       "t": "EQIR11",
@@ -2621,7 +884,7 @@
       "com": "2026-09-18",
       "pag": "2026-09-25",
       "val": 0.1,
-      "dy": "13.92%"
+      "dy": "14.08%"
     },
     {
       "t": "EXES11",
@@ -2630,7 +893,7 @@
       "com": "2026-09-18",
       "pag": "2026-09-25",
       "val": 0.13,
-      "dy": "16.30%"
+      "dy": "16.60%"
     },
     {
       "t": "FCFL11",
@@ -2639,7 +902,7 @@
       "com": "2026-09-18",
       "pag": "2026-09-25",
       "val": 0.92,
-      "dy": "8.90%"
+      "dy": "8.95%"
     },
     {
       "t": "ICNE11",
@@ -2702,7 +965,7 @@
       "com": "2026-08-31",
       "pag": "2026-09-25",
       "val": 0.2028,
-      "dy": "13.60%"
+      "dy": "13.66%"
     },
     {
       "t": "SNCI11",
@@ -2711,7 +974,7 @@
       "com": "2026-09-15",
       "pag": "2026-09-25",
       "val": 1.0,
-      "dy": "14.10%"
+      "dy": "14.04%"
     },
     {
       "t": "SNEL11",
@@ -2720,7 +983,7 @@
       "com": "2026-09-15",
       "pag": "2026-09-25",
       "val": 0.1,
-      "dy": "15.02%"
+      "dy": "15.09%"
     },
     {
       "t": "SNFF11",
@@ -2738,7 +1001,7 @@
       "com": "2026-09-15",
       "pag": "2026-09-25",
       "val": 0.1,
-      "dy": "12.36%"
+      "dy": "12.41%"
     },
     {
       "t": "TJKB11",
@@ -2765,7 +1028,7 @@
       "com": "2026-09-18",
       "pag": "2026-09-25",
       "val": 0.92,
-      "dy": "10.42%"
+      "dy": "10.52%"
     },
     {
       "t": "BRSR3",
@@ -2774,7 +1037,7 @@
       "com": "2026-09-11",
       "pag": "2026-09-28",
       "val": 0.2201,
-      "dy": "13.24%"
+      "dy": "12.62%"
     },
     {
       "t": "BRSR5",
@@ -2792,7 +1055,7 @@
       "com": "2026-09-11",
       "pag": "2026-09-28",
       "val": 0.2201,
-      "dy": "14.53%"
+      "dy": "14.57%"
     },
     {
       "t": "FLRY3",
@@ -2801,7 +1064,7 @@
       "com": "2026-08-11",
       "pag": "2026-09-28",
       "val": 0.4007,
-      "dy": "17.05%"
+      "dy": "17.10%"
     },
     {
       "t": "KDP",
@@ -2819,7 +1082,7 @@
       "com": "2026-08-31",
       "pag": "2026-09-29",
       "val": 0.86,
-      "dy": "11.39%"
+      "dy": "11.38%"
     },
     {
       "t": "BMKS3",
@@ -2828,7 +1091,7 @@
       "com": "2025-12-29",
       "pag": "2026-09-29",
       "val": 20.0,
-      "dy": "63.32%"
+      "dy": "60.75%"
     },
     {
       "t": "BTML11",
@@ -2945,7 +1208,7 @@
       "com": "2026-09-17",
       "pag": "2026-09-30",
       "val": 0.1442,
-      "dy": "20.62%"
+      "dy": "20.48%"
     },
     {
       "t": "CLSC3",
@@ -2963,7 +1226,7 @@
       "com": "2026-09-30",
       "pag": "2026-09-30",
       "val": 1.0582,
-      "dy": "6.69%"
+      "dy": "6.68%"
     },
     {
       "t": "CPLE3",
@@ -2972,7 +1235,7 @@
       "com": "2026-04-29",
       "pag": "2026-09-30",
       "val": 0.2377,
-      "dy": "16.16%"
+      "dy": "16.43%"
     },
     {
       "t": "CPT",
@@ -3008,7 +1271,7 @@
       "com": "2026-09-23",
       "pag": "2026-09-30",
       "val": 0.09,
-      "dy": "8.24%"
+      "dy": "8.25%"
     },
     {
       "t": "ESS",
@@ -3035,7 +1298,7 @@
       "com": "2026-09-23",
       "pag": "2026-09-30",
       "val": 0.36,
-      "dy": "11.08%"
+      "dy": "10.67%"
     },
     {
       "t": "HST",
@@ -3089,7 +1352,7 @@
       "com": "2026-09-22",
       "pag": "2026-09-30",
       "val": 0.03,
-      "dy": "1.82%"
+      "dy": "1.86%"
     },
     {
       "t": "MDLZ",
@@ -3107,7 +1370,7 @@
       "com": "2025-12-30",
       "pag": "2026-09-30",
       "val": 0.5918,
-      "dy": "23.18%"
+      "dy": "23.22%"
     },
     {
       "t": "MPWR",
@@ -3125,7 +1388,7 @@
       "com": "2025-09-26",
       "pag": "2026-09-30",
       "val": 0.2456,
-      "dy": "7.76%"
+      "dy": "7.91%"
     },
     {
       "t": "NUE",
@@ -3179,7 +1442,7 @@
       "com": "2026-09-30",
       "pag": "2026-09-30",
       "val": 0.0597,
-      "dy": "6.40%"
+      "dy": "6.51%"
     },
     {
       "t": "SHUL4",
@@ -3188,7 +1451,7 @@
       "com": "2025-12-26",
       "pag": "2026-09-30",
       "val": 0.0875,
-      "dy": "19.81%"
+      "dy": "20.47%"
     },
     {
       "t": "STAG",
@@ -3233,7 +1496,7 @@
       "com": "2025-11-28",
       "pag": "2026-09-30",
       "val": 0.3765,
-      "dy": "22.20%"
+      "dy": "22.96%"
     },
     {
       "t": "VLTO",
@@ -3260,7 +1523,7 @@
       "com": "2026-09-04",
       "pag": "2026-09-30",
       "val": 3.5,
-      "dy": "49.48%"
+      "dy": "49.49%"
     },
     {
       "t": "WPC",
@@ -3323,7 +1586,7 @@
       "com": "2026-09-01",
       "pag": "2026-10-01",
       "val": 0.0288,
-      "dy": "3.47%"
+      "dy": "3.44%"
     },
     {
       "t": "BEES4",
@@ -3332,7 +1595,7 @@
       "com": "2026-09-01",
       "pag": "2026-10-01",
       "val": 0.0288,
-      "dy": "3.51%"
+      "dy": "3.37%"
     },
     {
       "t": "CAH",
@@ -3368,7 +1631,7 @@
       "com": "2026-08-31",
       "pag": "2026-10-01",
       "val": 0.0242,
-      "dy": "1.83%"
+      "dy": "1.85%"
     },
     {
       "t": "ITSA4",
@@ -3377,7 +1640,7 @@
       "com": "2026-08-31",
       "pag": "2026-10-01",
       "val": 0.0242,
-      "dy": "1.84%"
+      "dy": "1.85%"
     },
     {
       "t": "ITUB3",
@@ -3404,7 +1667,7 @@
       "com": "2026-08-18",
       "pag": "2026-10-01",
       "val": 0.1594,
-      "dy": "6.27%"
+      "dy": "6.29%"
     },
     {
       "t": "MRSH",
@@ -3458,7 +1721,7 @@
       "com": "",
       "pag": "2026-10-01",
       "val": 0.09,
-      "dy": "13.22%"
+      "dy": "13.14%"
     },
     {
       "t": "STT",
@@ -3476,7 +1739,7 @@
       "com": "2026-09-22",
       "pag": "2026-10-02",
       "val": 0.2919,
-      "dy": "9.81%"
+      "dy": "9.93%"
     },
     {
       "t": "ALUP11",
@@ -3485,7 +1748,7 @@
       "com": "2026-08-13",
       "pag": "2026-10-02",
       "val": 0.21,
-      "dy": "6.55%"
+      "dy": "6.51%"
     },
     {
       "t": "ALUP3",
@@ -3494,7 +1757,7 @@
       "com": "2026-08-13",
       "pag": "2026-10-02",
       "val": 0.07,
-      "dy": "6.26%"
+      "dy": "6.58%"
     },
     {
       "t": "ALUP4",
@@ -3503,7 +1766,7 @@
       "com": "2026-08-13",
       "pag": "2026-10-02",
       "val": 0.07,
-      "dy": "6.61%"
+      "dy": "6.71%"
     },
     {
       "t": "BMY",
@@ -3539,7 +1802,7 @@
       "com": "2026-08-11",
       "pag": "2026-10-02",
       "val": 0.4007,
-      "dy": "17.05%"
+      "dy": "17.10%"
     },
     {
       "t": "GEOO34",
@@ -3602,7 +1865,7 @@
       "com": "2026-08-13",
       "pag": "2026-10-05",
       "val": 0.21,
-      "dy": "6.55%"
+      "dy": "6.51%"
     },
     {
       "t": "ALUP3",
@@ -3611,7 +1874,7 @@
       "com": "2026-08-13",
       "pag": "2026-10-05",
       "val": 0.07,
-      "dy": "6.26%"
+      "dy": "6.58%"
     },
     {
       "t": "ALUP4",
@@ -3620,7 +1883,7 @@
       "com": "2026-08-13",
       "pag": "2026-10-05",
       "val": 0.07,
-      "dy": "6.61%"
+      "dy": "6.71%"
     },
     {
       "t": "ERIE",
@@ -3737,7 +2000,7 @@
       "com": "2026-09-24",
       "pag": "2026-10-06",
       "val": 0.1841,
-      "dy": "5.01%"
+      "dy": "5.05%"
     },
     {
       "t": "SPG211",
@@ -3755,7 +2018,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-07",
       "val": 0.55,
-      "dy": "8.57%"
+      "dy": "8.54%"
     },
     {
       "t": "AQPA11",
@@ -3773,7 +2036,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-07",
       "val": 0.01,
-      "dy": "10.17%"
+      "dy": "10.34%"
     },
     {
       "t": "ARRI11",
@@ -3782,7 +2045,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-07",
       "val": 0.05,
-      "dy": "12.96%"
+      "dy": "13.04%"
     },
     {
       "t": "B3SA3",
@@ -3791,7 +2054,7 @@
       "com": "2025-12-30",
       "pag": "2026-10-07",
       "val": 0.0745,
-      "dy": "3.77%"
+      "dy": "3.80%"
     },
     {
       "t": "B3SA3",
@@ -3800,7 +2063,7 @@
       "com": "2026-09-22",
       "pag": "2026-10-07",
       "val": 0.0759,
-      "dy": "3.84%"
+      "dy": "3.87%"
     },
     {
       "t": "B3SA3",
@@ -3809,7 +2072,7 @@
       "com": "2026-09-22",
       "pag": "2026-10-07",
       "val": 0.1507,
-      "dy": "7.63%"
+      "dy": "7.69%"
     },
     {
       "t": "BFCC11",
@@ -3881,7 +2144,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-07",
       "val": 0.08,
-      "dy": "10.95%"
+      "dy": "10.98%"
     },
     {
       "t": "HOSI11",
@@ -3899,7 +2162,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-07",
       "val": 0.95,
-      "dy": "14.64%"
+      "dy": "14.57%"
     },
     {
       "t": "HSML11",
@@ -3908,7 +2171,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-07",
       "val": 0.75,
-      "dy": "9.68%"
+      "dy": "9.59%"
     },
     {
       "t": "HTMX11",
@@ -3917,7 +2180,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-07",
       "val": 1.2,
-      "dy": "10.30%"
+      "dy": "10.22%"
     },
     {
       "t": "HUSC11",
@@ -3944,7 +2207,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-07",
       "val": 0.66,
-      "dy": "7.29%"
+      "dy": "7.22%"
     },
     {
       "t": "LEN",
@@ -3962,7 +2225,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-07",
       "val": 0.12,
-      "dy": "19.86%"
+      "dy": "19.92%"
     },
     {
       "t": "LVBI11",
@@ -3971,7 +2234,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-07",
       "val": 0.8,
-      "dy": "9.14%"
+      "dy": "9.07%"
     },
     {
       "t": "NSLU11",
@@ -3980,7 +2243,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-07",
       "val": 1.81,
-      "dy": "11.49%"
+      "dy": "11.46%"
     },
     {
       "t": "OCRE11",
@@ -3998,7 +2261,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-07",
       "val": 0.08,
-      "dy": "10.67%"
+      "dy": "9.50%"
     },
     {
       "t": "PLAG11",
@@ -4025,7 +2288,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-07",
       "val": 0.1,
-      "dy": "14.04%"
+      "dy": "13.97%"
     },
     {
       "t": "PVBI11",
@@ -4034,7 +2297,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-07",
       "val": 0.37,
-      "dy": "5.93%"
+      "dy": "5.91%"
     },
     {
       "t": "RPAD5",
@@ -4052,7 +2315,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-07",
       "val": 0.85,
-      "dy": "12.72%"
+      "dy": "12.76%"
     },
     {
       "t": "SPDE11",
@@ -4070,7 +2333,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-07",
       "val": 0.45,
-      "dy": "16.10%"
+      "dy": "15.77%"
     },
     {
       "t": "STRX11",
@@ -4088,7 +2351,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-07",
       "val": 0.06,
-      "dy": "12.70%"
+      "dy": "12.57%"
     },
     {
       "t": "VGRI11",
@@ -4097,7 +2360,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-07",
       "val": 0.08,
-      "dy": "15.43%"
+      "dy": "15.41%"
     },
     {
       "t": "VPSI11",
@@ -4115,7 +2378,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-08",
       "val": 0.38,
-      "dy": "6.33%"
+      "dy": "6.23%"
     },
     {
       "t": "BLAU3",
@@ -4124,7 +2387,7 @@
       "com": "2026-09-29",
       "pag": "2026-10-08",
       "val": 0.0758,
-      "dy": "7.13%"
+      "dy": "7.32%"
     },
     {
       "t": "GGRC11",
@@ -4133,7 +2396,7 @@
       "com": "2026-10-01",
       "pag": "2026-10-08",
       "val": 0.1,
-      "dy": "12.97%"
+      "dy": "13.03%"
     },
     {
       "t": "INTU",
@@ -4151,7 +2414,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-08",
       "val": 0.09,
-      "dy": "8.91%"
+      "dy": "9.14%"
     },
     {
       "t": "TOTS3",
@@ -4160,7 +2423,7 @@
       "com": "2026-09-23",
       "pag": "2026-10-08",
       "val": 0.15,
-      "dy": "4.28%"
+      "dy": "4.16%"
     },
     {
       "t": "VERZ34",
@@ -4178,7 +2441,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-08",
       "val": 1.5,
-      "dy": "23.23%"
+      "dy": "23.30%"
     },
     {
       "t": "ATTB34",
@@ -4223,7 +2486,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-09",
       "val": 3.3,
-      "dy": "8.98%"
+      "dy": "8.80%"
     },
     {
       "t": "GD",
@@ -4241,7 +2504,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-09",
       "val": 0.92,
-      "dy": "15.56%"
+      "dy": "15.57%"
     },
     {
       "t": "JHSF3",
@@ -4250,7 +2513,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-09",
       "val": 0.0692,
-      "dy": "5.85%"
+      "dy": "5.82%"
     },
     {
       "t": "LMAI11",
@@ -4322,7 +2585,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-09",
       "val": 0.09,
-      "dy": "3.23%"
+      "dy": "3.18%"
     },
     {
       "t": "QUAL3",
@@ -4331,7 +2594,7 @@
       "com": "2026-06-29",
       "pag": "2026-10-09",
       "val": 0.009,
-      "dy": "4.91%"
+      "dy": "5.07%"
     },
     {
       "t": "T",
@@ -4358,7 +2621,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-12",
       "val": 1.0,
-      "dy": "21.62%"
+      "dy": "21.82%"
     },
     {
       "t": "ACN",
@@ -4376,7 +2639,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-13",
       "val": 1.22,
-      "dy": "16.72%"
+      "dy": "16.68%"
     },
     {
       "t": "AVUR11",
@@ -4385,7 +2648,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-13",
       "val": 1.8,
-      "dy": "24.67%"
+      "dy": "24.60%"
     },
     {
       "t": "CRFF11",
@@ -4394,7 +2657,7 @@
       "com": "2026-10-01",
       "pag": "2026-10-13",
       "val": 0.65,
-      "dy": "11.65%"
+      "dy": "11.49%"
     },
     {
       "t": "CXRI11",
@@ -4403,7 +2666,7 @@
       "com": "2026-10-01",
       "pag": "2026-10-13",
       "val": 0.65,
-      "dy": "11.41%"
+      "dy": "11.13%"
     },
     {
       "t": "GIS",
@@ -4421,7 +2684,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-13",
       "val": 0.08,
-      "dy": "11.57%"
+      "dy": "11.50%"
     },
     {
       "t": "HRL",
@@ -4448,7 +2711,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-13",
       "val": 0.8,
-      "dy": "11.46%"
+      "dy": "11.57%"
     },
     {
       "t": "JPPA11",
@@ -4457,7 +2720,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-13",
       "val": 1.2,
-      "dy": "18.00%"
+      "dy": "18.01%"
     },
     {
       "t": "KFEN11",
@@ -4475,7 +2738,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-13",
       "val": 1.0,
-      "dy": "12.32%"
+      "dy": "12.37%"
     },
     {
       "t": "KNUQ11",
@@ -4484,7 +2747,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-13",
       "val": 1.15,
-      "dy": "13.57%"
+      "dy": "13.60%"
     },
     {
       "t": "MCLO11",
@@ -4529,7 +2792,7 @@
       "com": "2026-10-05",
       "pag": "2026-10-13",
       "val": 11.68,
-      "dy": "13.92%"
+      "dy": "13.91%"
     },
     {
       "t": "SMRE11",
@@ -4538,7 +2801,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-13",
       "val": 1.0,
-      "dy": "21.62%"
+      "dy": "21.82%"
     },
     {
       "t": "TMPS11",
@@ -4547,7 +2810,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-13",
       "val": 0.7,
-      "dy": "11.43%"
+      "dy": "11.46%"
     },
     {
       "t": "VERE11",
@@ -4583,7 +2846,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-14",
       "val": 6.61,
-      "dy": "12.39%"
+      "dy": "12.49%"
     },
     {
       "t": "BEES3",
@@ -4592,7 +2855,7 @@
       "com": "2026-10-01",
       "pag": "2026-10-14",
       "val": 0.0738,
-      "dy": "8.90%"
+      "dy": "8.81%"
     },
     {
       "t": "BEES4",
@@ -4601,7 +2864,7 @@
       "com": "2026-10-01",
       "pag": "2026-10-14",
       "val": 0.0738,
-      "dy": "9.00%"
+      "dy": "8.64%"
     },
     {
       "t": "BTML11",
@@ -4619,7 +2882,7 @@
       "com": "2026-10-02",
       "pag": "2026-10-14",
       "val": 0.4135,
-      "dy": "28.37%"
+      "dy": "29.07%"
     },
     {
       "t": "HUSI11",
@@ -4637,7 +2900,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-14",
       "val": 0.07,
-      "dy": "9.35%"
+      "dy": "9.42%"
     },
     {
       "t": "KNCR11",
@@ -4646,7 +2909,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-14",
       "val": 1.13,
-      "dy": "12.79%"
+      "dy": "12.80%"
     },
     {
       "t": "KNHY11",
@@ -4655,7 +2918,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-14",
       "val": 0.7,
-      "dy": "8.40%"
+      "dy": "8.37%"
     },
     {
       "t": "KNIP11",
@@ -4664,7 +2927,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-14",
       "val": 0.6,
-      "dy": "7.70%"
+      "dy": "7.75%"
     },
     {
       "t": "KNSC11",
@@ -4673,7 +2936,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-14",
       "val": 0.08,
-      "dy": "10.48%"
+      "dy": "10.56%"
     },
     {
       "t": "LREN3",
@@ -4682,7 +2945,7 @@
       "com": "2026-09-22",
       "pag": "2026-10-14",
       "val": 0.2407,
-      "dy": "19.35%"
+      "dy": "19.58%"
     },
     {
       "t": "MU",
@@ -4709,7 +2972,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-14",
       "val": 0.65,
-      "dy": "9.69%"
+      "dy": "9.66%"
     },
     {
       "t": "RRES11",
@@ -4727,7 +2990,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-14",
       "val": 0.97,
-      "dy": "21.93%"
+      "dy": "21.49%"
     },
     {
       "t": "VCJR11",
@@ -4736,7 +2999,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-14",
       "val": 0.75,
-      "dy": "11.99%"
+      "dy": "11.82%"
     },
     {
       "t": "ZAVC11",
@@ -4745,7 +3008,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-14",
       "val": 0.13,
-      "dy": "16.61%"
+      "dy": "16.49%"
     },
     {
       "t": "ZAVI11",
@@ -4754,7 +3017,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-14",
       "val": 0.12,
-      "dy": "14.41%"
+      "dy": "14.39%"
     },
     {
       "t": "ABBV",
@@ -4781,7 +3044,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.09,
-      "dy": "13.48%"
+      "dy": "13.57%"
     },
     {
       "t": "ATSA11",
@@ -4808,7 +3071,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.95,
-      "dy": "16.57%"
+      "dy": "16.55%"
     },
     {
       "t": "BBIG11",
@@ -4817,7 +3080,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.03,
-      "dy": "6.15%"
+      "dy": "6.21%"
     },
     {
       "t": "BBRC11",
@@ -4826,7 +3089,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 1.05,
-      "dy": "12.23%"
+      "dy": "12.27%"
     },
     {
       "t": "BCRI11",
@@ -4835,7 +3098,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.74,
-      "dy": "15.18%"
+      "dy": "15.31%"
     },
     {
       "t": "BIME11",
@@ -4844,7 +3107,7 @@
       "com": "2026-10-06",
       "pag": "2026-10-15",
       "val": 0.06,
-      "dy": "13.90%"
+      "dy": "14.17%"
     },
     {
       "t": "BLMG11",
@@ -4853,7 +3116,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-15",
       "val": 0.39,
-      "dy": "14.44%"
+      "dy": "14.56%"
     },
     {
       "t": "BLMO11",
@@ -4880,7 +3143,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.4,
-      "dy": "13.16%"
+      "dy": "13.23%"
     },
     {
       "t": "BRCO11",
@@ -4889,7 +3152,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.91,
-      "dy": "9.77%"
+      "dy": "9.67%"
     },
     {
       "t": "BRCR11",
@@ -4898,7 +3161,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-15",
       "val": 0.41,
-      "dy": "10.75%"
+      "dy": "10.56%"
     },
     {
       "t": "BTCI11",
@@ -4916,7 +3179,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-15",
       "val": 0.1,
-      "dy": "13.45%"
+      "dy": "13.50%"
     },
     {
       "t": "BTHI11",
@@ -4925,7 +3188,7 @@
       "com": "2026-10-05",
       "pag": "2026-10-15",
       "val": 0.45,
-      "dy": "11.30%"
+      "dy": "11.67%"
     },
     {
       "t": "BTWR11",
@@ -4943,7 +3206,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.2,
-      "dy": "8.64%"
+      "dy": "8.71%"
     },
     {
       "t": "CEOC11",
@@ -4952,7 +3215,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-15",
       "val": 0.53,
-      "dy": "15.00%"
+      "dy": "14.97%"
     },
     {
       "t": "CJCT11",
@@ -4970,7 +3233,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.48,
-      "dy": "14.05%"
+      "dy": "14.10%"
     },
     {
       "t": "CXCI11",
@@ -4979,7 +3242,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-15",
       "val": 0.75,
-      "dy": "13.38%"
+      "dy": "13.33%"
     },
     {
       "t": "CXCO11",
@@ -4988,7 +3251,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.75,
-      "dy": "12.49%"
+      "dy": "12.40%"
     },
     {
       "t": "DAL",
@@ -5006,7 +3269,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-15",
       "val": 0.26,
-      "dy": "17.19%"
+      "dy": "17.15%"
     },
     {
       "t": "DPRO11",
@@ -5024,7 +3287,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-15",
       "val": 0.07,
-      "dy": "15.03%"
+      "dy": "15.14%"
     },
     {
       "t": "EDFO11",
@@ -5033,7 +3296,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.84,
-      "dy": "8.33%"
+      "dy": "7.30%"
     },
     {
       "t": "EIRA11",
@@ -5042,7 +3305,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-15",
       "val": 1.13,
-      "dy": "12.96%"
+      "dy": "13.10%"
     },
     {
       "t": "EME",
@@ -5060,7 +3323,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-15",
       "val": 0.1,
-      "dy": "11.72%"
+      "dy": "11.96%"
     },
     {
       "t": "ERPA11",
@@ -5087,7 +3350,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-15",
       "val": 1.71,
-      "dy": "13.14%"
+      "dy": "12.97%"
     },
     {
       "t": "FATN11",
@@ -5096,7 +3359,7 @@
       "com": "2026-10-06",
       "pag": "2026-10-15",
       "val": 0.8,
-      "dy": "10.67%"
+      "dy": "10.62%"
     },
     {
       "t": "FCX",
@@ -5114,7 +3377,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.48,
-      "dy": "11.21%"
+      "dy": "10.91%"
     },
     {
       "t": "FIIP11",
@@ -5123,7 +3386,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 1.42,
-      "dy": "11.82%"
+      "dy": "11.36%"
     },
     {
       "t": "FISC11",
@@ -5141,7 +3404,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-15",
       "val": 1.0,
-      "dy": "13.19%"
+      "dy": "13.17%"
     },
     {
       "t": "FLMA11",
@@ -5150,7 +3413,7 @@
       "com": "2026-10-06",
       "pag": "2026-10-15",
       "val": 1.29,
-      "dy": "9.70%"
+      "dy": "9.71%"
     },
     {
       "t": "FLRP11",
@@ -5159,7 +3422,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.15,
-      "dy": "8.56%"
+      "dy": "8.20%"
     },
     {
       "t": "FVPQ11",
@@ -5168,7 +3431,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.45,
-      "dy": "11.49%"
+      "dy": "11.56%"
     },
     {
       "t": "FYTO11",
@@ -5177,7 +3440,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-15",
       "val": 0.1,
-      "dy": "14.58%"
+      "dy": "14.63%"
     },
     {
       "t": "GSFI11",
@@ -5186,7 +3449,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.11,
-      "dy": "10.57%"
+      "dy": "10.58%"
     },
     {
       "t": "GTWR11",
@@ -5195,7 +3458,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.9,
-      "dy": "13.47%"
+      "dy": "13.38%"
     },
     {
       "t": "HCTR11",
@@ -5204,7 +3467,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-15",
       "val": 0.21,
-      "dy": "18.60%"
+      "dy": "18.43%"
     },
     {
       "t": "HFOF11",
@@ -5213,7 +3476,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.06,
-      "dy": "10.73%"
+      "dy": "10.70%"
     },
     {
       "t": "HGBL11",
@@ -5222,7 +3485,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.07,
-      "dy": "9.01%"
+      "dy": "8.98%"
     },
     {
       "t": "HGBS11",
@@ -5231,7 +3494,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.17,
-      "dy": "10.55%"
+      "dy": "10.51%"
     },
     {
       "t": "HGCR11",
@@ -5240,7 +3503,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 1.0,
-      "dy": "12.14%"
+      "dy": "12.12%"
     },
     {
       "t": "HGIC11",
@@ -5249,7 +3512,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-15",
       "val": 0.6,
-      "dy": "15.35%"
+      "dy": "15.43%"
     },
     {
       "t": "HGLG11",
@@ -5258,7 +3521,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 1.17,
-      "dy": "8.98%"
+      "dy": "8.92%"
     },
     {
       "t": "HGRE11",
@@ -5267,7 +3530,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.85,
-      "dy": "7.93%"
+      "dy": "7.99%"
     },
     {
       "t": "HGRU11",
@@ -5276,7 +3539,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.95,
-      "dy": "9.06%"
+      "dy": "9.03%"
     },
     {
       "t": "HILG11",
@@ -5312,7 +3575,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.07,
-      "dy": "9.00%"
+      "dy": "8.96%"
     },
     {
       "t": "HPDP11",
@@ -5321,7 +3584,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.61,
-      "dy": "8.12%"
+      "dy": "7.80%"
     },
     {
       "t": "HREC11",
@@ -5330,7 +3593,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.1,
-      "dy": "14.27%"
+      "dy": "14.29%"
     },
     {
       "t": "HRES11",
@@ -5348,7 +3611,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.75,
-      "dy": "10.57%"
+      "dy": "10.65%"
     },
     {
       "t": "INHF11",
@@ -5366,7 +3629,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.6,
-      "dy": "11.00%"
+      "dy": "11.02%"
     },
     {
       "t": "INRD11",
@@ -5384,7 +3647,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.62,
-      "dy": "11.28%"
+      "dy": "11.34%"
     },
     {
       "t": "JFLL11",
@@ -5393,7 +3656,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.15,
-      "dy": "3.56%"
+      "dy": "3.55%"
     },
     {
       "t": "JSAF11",
@@ -5402,7 +3665,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.08,
-      "dy": "12.72%"
+      "dy": "12.55%"
     },
     {
       "t": "JSCR11",
@@ -5411,7 +3674,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.09,
-      "dy": "13.42%"
+      "dy": "13.43%"
     },
     {
       "t": "JSRE11",
@@ -5420,7 +3683,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.5,
-      "dy": "8.89%"
+      "dy": "8.68%"
     },
     {
       "t": "KEVE11",
@@ -5438,7 +3701,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.8,
-      "dy": "11.61%"
+      "dy": "11.66%"
     },
     {
       "t": "KIVO11",
@@ -5447,7 +3710,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.92,
-      "dy": "19.03%"
+      "dy": "18.93%"
     },
     {
       "t": "KNRI11",
@@ -5456,7 +3719,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 1.1,
-      "dy": "8.05%"
+      "dy": "8.11%"
     },
     {
       "t": "KORE11",
@@ -5465,7 +3728,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.6,
-      "dy": "9.66%"
+      "dy": "9.64%"
     },
     {
       "t": "LPLP11",
@@ -5510,7 +3773,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.1,
-      "dy": "12.68%"
+      "dy": "12.71%"
     },
     {
       "t": "NCRI11",
@@ -5519,7 +3782,7 @@
       "com": "2026-10-06",
       "pag": "2026-10-15",
       "val": 0.06,
-      "dy": "8.48%"
+      "dy": "8.62%"
     },
     {
       "t": "NEWL11",
@@ -5528,7 +3791,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 1.0,
-      "dy": "10.86%"
+      "dy": "10.82%"
     },
     {
       "t": "NEWU11",
@@ -5573,7 +3836,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.09,
-      "dy": "13.50%"
+      "dy": "13.55%"
     },
     {
       "t": "PMLL11",
@@ -5582,7 +3845,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 1.0,
-      "dy": "10.91%"
+      "dy": "11.00%"
     },
     {
       "t": "PNPR11",
@@ -5609,7 +3872,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.11,
-      "dy": "12.56%"
+      "dy": "12.48%"
     },
     {
       "t": "RBHG11",
@@ -5618,7 +3881,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.78,
-      "dy": "14.93%"
+      "dy": "14.98%"
     },
     {
       "t": "RBHY11",
@@ -5627,7 +3890,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.95,
-      "dy": "18.38%"
+      "dy": "18.31%"
     },
     {
       "t": "RBIR11",
@@ -5636,7 +3899,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 2.42,
-      "dy": "39.24%"
+      "dy": "38.72%"
     },
     {
       "t": "RBOP11",
@@ -5645,7 +3908,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 1.45,
-      "dy": "8.92%"
+      "dy": "9.21%"
     },
     {
       "t": "RBRD11",
@@ -5654,7 +3917,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.55,
-      "dy": "16.87%"
+      "dy": "16.83%"
     },
     {
       "t": "RBRL11",
@@ -5663,7 +3926,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.6,
-      "dy": "8.47%"
+      "dy": "8.37%"
     },
     {
       "t": "RBRP11",
@@ -5672,7 +3935,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-15",
       "val": 0.35,
-      "dy": "8.00%"
+      "dy": "7.95%"
     },
     {
       "t": "RBRS11",
@@ -5681,7 +3944,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.2,
-      "dy": "5.45%"
+      "dy": "5.33%"
     },
     {
       "t": "RBVA11",
@@ -5699,7 +3962,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 1.3,
-      "dy": "10.93%"
+      "dy": "10.54%"
     },
     {
       "t": "RECD11",
@@ -5708,7 +3971,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.05,
-      "dy": "10.89%"
+      "dy": "10.81%"
     },
     {
       "t": "RECM11",
@@ -5717,7 +3980,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-15",
       "val": 0.1,
-      "dy": "16.88%"
+      "dy": "16.76%"
     },
     {
       "t": "RECR11",
@@ -5762,7 +4025,7 @@
       "com": "2026-10-06",
       "pag": "2026-10-15",
       "val": 0.08,
-      "dy": "16.05%"
+      "dy": "16.11%"
     },
     {
       "t": "RMBS11",
@@ -5771,7 +4034,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-15",
       "val": 0.08,
-      "dy": "12.39%"
+      "dy": "12.53%"
     },
     {
       "t": "RNGO11",
@@ -5780,7 +4043,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.52,
-      "dy": "11.64%"
+      "dy": "11.65%"
     },
     {
       "t": "SAPI11",
@@ -5789,7 +4052,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.11,
-      "dy": "14.93%"
+      "dy": "15.15%"
     },
     {
       "t": "SEED11",
@@ -5807,7 +4070,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-15",
       "val": 0.59,
-      "dy": "13.05%"
+      "dy": "13.30%"
     },
     {
       "t": "SHPH11",
@@ -5816,7 +4079,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 4.5,
-      "dy": "5.53%"
+      "dy": "5.89%"
     },
     {
       "t": "SPXS11",
@@ -5825,7 +4088,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-15",
       "val": 0.1,
-      "dy": "15.11%"
+      "dy": "15.13%"
     },
     {
       "t": "TEPP11",
@@ -5834,7 +4097,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.07,
-      "dy": "10.84%"
+      "dy": "10.85%"
     },
     {
       "t": "TGAR11",
@@ -5852,7 +4115,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.44,
-      "dy": "9.78%"
+      "dy": "9.86%"
     },
     {
       "t": "TRXB11",
@@ -5870,7 +4133,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.93,
-      "dy": "15.54%"
+      "dy": "15.50%"
     },
     {
       "t": "TRXY11",
@@ -5879,7 +4142,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.11,
-      "dy": "17.17%"
+      "dy": "17.21%"
     },
     {
       "t": "TSER11",
@@ -5897,7 +4160,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 1.05,
-      "dy": "14.18%"
+      "dy": "14.32%"
     },
     {
       "t": "URPR11",
@@ -5906,7 +4169,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.3,
-      "dy": "16.76%"
+      "dy": "16.39%"
     },
     {
       "t": "VCRI11",
@@ -5915,7 +4178,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.09,
-      "dy": "14.42%"
+      "dy": "14.40%"
     },
     {
       "t": "VCRR11",
@@ -5924,7 +4187,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.56,
-      "dy": "11.98%"
+      "dy": "12.00%"
     },
     {
       "t": "VILG11",
@@ -5933,7 +4196,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.82,
-      "dy": "9.62%"
+      "dy": "9.68%"
     },
     {
       "t": "VINO11",
@@ -5942,7 +4205,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.04,
-      "dy": "10.23%"
+      "dy": "10.34%"
     },
     {
       "t": "VISC11",
@@ -5955,7 +4218,7 @@
     },
     {
       "t": "VJFD11",
-      "n": "JFDCAM Fundo de Investimento Imobiliario",
+      "n": "JFDCAM Fii-JFDM Fundstd Van F",
       "tipo": "Rendimento",
       "com": "2026-09-30",
       "pag": "2026-10-15",
@@ -5969,7 +4232,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 1.2,
-      "dy": "13.40%"
+      "dy": "13.67%"
     },
     {
       "t": "VRTA11",
@@ -5978,7 +4241,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.85,
-      "dy": "13.37%"
+      "dy": "13.43%"
     },
     {
       "t": "VRTM11",
@@ -5987,7 +4250,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.09,
-      "dy": "15.77%"
+      "dy": "15.74%"
     },
     {
       "t": "VSLH11",
@@ -5996,7 +4259,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-15",
       "val": 0.02,
-      "dy": "14.63%"
+      "dy": "14.55%"
     },
     {
       "t": "VVDI11",
@@ -6014,7 +4277,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.1,
-      "dy": "13.06%"
+      "dy": "13.16%"
     },
     {
       "t": "WPLZ11",
@@ -6023,7 +4286,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.37,
-      "dy": "8.88%"
+      "dy": "8.90%"
     },
     {
       "t": "XLPR11",
@@ -6041,7 +4304,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.82,
-      "dy": "11.93%"
+      "dy": "11.82%"
     },
     {
       "t": "XPLG11",
@@ -6050,7 +4313,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-15",
       "val": 0.82,
-      "dy": "9.73%"
+      "dy": "9.65%"
     },
     {
       "t": "XPSF11",
@@ -6077,7 +4340,7 @@
       "com": "2026-10-08",
       "pag": "2026-10-16",
       "val": 0.09,
-      "dy": "11.64%"
+      "dy": "11.69%"
     },
     {
       "t": "CLIN11",
@@ -6086,7 +4349,7 @@
       "com": "2026-10-08",
       "pag": "2026-10-16",
       "val": 1.0,
-      "dy": "12.81%"
+      "dy": "12.90%"
     },
     {
       "t": "EOG",
@@ -6104,7 +4367,7 @@
       "com": "2025-12-29",
       "pag": "2026-10-16",
       "val": 0.0779,
-      "dy": "14.96%"
+      "dy": "14.84%"
     },
     {
       "t": "FPAB11",
@@ -6113,7 +4376,7 @@
       "com": "2026-10-08",
       "pag": "2026-10-16",
       "val": 1.9,
-      "dy": "11.18%"
+      "dy": "11.40%"
     },
     {
       "t": "IBBP11",
@@ -6122,7 +4385,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-16",
       "val": 0.08,
-      "dy": "11.82%"
+      "dy": "11.84%"
     },
     {
       "t": "PCIP11",
@@ -6131,7 +4394,7 @@
       "com": "2026-10-08",
       "pag": "2026-10-16",
       "val": 0.65,
-      "dy": "9.57%"
+      "dy": "9.61%"
     },
     {
       "t": "PSEC11",
@@ -6140,7 +4403,7 @@
       "com": "2026-10-08",
       "pag": "2026-10-16",
       "val": 0.6,
-      "dy": "13.44%"
+      "dy": "13.48%"
     },
     {
       "t": "WSM",
@@ -6158,7 +4421,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-19",
       "val": 0.72,
-      "dy": "11.66%"
+      "dy": "11.70%"
     },
     {
       "t": "IBCR11",
@@ -6167,7 +4430,7 @@
       "com": "2026-10-09",
       "pag": "2026-10-19",
       "val": 0.59,
-      "dy": "14.98%"
+      "dy": "15.06%"
     },
     {
       "t": "IRIM11",
@@ -6194,7 +4457,7 @@
       "com": "2026-10-09",
       "pag": "2026-10-19",
       "val": 1.0,
-      "dy": "13.31%"
+      "dy": "13.65%"
     },
     {
       "t": "VTPL11",
@@ -6230,7 +4493,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-20",
       "val": 13.1,
-      "dy": "6.08%"
+      "dy": "6.05%"
     },
     {
       "t": "RZZR11",
@@ -6239,7 +4502,7 @@
       "com": "2026-10-13",
       "pag": "2026-10-20",
       "val": 1.24,
-      "dy": "11.05%"
+      "dy": "11.19%"
     },
     {
       "t": "TELM11",
@@ -6248,7 +4511,7 @@
       "com": "2026-10-13",
       "pag": "2026-10-20",
       "val": 0.09,
-      "dy": "11.37%"
+      "dy": "11.42%"
     },
     {
       "t": "VGIP11",
@@ -6257,7 +4520,7 @@
       "com": "2026-10-13",
       "pag": "2026-10-20",
       "val": 0.67,
-      "dy": "10.20%"
+      "dy": "10.29%"
     },
     {
       "t": "VGIR11",
@@ -6266,7 +4529,7 @@
       "com": "2026-10-13",
       "pag": "2026-10-20",
       "val": 0.13,
-      "dy": "16.22%"
+      "dy": "16.32%"
     },
     {
       "t": "APTO11",
@@ -6275,7 +4538,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-21",
       "val": 0.05,
-      "dy": "8.89%"
+      "dy": "8.92%"
     },
     {
       "t": "AURB11",
@@ -6311,7 +4574,7 @@
       "com": "2026-10-14",
       "pag": "2026-10-21",
       "val": 0.85,
-      "dy": "14.23%"
+      "dy": "14.15%"
     },
     {
       "t": "JCCJ11",
@@ -6320,7 +4583,7 @@
       "com": "2026-10-14",
       "pag": "2026-10-21",
       "val": 1.77,
-      "dy": "14.30%"
+      "dy": "14.17%"
     },
     {
       "t": "RCFF11",
@@ -6338,7 +4601,7 @@
       "com": "2026-10-14",
       "pag": "2026-10-21",
       "val": 1.1,
-      "dy": "12.86%"
+      "dy": "12.85%"
     },
     {
       "t": "RINV11",
@@ -6347,7 +4610,7 @@
       "com": "2026-10-14",
       "pag": "2026-10-21",
       "val": 1.05,
-      "dy": "11.78%"
+      "dy": "11.83%"
     },
     {
       "t": "TOPP11",
@@ -6356,7 +4619,7 @@
       "com": "2026-10-14",
       "pag": "2026-10-21",
       "val": 0.45,
-      "dy": "7.60%"
+      "dy": "7.48%"
     },
     {
       "t": "VITT3",
@@ -6365,7 +4628,7 @@
       "com": "2026-09-28",
       "pag": "2026-10-21",
       "val": 0.085,
-      "dy": "28.33%"
+      "dy": "27.79%"
     },
     {
       "t": "ZAGH11",
@@ -6374,7 +4637,7 @@
       "com": "2026-10-07",
       "pag": "2026-10-21",
       "val": 0.05,
-      "dy": "8.00%"
+      "dy": "8.01%"
     },
     {
       "t": "AFHF11",
@@ -6383,7 +4646,7 @@
       "com": "2026-10-15",
       "pag": "2026-10-22",
       "val": 0.12,
-      "dy": "13.85%"
+      "dy": "13.78%"
     },
     {
       "t": "AFHI11",
@@ -6392,7 +4655,7 @@
       "com": "2026-10-15",
       "pag": "2026-10-22",
       "val": 1.0,
-      "dy": "12.51%"
+      "dy": "12.49%"
     },
     {
       "t": "AJFI11",
@@ -6401,7 +4664,7 @@
       "com": "2026-10-15",
       "pag": "2026-10-22",
       "val": 0.06,
-      "dy": "8.36%"
+      "dy": "8.37%"
     },
     {
       "t": "CPLG11",
@@ -6410,7 +4673,7 @@
       "com": "2026-10-15",
       "pag": "2026-10-22",
       "val": 0.13,
-      "dy": "14.08%"
+      "dy": "14.02%"
     },
     {
       "t": "CPSH11",
@@ -6419,7 +4682,7 @@
       "com": "2026-10-15",
       "pag": "2026-10-22",
       "val": 0.11,
-      "dy": "13.12%"
+      "dy": "13.04%"
     },
     {
       "t": "CPTS11",
@@ -6437,7 +4700,7 @@
       "com": "2026-10-15",
       "pag": "2026-10-22",
       "val": 0.1,
-      "dy": "11.62%"
+      "dy": "11.82%"
     },
     {
       "t": "DAYM11",
@@ -6446,7 +4709,7 @@
       "com": "2026-10-15",
       "pag": "2026-10-22",
       "val": 0.04,
-      "dy": "11.91%"
+      "dy": "12.03%"
     },
     {
       "t": "GAME11",
@@ -6455,7 +4718,7 @@
       "com": "2026-10-09",
       "pag": "2026-10-22",
       "val": 0.1,
-      "dy": "14.02%"
+      "dy": "13.84%"
     },
     {
       "t": "GLCR11",
@@ -6500,7 +4763,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-22",
       "val": 0.12,
-      "dy": "15.40%"
+      "dy": "15.53%"
     },
     {
       "t": "MIDW11",
@@ -6518,7 +4781,7 @@
       "com": "2026-10-15",
       "pag": "2026-10-22",
       "val": 0.09,
-      "dy": "13.86%"
+      "dy": "13.97%"
     },
     {
       "t": "RBRX11",
@@ -6527,7 +4790,7 @@
       "com": "2026-10-15",
       "pag": "2026-10-22",
       "val": 0.09,
-      "dy": "14.14%"
+      "dy": "14.12%"
     },
     {
       "t": "RZAK11",
@@ -6536,7 +4799,7 @@
       "com": "2026-10-15",
       "pag": "2026-10-22",
       "val": 1.05,
-      "dy": "15.76%"
+      "dy": "15.85%"
     },
     {
       "t": "RZAT11",
@@ -6545,7 +4808,7 @@
       "com": "2026-10-15",
       "pag": "2026-10-22",
       "val": 0.95,
-      "dy": "13.32%"
+      "dy": "13.31%"
     },
     {
       "t": "RZZV11",
@@ -6563,7 +4826,7 @@
       "com": "2026-10-15",
       "pag": "2026-10-22",
       "val": 0.05,
-      "dy": "4.46%"
+      "dy": "4.62%"
     },
     {
       "t": "WTSP11",
@@ -6572,7 +4835,7 @@
       "com": "2026-10-15",
       "pag": "2026-10-22",
       "val": 0.7,
-      "dy": "12.63%"
+      "dy": "12.35%"
     },
     {
       "t": "BTLG11",
@@ -6581,7 +4844,7 @@
       "com": "2026-10-15",
       "pag": "2026-10-23",
       "val": 0.81,
-      "dy": "9.27%"
+      "dy": "9.34%"
     },
     {
       "t": "BVAR11",
@@ -6626,7 +4889,7 @@
       "com": "2026-10-15",
       "pag": "2026-10-23",
       "val": 1.0,
-      "dy": "14.10%"
+      "dy": "14.04%"
     },
     {
       "t": "SNEL11",
@@ -6635,7 +4898,7 @@
       "com": "2026-10-15",
       "pag": "2026-10-23",
       "val": 0.1,
-      "dy": "15.02%"
+      "dy": "15.09%"
     },
     {
       "t": "SNME11",
@@ -6644,7 +4907,7 @@
       "com": "2026-10-15",
       "pag": "2026-10-26",
       "val": 0.1,
-      "dy": "12.36%"
+      "dy": "12.41%"
     },
     {
       "t": "HBCR11",
@@ -6662,7 +4925,7 @@
       "com": "2026-06-25",
       "pag": "2026-10-28",
       "val": 0.0773,
-      "dy": "17.50%"
+      "dy": "18.08%"
     },
     {
       "t": "BCIA11",
@@ -6671,7 +4934,7 @@
       "com": "2026-09-30",
       "pag": "2026-10-29",
       "val": 0.86,
-      "dy": "11.39%"
+      "dy": "11.38%"
     },
     {
       "t": "IGTI11",
@@ -6680,7 +4943,7 @@
       "com": "2026-10-15",
       "pag": "2026-10-29",
       "val": 0.1687,
-      "dy": "6.25%"
+      "dy": "6.33%"
     },
     {
       "t": "IGTI3",
@@ -6689,7 +4952,7 @@
       "com": "2026-10-15",
       "pag": "2026-10-29",
       "val": 0.0241,
-      "dy": "6.89%"
+      "dy": "6.90%"
     },
     {
       "t": "BBDC3",
@@ -6698,7 +4961,7 @@
       "com": "2026-04-06",
       "pag": "2026-10-30",
       "val": 0.2703,
-      "dy": "17.79%"
+      "dy": "17.75%"
     },
     {
       "t": "BBDC4",
@@ -6707,7 +4970,7 @@
       "com": "2026-04-06",
       "pag": "2026-10-30",
       "val": 0.2973,
-      "dy": "17.25%"
+      "dy": "17.28%"
     },
     {
       "t": "EALT3",
@@ -6716,7 +4979,7 @@
       "com": "2026-04-29",
       "pag": "2026-10-30",
       "val": 0.0564,
-      "dy": "4.91%"
+      "dy": "5.21%"
     },
     {
       "t": "EALT4",
@@ -6725,7 +4988,7 @@
       "com": "2026-04-29",
       "pag": "2026-10-30",
       "val": 0.062,
-      "dy": "6.12%"
+      "dy": "6.22%"
     },
     {
       "t": "SEER3",
@@ -6734,7 +4997,7 @@
       "com": "2026-08-31",
       "pag": "2026-10-30",
       "val": 0.2028,
-      "dy": "13.60%"
+      "dy": "13.66%"
     },
     {
       "t": "SMFT3",
@@ -6743,7 +5006,7 @@
       "com": "2026-09-03",
       "pag": "2026-10-30",
       "val": 0.0654,
-      "dy": "3.06%"
+      "dy": "3.11%"
     },
     {
       "t": "VVMR11",
@@ -6752,7 +5015,7 @@
       "com": "2026-10-05",
       "pag": "2026-10-30",
       "val": 3.5,
-      "dy": "49.48%"
+      "dy": "49.49%"
     },
     {
       "t": "BBDC3",
@@ -6779,7 +5042,7 @@
       "com": "2026-10-01",
       "pag": "2026-11-03",
       "val": 0.0288,
-      "dy": "3.47%"
+      "dy": "3.44%"
     },
     {
       "t": "BEES4",
@@ -6788,7 +5051,7 @@
       "com": "2026-10-01",
       "pag": "2026-11-03",
       "val": 0.0288,
-      "dy": "3.51%"
+      "dy": "3.37%"
     },
     {
       "t": "ITUB3",
@@ -6815,7 +5078,7 @@
       "com": "2026-10-09",
       "pag": "2026-11-05",
       "val": 0.2604,
-      "dy": "18.81%"
+      "dy": "19.49%"
     },
     {
       "t": "WLMM4",
@@ -6824,7 +5087,7 @@
       "com": "2026-10-09",
       "pag": "2026-11-05",
       "val": 0.2865,
-      "dy": "20.24%"
+      "dy": "20.07%"
     },
     {
       "t": "CSMG3",
@@ -6833,7 +5096,7 @@
       "com": "2026-09-21",
       "pag": "2026-11-09",
       "val": 0.2556,
-      "dy": "4.83%"
+      "dy": "4.87%"
     },
     {
       "t": "ALLD3",
@@ -6842,7 +5105,7 @@
       "com": "2026-10-05",
       "pag": "2026-11-12",
       "val": 0.144,
-      "dy": "24.72%"
+      "dy": "24.48%"
     },
     {
       "t": "ALLD3",
@@ -6851,7 +5114,7 @@
       "com": "2026-10-05",
       "pag": "2026-11-12",
       "val": 0.4812,
-      "dy": "82.61%"
+      "dy": "81.79%"
     },
     {
       "t": "KLBN11",
@@ -6860,7 +5123,7 @@
       "com": "2025-12-15",
       "pag": "2026-11-12",
       "val": 0.228,
-      "dy": "14.85%"
+      "dy": "15.03%"
     },
     {
       "t": "KLBN3",
@@ -6869,7 +5132,7 @@
       "com": "2025-12-15",
       "pag": "2026-11-12",
       "val": 0.0456,
-      "dy": "14.55%"
+      "dy": "14.83%"
     },
     {
       "t": "KLBN4",
@@ -6878,7 +5141,7 @@
       "com": "2025-12-15",
       "pag": "2026-11-12",
       "val": 0.0456,
-      "dy": "14.83%"
+      "dy": "15.12%"
     },
     {
       "t": "INRD11",
@@ -6896,7 +5159,7 @@
       "com": "2026-09-25",
       "pag": "2026-11-18",
       "val": 0.5566,
-      "dy": "12.64%"
+      "dy": "12.71%"
     },
     {
       "t": "PETR3",
@@ -6905,7 +5168,7 @@
       "com": "2026-08-21",
       "pag": "2026-11-23",
       "val": 0.6741,
-      "dy": "12.47%"
+      "dy": "12.49%"
     },
     {
       "t": "PETR4",
@@ -6914,7 +5177,7 @@
       "com": "2026-08-21",
       "pag": "2026-11-23",
       "val": 0.6741,
-      "dy": "13.90%"
+      "dy": "14.01%"
     },
     {
       "t": "TAEE11",
@@ -6923,7 +5186,7 @@
       "com": "2026-08-14",
       "pag": "2026-11-26",
       "val": 0.2408,
-      "dy": "6.30%"
+      "dy": "6.39%"
     },
     {
       "t": "TAEE11",
@@ -6932,7 +5195,7 @@
       "com": "2026-08-14",
       "pag": "2026-11-26",
       "val": 0.3595,
-      "dy": "9.40%"
+      "dy": "9.54%"
     },
     {
       "t": "TAEE3",
@@ -6959,7 +5222,7 @@
       "com": "2026-08-14",
       "pag": "2026-11-26",
       "val": 0.0803,
-      "dy": "6.34%"
+      "dy": "6.29%"
     },
     {
       "t": "TAEE4",
@@ -6968,7 +5231,7 @@
       "com": "2026-08-14",
       "pag": "2026-11-26",
       "val": 0.1198,
-      "dy": "9.46%"
+      "dy": "9.38%"
     },
     {
       "t": "PSSA3",
@@ -6977,7 +5240,7 @@
       "com": "2026-03-31",
       "pag": "2026-11-30",
       "val": 0.8861,
-      "dy": "20.21%"
+      "dy": "20.56%"
     },
     {
       "t": "RAIL3",
@@ -6986,7 +5249,7 @@
       "com": "2026-04-28",
       "pag": "2026-11-30",
       "val": 0.1084,
-      "dy": "6.74%"
+      "dy": "6.86%"
     },
     {
       "t": "SAUD3",
@@ -6995,7 +5258,7 @@
       "com": "2026-06-30",
       "pag": "2026-11-30",
       "val": 0.0787,
-      "dy": "6.02%"
+      "dy": "6.12%"
     },
     {
       "t": "RADL3",
@@ -7004,7 +5267,7 @@
       "com": "2026-07-03",
       "pag": "2026-12-01",
       "val": 0.0272,
-      "dy": "1.51%"
+      "dy": "1.55%"
     },
     {
       "t": "RADL3",
@@ -7013,7 +5276,7 @@
       "com": "2026-04-06",
       "pag": "2026-12-01",
       "val": 0.086,
-      "dy": "4.78%"
+      "dy": "4.89%"
     },
     {
       "t": "RADL3",
@@ -7022,7 +5285,7 @@
       "com": "2026-07-03",
       "pag": "2026-12-01",
       "val": 0.0884,
-      "dy": "4.91%"
+      "dy": "5.02%"
     },
     {
       "t": "INRD11",
@@ -7049,7 +5312,7 @@
       "com": "2026-10-08",
       "pag": "2026-12-07",
       "val": 0.189,
-      "dy": "7.79%"
+      "dy": "7.83%"
     },
     {
       "t": "MTSA4",
@@ -7058,7 +5321,7 @@
       "com": "2026-09-21",
       "pag": "2026-12-10",
       "val": 0.55,
-      "dy": "14.33%"
+      "dy": "14.25%"
     },
     {
       "t": "CEGR3",
@@ -7085,7 +5348,7 @@
       "com": "2025-11-25",
       "pag": "2026-12-16",
       "val": 0.7634,
-      "dy": "24.97%"
+      "dy": "24.87%"
     },
     {
       "t": "SAUD3",
@@ -7094,7 +5357,7 @@
       "com": "2025-12-18",
       "pag": "2026-12-17",
       "val": 0.0509,
-      "dy": "3.90%"
+      "dy": "3.96%"
     },
     {
       "t": "SAUD3",
@@ -7103,7 +5366,7 @@
       "com": "2025-12-18",
       "pag": "2026-12-17",
       "val": 0.1926,
-      "dy": "14.74%"
+      "dy": "14.99%"
     },
     {
       "t": "VLID3",
@@ -7112,7 +5375,7 @@
       "com": "2025-11-28",
       "pag": "2026-12-18",
       "val": 0.3765,
-      "dy": "22.20%"
+      "dy": "22.96%"
     },
     {
       "t": "PETR3",
@@ -7130,7 +5393,7 @@
       "com": "2026-08-21",
       "pag": "2026-12-21",
       "val": 0.4716,
-      "dy": "8.73%"
+      "dy": "8.74%"
     },
     {
       "t": "PETR4",
@@ -7139,7 +5402,7 @@
       "com": "2026-08-21",
       "pag": "2026-12-21",
       "val": 0.2025,
-      "dy": "4.17%"
+      "dy": "4.21%"
     },
     {
       "t": "PETR4",
@@ -7148,7 +5411,7 @@
       "com": "2026-08-21",
       "pag": "2026-12-21",
       "val": 0.4716,
-      "dy": "9.72%"
+      "dy": "9.80%"
     },
     {
       "t": "JSLG3",
@@ -7157,7 +5420,7 @@
       "com": "2025-12-29",
       "pag": "2026-12-28",
       "val": 1.4803,
-      "dy": "149.53%"
+      "dy": "148.65%"
     },
     {
       "t": "RIAA3",
@@ -7166,7 +5429,7 @@
       "com": "2026-05-13",
       "pag": "2026-12-28",
       "val": 0.0797,
-      "dy": "8.54%"
+      "dy": "8.69%"
     },
     {
       "t": "ARML3",
@@ -7175,7 +5438,7 @@
       "com": "2026-01-08",
       "pag": "2026-12-30",
       "val": 0.3036,
-      "dy": "52.12%"
+      "dy": "52.80%"
     },
     {
       "t": "BALM3",
@@ -7256,7 +5519,7 @@
       "com": "2025-06-25",
       "pag": "2026-12-30",
       "val": 0.7894,
-      "dy": "4.99%"
+      "dy": "4.98%"
     },
     {
       "t": "CLSC4",
@@ -7274,7 +5537,7 @@
       "com": "2025-09-24",
       "pag": "2026-12-30",
       "val": 1.0069,
-      "dy": "6.37%"
+      "dy": "6.36%"
     },
     {
       "t": "CLSC4",
@@ -7283,7 +5546,7 @@
       "com": "2025-12-17",
       "pag": "2026-12-30",
       "val": 1.2171,
-      "dy": "7.70%"
+      "dy": "7.69%"
     },
     {
       "t": "CMIG3",
@@ -7292,7 +5555,7 @@
       "com": "2026-04-30",
       "pag": "2026-12-30",
       "val": 0.1182,
-      "dy": "7.97%"
+      "dy": "8.04%"
     },
     {
       "t": "CMIG4",
@@ -7301,7 +5564,7 @@
       "com": "2026-04-30",
       "pag": "2026-12-30",
       "val": 0.1182,
-      "dy": "11.99%"
+      "dy": "12.12%"
     },
     {
       "t": "DESK3",
@@ -7310,7 +5573,7 @@
       "com": "2026-04-29",
       "pag": "2026-12-30",
       "val": 0.0439,
-      "dy": "2.72%"
+      "dy": "2.73%"
     },
     {
       "t": "EQTL3",
@@ -7319,7 +5582,7 @@
       "com": "2025-12-29",
       "pag": "2026-12-30",
       "val": 0.1333,
-      "dy": "3.23%"
+      "dy": "3.29%"
     },
     {
       "t": "MDNE3",
@@ -7328,7 +5591,7 @@
       "com": "2025-12-30",
       "pag": "2026-12-30",
       "val": 0.5918,
-      "dy": "23.18%"
+      "dy": "23.22%"
     },
     {
       "t": "MULT3",
@@ -7337,7 +5600,7 @@
       "com": "2025-12-29",
       "pag": "2026-12-30",
       "val": 0.3065,
-      "dy": "9.69%"
+      "dy": "9.87%"
     },
     {
       "t": "RDOR3",
@@ -7346,7 +5609,7 @@
       "com": "2025-12-18",
       "pag": "2026-12-30",
       "val": 0.9517,
-      "dy": "25.90%"
+      "dy": "26.13%"
     },
     {
       "t": "TEND3",
@@ -7364,7 +5627,7 @@
       "com": "2026-06-22",
       "pag": "2026-12-31",
       "val": 0.0449,
-      "dy": "3.20%"
+      "dy": "3.23%"
     },
     {
       "t": "ABEV3",
@@ -7373,7 +5636,7 @@
       "com": "2026-09-21",
       "pag": "2026-12-31",
       "val": 0.0713,
-      "dy": "5.08%"
+      "dy": "5.13%"
     },
     {
       "t": "ABEV3",
@@ -7382,7 +5645,7 @@
       "com": "2025-12-18",
       "pag": "2026-12-31",
       "val": 0.269,
-      "dy": "19.16%"
+      "dy": "19.34%"
     },
     {
       "t": "AFLT3",
@@ -7391,7 +5654,7 @@
       "com": "2026-06-24",
       "pag": "2026-12-31",
       "val": 0.1535,
-      "dy": "27.01%"
+      "dy": "27.05%"
     },
     {
       "t": "AFLT3",
@@ -7400,7 +5663,7 @@
       "com": "2026-07-24",
       "pag": "2026-12-31",
       "val": 0.1585,
-      "dy": "27.89%"
+      "dy": "27.93%"
     },
     {
       "t": "AFLT3",
@@ -7409,7 +5672,7 @@
       "com": "2026-04-09",
       "pag": "2026-12-31",
       "val": 0.2354,
-      "dy": "41.42%"
+      "dy": "41.48%"
     },
     {
       "t": "CEEB3",
@@ -7418,7 +5681,7 @@
       "com": "2026-06-24",
       "pag": "2026-12-31",
       "val": 0.4965,
-      "dy": "12.68%"
+      "dy": "12.90%"
     },
     {
       "t": "CEEB3",
@@ -7427,7 +5690,7 @@
       "com": "2026-03-10",
       "pag": "2026-12-31",
       "val": 0.4997,
-      "dy": "12.76%"
+      "dy": "12.98%"
     },
     {
       "t": "CEEB5",
@@ -7454,7 +5717,7 @@
       "com": "2026-01-02",
       "pag": "2026-12-31",
       "val": 0.0302,
-      "dy": "7.25%"
+      "dy": "7.31%"
     },
     {
       "t": "CMIN3",
@@ -7463,7 +5726,7 @@
       "com": "2026-01-02",
       "pag": "2026-12-31",
       "val": 0.0478,
-      "dy": "11.47%"
+      "dy": "11.56%"
     },
     {
       "t": "CMIN3",
@@ -7472,7 +5735,7 @@
       "com": "2026-04-16",
       "pag": "2026-12-31",
       "val": 0.1415,
-      "dy": "33.96%"
+      "dy": "34.23%"
     },
     {
       "t": "COCE3",
@@ -7490,7 +5753,7 @@
       "com": "2026-04-29",
       "pag": "2026-12-31",
       "val": 1.4833,
-      "dy": "46.96%"
+      "dy": "47.89%"
     },
     {
       "t": "CPFE3",
@@ -7499,7 +5762,7 @@
       "com": "2026-04-29",
       "pag": "2026-12-31",
       "val": 3.7315,
-      "dy": "89.43%"
+      "dy": "90.44%"
     },
     {
       "t": "CURY3",
@@ -7508,7 +5771,7 @@
       "com": "2026-02-04",
       "pag": "2026-12-31",
       "val": 0.4545,
-      "dy": "16.65%"
+      "dy": "16.85%"
     },
     {
       "t": "EKTR3",
@@ -7643,7 +5906,7 @@
       "com": "2025-12-29",
       "pag": "2026-12-31",
       "val": 1.4803,
-      "dy": "149.53%"
+      "dy": "148.65%"
     },
     {
       "t": "LUXM4",
@@ -7661,7 +5924,7 @@
       "com": "2026-04-29",
       "pag": "2026-12-31",
       "val": 0.1004,
-      "dy": "36.51%"
+      "dy": "37.19%"
     },
     {
       "t": "PASS3",
@@ -7670,7 +5933,7 @@
       "com": "2026-05-04",
       "pag": "2026-12-31",
       "val": 0.5678,
-      "dy": "24.22%"
+      "dy": "24.73%"
     },
     {
       "t": "PATI3",
@@ -7679,16 +5942,16 @@
       "com": "2026-04-28",
       "pag": "2026-12-31",
       "val": 0.4337,
-      "dy": "18.51%"
+      "dy": "18.14%"
     },
     {
       "t": "PATI4",
-      "n": "Panatlântica S.A.",
+      "n": "Panatlantica S.A. Pfd",
       "tipo": "DIVIDENDO",
       "com": "2026-04-28",
       "pag": "2026-12-31",
       "val": 1.8604,
-      "dy": "75.73%"
+      "dy": "62.98%"
     },
     {
       "t": "QUAL3",
@@ -7697,7 +5960,7 @@
       "com": "2026-06-29",
       "pag": "2026-12-31",
       "val": 0.009,
-      "dy": "4.91%"
+      "dy": "5.07%"
     },
     {
       "t": "RECV3",
@@ -7706,7 +5969,7 @@
       "com": "2026-01-08",
       "pag": "2026-12-31",
       "val": 0.3413,
-      "dy": "32.15%"
+      "dy": "33.03%"
     },
     {
       "t": "ROMI3",
@@ -7715,7 +5978,7 @@
       "com": "2025-12-30",
       "pag": "2026-12-31",
       "val": 0.18,
-      "dy": "29.47%"
+      "dy": "27.62%"
     },
     {
       "t": "SBFG3",
@@ -7724,7 +5987,7 @@
       "com": "2026-04-24",
       "pag": "2026-12-31",
       "val": 0.5429,
-      "dy": "55.12%"
+      "dy": "56.65%"
     },
     {
       "t": "SUZB3",
@@ -7742,7 +6005,7 @@
       "com": "2026-04-28",
       "pag": "2026-12-31",
       "val": 0.3126,
-      "dy": "51.60%"
+      "dy": "53.74%"
     },
     {
       "t": "WIZC3",
@@ -7751,7 +6014,7 @@
       "com": "2025-12-26",
       "pag": "2026-12-31",
       "val": 0.3161,
-      "dy": "52.18%"
+      "dy": "54.34%"
     },
     {
       "t": "SHUL4",
@@ -7760,7 +6023,7 @@
       "com": "2026-09-24",
       "pag": "2027-01-15",
       "val": 0.0803,
-      "dy": "18.18%"
+      "dy": "18.78%"
     }
   ]
 }
