@@ -1,5 +1,5 @@
 {
-  "updated_at": "28/10/2026 14:44",
+  "updated_at": "28/10/2026 15:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,20 +1128,20 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 170434.77,
-      "changePct": -0.03,
+      "price": 170479.55,
+      "changePct": -0.0298,
       "high": 175711.22,
-      "low": 170297.16
+      "low": 170169.77
     },
     {
       "ticker": "INDEXBVMF:IFIX",
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3651.95,
+      "price": 3652.22,
       "changePct": -0.018000000000000002,
       "high": 3720.19,
-      "low": 3650.94
+      "low": 3648.69
     },
     {
       "ticker": "INDEXBVMF:SMLL",
@@ -1158,10 +1158,10 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 11924.06,
-      "changePct": -0.0318,
+      "price": 11915.9,
+      "changePct": -0.0325,
       "high": 12316.57,
-      "low": 11923.48
+      "low": 11901.52
     },
     {
       "ticker": "INDEXBVMF:IMAB",
@@ -1188,8 +1188,8 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7735.32,
-      "changePct": 0.0016,
+      "price": 7728.56,
+      "changePct": 0.0008,
       "high": 7751.06,
       "low": 7718.37
     },
@@ -1198,8 +1198,8 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 26473.99,
-      "changePct": -0.0001,
+      "price": 26435.91,
+      "changePct": -0.0016,
       "high": 26582.01,
       "low": 26428.26
     },
@@ -1208,8 +1208,8 @@
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 52494.3,
-      "changePct": 0.0022,
+      "price": 52470.38,
+      "changePct": 0.0018,
       "high": 52634.32,
       "low": 52335.43
     },
@@ -1218,8 +1218,8 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2821.95,
-      "changePct": 0.0011,
+      "price": 2822.51,
+      "changePct": 0.0013,
       "high": 2827.5,
       "low": 2815.24
     },
