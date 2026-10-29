@@ -1,5 +1,5 @@
 {
-  "updated_at": "29/10/2026 10:44",
+  "updated_at": "29/10/2026 11:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,9 +1128,9 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 170713.55,
+      "price": 170714.98,
       "changePct": -0.0017000000000000001,
-      "high": 171034.05,
+      "high": 171402.97,
       "low": 170255.95
     },
     {
@@ -1138,10 +1138,10 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3652.43,
-      "changePct": -0.0005,
+      "price": 3647.69,
+      "changePct": -0.0018,
       "high": 3664.96,
-      "low": 3650.27
+      "low": 3647.69
     },
     {
       "ticker": "INDEXBVMF:SMLL",
@@ -1158,9 +1158,9 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 11957.33,
-      "changePct": -0.0011,
-      "high": 11975.62,
+      "price": 11939.05,
+      "changePct": -0.0027,
+      "high": 12003.37,
       "low": 11912.55
     },
     {
@@ -1188,9 +1188,9 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7711.16,
-      "changePct": -0.0042,
-      "high": 7713.69,
+      "price": 7708.22,
+      "changePct": -0.0046,
+      "high": 7724.02,
       "low": 7695.75
     },
     {
@@ -1198,9 +1198,9 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 26192.4,
-      "changePct": -0.013500000000000002,
-      "high": 26209.84,
+      "price": 26162.35,
+      "changePct": -0.0146,
+      "high": 26231.48,
       "low": 26053.16
     },
     {
@@ -1208,9 +1208,9 @@
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 52247.43,
-      "changePct": -0.0043,
-      "high": 52325.44,
+      "price": 52295.24,
+      "changePct": -0.0034000000000000002,
+      "high": 52405.88,
       "low": 52086.13
     },
     {
@@ -1218,10 +1218,10 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2830.51,
-      "changePct": 0.0040999999999999995,
-      "high": 2830.9,
-      "low": 2810.95
+      "price": 2858.39,
+      "changePct": 0.0098,
+      "high": 2858.42,
+      "low": 2841.43
     },
     {
       "ticker": "CBOE:VIX",
@@ -1238,9 +1238,9 @@
       "stale": false,
       "descricao": "FTSE 100 (Reino Unido)",
       "tipo": "Índice Global",
-      "price": 10759.26,
-      "changePct": 0.0060999999999999995,
-      "high": 10771.8,
+      "price": 10732.87,
+      "changePct": 0.0036,
+      "high": 10773.7,
       "low": 10694.02
     },
     {
@@ -1248,9 +1248,9 @@
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 26030.59,
-      "changePct": 0.0127,
-      "high": 26051.46,
+      "price": 26071.57,
+      "changePct": 0.0143,
+      "high": 26106.19,
       "low": 25720.69
     },
     {
