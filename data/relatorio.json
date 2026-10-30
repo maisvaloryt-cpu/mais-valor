@@ -1,5 +1,5 @@
 {
-  "gerado_em": "28/10/2026 21:57",
+  "gerado_em": "29/10/2026 21:53",
   "historico_mensal": {
     "total": 1596,
     "ok": 1593,
@@ -27,110 +27,110 @@
       {
         "ticker": "ADHM3",
         "ultimo": "2026-09-18",
-        "dias_atras": 40
+        "dias_atras": 41
       },
       {
         "ticker": "AEFI11",
         "ultimo": "2026-09-18",
-        "dias_atras": 40
+        "dias_atras": 41
       },
       {
         "ticker": "AFOF11",
         "ultimo": "2026-09-18",
-        "dias_atras": 40
+        "dias_atras": 41
       },
       {
         "ticker": "BPHA3",
         "ultimo": "2026-09-18",
-        "dias_atras": 40
+        "dias_atras": 41
       },
       {
         "ticker": "BREV11",
         "ultimo": "2026-06-20",
-        "dias_atras": 130
+        "dias_atras": 131
       },
       {
         "ticker": "BRGE11",
         "ultimo": "2026-09-18",
-        "dias_atras": 40
+        "dias_atras": 41
       },
       {
         "ticker": "BRGE12",
         "ultimo": "2026-09-18",
-        "dias_atras": 40
+        "dias_atras": 41
       },
       {
         "ticker": "BRGE3",
         "ultimo": "2026-09-18",
-        "dias_atras": 40
+        "dias_atras": 41
       },
       {
         "ticker": "BRGE5",
         "ultimo": "2026-09-18",
-        "dias_atras": 40
+        "dias_atras": 41
       },
       {
         "ticker": "BRGE6",
         "ultimo": "2026-09-18",
-        "dias_atras": 40
+        "dias_atras": 41
       },
       {
         "ticker": "BRGE7",
         "ultimo": "2026-09-18",
-        "dias_atras": 40
+        "dias_atras": 41
       },
       {
         "ticker": "BRGE8",
         "ultimo": "2026-09-18",
-        "dias_atras": 40
+        "dias_atras": 41
       },
       {
         "ticker": "BRIM11",
         "ultimo": "2026-06-11",
-        "dias_atras": 139
+        "dias_atras": 140
       },
       {
         "ticker": "BRIV3",
         "ultimo": "2026-09-18",
-        "dias_atras": 40
+        "dias_atras": 41
       },
       {
         "ticker": "BRIV4",
         "ultimo": "2026-09-18",
-        "dias_atras": 40
+        "dias_atras": 41
       },
       {
         "ticker": "BRPR3",
         "ultimo": "2026-09-18",
-        "dias_atras": 40
+        "dias_atras": 41
       },
       {
         "ticker": "CCRF11",
         "ultimo": "2026-08-19",
-        "dias_atras": 70
+        "dias_atras": 71
       },
       {
         "ticker": "CORR3",
         "ultimo": "2026-09-18",
-        "dias_atras": 40
+        "dias_atras": 41
       },
       {
         "ticker": "CORR4",
         "ultimo": "2026-09-18",
-        "dias_atras": 40
+        "dias_atras": 41
       },
       {
         "ticker": "CRIV3",
         "ultimo": "2026-09-18",
-        "dias_atras": 40
+        "dias_atras": 41
       }
     ]
   },
   "cotacoes": {
-    "atualizado_em": "28/10/2026 21:34",
-    "total_acoes": 477,
+    "atualizado_em": "29/10/2026 21:31",
+    "total_acoes": 476,
     "total_fiis": 514,
-    "fallbacks": 55,
+    "fallbacks": 56,
     "tickers_fallback": [
       "NGRD3",
       "EMAE4",
@@ -153,8 +153,8 @@
       "BRGE6",
       "BRGE7",
       "BRGE8",
-      "BRGE5",
       "BRGE11",
+      "BRGE5",
       "BRGE12",
       "BRGE3",
       "CRIV4",
@@ -182,6 +182,7 @@
       "RBBV11",
       "RBGS11",
       "RBRM11",
+      "SPG211",
       "SRVD11",
       "TBOF11",
       "THRA11",
@@ -190,13 +191,13 @@
     ]
   },
   "fundamentus": {
-    "atualizado_em": "28/10/2026 21:34",
-    "total_acoes": 995,
+    "atualizado_em": "29/10/2026 21:31",
+    "total_acoes": 994,
     "total_fiis": 567,
-    "atualizado_fiis": "28/10/2026 21:34"
+    "atualizado_fiis": "29/10/2026 21:31"
   },
   "criptos": {
-    "atualizado_em": "28/10/2026 22:18 UTC",
+    "atualizado_em": "29/10/2026 22:32 UTC",
     "total_moedas": 100,
     "com_dados": 100,
     "sem_dados": 0,
@@ -213,8 +214,8 @@
   "resumo": {
     "acoes_com_historico": 1593,
     "fiis_com_historico": 413,
-    "cotacoes_atuais": 991,
-    "indicadores_fundamentus": 1562,
+    "cotacoes_atuais": 990,
+    "indicadores_fundamentus": 1561,
     "criptos_atuais": 100,
     "status_geral": "✅ OK"
   }
