@@ -1,5 +1,5 @@
 {
-  "updated_at": "02/11/2026 16:44",
+  "updated_at": "02/11/2026 17:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1188,28 +1188,28 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7563.15,
-      "changePct": -0.0022,
+      "price": 7567.31,
+      "changePct": -0.0017000000000000001,
       "high": 7662.23,
-      "low": 7559.26
+      "low": 7554.78
     },
     {
       "ticker": "INDEXNASDAQ:.IXIC",
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 25280.75,
-      "changePct": -0.0060999999999999995,
+      "price": 25299.8,
+      "changePct": -0.0054,
       "high": 25799.46,
-      "low": 25262.16
+      "low": 25227.98
     },
     {
       "ticker": "INDEXDJX:.DJI",
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 52088.68,
-      "changePct": 0.0060999999999999995,
+      "price": 52114.97,
+      "changePct": 0.0067,
       "high": 52424.91,
       "low": 52008.23
     },
@@ -1218,10 +1218,10 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2816.37,
-      "changePct": 0.0016,
+      "price": 2815.73,
+      "changePct": 0.0014000000000000002,
       "high": 2846.03,
-      "low": 2813.18
+      "low": 2810.33
     },
     {
       "ticker": "CBOE:VIX",
