@@ -1,54 +1,9 @@
 {
-  "updated_at": "01/11/2026 11:59",
-  "total": 771,
+  "updated_at": "03/11/2026 00:03",
+  "total": 766,
   "total_registros": 70620,
   "total_ativos": 1639,
   "dividendos": [
-    {
-      "t": "BRSR3",
-      "n": "Banco do Estado do Rio Grande do Sul SA",
-      "tipo": "JRS CAP PROPRIO",
-      "com": "2026-09-11",
-      "pag": "2026-09-28",
-      "val": 0.2201,
-      "dy": "15.75%"
-    },
-    {
-      "t": "BRSR5",
-      "n": "Banco do Estado do Rio Grande do Sul SA 6 % Conv Pfd A",
-      "tipo": "JRS CAP PROPRIO",
-      "com": "2026-09-11",
-      "pag": "2026-09-28",
-      "val": 0.2201,
-      "dy": "14.68%"
-    },
-    {
-      "t": "BRSR6",
-      "n": "Banco do Estado do Rio Grande do Sul SA Pfd Series B",
-      "tipo": "JRS CAP PROPRIO",
-      "com": "2026-09-11",
-      "pag": "2026-09-28",
-      "val": 0.2201,
-      "dy": "21.37%"
-    },
-    {
-      "t": "FLRY3",
-      "n": "Fleury SA",
-      "tipo": "JRS CAP PROPRIO",
-      "com": "2026-08-11",
-      "pag": "2026-09-28",
-      "val": 0.4007,
-      "dy": "23.49%"
-    },
-    {
-      "t": "KDP",
-      "n": "KDP",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-09-28",
-      "val": 0.23,
-      "dy": ""
-    },
     {
       "t": "BCIA11",
       "n": "Bradesco Carteira Imobiliatia Ative- Fundo de Fundos de Investimento Imobiliario- FII Cotas",
@@ -4056,7 +4011,7 @@
     },
     {
       "t": "APXM11",
-      "n": "Fundo De Investimento Imobiliario Apex Malls - FII",
+      "n": "Vinci Malls II Fundo de Investimento Imobiliário Responsabilidade Limitada",
       "tipo": "Rendimento",
       "com": "2026-10-20",
       "pag": "2026-10-27",
