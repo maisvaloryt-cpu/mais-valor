@@ -1,5 +1,5 @@
 {
-  "gerado_em": "03/11/2026 00:03",
+  "gerado_em": "03/11/2026 22:18",
   "historico_mensal": {
     "total": 1599,
     "ok": 1595,
@@ -25,8 +25,8 @@
   },
   "historico_diario": {
     "total": 993,
-    "atualizados": 935,
-    "desatualizados": 58,
+    "atualizados": 937,
+    "desatualizados": 56,
     "lista_desatualizados": [
       {
         "ticker": "ADHM3",
@@ -131,10 +131,10 @@
     ]
   },
   "cotacoes": {
-    "atualizado_em": "02/11/2026 23:43",
+    "atualizado_em": "03/11/2026 21:59",
     "total_acoes": 477,
     "total_fiis": 514,
-    "fallbacks": 56,
+    "fallbacks": 54,
     "tickers_fallback": [
       "NGRD3",
       "EMAE4",
@@ -149,16 +149,14 @@
       "CORR4",
       "SLED3",
       "NEOE3",
-      "MRSA6B",
-      "MRSA5B",
       "PTNT3",
       "PTNT4",
       "TKNO4",
       "BRGE6",
       "BRGE7",
       "BRGE8",
-      "BRGE11",
       "BRGE5",
+      "BRGE11",
       "BRGE12",
       "BRGE3",
       "CRIV4",
@@ -195,13 +193,13 @@
     ]
   },
   "fundamentus": {
-    "atualizado_em": "02/11/2026 23:43",
+    "atualizado_em": "03/11/2026 21:59",
     "total_acoes": 995,
     "total_fiis": 567,
-    "atualizado_fiis": "02/11/2026 23:43"
+    "atualizado_fiis": "03/11/2026 21:59"
   },
   "criptos": {
-    "atualizado_em": "03/11/2026 00:41 UTC",
+    "atualizado_em": "03/11/2026 22:59 UTC",
     "total_moedas": 100,
     "com_dados": 100,
     "sem_dados": 0,
