@@ -1,5 +1,5 @@
 {
-  "updated_at": "04/11/2026 16:14",
+  "updated_at": "04/11/2026 16:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,8 +1128,8 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 167196.36,
-      "changePct": 0.0101,
+      "price": 167309.17,
+      "changePct": 0.0108,
       "high": 167986.38,
       "low": 165541.38
     },
@@ -1138,8 +1138,8 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3541.74,
-      "changePct": 0.004699999999999999,
+      "price": 3542.26,
+      "changePct": 0.0048,
       "high": 3554.13,
       "low": 3516.06
     },
@@ -1158,8 +1158,8 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 11646.72,
-      "changePct": 0.0085,
+      "price": 11664.34,
+      "changePct": 0.01,
       "high": 11708.59,
       "low": 11549.17
     },
@@ -1188,8 +1188,8 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7707.15,
-      "changePct": 0.0183,
+      "price": 7702.51,
+      "changePct": 0.0176,
       "high": 7715.57,
       "low": 7635.81
     },
@@ -1198,8 +1198,8 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 25873.22,
-      "changePct": 0.019799999999999998,
+      "price": 25840.41,
+      "changePct": 0.018500000000000003,
       "high": 26048.83,
       "low": 25602.14
     },
@@ -1208,9 +1208,9 @@
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 53355.35,
-      "changePct": 0.030299999999999997,
-      "high": 53369.12,
+      "price": 53352.71,
+      "changePct": 0.0302,
+      "high": 53370.64,
       "low": 52410.23
     },
     {
@@ -1218,8 +1218,8 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2854.68,
-      "changePct": 0.015,
+      "price": 2855.36,
+      "changePct": 0.015300000000000001,
       "high": 2875.14,
       "low": 2831.51
     },
