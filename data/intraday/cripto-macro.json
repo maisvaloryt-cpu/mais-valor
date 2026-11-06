@@ -1,5 +1,5 @@
 {
-  "updated_at": "06/11/2026 10:14",
+  "updated_at": "06/11/2026 10:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,20 +1128,20 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 166191.45,
-      "changePct": -0.008199999999999999,
-      "high": 168994.33,
-      "low": 166189.73
+      "price": 166686.89,
+      "changePct": 0.003,
+      "high": 166686.89,
+      "low": 165909.73
     },
     {
       "ticker": "INDEXBVMF:IFIX",
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3602.02,
-      "changePct": 0.012199999999999999,
-      "high": 3604.67,
-      "low": 3553.31
+      "price": 3611.52,
+      "changePct": 0.0026,
+      "high": 3611.52,
+      "low": 3592.59
     },
     {
       "ticker": "INDEXBVMF:SMLL",
@@ -1158,10 +1158,10 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 11591.35,
-      "changePct": -0.0087,
-      "high": 11776.33,
-      "low": 11591.35
+      "price": 11617.06,
+      "changePct": 0.0022,
+      "high": 11622.42,
+      "low": 11566.8
     },
     {
       "ticker": "INDEXBVMF:IMAB",
@@ -1209,9 +1209,9 @@
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
       "price": 51523.06,
-      "changePct": -0.0344,
-      "high": 53710.61,
-      "low": 51486.82
+      "changePct": 0,
+      "high": null,
+      "low": null
     },
     {
       "ticker": "INDEXRUSSELL:RUT",
@@ -1238,8 +1238,8 @@
       "stale": false,
       "descricao": "FTSE 100 (Reino Unido)",
       "tipo": "Índice Global",
-      "price": 10567.48,
-      "changePct": -0.02,
+      "price": 10563.97,
+      "changePct": -0.0203,
       "high": 10784.16,
       "low": 10528.07
     },
@@ -1248,10 +1248,10 @@
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 25702.61,
-      "changePct": -0.0236,
+      "price": 25756.36,
+      "changePct": -0.0216,
       "high": 26061.64,
-      "low": 25661.42
+      "low": 25658.61
     },
     {
       "ticker": "INDEXEURO:SX5E",
