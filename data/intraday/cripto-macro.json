@@ -1,5 +1,5 @@
 {
-  "updated_at": "10/11/2026 10:14",
+  "updated_at": "10/11/2026 10:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,20 +1128,20 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 172236.05,
-      "changePct": 0,
-      "high": null,
-      "low": null
+      "price": 172992.81,
+      "changePct": 0.0044,
+      "high": 173271.61,
+      "low": 172210.98
     },
     {
       "ticker": "INDEXBVMF:IFIX",
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3590.39,
-      "changePct": 0,
-      "high": null,
-      "low": null
+      "price": 3590.21,
+      "changePct": -0.0001,
+      "high": 3597.2,
+      "low": 3589.57
     },
     {
       "ticker": "INDEXBVMF:SMLL",
@@ -1158,10 +1158,10 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 12050.72,
-      "changePct": 0,
-      "high": null,
-      "low": null
+      "price": 12110.83,
+      "changePct": 0.005,
+      "high": 12129.85,
+      "low": 12050.92
     },
     {
       "ticker": "INDEXBVMF:IMAB",
@@ -1209,9 +1209,9 @@
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
       "price": 52389.75,
-      "changePct": 0.0215,
-      "high": 52574.34,
-      "low": 51643.01
+      "changePct": 0,
+      "high": null,
+      "low": null
     },
     {
       "ticker": "INDEXRUSSELL:RUT",
@@ -1238,8 +1238,8 @@
       "stale": false,
       "descricao": "FTSE 100 (Reino Unido)",
       "tipo": "Índice Global",
-      "price": 10832.3,
-      "changePct": 0.0046,
+      "price": 10820.43,
+      "changePct": 0.0034999999999999996,
       "high": 10868.51,
       "low": 10775.76
     },
@@ -1248,8 +1248,8 @@
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 26584.6,
-      "changePct": 0.0121,
+      "price": 26596.36,
+      "changePct": 0.0125,
       "high": 26633.78,
       "low": 26460.64
     },
