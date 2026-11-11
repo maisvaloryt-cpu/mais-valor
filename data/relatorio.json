@@ -1,5 +1,5 @@
 {
-  "gerado_em": "10/11/2026 00:23",
+  "gerado_em": "10/11/2026 22:19",
   "historico_mensal": {
     "total": 1599,
     "ok": 1595,
@@ -131,7 +131,7 @@
     ]
   },
   "cotacoes": {
-    "atualizado_em": "10/11/2026 00:04",
+    "atualizado_em": "10/11/2026 21:58",
     "total_acoes": 480,
     "total_fiis": 515,
     "fallbacks": 58,
@@ -197,13 +197,13 @@
     ]
   },
   "fundamentus": {
-    "atualizado_em": "10/11/2026 00:04",
+    "atualizado_em": "10/11/2026 21:58",
     "total_acoes": 998,
     "total_fiis": 568,
-    "atualizado_fiis": "10/11/2026 00:04"
+    "atualizado_fiis": "10/11/2026 21:58"
   },
   "criptos": {
-    "atualizado_em": "10/11/2026 01:16 UTC",
+    "atualizado_em": "10/11/2026 22:56 UTC",
     "total_moedas": 100,
     "com_dados": 100,
     "sem_dados": 0,
