@@ -1,5 +1,5 @@
 {
-  "updated_at": "11/11/2026 17:14",
+  "updated_at": "11/11/2026 17:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,8 +1128,8 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 172307.48,
-      "changePct": 0.005699999999999999,
+      "price": 172288.11,
+      "changePct": 0.005600000000000001,
       "high": 172986.66,
       "low": 171335.2
     },
@@ -1138,7 +1138,7 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3600.01,
+      "price": 3599.77,
       "changePct": 0.0074,
       "high": 3602.53,
       "low": 3573.49
@@ -1158,8 +1158,8 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 12108.33,
-      "changePct": 0.0078000000000000005,
+      "price": 12111.28,
+      "changePct": 0.008,
       "high": 12140.5,
       "low": 12015.01
     },
@@ -1188,8 +1188,8 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7627.1,
-      "changePct": 0.0141,
+      "price": 7623.32,
+      "changePct": 0.013600000000000001,
       "high": 7647.2,
       "low": 7571.88
     },
@@ -1198,8 +1198,8 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 25508.14,
-      "changePct": 0.0176,
+      "price": 25493.68,
+      "changePct": 0.0171,
       "high": 25649.85,
       "low": 25326.69
     },
@@ -1208,8 +1208,8 @@
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 52488.77,
-      "changePct": 0.0049,
+      "price": 52482.61,
+      "changePct": 0.0048,
       "high": 52512.72,
       "low": 52055.14
     },
@@ -1218,8 +1218,8 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2846.05,
-      "changePct": 0.0087,
+      "price": 2844.75,
+      "changePct": 0.0083,
       "high": 2852.14,
       "low": 2832.42
     },
