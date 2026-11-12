@@ -1,5 +1,5 @@
 {
-  "updated_at": "12/11/2026 14:44",
+  "updated_at": "12/11/2026 15:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,8 +1128,8 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 171028.1,
-      "changePct": -0.006,
+      "price": 170917.9,
+      "changePct": -0.0066,
       "high": 172060.44,
       "low": 169942.38
     },
@@ -1138,10 +1138,10 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3565.31,
-      "changePct": -0.0091,
+      "price": 3561.61,
+      "changePct": -0.0101,
       "high": 3602.12,
-      "low": 3565.24
+      "low": 3561.08
     },
     {
       "ticker": "INDEXBVMF:SMLL",
@@ -1158,8 +1158,8 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 11987.31,
-      "changePct": -0.009399999999999999,
+      "price": 11974.61,
+      "changePct": -0.0104,
       "high": 12100.47,
       "low": 11868.17
     },
@@ -1188,8 +1188,8 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7634.42,
-      "changePct": 0.002,
+      "price": 7625.11,
+      "changePct": 0.0008,
       "high": 7652.76,
       "low": 7550.84
     },
@@ -1198,8 +1198,8 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 25493.79,
-      "changePct": 0.0011,
+      "price": 25456.79,
+      "changePct": -0.0004,
       "high": 25597.23,
       "low": 25068.28
     },
@@ -1208,8 +1208,8 @@
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 52676.89,
-      "changePct": 0.0036,
+      "price": 52598.34,
+      "changePct": 0.0021,
       "high": 52751.22,
       "low": 52363.55
     },
@@ -1218,7 +1218,7 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2824.36,
+      "price": 2824.45,
       "changePct": -0.0077,
       "high": 2832.79,
       "low": 2804
