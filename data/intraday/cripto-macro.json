@@ -1,5 +1,5 @@
 {
-  "updated_at": "13/11/2026 16:14",
+  "updated_at": "13/11/2026 16:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,8 +1128,8 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 172030.81,
-      "changePct": 0.0040999999999999995,
+      "price": 172216.19,
+      "changePct": 0.0052,
       "high": 172715.48,
       "low": 171132.23
     },
@@ -1138,8 +1138,8 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3597.69,
-      "changePct": 0.0087,
+      "price": 3598.98,
+      "changePct": 0.0091,
       "high": 3602.65,
       "low": 3566.57
     },
@@ -1158,8 +1158,8 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 12063.14,
-      "changePct": 0.005,
+      "price": 12068.94,
+      "changePct": 0.0055000000000000005,
       "high": 12118.48,
       "low": 11981.36
     },
@@ -1188,7 +1188,7 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7552.15,
+      "price": 7552.05,
       "changePct": -0.0053,
       "high": 7621.78,
       "low": 7499.4
@@ -1198,8 +1198,8 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 25121.33,
-      "changePct": -0.0096,
+      "price": 25117.24,
+      "changePct": -0.0098,
       "high": 25423.09,
       "low": 24872.41
     },
@@ -1208,8 +1208,8 @@
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 52288.39,
-      "changePct": -0.0002,
+      "price": 52289.84,
+      "changePct": -0.0001,
       "high": 52521.48,
       "low": 52017.86
     },
@@ -1218,8 +1218,8 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2785.32,
-      "changePct": -0.0049,
+      "price": 2787.47,
+      "changePct": -0.0040999999999999995,
       "high": 2805.9,
       "low": 2763.72
     },
