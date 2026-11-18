@@ -1,5 +1,5 @@
 {
-  "updated_at": "18/11/2026 15:44",
+  "updated_at": "18/11/2026 16:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,8 +1128,8 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 168053.05,
-      "changePct": -0.0104,
+      "price": 167866.73,
+      "changePct": -0.0115,
       "high": 170259.69,
       "low": 167099.05
     },
@@ -1138,8 +1138,8 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3506.79,
-      "changePct": -0.01,
+      "price": 3508.52,
+      "changePct": -0.0095,
       "high": 3543.21,
       "low": 3506.45
     },
@@ -1158,8 +1158,8 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 11815.28,
-      "changePct": -0.009000000000000001,
+      "price": 11807.09,
+      "changePct": -0.0096,
       "high": 11958.16,
       "low": 11759.37
     },
@@ -1188,8 +1188,8 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7355.92,
-      "changePct": 0.0021,
+      "price": 7332.03,
+      "changePct": -0.0012,
       "high": 7367.68,
       "low": 7285.76
     },
@@ -1198,8 +1198,8 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 24533.31,
-      "changePct": 0.0084,
+      "price": 24453.47,
+      "changePct": 0.0051,
       "high": 24538.78,
       "low": 24225.3
     },
@@ -1208,8 +1208,8 @@
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 50426.89,
-      "changePct": -0.0066,
+      "price": 50238.12,
+      "changePct": -0.0103,
       "high": 50637.7,
       "low": 50029.35
     },
@@ -1218,8 +1218,8 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2729.39,
-      "changePct": 0.0102,
+      "price": 2730.95,
+      "changePct": 0.0108,
       "high": 2736.44,
       "low": 2697.71
     },
