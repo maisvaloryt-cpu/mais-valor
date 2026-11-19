@@ -1,5 +1,5 @@
 {
-  "gerado_em": "18/11/2026 00:03",
+  "gerado_em": "18/11/2026 23:30",
   "historico_mensal": {
     "total": 1599,
     "ok": 1595,
@@ -131,10 +131,10 @@
     ]
   },
   "cotacoes": {
-    "atualizado_em": "17/11/2026 23:41",
+    "atualizado_em": "18/11/2026 23:08",
     "total_acoes": 480,
     "total_fiis": 516,
-    "fallbacks": 57,
+    "fallbacks": 56,
     "tickers_fallback": [
       "NGRD3",
       "ECPR4",
@@ -189,20 +189,19 @@
       "SPG211",
       "SRVD11",
       "TBOF11",
-      "TGAR11",
       "THRA11",
       "VVPR11",
       "YCHY11"
     ]
   },
   "fundamentus": {
-    "atualizado_em": "17/11/2026 23:40",
+    "atualizado_em": "18/11/2026 23:08",
     "total_acoes": 998,
     "total_fiis": 569,
-    "atualizado_fiis": "17/11/2026 23:41"
+    "atualizado_fiis": "18/11/2026 23:08"
   },
   "criptos": {
-    "atualizado_em": "18/11/2026 00:41 UTC",
+    "atualizado_em": "18/11/2026 23:59 UTC",
     "total_moedas": 100,
     "com_dados": 100,
     "sem_dados": 0,
