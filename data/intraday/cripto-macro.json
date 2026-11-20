@@ -1,5 +1,5 @@
 {
-  "updated_at": "20/11/2026 15:14",
+  "updated_at": "20/11/2026 15:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1188,8 +1188,8 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7010.41,
-      "changePct": -0.0231,
+      "price": 7023.74,
+      "changePct": -0.0212,
       "high": 7198.67,
       "low": 7005.66
     },
@@ -1198,8 +1198,8 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 22978.13,
-      "changePct": -0.0377,
+      "price": 23017.99,
+      "changePct": -0.0361,
       "high": 23837.76,
       "low": 22966.65
     },
@@ -1208,18 +1208,18 @@
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 48702.55,
-      "changePct": -0.008,
+      "price": 48776.12,
+      "changePct": -0.006500000000000001,
       "high": 49594.9,
-      "low": 48674.35
+      "low": 48664.1
     },
     {
       "ticker": "INDEXRUSSELL:RUT",
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2609.09,
-      "changePct": -0.0173,
+      "price": 2611.38,
+      "changePct": -0.0165,
       "high": 2665.14,
       "low": 2604.12
     },
