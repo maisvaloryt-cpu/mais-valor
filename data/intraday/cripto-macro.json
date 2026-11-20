@@ -1,5 +1,5 @@
 {
-  "updated_at": "20/11/2026 10:14",
+  "updated_at": "20/11/2026 10:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1209,9 +1209,9 @@
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
       "price": 49097.06,
-      "changePct": -0.0219,
-      "high": 50454.81,
-      "low": 49091.92
+      "changePct": 0,
+      "high": null,
+      "low": null
     },
     {
       "ticker": "INDEXRUSSELL:RUT",
@@ -1238,20 +1238,20 @@
       "stale": false,
       "descricao": "FTSE 100 (Reino Unido)",
       "tipo": "Índice Global",
-      "price": 10346.28,
-      "changePct": -0.0102,
+      "price": 10338.58,
+      "changePct": -0.0109,
       "high": 10452.77,
-      "low": 10345.43
+      "low": 10330.04
     },
     {
       "ticker": "INDEXDB:DAX",
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 24919.49,
-      "changePct": -0.021400000000000002,
+      "price": 24845.27,
+      "changePct": -0.024300000000000002,
       "high": 25194.64,
-      "low": 24886.43
+      "low": 24822.06
     },
     {
       "ticker": "INDEXEURO:SX5E",
