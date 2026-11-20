@@ -1,5 +1,5 @@
 {
-  "updated_at": "20/11/2026 13:14",
+  "updated_at": "20/11/2026 13:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1188,40 +1188,40 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7102.55,
-      "changePct": -0.0102,
+      "price": 7042.49,
+      "changePct": -0.018600000000000002,
       "high": 7198.67,
-      "low": 7061.09
+      "low": 7040
     },
     {
       "ticker": "INDEXNASDAQ:.IXIC",
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 23382.58,
-      "changePct": -0.0208,
+      "price": 23143.4,
+      "changePct": -0.0308,
       "high": 23837.76,
-      "low": 23191.59
+      "low": 23116.23
     },
     {
       "ticker": "INDEXDJX:.DJI",
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 49183.41,
-      "changePct": 0.0018,
+      "price": 48881.4,
+      "changePct": -0.0044,
       "high": 49594.9,
-      "low": 48974.27
+      "low": 48873.18
     },
     {
       "ticker": "INDEXRUSSELL:RUT",
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2632.27,
-      "changePct": -0.0086,
+      "price": 2625.58,
+      "changePct": -0.0111,
       "high": 2665.14,
-      "low": 2630.48
+      "low": 2625.3
     },
     {
       "ticker": "CBOE:VIX",
@@ -1238,8 +1238,8 @@
       "stale": false,
       "descricao": "FTSE 100 (Reino Unido)",
       "tipo": "Índice Global",
-      "price": 10375.11,
-      "changePct": -0.0074,
+      "price": 10346.34,
+      "changePct": -0.0102,
       "high": 10452.77,
       "low": 10330.04
     },
@@ -1248,10 +1248,10 @@
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 24863.35,
-      "changePct": -0.0236,
+      "price": 24836.73,
+      "changePct": -0.0246,
       "high": 25194.64,
-      "low": 24815.15
+      "low": 24814.15
     },
     {
       "ticker": "INDEXEURO:SX5E",
