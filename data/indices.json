@@ -1,9 +1,9 @@
 {
-  "updated_at": "19/11/2026 22:57",
+  "updated_at": "20/11/2026 22:52",
   "ibov": {
-    "val": 166376.44,
+    "val": 166376.0,
     "chg": -0.78,
-    "chg_pts": -1310.94,
+    "chg_pts": -1311.38,
     "stale": false
   },
   "ifix": {
@@ -37,27 +37,27 @@
     "stale": false
   },
   "sp500": {
-    "val": 7175.83,
-    "chg": -2.0,
-    "chg_pts": -146.45,
+    "val": 6910.39,
+    "chg": -3.72,
+    "chg_pts": -267.17,
     "stale": false
   },
   "nasdaq": {
-    "val": 23879.2,
-    "chg": -2.24,
-    "chg_pts": -547.47,
+    "val": 22617.73,
+    "chg": -5.29,
+    "chg_pts": -1264.36,
     "stale": false
   },
   "dow": {
-    "val": 49097.06,
-    "chg": -2.18,
-    "chg_pts": -1095.97,
+    "val": 48147.33,
+    "chg": -1.97,
+    "chg_pts": -965.3,
     "stale": false
   },
   "russell": {
-    "val": 2655.11,
-    "chg": -2.19,
-    "chg_pts": -59.56,
+    "val": 2581.79,
+    "chg": -2.8,
+    "chg_pts": -74.45,
     "stale": false
   }
 }

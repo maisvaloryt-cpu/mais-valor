@@ -1,99 +1,9 @@
 {
-  "updated_at": "19/11/2026 23:18",
-  "total": 686,
+  "updated_at": "20/11/2026 23:13",
+  "total": 676,
   "total_registros": 71105,
   "total_ativos": 1644,
   "dividendos": [
-    {
-      "t": "ARTE11",
-      "n": "Artemis Fundo de Investimento Imobiliario Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-10-08",
-      "pag": "2026-10-16",
-      "val": 0.08,
-      "dy": "16.41%"
-    },
-    {
-      "t": "CCME11",
-      "n": "Canuma Capital Multiestrategia Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-10-08",
-      "pag": "2026-10-16",
-      "val": 0.09,
-      "dy": "13.20%"
-    },
-    {
-      "t": "CLIN11",
-      "n": "Clave Indices de Precos Fundo de Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-10-08",
-      "pag": "2026-10-16",
-      "val": 1.0,
-      "dy": "14.89%"
-    },
-    {
-      "t": "EOG",
-      "n": "EOG",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-10-16",
-      "val": 1.02,
-      "dy": ""
-    },
-    {
-      "t": "FIQE3",
-      "n": "Unifique Telecomunicacoes SA",
-      "tipo": "DIVIDENDO",
-      "com": "2025-12-29",
-      "pag": "2026-10-16",
-      "val": 0.0779,
-      "dy": "16.31%"
-    },
-    {
-      "t": "FPAB11",
-      "n": "Fundo De Investimento Imobiliario Projeto Agua Branca",
-      "tipo": "Rendimento",
-      "com": "2026-10-08",
-      "pag": "2026-10-16",
-      "val": 1.9,
-      "dy": "10.37%"
-    },
-    {
-      "t": "IBBP11",
-      "n": "Invista Brazilian Business Park Fundo De Investimento Imobiliario",
-      "tipo": "Rendimento",
-      "com": "2026-10-07",
-      "pag": "2026-10-16",
-      "val": 0.08,
-      "dy": "12.28%"
-    },
-    {
-      "t": "PCIP11",
-      "n": "Patria Credito Imobiliario Indice de Precos Fundo de Investimento Imobiliario Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-10-08",
-      "pag": "2026-10-16",
-      "val": 0.65,
-      "dy": "11.70%"
-    },
-    {
-      "t": "PSEC11",
-      "n": "Patria Securities Fundo de Investimento Imobiliario Responsabilidade Limitada",
-      "tipo": "Rendimento",
-      "com": "2026-10-08",
-      "pag": "2026-10-16",
-      "val": 0.6,
-      "dy": "16.71%"
-    },
-    {
-      "t": "WSM",
-      "n": "WSM",
-      "tipo": "Dividendo",
-      "com": "",
-      "pag": "2026-10-16",
-      "val": 0.76,
-      "dy": ""
-    },
     {
       "t": "CXAG11",
       "n": "Fundo de Investimento Imobiliario Caixa Agencias",
@@ -3894,7 +3804,7 @@
     },
     {
       "t": "JPPA11",
-      "n": "FII JPPA CRICI ER",
+      "n": "Jpp Capital Recebiveis Imobiliarios Fundo De Investimento Imobiliario",
       "tipo": "Rendimento",
       "com": "2026-10-30",
       "pag": "2026-11-16",
@@ -5847,7 +5757,7 @@
     },
     {
       "t": "COCE3",
-      "n": "Companhia Energetica do Ceara-COELCE",
+      "n": "Companhia Energética do Ceará - COELCE",
       "tipo": "DIVIDENDO",
       "com": "2026-04-29",
       "pag": "2026-12-31",
