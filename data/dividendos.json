@@ -1,7 +1,7 @@
 {
-  "updated_at": "20/11/2026 23:13",
-  "total": 676,
-  "total_registros": 71105,
+  "updated_at": "22/11/2026 13:07",
+  "total": 717,
+  "total_registros": 70993,
   "total_ativos": 1644,
   "dividendos": [
     {
@@ -255,6 +255,15 @@
       "pag": "2026-10-21",
       "val": 1.25,
       "dy": ""
+    },
+    {
+      "t": "NAVT11",
+      "n": "Navi Imobiliario Total Return Fundos DE Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "",
+      "pag": "2026-10-21",
+      "val": 0.85,
+      "dy": "14.57%"
     },
     {
       "t": "RCFF11",
@@ -1499,15 +1508,6 @@
       "dy": "0.54%"
     },
     {
-      "t": "LIFE11",
-      "n": "Life Capital Partners Fundo de Investimentos Imobiliarios 1",
-      "tipo": "Rendimento",
-      "com": "",
-      "pag": "2026-11-03",
-      "val": 0.115,
-      "dy": "24.21%"
-    },
-    {
       "t": "MET",
       "n": "MET",
       "tipo": "Dividendo",
@@ -1794,15 +1794,6 @@
       "pag": "2026-11-09",
       "val": 0.01,
       "dy": "10.00%"
-    },
-    {
-      "t": "FLMA11",
-      "n": "Fundo Invest Imobiliario Continental Square Faria Lima",
-      "tipo": "Rendimento",
-      "com": "",
-      "pag": "2026-11-09",
-      "val": 1.11,
-      "dy": "8.88%"
     },
     {
       "t": "GARE11",
@@ -2658,6 +2649,24 @@
       "pag": "2026-11-13",
       "val": 0.7,
       "dy": "18.59%"
+    },
+    {
+      "t": "CASN3",
+      "n": "Companhia Catarinense de Aguas e Saneamento-Casan",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-11-13",
+      "pag": "2026-11-13",
+      "val": 0.055,
+      "dy": "14.25%"
+    },
+    {
+      "t": "CASN4",
+      "n": "Companhia Catarinense de Aguas e Saneamento-Casan Pfd",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-11-13",
+      "pag": "2026-11-13",
+      "val": 0.0605,
+      "dy": "14.49%"
     },
     {
       "t": "CCVA11",
@@ -4802,6 +4811,15 @@
       "dy": "17.71%"
     },
     {
+      "t": "ADSH11",
+      "n": "Ad Shopping Fundo de Investimento Imobiliario Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-11-16",
+      "pag": "2026-11-23",
+      "val": 0.03,
+      "dy": "3.30%"
+    },
+    {
       "t": "APTO11",
       "n": "Vinci Residencial Fundo de Investimento Imobiliario - Responsabilidade Limitada",
       "tipo": "Rendimento",
@@ -4881,6 +4899,15 @@
       "pag": "2026-11-23",
       "val": 1.77,
       "dy": "15.76%"
+    },
+    {
+      "t": "MIDW11",
+      "n": "Midway Mall Fundo de Investimento Imobiliario Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-11-16",
+      "pag": "2026-11-23",
+      "val": 0.11,
+      "dy": "12.00%"
     },
     {
       "t": "PETR3",
@@ -4982,6 +5009,33 @@
       "dy": "8.57%"
     },
     {
+      "t": "AFHF11",
+      "n": "AF Invest Real Estate Multiestrategia Fundo de Investimento Imobiliario Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-11-16",
+      "pag": "2026-11-24",
+      "val": 0.12,
+      "dy": "14.43%"
+    },
+    {
+      "t": "AFHI11",
+      "n": "AF Invest CRI Fundo de Investimento Imobiliario Recebiveis Imobiliarios",
+      "tipo": "Rendimento",
+      "com": "2026-11-16",
+      "pag": "2026-11-24",
+      "val": 0.97,
+      "dy": "12.74%"
+    },
+    {
+      "t": "AJFI11",
+      "n": "AJ Malls Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-11-16",
+      "pag": "2026-11-24",
+      "val": 0.06,
+      "dy": "8.70%"
+    },
+    {
       "t": "BVAR11",
       "n": "Fundo de Investimento Imobiliário Brasil Varejo - FII",
       "tipo": "Rendimento",
@@ -4989,6 +5043,51 @@
       "pag": "2026-11-24",
       "val": 5.0,
       "dy": "5.24%"
+    },
+    {
+      "t": "CPLG11",
+      "n": "Capitania Logistica Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-11-16",
+      "pag": "2026-11-24",
+      "val": 0.13,
+      "dy": "14.18%"
+    },
+    {
+      "t": "CPSH11",
+      "n": "Shoppings AAA Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-11-16",
+      "pag": "2026-11-24",
+      "val": 0.11,
+      "dy": "14.81%"
+    },
+    {
+      "t": "CPTS11",
+      "n": "Capitania Securities II Fundo de Investimento Imobiliario Cotas",
+      "tipo": "Rendimento",
+      "com": "2026-11-16",
+      "pag": "2026-11-24",
+      "val": 0.09,
+      "dy": "16.51%"
+    },
+    {
+      "t": "CPUR11",
+      "n": "Capitania HBC Renda Urbana Fundo de Investimento Imobiliario Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-11-16",
+      "pag": "2026-11-24",
+      "val": 0.07,
+      "dy": "8.08%"
+    },
+    {
+      "t": "DAYM11",
+      "n": "Asa Metropolis Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-11-16",
+      "pag": "2026-11-24",
+      "val": 0.04,
+      "dy": "12.28%"
     },
     {
       "t": "GAME11",
@@ -5000,6 +5099,24 @@
       "dy": "14.41%"
     },
     {
+      "t": "GLCR11",
+      "n": "Galapagos Credito Estruturado Prazo Determinado Fundo De Investimento Imobiliario Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-11-16",
+      "pag": "2026-11-24",
+      "val": 0.65,
+      "dy": "8.37%"
+    },
+    {
+      "t": "HBCR11",
+      "n": "Fundo de Investimento Imobiliario HBC Renda Urbana",
+      "tipo": "Rendimento",
+      "com": "2026-11-16",
+      "pag": "2026-11-24",
+      "val": 2.0,
+      "dy": "16.50%"
+    },
+    {
       "t": "HUCG11",
       "n": "Fundo de Investimento Imobiliario Hospital Unimed Campina Grande",
       "tipo": "Rendimento",
@@ -5007,6 +5124,24 @@
       "pag": "2026-11-24",
       "val": 0.68,
       "dy": "9.67%"
+    },
+    {
+      "t": "IVBP11",
+      "n": "Invista Business Park Fundo De Investimento Imobiliario Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-11-16",
+      "pag": "2026-11-24",
+      "val": 0.06,
+      "dy": "7.64%"
+    },
+    {
+      "t": "JASC11",
+      "n": "Jasc Renda Varejo Essencial Fundo de Investimento Imobiliario FII",
+      "tipo": "Rendimento",
+      "com": "2026-11-16",
+      "pag": "2026-11-24",
+      "val": 0.73,
+      "dy": "8.02%"
     },
     {
       "t": "MANA11",
@@ -5018,6 +5153,15 @@
       "dy": "15.96%"
     },
     {
+      "t": "ONDA11",
+      "n": "Onda Invest Multiestrategia Fundo de Investimento Imobiliario Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-11-16",
+      "pag": "2026-11-24",
+      "val": 0.05,
+      "dy": "8.82%"
+    },
+    {
       "t": "OUJP11",
       "n": "Ourinvest JPP Fundo de Investimento Imobiliario - FII",
       "tipo": "Rendimento",
@@ -5027,6 +5171,42 @@
       "dy": "18.21%"
     },
     {
+      "t": "RZAK11",
+      "n": "Riza Akin Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-11-16",
+      "pag": "2026-11-24",
+      "val": 1.05,
+      "dy": "18.44%"
+    },
+    {
+      "t": "RZAT11",
+      "n": "Riza Arctium Real Estate Fundo de Investimento Imobiliario",
+      "tipo": "Rendimento",
+      "com": "2026-11-16",
+      "pag": "2026-11-24",
+      "val": 1.0,
+      "dy": "16.92%"
+    },
+    {
+      "t": "SHPP11",
+      "n": "Shopping Patio Paulista Fundo De Investimento Imobiliario Responsabilidade Limitada",
+      "tipo": "Rendimento",
+      "com": "2026-11-16",
+      "pag": "2026-11-24",
+      "val": 0.06,
+      "dy": "6.55%"
+    },
+    {
+      "t": "WTSP11",
+      "n": "Fundo de Investimento Imobiliario - Ourinvest RE I",
+      "tipo": "Rendimento",
+      "com": "2026-11-16",
+      "pag": "2026-11-24",
+      "val": 0.8,
+      "dy": "13.74%"
+    },
+    {
       "t": "BTLG11",
       "n": "BTG Pactual Logistica Fundo de Investimento Imobiliario Responsabilidade Limitada",
       "tipo": "Rendimento",
@@ -5034,6 +5214,15 @@
       "pag": "2026-11-25",
       "val": 0.81,
       "dy": "10.25%"
+    },
+    {
+      "t": "RBRX11",
+      "n": "Patria Plus Multiestrategia Real Estate FII",
+      "tipo": "Rendimento",
+      "com": "2026-11-16",
+      "pag": "2026-11-25",
+      "val": 0.08,
+      "dy": "15.79%"
     },
     {
       "t": "SNCI11",
@@ -5070,6 +5259,24 @@
       "pag": "2026-11-26",
       "val": 0.12,
       "dy": "14.31%"
+    },
+    {
+      "t": "DEXP3",
+      "n": "Dexxos Participacoes SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-11-13",
+      "pag": "2026-11-26",
+      "val": 0.1671,
+      "dy": "30.06%"
+    },
+    {
+      "t": "DEXP4",
+      "n": "Dexxos Participacoes SA Pref",
+      "tipo": "DIVIDENDO",
+      "com": "2026-11-13",
+      "pag": "2026-11-26",
+      "val": 0.1678,
+      "dy": "30.23%"
     },
     {
       "t": "TAEE11",
@@ -5126,6 +5333,15 @@
       "dy": "10.69%"
     },
     {
+      "t": "MTRE3",
+      "n": "Mitre Realty Empreendimentos e Participacoes SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-11-13",
+      "pag": "2026-11-27",
+      "val": 0.0378,
+      "dy": "14.78%"
+    },
+    {
       "t": "BCIA11",
       "n": "Bradesco Carteira Imobiliatia Ative- Fundo de Fundos de Investimento Imobiliario- FII Cotas",
       "tipo": "Rendimento",
@@ -5135,6 +5351,24 @@
       "dy": "13.02%"
     },
     {
+      "t": "BMOB3",
+      "n": "Bemobi Mobile Tech SA",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-11-17",
+      "pag": "2026-11-30",
+      "val": 0.1918,
+      "dy": "9.33%"
+    },
+    {
+      "t": "CURY3",
+      "n": "Cury Construtora e Incorporadora SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-11-13",
+      "pag": "2026-11-30",
+      "val": 0.6493,
+      "dy": "31.15%"
+    },
+    {
       "t": "EZTC3",
       "n": "EZ TEC Empreendimentos e Participacoes SA",
       "tipo": "DIVIDENDO",
@@ -5142,6 +5376,15 @@
       "pag": "2026-11-30",
       "val": 0.0731,
       "dy": "9.49%"
+    },
+    {
+      "t": "LOGG3",
+      "n": "Log Commercial Properties e Participacoes SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-11-13",
+      "pag": "2026-11-30",
+      "val": 0.9947,
+      "dy": "60.84%"
     },
     {
       "t": "PSSA3",
@@ -5169,6 +5412,24 @@
       "pag": "2026-11-30",
       "val": 0.0787,
       "dy": "6.08%"
+    },
+    {
+      "t": "VLID3",
+      "n": "Valid Solucoes SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-11-16",
+      "pag": "2026-11-30",
+      "val": 0.1796,
+      "dy": "14.58%"
+    },
+    {
+      "t": "VTRU3",
+      "n": "Vitru Educacao SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-11-18",
+      "pag": "2026-11-30",
+      "val": 0.5332,
+      "dy": "47.57%"
     },
     {
       "t": "BBDC3",
@@ -5261,6 +5522,15 @@
       "dy": "111.82%"
     },
     {
+      "t": "BPAR3",
+      "n": "Banco do Estado do Pará S.A",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-11-17",
+      "pag": "2026-12-03",
+      "val": 2.3787,
+      "dy": "15.86%"
+    },
+    {
       "t": "ISAE3",
       "n": "Isa Energia Brasil SA",
       "tipo": "JRS CAP PROPRIO",
@@ -5279,6 +5549,15 @@
       "dy": "8.71%"
     },
     {
+      "t": "AURA33",
+      "n": "Aura Minerals Inc Shs Unsponsored Brazilian Depositary Receipt Repr 1 Sh",
+      "tipo": "DIVIDENDO",
+      "com": "2026-11-18",
+      "pag": "2026-12-08",
+      "val": 1.3145,
+      "dy": "12.93%"
+    },
+    {
       "t": "GRND3",
       "n": "Grendene S.A.",
       "tipo": "DIVIDENDO",
@@ -5295,6 +5574,15 @@
       "pag": "2026-12-10",
       "val": 0.55,
       "dy": "16.58%"
+    },
+    {
+      "t": "REDE3",
+      "n": "Rede Energia S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-11-13",
+      "pag": "2026-12-10",
+      "val": 0.0545,
+      "dy": "12.58%"
     },
     {
       "t": "CEGR3",
@@ -5378,6 +5666,15 @@
       "dy": "14.87%"
     },
     {
+      "t": "LEVE3",
+      "n": "Mahle-Metal Leve S.A.",
+      "tipo": "JRS CAP PROPRIO",
+      "com": "2026-11-13",
+      "pag": "2026-12-18",
+      "val": 0.7669,
+      "dy": "29.88%"
+    },
+    {
       "t": "RBIR11",
       "n": "RB Capital Desenvolvimento Residencial IV Fundo de Investimento Imobiliario - FII",
       "tipo": "Amortização",
@@ -5439,6 +5736,24 @@
       "pag": "2026-12-21",
       "val": 0.4716,
       "dy": "13.26%"
+    },
+    {
+      "t": "DEXP3",
+      "n": "Dexxos Participacoes SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-11-13",
+      "pag": "2026-12-23",
+      "val": 0.1671,
+      "dy": "30.06%"
+    },
+    {
+      "t": "DEXP4",
+      "n": "Dexxos Participacoes SA Pref",
+      "tipo": "DIVIDENDO",
+      "com": "2026-11-13",
+      "pag": "2026-12-23",
+      "val": 0.1678,
+      "dy": "30.23%"
     },
     {
       "t": "RIAA3",
@@ -5945,6 +6260,15 @@
       "dy": "30.83%"
     },
     {
+      "t": "PASS3",
+      "n": "Compass Gas e Energia SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-11-17",
+      "pag": "2026-12-31",
+      "val": 0.6958,
+      "dy": "37.78%"
+    },
+    {
       "t": "PATI3",
       "n": "Panatlantica S.A.",
       "tipo": "DIVIDENDO",
@@ -6062,6 +6386,24 @@
       "dy": "23.45%"
     },
     {
+      "t": "DEXP3",
+      "n": "Dexxos Participacoes SA",
+      "tipo": "DIVIDENDO",
+      "com": "2026-11-13",
+      "pag": "2027-01-22",
+      "val": 0.1671,
+      "dy": "30.06%"
+    },
+    {
+      "t": "DEXP4",
+      "n": "Dexxos Participacoes SA Pref",
+      "tipo": "DIVIDENDO",
+      "com": "2026-11-13",
+      "pag": "2027-01-22",
+      "val": 0.1678,
+      "dy": "30.23%"
+    },
+    {
       "t": "TIMS3",
       "n": "TIM S.A.",
       "tipo": "JRS CAP PROPRIO",
@@ -6069,6 +6411,33 @@
       "pag": "2027-01-22",
       "val": 0.2167,
       "dy": "11.82%"
+    },
+    {
+      "t": "TAEE11",
+      "n": "Transmissora Alianca De Energia Eletrica S.A. Unit",
+      "tipo": "DIVIDENDO",
+      "com": "2026-11-16",
+      "pag": "2027-01-27",
+      "val": 1.0561,
+      "dy": "31.55%"
+    },
+    {
+      "t": "TAEE3",
+      "n": "Transmissora Alianca De Energia Eletrica S.A.",
+      "tipo": "DIVIDENDO",
+      "com": "2026-11-16",
+      "pag": "2027-01-27",
+      "val": 0.352,
+      "dy": "31.76%"
+    },
+    {
+      "t": "TAEE4",
+      "n": "Transmissora Alianca De Energia Eletrica S.A. Pfd",
+      "tipo": "DIVIDENDO",
+      "com": "2026-11-16",
+      "pag": "2027-01-27",
+      "val": 0.352,
+      "dy": "31.41%"
     },
     {
       "t": "BBDC3",
