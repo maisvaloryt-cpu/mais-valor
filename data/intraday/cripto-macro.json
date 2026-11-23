@@ -1,5 +1,5 @@
 {
-  "updated_at": "23/11/2026 15:44",
+  "updated_at": "23/11/2026 16:14",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,8 +1128,8 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 164999.4,
-      "changePct": -0.0083,
+      "price": 165075.34,
+      "changePct": -0.0078000000000000005,
       "high": 166373.69,
       "low": 164129.33
     },
@@ -1138,8 +1138,8 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3433.2,
-      "changePct": -0.0149,
+      "price": 3432.1,
+      "changePct": -0.0152,
       "high": 3486.06,
       "low": 3425.73
     },
@@ -1158,8 +1158,8 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 11604.14,
-      "changePct": -0.0095,
+      "price": 11615.8,
+      "changePct": -0.0085,
       "high": 11715.32,
       "low": 11545.14
     },
@@ -1188,8 +1188,8 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 7237.4,
-      "changePct": 0.0473,
+      "price": 7253.73,
+      "changePct": 0.049699999999999994,
       "high": 7295.6,
       "low": 7152.66
     },
@@ -1198,8 +1198,8 @@
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 24095.44,
-      "changePct": 0.0653,
+      "price": 24141.03,
+      "changePct": 0.0673,
       "high": 24353.65,
       "low": 23794.96
     },
@@ -1208,8 +1208,8 @@
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 49625.97,
-      "changePct": 0.030699999999999998,
+      "price": 49736.23,
+      "changePct": 0.033,
       "high": 49810.26,
       "low": 49033.31
     },
@@ -1218,8 +1218,8 @@
       "stale": false,
       "descricao": "Russell 2000",
       "tipo": "Índice EUA",
-      "price": 2669.01,
-      "changePct": 0.0338,
+      "price": 2662,
+      "changePct": 0.0311,
       "high": 2670.09,
       "low": 2631.59
     },
