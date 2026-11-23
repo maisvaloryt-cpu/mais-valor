@@ -1,5 +1,5 @@
 {
-  "updated_at": "23/11/2026 11:14",
+  "updated_at": "23/11/2026 11:44",
   "cripto": [
     {
       "ticker": "BTC",
@@ -1128,8 +1128,8 @@
       "stale": false,
       "descricao": "Ibovespa",
       "tipo": "Índice BR",
-      "price": 164931.52,
-      "changePct": -0.0087,
+      "price": 165714.38,
+      "changePct": -0.004,
       "high": 166373.69,
       "low": 164129.33
     },
@@ -1138,8 +1138,8 @@
       "stale": false,
       "descricao": "IFIX (FIIs)",
       "tipo": "Índice BR",
-      "price": 3468.25,
-      "changePct": -0.0048,
+      "price": 3463.49,
+      "changePct": -0.0062,
       "high": 3486.06,
       "low": 3443.54
     },
@@ -1158,8 +1158,8 @@
       "stale": false,
       "descricao": "Índice Dividendos",
       "tipo": "Índice BR",
-      "price": 11649.29,
-      "changePct": -0.005699999999999999,
+      "price": 11689.67,
+      "changePct": -0.0022,
       "high": 11715.32,
       "low": 11583.38
     },
@@ -1188,30 +1188,30 @@
       "stale": false,
       "descricao": "S&P 500",
       "tipo": "Índice EUA",
-      "price": 6910.39,
-      "changePct": -0.037000000000000005,
-      "high": 7198.67,
-      "low": 6882.66
+      "price": 7188.2,
+      "changePct": 0.04019999999999999,
+      "high": 7260.17,
+      "low": 7152.66
     },
     {
       "ticker": "INDEXNASDAQ:.IXIC",
       "stale": false,
       "descricao": "Nasdaq Composite",
       "tipo": "Índice EUA",
-      "price": 22617.73,
-      "changePct": -0.0528,
-      "high": 23837.76,
-      "low": 22513.01
+      "price": 23912.92,
+      "changePct": 0.057300000000000004,
+      "high": 24269.75,
+      "low": 23794.96
     },
     {
       "ticker": "INDEXDJX:.DJI",
       "stale": false,
       "descricao": "Dow Jones Industrial",
       "tipo": "Índice EUA",
-      "price": 48147.33,
-      "changePct": 0,
-      "high": null,
-      "low": null
+      "price": 49186.06,
+      "changePct": 0.0216,
+      "high": 49510.32,
+      "low": 49033.31
     },
     {
       "ticker": "INDEXRUSSELL:RUT",
@@ -1238,8 +1238,8 @@
       "stale": false,
       "descricao": "FTSE 100 (Reino Unido)",
       "tipo": "Índice Global",
-      "price": 10432.28,
-      "changePct": 0.0083,
+      "price": 10436.59,
+      "changePct": 0.0087,
       "high": 10447.46,
       "low": 10340.83
     },
@@ -1248,9 +1248,9 @@
       "stale": false,
       "descricao": "DAX (Alemanha)",
       "tipo": "Índice Global",
-      "price": 25149.72,
-      "changePct": 0.013999999999999999,
-      "high": 25174.29,
+      "price": 25205.94,
+      "changePct": 0.0163,
+      "high": 25249.49,
       "low": 24873.34
     },
     {
